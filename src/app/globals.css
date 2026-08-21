@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  --bg-top: #e8f6df;
+  --bg-mid: #fff8e7;
+  --bg-bottom: #d9f0ff;
+  --leaf: #2f7d4a;
+  --leaf-dark: #1f5a34;
+  --honey: #f0b429;
+  --honey-dark: #c88912;
+  --petal: #ff8fab;
+  --ink: #243528;
+  --muted: #4d6354;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-solid: #fffdf8;
+  --danger: #c62828;
+  --danger-dark: #9b1c1c;
+  --ring: #3d9a5f;
+  --shadow: 0 18px 40px rgba(36, 53, 40, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--bg-mid);
+  --color-foreground: var(--ink);
+  --color-ink: var(--ink);
+  --color-leaf: var(--leaf);
+  --color-leaf-dark: var(--leaf-dark);
+  --color-honey: var(--honey);
+  --color-honey-dark: var(--honey-dark);
+  --color-petal: var(--petal);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface-solid);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-nunito);
+  --font-display: var(--font-fredoka);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: var(--font-nunito), system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 143, 171, 0.18), transparent 28%),
+    radial-gradient(circle at 88% 12%, rgba(240, 180, 41, 0.22), transparent 26%),
+    radial-gradient(circle at 70% 80%, rgba(61, 154, 95, 0.16), transparent 34%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
+  background-attachment: fixed;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.page-shell {
+  width: min(960px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.insect-silhouette {
+  position: absolute;
+  opacity: 0.14;
+  pointer-events: none;
+  color: var(--leaf-dark);
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes buzz {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float-soft 5s ease-in-out infinite;
+}
+
+.animate-buzz {
+  animation: buzz 4.5s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
