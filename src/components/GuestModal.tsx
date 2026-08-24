@@ -5,6 +5,7 @@ import {
   NAME_MAX_LENGTH,
   validateGuestInput,
 } from "@/lib/validation";
+import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type GuestModalMode = "create" | "edit";
 
@@ -49,6 +50,8 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaReset, setRecaptchaReset] = useState(0);
 
   const isDirty =
     form.name !== initialForm.name ||
@@ -127,6 +130,11 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
       return;
     }
 
+    if (!recaptchaToken) {
+      setFieldError("Bitte bestätige, dass du kein Roboter bist.");
+      return;
+    }
+
     setSaving(true);
     try {
       const url =
@@ -136,7 +144,10 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validation.data),
+        body: JSON.stringify({
+          ...validation.data,
+          recaptchaToken,
+        }),
       });
 
       if (!response.ok) {
@@ -147,6 +158,7 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
           payload?.error ??
             "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
         );
+        setRecaptchaReset((value) => value + 1);
         return;
       }
 
@@ -156,6 +168,7 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
       setSubmitError(
         "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
       );
+      setRecaptchaReset((value) => value + 1);
     } finally {
       setSaving(false);
     }
@@ -247,6 +260,11 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
             />
           </div>
 
+          <RecaptchaCheckbox
+            onTokenChange={setRecaptchaToken}
+            resetSignal={recaptchaReset}
+          />
+
           {fieldError || submitError ? (
             <p className="text-sm text-danger" role="alert">
               {fieldError ?? submitError}
@@ -264,7 +282,7 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !recaptchaToken}
               className="min-h-11 rounded-xl bg-leaf px-4 font-bold text-white hover:bg-leaf-dark disabled:opacity-50"
             >
               {saving ? "Wird gespeichert ..." : "Bestätigen"}

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { guests } from "@/db/schema";
+import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import {
   isUuid,
   normalizeArrivalTime,
@@ -38,6 +39,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json(
         { error: "Ungültige Anfragedaten." },
         { status: 400 },
+      );
+    }
+
+    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
+    if (!recaptcha.ok) {
+      return NextResponse.json(
+        { error: recaptcha.error },
+        { status: recaptcha.status },
       );
     }
 
