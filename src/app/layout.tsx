@@ -13,9 +13,8 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Insektenparty – Einladung",
-  description:
-    "Digitale Einladung zur Insektenparty: Infos ansehen und Gästeliste verwalten.",
+  title: "Familie Mordkovich",
+  description: "Willkommen auf der Seite unserer Familie.",
 };
 
 export default function RootLayout({
