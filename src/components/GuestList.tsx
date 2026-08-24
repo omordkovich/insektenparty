@@ -1,5 +1,3 @@
-"use client";
-
 import type { GuestDto } from "@/lib/types";
 import { GuestItem } from "./GuestItem";
 

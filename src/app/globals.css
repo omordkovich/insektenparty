@@ -49,10 +49,10 @@ body {
   color: var(--ink);
   font-family: var(--font-nunito), system-ui, sans-serif;
   background:
-    radial-gradient(circle at 12% 18%, rgba(255, 143, 171, 0.18), transparent 28%),
-    radial-gradient(circle at 88% 12%, rgba(240, 180, 41, 0.22), transparent 26%),
-    radial-gradient(circle at 70% 80%, rgba(61, 154, 95, 0.16), transparent 34%),
-    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
+          radial-gradient(circle at 12% 18%, rgba(255, 143, 171, 0.18), transparent 28%),
+          radial-gradient(circle at 88% 12%, rgba(240, 180, 41, 0.22), transparent 26%),
+          radial-gradient(circle at 70% 80%, rgba(61, 154, 95, 0.16), transparent 34%),
+          linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
   background-attachment: fixed;
 }
 
@@ -79,11 +79,10 @@ input {
   margin-inline: auto;
 }
 
-.insect-silhouette {
+.insect-deco {
   position: absolute;
-  opacity: 0.14;
   pointer-events: none;
-  color: var(--leaf-dark);
+  object-fit: contain;
 }
 
 @keyframes float-soft {

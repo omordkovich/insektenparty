@@ -1,5 +1,3 @@
-"use client";
-
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import type { GuestDto } from "@/lib/types";
 import {
