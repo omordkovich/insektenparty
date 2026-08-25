@@ -6,7 +6,7 @@ import { Hero } from "@/components/Hero";
 
 export default function PartyPage() {
   return (
-    <div className="relative flex min-h-full flex-col">
+    <div className="relative flex min-h-full flex-col" style={{ isolation: "isolate" }}>
       <Header />
       <main className="flex-1">
         <Hero />
@@ -20,7 +20,7 @@ export default function PartyPage() {
         width={434}
         height={1024}
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 z-0 hidden h-[320px] w-auto object-contain object-bottom lg:block xl:h-[420px] 2xl:h-[520px]"
+        className="pointer-events-none absolute bottom-0 left-0 -z-10 hidden lg:block"
       />
       <Image
         src="/plants-right.png"
@@ -28,7 +28,7 @@ export default function PartyPage() {
         width={283}
         height={1024}
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 z-0 hidden h-[320px] w-auto object-contain object-bottom lg:block xl:h-[420px] 2xl:h-[520px]"
+        className="pointer-events-none absolute right-0 bottom-0 -z-10 hidden lg:block"
       />
     </div>
   );
