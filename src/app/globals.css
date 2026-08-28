@@ -136,3 +136,46 @@ input {
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
+
+/* At and above this width there's room beside the text column: float the
+   hero insects at their original spot, vertically centered on the 74% line. */
+@media (min-width: 1136px) {
+  /* translate (not transform) so the buzz/float keyframe animations, which
+     animate `transform`, don't clobber this vertical centering. */
+  .hero-insect-wide {
+    top: 74%;
+    translate: 0 -50%;
+  }
+}
+
+/* Below this width the side position would collide with the centered text
+   column, so the insects drop into the gap above the guest list instead.
+   Size is untouched here on purpose - only the anchor point changes, from
+   `top` (centered on the text) to `bottom` (centered in the gap below it). */
+@media (max-width: 1135px) {
+  .hero-narrow-padding {
+    padding-bottom: 9rem;
+  }
+
+  /* bottom offset centers the icon in the gap below the text
+     ((gap - icon height) / 2), so the margin above and below match. */
+  .hero-insect-narrow-bee {
+    bottom: 38px;
+  }
+
+  .hero-insect-narrow-butterfly {
+    bottom: 34px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1135px) {
+  /* icons grow at the sm breakpoint (unchanged, original sizing) - the
+     bottom offset grows to match so the margin stays symmetric. */
+  .hero-insect-narrow-bee {
+    bottom: 26px;
+  }
+
+  .hero-insect-narrow-butterfly {
+    bottom: 18px;
+  }
+}

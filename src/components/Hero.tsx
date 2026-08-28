@@ -3,14 +3,14 @@ import { eventConfig } from "@/lib/event";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-4 pb-10 pt-4">
+    <section className="relative overflow-hidden px-4 pb-10 pt-4 hero-narrow-padding">
       <Image
         src="/insects/bee.png"
         alt=""
         width={144}
         height={80}
         aria-hidden="true"
-        className="insect-deco animate-buzz top-[74%] left-[6%] h-14 w-24 -translate-y-1/2 sm:left-[10%] sm:h-20 sm:w-36"
+        className="insect-deco animate-buzz hero-insect-wide hero-insect-narrow-bee left-[6%] sm:left-[10%] h-14 w-24 sm:h-20 sm:w-36"
       />
       <Image
         src="/insects/butterfly.png"
@@ -18,7 +18,7 @@ export function Hero() {
         width={144}
         height={96}
         aria-hidden="true"
-        className="insect-deco animate-float top-[74%] right-[6%] h-16 w-28 -translate-y-1/2 sm:right-[10%] sm:h-24 sm:w-36"
+        className="insect-deco animate-float hero-insect-wide hero-insect-narrow-butterfly right-[6%] sm:right-[10%] h-16 w-28 sm:h-24 sm:w-36"
       />
 
       <div className="page-shell relative animate-fade-up text-center">
