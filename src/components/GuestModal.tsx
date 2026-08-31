@@ -15,6 +15,7 @@ type GuestModalProps = {
   mode: GuestModalMode;
   guest: GuestDto | null;
   apiBasePath?: string;
+  defaultArrivalTime?: string;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
 };
@@ -27,7 +28,11 @@ type FormState = {
   bringingDescription: string;
 };
 
-function getInitialForm(mode: GuestModalMode, guest: GuestDto | null): FormState {
+function getInitialForm(
+  mode: GuestModalMode,
+  guest: GuestDto | null,
+  defaultArrivalTime: string,
+): FormState {
   if (mode === "edit" && guest) {
     return {
       name: guest.name,
@@ -41,7 +46,7 @@ function getInitialForm(mode: GuestModalMode, guest: GuestDto | null): FormState
   return {
     name: "",
     additionalGuests: "0",
-    arrivalTime: "09:00",
+    arrivalTime: defaultArrivalTime,
     bringingSomething: false,
     bringingDescription: "",
   };
@@ -51,6 +56,7 @@ export function GuestModal({
   mode,
   guest,
   apiBasePath = "/api/guests",
+  defaultArrivalTime = "09:00",
   onClose,
   onSaved,
 }: GuestModalProps) {
@@ -61,7 +67,7 @@ export function GuestModal({
   const bringingId = useId();
   const bringingDescriptionId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const initialForm = getInitialForm(mode, guest);
+  const initialForm = getInitialForm(mode, guest, defaultArrivalTime);
 
   const [form, setForm] = useState<FormState>(initialForm);
   const [fieldError, setFieldError] = useState<string | null>(null);

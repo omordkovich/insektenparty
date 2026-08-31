@@ -34,9 +34,13 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
 
 type GuestSectionProps = {
   apiBasePath?: string;
+  defaultArrivalTime?: string;
 };
 
-export function GuestSection({ apiBasePath = "/api/guests" }: GuestSectionProps) {
+export function GuestSection({
+  apiBasePath = "/api/guests",
+  defaultArrivalTime = "09:00",
+}: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +135,7 @@ export function GuestSection({ apiBasePath = "/api/guests" }: GuestSectionProps)
           mode={modal.mode}
           guest={modal.selectedGuest}
           apiBasePath={apiBasePath}
+          defaultArrivalTime={defaultArrivalTime}
           onClose={closeModal}
           onSaved={refreshGuests}
         />

@@ -5,6 +5,7 @@ export type PartyConfig = {
   dateLabel: string;
   timeLabel: string;
   locationLabel: string;
+  defaultArrivalTime: string;
   contact: {
     name: string;
     phone: string;
@@ -27,6 +28,7 @@ export const eventConfig: PartyConfig = {
   dateLabel: "Sonntag, 13. September 2026",
   timeLabel: "09:00 – 11:30 Uhr",
   locationLabel: "Spielscheune, Krewelshof 1, 53797 Lohmar",
+  defaultArrivalTime: "09:00",
   contact: {
     name: "Familie Mordkovich",
     phone: "+49(0)15254267014",
@@ -49,6 +51,7 @@ export const jugendidolenEventConfig: PartyConfig = {
   dateLabel: "Freitag, 4. September 2026",
   timeLabel: "ab 17:00 Uhr",
   locationLabel: "Am Mutzbach 24, 51969 Köln",
+  defaultArrivalTime: "17:00",
   contact: {
     name: "Familie Mordkovich",
     phone: "+49(0)15254267014",

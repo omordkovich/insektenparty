@@ -11,25 +11,28 @@ export default function PartyPage() {
       <Header config={jugendidolenEventConfig} />
       <main className="flex-1">
         <Hero config={jugendidolenEventConfig} />
-        <GuestSection apiBasePath="/api/jugendidolen-guests" />
+        <GuestSection
+          apiBasePath="/api/jugendidolen-guests"
+          defaultArrivalTime={jugendidolenEventConfig.defaultArrivalTime}
+        />
       </main>
       <Footer config={jugendidolenEventConfig} />
 
-      <Image
-        src={jugendidolenEventConfig.assets.plantsLeft}
-        alt=""
-        width={434}
-        height={1024}
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 -z-10 h-auto w-[110px] sm:w-[170px] md:w-[245px] lg:w-[434px]"
-      />
       <Image
         src={jugendidolenEventConfig.assets.plantsRight}
         alt=""
         width={283}
         height={1024}
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-auto w-[70px] sm:w-[110px] md:w-[160px] lg:w-[283px]"
+        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-auto w-[min(283px,45.4vw)]"
+      />
+      <Image
+        src={jugendidolenEventConfig.assets.plantsLeft}
+        alt=""
+        width={434}
+        height={1024}
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 -z-10 h-auto w-[min(434px,69.6vw)]"
       />
     </div>
   );

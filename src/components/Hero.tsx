@@ -6,8 +6,8 @@ type HeroProps = {
 
 export function Hero({ config }: HeroProps) {
   return (
-    <section className="relative overflow-hidden px-4 pb-10 pt-4">
-      <div className="page-shell relative animate-fade-up text-center">
+    <section className="page-shell relative py-6">
+      <div className="animate-fade-up rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-[var(--shadow)] sm:p-8">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark">
           {config.kicker}
         </p>
