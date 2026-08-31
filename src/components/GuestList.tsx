@@ -57,9 +57,9 @@ export function GuestList({
 
         {!loading && !error && guests.length > 0 ? (
           <>
-            <div className="mt-8 overflow-x-auto">
-              <table className="w-full min-w-[560px] border-collapse text-left">
-                <thead>
+            <div className="mt-8">
+              <table className="w-full border-collapse text-left">
+                <thead className="hidden sm:table-header-group">
                   <tr className="border-b border-leaf/20 text-sm font-bold text-leaf-dark">
                     <th className="px-2 py-2 font-bold">Name:</th>
                     <th className="px-2 py-2" aria-hidden="true" />
@@ -68,7 +68,7 @@ export function GuestList({
                     <th className="px-2 py-2" aria-hidden="true" />
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="block space-y-3 sm:table-row-group sm:space-y-0">
                   {guests.map((guest) => (
                     <GuestItem
                       key={guest.id}

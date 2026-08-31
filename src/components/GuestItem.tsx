@@ -17,31 +17,35 @@ export function GuestItem({
   disabled = false,
 }: GuestItemProps) {
   return (
-    <tr className="border-b border-leaf/10 last:border-0">
-      <td className="px-2 py-3 align-middle">
+    <tr className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-[var(--shadow)] backdrop-blur-sm sm:table-row sm:rounded-none sm:border-0 sm:border-b sm:border-leaf/10 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none sm:last:border-0">
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <span className="font-bold text-leaf-dark">{guest.name}</span>
       </td>
-      <td className="px-2 py-3 align-middle text-sm font-semibold text-honey-dark">
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle text-sm font-semibold text-honey-dark">
         {guest.additionalGuests > 0 ? `+${guest.additionalGuests}` : null}
       </td>
-      <td className="px-2 py-3 align-middle font-mono text-base font-semibold tracking-wide text-ink">
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {guest.arrivalTime}
       </td>
-      <td className="px-2 py-3 align-middle">
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         {guest.bringingSomething ? (
           <button
             type="button"
             onClick={() => onShowBringing(guest)}
             disabled={disabled}
-            className="font-bold text-leaf underline underline-offset-2 hover:text-leaf-dark disabled:opacity-50"
+            aria-label={`${guest.name} bringt etwas mit - anzeigen`}
+            title="Bringt etwas mit"
+            className="text-leaf transition hover:text-leaf-dark disabled:opacity-50"
           >
-            JA
+            <GiftIcon />
           </button>
         ) : (
-          <span className="text-muted">NEIN</span>
+          <span className="text-muted/40" aria-label="Bringt nichts mit" title="Bringt nichts mit">
+            <GiftIcon />
+          </span>
         )}
       </td>
-      <td className="px-2 py-3 align-middle">
+      <td className="block w-full sm:w-auto sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <div className="flex justify-end gap-2">
           <Button
             variant="outline"
@@ -78,6 +82,28 @@ function PencilIcon() {
         strokeLinejoin="round"
       />
       <path d="M13 6l3 3" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function GiftIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4" y="9" width="16" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <path d="M4 13h16" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 9v11" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M12 9c0-2-1.5-4-3.5-4S6 6.5 6 8s1 1 2 1h4Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 9c0-2 1.5-4 3.5-4S18 6.5 18 8s-1 1-2 1h-4Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
