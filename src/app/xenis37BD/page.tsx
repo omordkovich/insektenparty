@@ -3,20 +3,20 @@ import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { eventConfig } from "@/lib/event";
+import { jugendidolenEventConfig } from "@/lib/event";
 
 export default function PartyPage() {
   return (
     <div className="relative flex min-h-full flex-col" style={{ isolation: "isolate" }}>
-      <Header config={eventConfig} />
+      <Header config={jugendidolenEventConfig} />
       <main className="flex-1">
-        <Hero config={eventConfig} />
-        <GuestSection />
+        <Hero config={jugendidolenEventConfig} />
+        <GuestSection apiBasePath="/api/jugendidolen-guests" />
       </main>
-      <Footer config={eventConfig} />
+      <Footer config={jugendidolenEventConfig} />
 
       <Image
-        src={eventConfig.assets.plantsLeft}
+        src={jugendidolenEventConfig.assets.plantsLeft}
         alt=""
         width={434}
         height={1024}
@@ -24,7 +24,7 @@ export default function PartyPage() {
         className="pointer-events-none absolute bottom-0 left-0 -z-10 h-auto w-[110px] sm:w-[170px] md:w-[245px] lg:w-[434px]"
       />
       <Image
-        src={eventConfig.assets.plantsRight}
+        src={jugendidolenEventConfig.assets.plantsRight}
         alt=""
         width={283}
         height={1024}

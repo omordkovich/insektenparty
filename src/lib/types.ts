@@ -3,6 +3,8 @@ export type GuestDto = {
   name: string;
   additionalGuests: number;
   arrivalTime: string;
+  bringingSomething: boolean;
+  bringingDescription: string | null;
   createdAt: string;
   updatedAt: string;
 };

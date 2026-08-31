@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { GuestDto } from "@/lib/types";
+import { BringingDetailsDialog } from "./BringingDetailsDialog";
 import { DeleteGuestDialog } from "./DeleteGuestDialog";
 import { GuestList } from "./GuestList";
 import { GuestModal, type GuestModalMode } from "./GuestModal";
@@ -18,8 +19,8 @@ const closedModal: ModalState = {
   selectedGuest: null,
 };
 
-async function fetchGuests(): Promise<GuestDto[]> {
-  const response = await fetch("/api/guests", { cache: "no-store" });
+async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
+  const response = await fetch(apiBasePath, { cache: "no-store" });
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as
       | { error?: string }
@@ -31,18 +32,23 @@ async function fetchGuests(): Promise<GuestDto[]> {
   return (await response.json()) as GuestDto[];
 }
 
-export function GuestSection() {
+type GuestSectionProps = {
+  apiBasePath?: string;
+};
+
+export function GuestSection({ apiBasePath = "/api/guests" }: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(closedModal);
   const [deleteGuest, setDeleteGuest] = useState<GuestDto | null>(null);
+  const [bringingGuest, setBringingGuest] = useState<GuestDto | null>(null);
 
   const refreshGuests = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchGuests();
+      const data = await fetchGuests(apiBasePath);
       setGuests(data);
     } catch (err) {
       setGuests([]);
@@ -54,14 +60,14 @@ export function GuestSection() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiBasePath]);
 
   useEffect(() => {
     let cancelled = false;
 
     void (async () => {
       try {
-        const data = await fetchGuests();
+        const data = await fetchGuests(apiBasePath);
         if (cancelled) return;
         setGuests(data);
         setError(null);
@@ -81,7 +87,7 @@ export function GuestSection() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [apiBasePath]);
 
   function openCreate() {
     setModal({
@@ -112,6 +118,7 @@ export function GuestSection() {
         onAdd={openCreate}
         onEdit={openEdit}
         onDelete={setDeleteGuest}
+        onShowBringing={setBringingGuest}
       />
 
       {modal.isOpen ? (
@@ -123,6 +130,7 @@ export function GuestSection() {
           }
           mode={modal.mode}
           guest={modal.selectedGuest}
+          apiBasePath={apiBasePath}
           onClose={closeModal}
           onSaved={refreshGuests}
         />
@@ -132,8 +140,17 @@ export function GuestSection() {
         <DeleteGuestDialog
           key={deleteGuest.id}
           guest={deleteGuest}
+          apiBasePath={apiBasePath}
           onClose={() => setDeleteGuest(null)}
           onDeleted={refreshGuests}
+        />
+      ) : null}
+
+      {bringingGuest ? (
+        <BringingDetailsDialog
+          key={bringingGuest.id}
+          guest={bringingGuest}
+          onClose={() => setBringingGuest(null)}
         />
       ) : null}
     </>

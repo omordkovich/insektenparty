@@ -6,12 +6,20 @@ export default function Home() {
       <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
         Willkomen auf die Seite unserer Familie!
       </h1>
-      <Link
-        href="/milans7BD"
-        className="mt-8 inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
-      >
-        Milans 7. Geburtstagsparty
-      </Link>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Link
+          href="/milans7BD"
+          className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
+        >
+          Milans 7. Geburtstagsparty
+        </Link>
+        <Link
+          href="/xenis37BD"
+          className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
+        >
+          Jugendidolen Party
+        </Link>
+      </div>
     </main>
   );
 }

@@ -1,9 +1,11 @@
 import type { GuestDto } from "@/lib/types";
+import { Button } from "./Button";
 
 type GuestItemProps = {
   guest: GuestDto;
   onEdit: (guest: GuestDto) => void;
   onDelete: (guest: GuestDto) => void;
+  onShowBringing: (guest: GuestDto) => void;
   disabled?: boolean;
 };
 
@@ -11,49 +13,58 @@ export function GuestItem({
   guest,
   onEdit,
   onDelete,
+  onShowBringing,
   disabled = false,
 }: GuestItemProps) {
   return (
-    <li className="rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-[var(--shadow)] backdrop-blur-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-6">
-          <span className="truncate text-lg font-bold text-leaf-dark">
-            {guest.name}
-          </span>
-          {guest.additionalGuests > 0 ? (
-            <span className="text-sm font-semibold text-honey-dark sm:min-w-12">
-              +{guest.additionalGuests}
-            </span>
-          ) : (
-            <span className="hidden sm:inline sm:min-w-12" aria-hidden="true" />
-          )}
-          <span className="font-mono text-base font-semibold tracking-wide text-ink">
-            {guest.arrivalTime}
-          </span>
-        </div>
-
-        <div className="flex gap-2">
+    <tr className="border-b border-leaf/10 last:border-0">
+      <td className="px-2 py-3 align-middle">
+        <span className="font-bold text-leaf-dark">{guest.name}</span>
+      </td>
+      <td className="px-2 py-3 align-middle text-sm font-semibold text-honey-dark">
+        {guest.additionalGuests > 0 ? `+${guest.additionalGuests}` : null}
+      </td>
+      <td className="px-2 py-3 align-middle font-mono text-base font-semibold tracking-wide text-ink">
+        {guest.arrivalTime}
+      </td>
+      <td className="px-2 py-3 align-middle">
+        {guest.bringingSomething ? (
           <button
             type="button"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-leaf/30 bg-white text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
+            onClick={() => onShowBringing(guest)}
+            disabled={disabled}
+            className="font-bold text-leaf underline underline-offset-2 hover:text-leaf-dark disabled:opacity-50"
+          >
+            JA
+          </button>
+        ) : (
+          <span className="text-muted">NEIN</span>
+        )}
+      </td>
+      <td className="px-2 py-3 align-middle">
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-white"
             aria-label={`${guest.name} bearbeiten`}
             onClick={() => onEdit(guest)}
             disabled={disabled}
           >
             <PencilIcon />
-          </button>
-          <button
-            type="button"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-danger/30 bg-white text-danger transition hover:bg-red-50 disabled:opacity-50"
+          </Button>
+          <Button
+            variant="outline-danger"
+            size="icon"
             aria-label={`${guest.name} löschen`}
             onClick={() => onDelete(guest)}
             disabled={disabled}
           >
             <TrashIcon />
-          </button>
+          </Button>
         </div>
-      </div>
-    </li>
+      </td>
+    </tr>
   );
 }
 

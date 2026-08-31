@@ -2,9 +2,11 @@ import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import type { GuestDto } from "@/lib/types";
 import {
   ARRIVAL_TIME_PATTERN,
+  BRINGING_DESCRIPTION_MAX_LENGTH,
   NAME_MAX_LENGTH,
   validateGuestInput,
 } from "@/lib/validation";
+import { Button } from "./Button";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type GuestModalMode = "create" | "edit";
@@ -12,6 +14,7 @@ export type GuestModalMode = "create" | "edit";
 type GuestModalProps = {
   mode: GuestModalMode;
   guest: GuestDto | null;
+  apiBasePath?: string;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
 };
@@ -20,6 +23,8 @@ type FormState = {
   name: string;
   additionalGuests: string;
   arrivalTime: string;
+  bringingSomething: boolean;
+  bringingDescription: string;
 };
 
 function getInitialForm(mode: GuestModalMode, guest: GuestDto | null): FormState {
@@ -28,6 +33,8 @@ function getInitialForm(mode: GuestModalMode, guest: GuestDto | null): FormState
       name: guest.name,
       additionalGuests: String(guest.additionalGuests),
       arrivalTime: guest.arrivalTime,
+      bringingSomething: guest.bringingSomething,
+      bringingDescription: guest.bringingDescription ?? "",
     };
   }
 
@@ -35,14 +42,24 @@ function getInitialForm(mode: GuestModalMode, guest: GuestDto | null): FormState
     name: "",
     additionalGuests: "0",
     arrivalTime: "09:00",
+    bringingSomething: false,
+    bringingDescription: "",
   };
 }
 
-export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
+export function GuestModal({
+  mode,
+  guest,
+  apiBasePath = "/api/guests",
+  onClose,
+  onSaved,
+}: GuestModalProps) {
   const titleId = useId();
   const nameId = useId();
   const additionalId = useId();
   const arrivalId = useId();
+  const bringingId = useId();
+  const bringingDescriptionId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const initialForm = getInitialForm(mode, guest);
 
@@ -56,7 +73,9 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
   const isDirty =
     form.name !== initialForm.name ||
     form.additionalGuests !== initialForm.additionalGuests ||
-    form.arrivalTime !== initialForm.arrivalTime;
+    form.arrivalTime !== initialForm.arrivalTime ||
+    form.bringingSomething !== initialForm.bringingSomething ||
+    form.bringingDescription !== initialForm.bringingDescription;
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -113,6 +132,8 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
         ? form.additionalGuests
         : parsedAdditional,
       arrivalTime: form.arrivalTime,
+      bringingSomething: form.bringingSomething,
+      bringingDescription: form.bringingDescription,
     });
 
     if (!validation.ok) {
@@ -138,7 +159,7 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
     setSaving(true);
     try {
       const url =
-        mode === "edit" && guest ? `/api/guests/${guest.id}` : "/api/guests";
+        mode === "edit" && guest ? `${apiBasePath}/${guest.id}` : apiBasePath;
       const method = mode === "edit" ? "PATCH" : "POST";
 
       const response = await fetch(url, {
@@ -188,9 +209,19 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
         aria-labelledby={titleId}
         className="relative z-10 w-full max-w-md rounded-3xl bg-surface p-5 shadow-[var(--shadow)] sm:p-7"
       >
+        <button
+          type="button"
+          onClick={requestClose}
+          disabled={saving}
+          aria-label="Schließen"
+          className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
+        >
+          <CloseIcon />
+        </button>
+
         <h2
           id={titleId}
-          className="font-[family-name:var(--font-display)] text-2xl text-leaf-dark"
+          className="pr-8 font-[family-name:var(--font-display)] text-2xl text-leaf-dark"
         >
           {mode === "create" ? "Gast hinzufügen" : "Gast bearbeiten"}
         </h2>
@@ -260,6 +291,45 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
             />
           </div>
 
+          <div>
+            <label className="flex items-center gap-2 text-sm font-bold">
+              <input
+                id={bringingId}
+                name="bringingSomething"
+                type="checkbox"
+                checked={form.bringingSomething}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    bringingSomething: event.target.checked,
+                  }))
+                }
+                className="h-5 w-5 rounded border-leaf/40"
+              />
+              Ich bringe was mit
+            </label>
+
+            {form.bringingSomething ? (
+              <input
+                id={bringingDescriptionId}
+                name="bringingDescription"
+                type="text"
+                maxLength={BRINGING_DESCRIPTION_MAX_LENGTH}
+                placeholder="Was bringst du mit?"
+                value={form.bringingDescription}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    bringingDescription: event.target.value,
+                  }))
+                }
+                className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+              />
+            ) : null}
+          </div>
+
           <RecaptchaCheckbox
             onTokenChange={setRecaptchaToken}
             resetSignal={recaptchaReset}
@@ -272,24 +342,28 @@ export function GuestModal({ mode, guest, onClose, onSaved }: GuestModalProps) {
           ) : null}
 
           <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={requestClose}
-              disabled={saving}
-              className="min-h-11 rounded-xl border border-leaf/30 px-4 font-semibold disabled:opacity-50"
-            >
+            <Button variant="outline" onClick={requestClose} disabled={saving}>
               Abbrechen
-            </button>
-            <button
-              type="submit"
-              disabled={saving || !recaptchaToken}
-              className="min-h-11 rounded-xl bg-leaf px-4 font-bold text-white hover:bg-leaf-dark disabled:opacity-50"
-            >
+            </Button>
+            <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
               {saving ? "Wird gespeichert ..." : "Bestätigen"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
     </div>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

@@ -1,4 +1,5 @@
 import type { GuestDto } from "@/lib/types";
+import { Button } from "./Button";
 import { GuestItem } from "./GuestItem";
 
 type GuestListProps = {
@@ -8,6 +9,7 @@ type GuestListProps = {
   onAdd: () => void;
   onEdit: (guest: GuestDto) => void;
   onDelete: (guest: GuestDto) => void;
+  onShowBringing: (guest: GuestDto) => void;
   actionsDisabled?: boolean;
 };
 
@@ -18,6 +20,7 @@ export function GuestList({
   onAdd,
   onEdit,
   onDelete,
+  onShowBringing,
   actionsDisabled = false,
 }: GuestListProps) {
   return (
@@ -46,38 +49,43 @@ export function GuestList({
           <div className="mt-8 text-center">
             <p className="text-lg text-muted">Noch hat sich niemand eingetragen.</p>
             <p className="mt-1 text-xl font-bold text-leaf-dark">Sei der Erste!</p>
-            <button
-              type="button"
-              onClick={onAdd}
-              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-leaf px-6 text-base font-bold text-white transition hover:bg-leaf-dark"
-            >
+            <Button variant="primary" size="lg" onClick={onAdd} className="mt-6">
               + Gast hinzufügen
-            </button>
+            </Button>
           </div>
         ) : null}
 
         {!loading && !error && guests.length > 0 ? (
           <>
-            <ul className="mt-8 space-y-3">
-              {guests.map((guest) => (
-                <GuestItem
-                  key={guest.id}
-                  guest={guest}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  disabled={actionsDisabled}
-                />
-              ))}
-            </ul>
+            <div className="mt-8 overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-leaf/20 text-sm font-bold text-leaf-dark">
+                    <th className="px-2 py-2 font-bold">Name:</th>
+                    <th className="px-2 py-2" aria-hidden="true" />
+                    <th className="px-2 py-2 font-bold">Ankunftszeit</th>
+                    <th className="px-2 py-2 font-bold">Ich bringe was mit</th>
+                    <th className="px-2 py-2" aria-hidden="true" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {guests.map((guest) => (
+                    <GuestItem
+                      key={guest.id}
+                      guest={guest}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onShowBringing={onShowBringing}
+                      disabled={actionsDisabled}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className="mt-6 flex justify-center">
-              <button
-                type="button"
-                onClick={onAdd}
-                disabled={actionsDisabled}
-                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-honey px-6 text-base font-bold text-leaf-dark transition hover:bg-honey-dark hover:text-white disabled:opacity-50"
-              >
+              <Button variant="secondary" size="lg" onClick={onAdd} disabled={actionsDisabled}>
                 + Gast hinzufügen
-              </button>
+              </Button>
             </div>
           </>
         ) : null}

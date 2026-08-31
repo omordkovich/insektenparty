@@ -1,14 +1,17 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { GuestDto } from "@/lib/types";
+import { Button } from "./Button";
 
 type DeleteGuestDialogProps = {
   guest: GuestDto;
+  apiBasePath?: string;
   onClose: () => void;
   onDeleted: () => Promise<void> | void;
 };
 
 export function DeleteGuestDialog({
   guest,
+  apiBasePath = "/api/guests",
   onClose,
   onDeleted,
 }: DeleteGuestDialogProps) {
@@ -49,7 +52,7 @@ export function DeleteGuestDialog({
     setError(null);
 
     try {
-      const response = await fetch(`/api/guests/${guest.id}`, {
+      const response = await fetch(`${apiBasePath}/${guest.id}`, {
         method: "DELETE",
       });
 
@@ -110,23 +113,12 @@ export function DeleteGuestDialog({
         ) : null}
 
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button
-            ref={cancelRef}
-            type="button"
-            onClick={onClose}
-            disabled={deleting}
-            className="min-h-11 rounded-xl border border-leaf/30 px-4 font-semibold disabled:opacity-50"
-          >
+          <Button ref={cancelRef} variant="outline" onClick={onClose} disabled={deleting}>
             Abbrechen
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="min-h-11 rounded-xl bg-danger px-4 font-bold text-white hover:bg-[var(--danger-dark)] disabled:opacity-50"
-          >
+          </Button>
+          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
             {deleting ? "Wird gelöscht ..." : "Löschen"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

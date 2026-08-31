@@ -1,10 +1,13 @@
 export const NAME_MAX_LENGTH = 100;
+export const BRINGING_DESCRIPTION_MAX_LENGTH = 1000;
 export const ARRIVAL_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export type GuestInput = {
   name: string;
   additionalGuests: number;
   arrivalTime: string;
+  bringingSomething: boolean;
+  bringingDescription: string | null;
 };
 
 export type ValidationResult =
@@ -75,12 +78,34 @@ export function validateGuestInput(body: unknown): ValidationResult {
     };
   }
 
+  const bringingSomething = body.bringingSomething === true;
+
+  let bringingDescription: string | null = null;
+  if (bringingSomething) {
+    if (typeof body.bringingDescription !== "string") {
+      return { ok: false, error: "Bitte gib an, was du mitbringst." };
+    }
+    const trimmedDescription = body.bringingDescription.trim();
+    if (!trimmedDescription) {
+      return { ok: false, error: "Bitte gib an, was du mitbringst." };
+    }
+    if (trimmedDescription.length > BRINGING_DESCRIPTION_MAX_LENGTH) {
+      return {
+        ok: false,
+        error: `Die Angabe darf höchstens ${BRINGING_DESCRIPTION_MAX_LENGTH} Zeichen lang sein.`,
+      };
+    }
+    bringingDescription = trimmedDescription;
+  }
+
   return {
     ok: true,
     data: {
       name,
       additionalGuests,
       arrivalTime,
+      bringingSomething,
+      bringingDescription,
     },
   };
 }

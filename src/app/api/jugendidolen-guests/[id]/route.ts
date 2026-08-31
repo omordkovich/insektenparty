@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { guests } from "@/db/schema";
+import { jugendidolenGuests } from "@/db/schema";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import {
   isUuid,
@@ -14,7 +14,7 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
+function toGuestDto(row: typeof jugendidolenGuests.$inferSelect): GuestDto {
   return {
     id: row.id,
     name: row.name,
@@ -59,7 +59,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const db = getDb();
     const [updated] = await db
-      .update(guests)
+      .update(jugendidolenGuests)
       .set({
         name: validation.data.name,
         additionalGuests: validation.data.additionalGuests,
@@ -68,7 +68,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         bringingDescription: validation.data.bringingDescription,
         updatedAt: new Date(),
       })
-      .where(eq(guests.id, id))
+      .where(eq(jugendidolenGuests.id, id))
       .returning();
 
     if (!updated) {
@@ -80,7 +80,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     return NextResponse.json(toGuestDto(updated));
   } catch (error) {
-    console.error("PATCH /api/guests/[id] failed:", error);
+    console.error("PATCH /api/jugendidolen-guests/[id] failed:", error);
     return NextResponse.json(
       {
         error:
@@ -100,9 +100,9 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     const db = getDb();
     const [deleted] = await db
-      .delete(guests)
-      .where(eq(guests.id, id))
-      .returning({ id: guests.id });
+      .delete(jugendidolenGuests)
+      .where(eq(jugendidolenGuests.id, id))
+      .returning({ id: jugendidolenGuests.id });
 
     if (!deleted) {
       return NextResponse.json(
@@ -113,7 +113,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("DELETE /api/guests/[id] failed:", error);
+    console.error("DELETE /api/jugendidolen-guests/[id] failed:", error);
     return NextResponse.json(
       {
         error:

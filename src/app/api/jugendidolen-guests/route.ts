@@ -1,12 +1,12 @@
 import { asc } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { guests } from "@/db/schema";
+import { jugendidolenGuests } from "@/db/schema";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import { normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
 import type { GuestDto } from "@/lib/types";
 
-function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
+function toGuestDto(row: typeof jugendidolenGuests.$inferSelect): GuestDto {
   return {
     id: row.id,
     name: row.name,
@@ -24,12 +24,12 @@ export async function GET() {
     const db = getDb();
     const rows = await db
       .select()
-      .from(guests)
-      .orderBy(asc(guests.arrivalTime), asc(guests.name));
+      .from(jugendidolenGuests)
+      .orderBy(asc(jugendidolenGuests.arrivalTime), asc(jugendidolenGuests.name));
 
     return NextResponse.json(rows.map(toGuestDto));
   } catch (error) {
-    console.error("GET /api/guests failed:", error);
+    console.error("GET /api/jugendidolen-guests failed:", error);
     return NextResponse.json(
       { error: "Die Gästeliste konnte nicht geladen werden." },
       { status: 500 },
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 
     const db = getDb();
     const [created] = await db
-      .insert(guests)
+      .insert(jugendidolenGuests)
       .values({
         name: validation.data.name,
         additionalGuests: validation.data.additionalGuests,
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(toGuestDto(created), { status: 201 });
   } catch (error) {
-    console.error("POST /api/guests failed:", error);
+    console.error("POST /api/jugendidolen-guests failed:", error);
     return NextResponse.json(
       {
         error:

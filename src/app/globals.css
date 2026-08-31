@@ -17,6 +17,10 @@
   --danger-dark: #9b1c1c;
   --ring: #3d9a5f;
   --shadow: 0 18px 40px rgba(36, 53, 40, 0.12);
+  /* Text color for content sitting on a --honey background. Kept as its own
+     variable (not just leaf-dark) because a theme can darken honey itself
+     (see .party-theme-jugendidolen) - the text needs to invert with it. */
+  --on-honey: var(--leaf-dark);
 }
 
 @theme inline {
@@ -31,6 +35,7 @@
   --color-muted: var(--muted);
   --color-surface: var(--surface-solid);
   --color-danger: var(--danger);
+  --color-on-honey: var(--on-honey);
   --font-sans: var(--font-nunito);
   --font-display: var(--font-fredoka);
 }
@@ -65,6 +70,39 @@ body {
   background-attachment: fixed;
 }
 
+/* Jugendidolen party: modern blue / slate / near-black palette instead of
+   the green/honey/pink garden theme. Overriding these custom properties is
+   enough - every Tailwind utility (text-leaf-dark, bg-honey, etc.) reads
+   its color through them, so components don't need theme-specific classes. */
+.party-theme-jugendidolen {
+  --bg-top: #dbeafe;
+  --bg-mid: #eef2f7;
+  --bg-bottom: #cbd5e1;
+  --leaf: #2563eb;
+  --leaf-dark: #1e3a8a;
+  --honey: #0f172a;
+  --honey-dark: #000000;
+  --petal: #94a3b8;
+  --ink: #0f172a;
+  --muted: #475569;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-solid: #f8fafc;
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
+  --ring: #3b82f6;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  --on-honey: #f8fafc;
+
+  min-height: 100%;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(37, 99, 235, 0.18), transparent 28%),
+    radial-gradient(circle at 88% 12%, rgba(100, 116, 139, 0.22), transparent 26%),
+    radial-gradient(circle at 70% 80%, rgba(15, 23, 42, 0.14), transparent 34%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
+  background-attachment: fixed;
+}
+
 body.modal-open {
   overflow: hidden;
 }
@@ -88,7 +126,7 @@ input {
   margin-inline: auto;
 }
 
-.insect-deco {
+.floating-accent {
   position: absolute;
   pointer-events: none;
   object-fit: contain;
@@ -135,12 +173,4 @@ input {
 
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
-}
-
-/* Below this width the header insects would come within 2px of the logo
-   (or overlap it), so they're hidden entirely rather than repositioned. */
-@media (max-width: 721px) {
-  .header-insect {
-    display: none;
-  }
 }
