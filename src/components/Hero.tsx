@@ -11,7 +11,7 @@ export function Hero({ config }: HeroProps) {
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark">
           {config.kicker}
         </p>
-        <h1 className="font-[family-name:var(--font-display)] text-5xl leading-none text-leaf-dark sm:text-6xl md:text-7xl">
+        <h1 className="font-[family-name:var(--font-display)] text-[clamp(1.5rem,9vw,3rem)] leading-none text-leaf-dark sm:text-6xl md:text-7xl">
           {config.title}
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">

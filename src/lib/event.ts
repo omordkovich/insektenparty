@@ -42,8 +42,8 @@ export const eventConfig: PartyConfig = {
 };
 
 export const jugendidolenEventConfig: PartyConfig = {
-  kicker: "Jugendidolen",
-  title: "Geburtstagsparty",
+  kicker: "WIR BLEIBEN JUNG UND WILD!",
+  title: "Happy Birthday!",
   greeting:
     "Willkommen zur Jugendidolen-Party! Wir freuen uns riesig, mit euch zu feiern.",
   dateLabel: "Freitag, 4. September 2026",
