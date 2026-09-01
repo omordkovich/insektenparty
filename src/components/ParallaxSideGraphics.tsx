@@ -14,6 +14,7 @@ type ParallaxSideGraphicsProps = {
 const PARALLAX_FACTOR = 0.3;
 
 export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphicsProps) {
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLImageElement>(null);
   const rightRef = useRef<HTMLImageElement>(null);
 
@@ -23,6 +24,7 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
     function apply() {
       const offset = window.scrollY * PARALLAX_FACTOR;
       const transform = `translateY(${offset}px)`;
+      if (backgroundRef.current) backgroundRef.current.style.transform = transform;
       if (leftRef.current) leftRef.current.style.transform = transform;
       if (rightRef.current) rightRef.current.style.transform = transform;
       ticking = false;
@@ -41,6 +43,11 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
 
   return (
     <>
+      <div
+        ref={backgroundRef}
+        aria-hidden="true"
+        className="parallax-background pointer-events-none absolute inset-0 -z-20 will-change-transform"
+      />
       <Image
         ref={rightRef}
         src={rightSrc}
