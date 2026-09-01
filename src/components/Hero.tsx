@@ -35,7 +35,6 @@ export function Hero({ config }: HeroProps) {
             <dd className="mt-1 font-semibold">
               <a
                 href={calendarLink}
-                download={`${config.title}.ics`}
                 className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
               >
                 {config.dateLabel}
