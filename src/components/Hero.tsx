@@ -1,4 +1,5 @@
-import { buildCalendarLink, buildMapsLink } from "@/lib/calendar";
+import { AddToCalendarLink } from "@/components/AddToCalendarLink";
+import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
 import type { PartyConfig } from "@/lib/event";
 
 type HeroProps = {
@@ -6,14 +7,16 @@ type HeroProps = {
 };
 
 export function Hero({ config }: HeroProps) {
-  const calendarLink = buildCalendarLink({
+  const calendarParams = {
     title: config.title,
     description: config.greeting,
     location: config.locationLabel,
     date: config.eventDate,
     startTime: config.eventStartTime,
     endTime: config.eventEndTime,
-  });
+  };
+  const icsLink = buildCalendarLink(calendarParams);
+  const googleCalendarLink = buildGoogleCalendarLink(calendarParams);
   const mapsLink = buildMapsLink(config.locationLabel);
 
   return (
@@ -33,12 +36,13 @@ export function Hero({ config }: HeroProps) {
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
             <dd className="mt-1 font-semibold">
-              <a
-                href={calendarLink}
+              <AddToCalendarLink
+                icsHref={icsLink}
+                googleHref={googleCalendarLink}
                 className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
               >
                 {config.dateLabel}
-              </a>
+              </AddToCalendarLink>
             </dd>
           </div>
           <div>

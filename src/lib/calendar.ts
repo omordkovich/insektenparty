@@ -46,6 +46,30 @@ export function buildCalendarLink(params: {
   return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
 }
 
+// Data-URI .ics links get treated as a download by most desktop/Android
+// browsers instead of prompting to add the event directly, so we route
+// through Google Calendar's prefill page instead - it opens the "add event"
+// screen with no file involved. Only real downside: iOS/Apple Calendar users
+// land on this web page rather than their native app.
+export function buildGoogleCalendarLink(params: {
+  title: string;
+  description: string;
+  location: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}): string {
+  const dates = `${toIcsDateTime(params.date, params.startTime)}/${toIcsDateTime(params.date, params.endTime)}`;
+  const qs = new URLSearchParams({
+    action: "TEMPLATE",
+    text: params.title,
+    dates,
+    details: params.description,
+    location: params.location,
+  });
+  return `https://calendar.google.com/calendar/render?${qs.toString()}`;
+}
+
 export function buildMapsLink(location: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 }
