@@ -11,7 +11,7 @@ type ParallaxSideGraphicsProps = {
 // <1 makes the graphics lag behind the normal scroll speed, reading as
 // further back than the logo/accents/panels (which scroll at 1:1, "in
 // front"). 0 would be a fully fixed background; 1 would be no parallax.
-const PARALLAX_FACTOR = 0.45;
+const PARALLAX_FACTOR = 0.3;
 
 export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphicsProps) {
   const leftRef = useRef<HTMLImageElement>(null);

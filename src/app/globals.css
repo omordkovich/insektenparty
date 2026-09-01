@@ -66,10 +66,6 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
 }
 
-.party-theme {
-  background-attachment: fixed;
-}
-
 /* Jugendidolen party: modern blue / slate / near-black palette instead of
    the green/honey/pink garden theme. Overriding these custom properties is
    enough - every Tailwind utility (text-leaf-dark, bg-honey, etc.) reads
@@ -100,7 +96,6 @@ body {
     radial-gradient(circle at 88% 12%, rgba(100, 116, 139, 0.22), transparent 26%),
     radial-gradient(circle at 70% 80%, rgba(15, 23, 42, 0.14), transparent 34%),
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
-  background-attachment: fixed;
 }
 
 body.modal-open {
