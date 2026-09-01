@@ -3,7 +3,7 @@ import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
-import { jugendidolenEventConfig } from "@/lib/event";
+import { jugendidolenEventConfig } from "@/lib/events/xenis37BD";
 
 export default function PartyPage() {
   return (

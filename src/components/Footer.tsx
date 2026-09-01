@@ -1,4 +1,4 @@
-import type { PartyConfig } from "@/lib/event";
+import type { PartyConfig } from "@/lib/party-config";
 
 type FooterProps = {
   config: PartyConfig;

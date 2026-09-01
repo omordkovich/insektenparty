@@ -3,7 +3,7 @@ import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
-import { eventConfig } from "@/lib/event";
+import { eventConfig } from "@/lib/events/milans7BD";
 
 export default function PartyPage() {
   return (

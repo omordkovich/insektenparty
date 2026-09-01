@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { PartyConfig } from "@/lib/event";
+import type { PartyConfig } from "@/lib/party-config";
 
 type HeaderProps = {
   config: PartyConfig;

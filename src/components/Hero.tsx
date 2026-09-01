@@ -1,6 +1,6 @@
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
 import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
-import type { PartyConfig } from "@/lib/event";
+import type { PartyConfig } from "@/lib/party-config";
 
 type HeroProps = {
   config: PartyConfig;
