@@ -32,6 +32,12 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
   return (await response.json()) as GuestDto[];
 }
 
+// How often to poll for guest-list changes made by other visitors. Kept
+// simple (plain polling) rather than Supabase Realtime since traffic here is
+// low - a websocket subscription would be instant but isn't worth the setup
+// cost for a party guest list.
+const POLL_INTERVAL_MS = 15_000;
+
 type GuestSectionProps = {
   apiBasePath?: string;
   defaultArrivalTime?: string;
@@ -48,7 +54,9 @@ export function GuestSection({
   const [deleteGuest, setDeleteGuest] = useState<GuestDto | null>(null);
   const [bringingGuest, setBringingGuest] = useState<GuestDto | null>(null);
 
-  const refreshGuests = useCallback(async () => {
+  // Used for user-triggered refreshes (after save/delete), where showing the
+  // loading spinner and any error banner is the desired feedback.
+  const loadGuests = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -69,13 +77,13 @@ export function GuestSection({
   useEffect(() => {
     let cancelled = false;
 
-    void (async () => {
-      try {
-        const data = await fetchGuests(apiBasePath);
+    void fetchGuests(apiBasePath)
+      .then((data) => {
         if (cancelled) return;
         setGuests(data);
         setError(null);
-      } catch (err) {
+      })
+      .catch((err: unknown) => {
         if (cancelled) return;
         setGuests([]);
         setError(
@@ -83,14 +91,29 @@ export function GuestSection({
             ? err.message
             : "Die Gästeliste konnte nicht geladen werden.",
         );
-      } finally {
+      })
+      .finally(() => {
         if (!cancelled) setLoading(false);
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;
     };
+  }, [apiBasePath]);
+
+  // Background poll: silently re-fetches and swaps in the new list, without
+  // touching the loading/error state, so a visitor who left the tab open
+  // sees new entries without a manual refresh. Failures are ignored - the
+  // currently-displayed list just stays as-is until the next successful poll.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      void fetchGuests(apiBasePath)
+        .then((data) => setGuests(data))
+        .catch(() => {});
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(interval);
   }, [apiBasePath]);
 
   function openCreate() {
@@ -137,7 +160,7 @@ export function GuestSection({
           apiBasePath={apiBasePath}
           defaultArrivalTime={defaultArrivalTime}
           onClose={closeModal}
-          onSaved={refreshGuests}
+          onSaved={loadGuests}
         />
       ) : null}
 
@@ -147,7 +170,7 @@ export function GuestSection({
           guest={deleteGuest}
           apiBasePath={apiBasePath}
           onClose={() => setDeleteGuest(null)}
-          onDeleted={refreshGuests}
+          onDeleted={loadGuests}
         />
       ) : null}
 
