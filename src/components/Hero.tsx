@@ -1,3 +1,4 @@
+import { buildCalendarLink, buildMapsLink } from "@/lib/calendar";
 import type { PartyConfig } from "@/lib/event";
 
 type HeroProps = {
@@ -5,6 +6,16 @@ type HeroProps = {
 };
 
 export function Hero({ config }: HeroProps) {
+  const calendarLink = buildCalendarLink({
+    title: config.title,
+    description: config.greeting,
+    location: config.locationLabel,
+    date: config.eventDate,
+    startTime: config.eventStartTime,
+    endTime: config.eventEndTime,
+  });
+  const mapsLink = buildMapsLink(config.locationLabel);
+
   return (
     <section className="page-shell relative py-6">
       <div className="animate-fade-up rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-[var(--shadow)] sm:p-8">
@@ -21,7 +32,15 @@ export function Hero({ config }: HeroProps) {
         <dl className="mx-auto mt-8 grid max-w-xl gap-3 text-left sm:grid-cols-3 sm:text-center">
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
-            <dd className="mt-1 font-semibold">{config.dateLabel}</dd>
+            <dd className="mt-1 font-semibold">
+              <a
+                href={calendarLink}
+                download={`${config.title}.ics`}
+                className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
+              >
+                {config.dateLabel}
+              </a>
+            </dd>
           </div>
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Uhrzeit</dt>
@@ -29,7 +48,16 @@ export function Hero({ config }: HeroProps) {
           </div>
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Ort</dt>
-            <dd className="mt-1 font-semibold">{config.locationLabel}</dd>
+            <dd className="mt-1 font-semibold">
+              <a
+                href={mapsLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
+              >
+                {config.locationLabel}
+              </a>
+            </dd>
           </div>
         </dl>
       </div>

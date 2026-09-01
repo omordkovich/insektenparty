@@ -6,6 +6,12 @@ export type PartyConfig = {
   timeLabel: string;
   locationLabel: string;
   defaultArrivalTime: string;
+  /** ISO date (YYYY-MM-DD) and 24h times (HH:MM), used to build the "add to
+   * calendar" link - kept separate from the human-readable labels above
+   * since those aren't reliably machine-parseable. */
+  eventDate: string;
+  eventStartTime: string;
+  eventEndTime: string;
   contact: {
     name: string;
     phone: string;
@@ -29,6 +35,9 @@ export const eventConfig: PartyConfig = {
   timeLabel: "09:00 – 11:30 Uhr",
   locationLabel: "Spielscheune, Krewelshof 1, 53797 Lohmar",
   defaultArrivalTime: "09:00",
+  eventDate: "2026-09-13",
+  eventStartTime: "09:00",
+  eventEndTime: "11:30",
   contact: {
     name: "Familie Mordkovich",
     phone: "+49(0)15254267014",
@@ -52,6 +61,9 @@ export const jugendidolenEventConfig: PartyConfig = {
   timeLabel: "ab 17:00 Uhr",
   locationLabel: "Am Mutzbach 24, 51969 Köln",
   defaultArrivalTime: "17:00",
+  eventDate: "2026-09-04",
+  eventStartTime: "17:00",
+  eventEndTime: "21:00",
   contact: {
     name: "Familie Mordkovich",
     phone: "+49(0)15254267014",

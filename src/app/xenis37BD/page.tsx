@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import { jugendidolenEventConfig } from "@/lib/event";
 
 export default function PartyPage() {
@@ -18,21 +18,9 @@ export default function PartyPage() {
       </main>
       <Footer config={jugendidolenEventConfig} />
 
-      <Image
-        src={jugendidolenEventConfig.assets.plantsRight}
-        alt=""
-        width={283}
-        height={1024}
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-auto w-[min(283px,45.4vw)]"
-      />
-      <Image
-        src={jugendidolenEventConfig.assets.plantsLeft}
-        alt=""
-        width={434}
-        height={1024}
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 -z-10 h-auto w-[min(434px,69.6vw)]"
+      <ParallaxSideGraphics
+        leftSrc={jugendidolenEventConfig.assets.plantsLeft}
+        rightSrc={jugendidolenEventConfig.assets.plantsRight}
       />
     </div>
   );
