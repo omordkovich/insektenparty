@@ -11,6 +11,7 @@ function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
     id: row.id,
     name: row.name,
     additionalGuests: row.additionalGuests,
+    additionalGuestNames: row.additionalGuestNames,
     arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
     bringingSomething: row.bringingSomething,
     bringingDescription: row.bringingDescription,
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
       .values({
         name: validation.data.name,
         additionalGuests: validation.data.additionalGuests,
+        additionalGuestNames: validation.data.additionalGuestNames,
         arrivalTime: validation.data.arrivalTime,
         bringingSomething: validation.data.bringingSomething,
         bringingDescription: validation.data.bringingDescription,

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { GuestDto } from "@/lib/types";
+import { AdditionalGuestsDialog } from "./AdditionalGuestsDialog";
 import { BringingDetailsDialog } from "./BringingDetailsDialog";
 import { DeleteGuestDialog } from "./DeleteGuestDialog";
 import { GuestList } from "./GuestList";
@@ -53,6 +54,8 @@ export function GuestSection({
   const [modal, setModal] = useState<ModalState>(closedModal);
   const [deleteGuest, setDeleteGuest] = useState<GuestDto | null>(null);
   const [bringingGuest, setBringingGuest] = useState<GuestDto | null>(null);
+  const [additionalGuestsGuest, setAdditionalGuestsGuest] =
+    useState<GuestDto | null>(null);
 
   // Used for user-triggered refreshes (after save/delete), where showing the
   // loading spinner and any error banner is the desired feedback.
@@ -146,6 +149,7 @@ export function GuestSection({
         onEdit={openEdit}
         onDelete={setDeleteGuest}
         onShowBringing={setBringingGuest}
+        onShowAdditionalGuests={setAdditionalGuestsGuest}
       />
 
       {modal.isOpen ? (
@@ -179,6 +183,16 @@ export function GuestSection({
           key={bringingGuest.id}
           guest={bringingGuest}
           onClose={() => setBringingGuest(null)}
+        />
+      ) : null}
+
+      {additionalGuestsGuest ? (
+        <AdditionalGuestsDialog
+          key={additionalGuestsGuest.id}
+          guest={additionalGuestsGuest}
+          apiBasePath={apiBasePath}
+          onClose={() => setAdditionalGuestsGuest(null)}
+          onSaved={loadGuests}
         />
       ) : null}
     </>

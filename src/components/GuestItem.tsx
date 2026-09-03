@@ -6,6 +6,7 @@ type GuestItemProps = {
   onEdit: (guest: GuestDto) => void;
   onDelete: (guest: GuestDto) => void;
   onShowBringing: (guest: GuestDto) => void;
+  onShowAdditionalGuests: (guest: GuestDto) => void;
   disabled?: boolean;
 };
 
@@ -14,6 +15,7 @@ export function GuestItem({
   onEdit,
   onDelete,
   onShowBringing,
+  onShowAdditionalGuests,
   disabled = false,
 }: GuestItemProps) {
   return (
@@ -22,7 +24,17 @@ export function GuestItem({
         <span className="font-bold text-leaf-dark">{guest.name}</span>
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle text-sm font-semibold text-honey-dark">
-        {guest.additionalGuests > 0 ? `+${guest.additionalGuests}` : null}
+        {guest.additionalGuests > 0 ? (
+          <button
+            type="button"
+            onClick={() => onShowAdditionalGuests(guest)}
+            disabled={disabled}
+            aria-label={`Zusätzliche Personen von ${guest.name} anzeigen`}
+            className="underline decoration-honey-dark/40 underline-offset-4 transition hover:text-leaf-dark disabled:opacity-50"
+          >
+            +{guest.additionalGuests}
+          </button>
+        ) : null}
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {guest.arrivalTime}

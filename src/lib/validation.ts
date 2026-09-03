@@ -1,10 +1,12 @@
 export const NAME_MAX_LENGTH = 100;
 export const BRINGING_DESCRIPTION_MAX_LENGTH = 1000;
+export const MAX_ADDITIONAL_GUESTS = 30;
 export const ARRIVAL_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export type GuestInput = {
   name: string;
   additionalGuests: number;
+  additionalGuestNames: string[];
   arrivalTime: string;
   bringingSomething: boolean;
   bringingDescription: string | null;
@@ -63,6 +65,51 @@ export function validateGuestInput(body: unknown): ValidationResult {
     };
   }
 
+  if (additionalGuests > MAX_ADDITIONAL_GUESTS) {
+    return {
+      ok: false,
+      error: `Zusätzliche Personen dürfen höchstens ${MAX_ADDITIONAL_GUESTS} sein.`,
+    };
+  }
+
+  const rawNames = body.additionalGuestNames;
+  if (!Array.isArray(rawNames)) {
+    return {
+      ok: false,
+      error: "Namen der zusätzlichen Personen sind ungültig.",
+    };
+  }
+  if (rawNames.length !== additionalGuests) {
+    return {
+      ok: false,
+      error:
+        "Anzahl der Namen muss der Anzahl zusätzlicher Personen entsprechen.",
+    };
+  }
+  const additionalGuestNames: string[] = [];
+  for (const rawName of rawNames) {
+    if (typeof rawName !== "string") {
+      return {
+        ok: false,
+        error: "Namen der zusätzlichen Personen sind ungültig.",
+      };
+    }
+    const trimmedName = rawName.trim();
+    if (!trimmedName) {
+      return {
+        ok: false,
+        error: "Namen der zusätzlichen Personen dürfen nicht leer sein.",
+      };
+    }
+    if (trimmedName.length > NAME_MAX_LENGTH) {
+      return {
+        ok: false,
+        error: `Namen der zusätzlichen Personen dürfen höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
+      };
+    }
+    additionalGuestNames.push(trimmedName);
+  }
+
   if (typeof body.arrivalTime !== "string") {
     return { ok: false, error: "Ankunftszeit ist erforderlich." };
   }
@@ -103,6 +150,7 @@ export function validateGuestInput(body: unknown): ValidationResult {
     data: {
       name,
       additionalGuests,
+      additionalGuestNames,
       arrivalTime,
       bringingSomething,
       bringingDescription,

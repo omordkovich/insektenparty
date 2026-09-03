@@ -19,6 +19,7 @@ function toGuestDto(row: typeof jugendidolenGuests.$inferSelect): GuestDto {
     id: row.id,
     name: row.name,
     additionalGuests: row.additionalGuests,
+    additionalGuestNames: row.additionalGuestNames,
     arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
     bringingSomething: row.bringingSomething,
     bringingDescription: row.bringingDescription,
@@ -63,6 +64,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .set({
         name: validation.data.name,
         additionalGuests: validation.data.additionalGuests,
+        additionalGuestNames: validation.data.additionalGuestNames,
         arrivalTime: validation.data.arrivalTime,
         bringingSomething: validation.data.bringingSomething,
         bringingDescription: validation.data.bringingDescription,

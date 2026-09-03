@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -12,6 +13,10 @@ export const guests = pgTable("guests", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   additionalGuests: integer("additional_guests").notNull().default(0),
+  additionalGuestNames: text("additional_guest_names")
+    .array()
+    .notNull()
+    .default([]),
   arrivalTime: time("arrival_time").notNull(),
   bringingSomething: boolean("bringing_something").notNull().default(false),
   bringingDescription: varchar("bringing_description", { length: 1000 }),
@@ -31,6 +36,10 @@ export const jugendidolenGuests = pgTable("jugendidolen_guests", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   additionalGuests: integer("additional_guests").notNull().default(0),
+  additionalGuestNames: text("additional_guest_names")
+    .array()
+    .notNull()
+    .default([]),
   arrivalTime: time("arrival_time").notNull(),
   bringingSomething: boolean("bringing_something").notNull().default(false),
   bringingDescription: varchar("bringing_description", { length: 1000 }),

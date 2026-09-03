@@ -3,6 +3,7 @@ import type { GuestDto } from "@/lib/types";
 import {
   ARRIVAL_TIME_PATTERN,
   BRINGING_DESCRIPTION_MAX_LENGTH,
+  MAX_ADDITIONAL_GUESTS,
   NAME_MAX_LENGTH,
   validateGuestInput,
 } from "@/lib/validation";
@@ -23,6 +24,7 @@ type GuestModalProps = {
 type FormState = {
   name: string;
   additionalGuests: string;
+  additionalGuestNames: string[];
   arrivalTime: string;
   bringingSomething: boolean;
   bringingDescription: string;
@@ -37,6 +39,7 @@ function getInitialForm(
     return {
       name: guest.name,
       additionalGuests: String(guest.additionalGuests),
+      additionalGuestNames: guest.additionalGuestNames,
       arrivalTime: guest.arrivalTime,
       bringingSomething: guest.bringingSomething,
       bringingDescription: guest.bringingDescription ?? "",
@@ -46,10 +49,31 @@ function getInitialForm(
   return {
     name: "",
     additionalGuests: "0",
+    additionalGuestNames: [],
     arrivalTime: defaultArrivalTime,
     bringingSomething: false,
     bringingDescription: "",
   };
+}
+
+// Resizes the names array to match the (clamped) parsed count from the
+// "Zusätzliche Personen" field - done directly in that field's onChange
+// rather than in an effect reacting to it, so this stays a single state
+// update instead of a render-then-adjust cascade.
+function resizeAdditionalGuestNames(
+  rawCount: string,
+  currentNames: string[],
+): string[] {
+  const parsed = Number(rawCount);
+  const target = Number.isFinite(parsed)
+    ? Math.min(MAX_ADDITIONAL_GUESTS, Math.max(0, Math.trunc(parsed)))
+    : 0;
+
+  const names = currentNames.slice(0, target);
+  while (names.length < target) {
+    names.push(`Gast_${names.length + 1}`);
+  }
+  return names;
 }
 
 export function GuestModal({
@@ -79,6 +103,8 @@ export function GuestModal({
   const isDirty =
     form.name !== initialForm.name ||
     form.additionalGuests !== initialForm.additionalGuests ||
+    form.additionalGuestNames.join("\n") !==
+      initialForm.additionalGuestNames.join("\n") ||
     form.arrivalTime !== initialForm.arrivalTime ||
     form.bringingSomething !== initialForm.bringingSomething ||
     form.bringingDescription !== initialForm.bringingDescription;
@@ -137,6 +163,7 @@ export function GuestModal({
       additionalGuests: Number.isNaN(parsedAdditional)
         ? form.additionalGuests
         : parsedAdditional,
+      additionalGuestNames: form.additionalGuestNames,
       arrivalTime: form.arrivalTime,
       bringingSomething: form.bringingSomething,
       bringingDescription: form.bringingDescription,
@@ -213,8 +240,10 @@ export function GuestModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 w-full max-w-md rounded-3xl bg-surface p-5 shadow-[var(--shadow)] sm:p-7"
+        className="relative z-10 flex max-h-[95dvh] w-full max-w-md flex-col overflow-hidden rounded-3xl bg-surface p-1 shadow-[var(--shadow)]"
       >
+        <form onSubmit={handleSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
+        <div className="shrink-0 p-5 pb-4 sm:p-7 sm:pb-4">
         <button
           type="button"
           onClick={requestClose}
@@ -231,8 +260,13 @@ export function GuestModal({
         >
           {mode === "create" ? "Gast hinzufügen" : "Gast bearbeiten"}
         </h2>
+        </div>
 
-        <form className="mt-5 space-y-4" onSubmit={handleSubmit} noValidate>
+        <div
+          className="mr-4 min-h-0 flex-1 overflow-y-auto px-5 pb-5 sm:px-7 sm:pb-7"
+          style={{ scrollbarGutter: "stable" }}
+        >
+        <div className="space-y-4">
           <div>
             <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
               Name
@@ -264,18 +298,50 @@ export function GuestModal({
               type="number"
               inputMode="numeric"
               min={0}
+              max={MAX_ADDITIONAL_GUESTS}
               step={1}
               value={form.additionalGuests}
               disabled={saving}
-              onChange={(event) =>
+              onChange={(event) => {
+                const rawValue = event.target.value;
                 setForm((current) => ({
                   ...current,
-                  additionalGuests: event.target.value,
-                }))
-              }
+                  additionalGuests: rawValue,
+                  additionalGuestNames: resizeAdditionalGuestNames(
+                    rawValue,
+                    current.additionalGuestNames,
+                  ),
+                }));
+              }}
               className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
             />
           </div>
+
+          {form.additionalGuestNames.length > 0 ? (
+            <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
+              <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
+              {form.additionalGuestNames.map((additionalName, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  maxLength={NAME_MAX_LENGTH}
+                  aria-label={`Name Gast ${index + 1}`}
+                  placeholder={`Gast_${index + 1}`}
+                  value={additionalName}
+                  disabled={saving}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setForm((current) => {
+                      const names = current.additionalGuestNames.slice();
+                      names[index] = value;
+                      return { ...current, additionalGuestNames: names };
+                    });
+                  }}
+                  className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-2"
+                />
+              ))}
+            </div>
+          ) : null}
 
           <div>
             <label htmlFor={arrivalId} className="mb-1 block text-sm font-bold">
@@ -346,15 +412,17 @@ export function GuestModal({
               {fieldError ?? submitError}
             </p>
           ) : null}
+        </div>
+        </div>
 
-          <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={requestClose} disabled={saving}>
-              Abbrechen
-            </Button>
-            <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
-              {saving ? "Wird gespeichert ..." : "Bestätigen"}
-            </Button>
-          </div>
+        <div className="flex shrink-0 flex-col-reverse gap-2 p-5 pt-3 sm:flex-row sm:justify-end sm:p-7 sm:pt-4">
+          <Button variant="outline" onClick={requestClose} disabled={saving}>
+            Abbrechen
+          </Button>
+          <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
+            {saving ? "Wird gespeichert ..." : "Bestätigen"}
+          </Button>
+        </div>
         </form>
       </div>
     </div>
