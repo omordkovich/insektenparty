@@ -193,9 +193,7 @@ export function GuestSection({
         <AdditionalGuestsDialog
           key={additionalGuestsGuest.id}
           guest={additionalGuestsGuest}
-          apiBasePath={apiBasePath}
           onClose={() => setAdditionalGuestsGuest(null)}
-          onSaved={loadGuests}
         />
       ) : null}
 

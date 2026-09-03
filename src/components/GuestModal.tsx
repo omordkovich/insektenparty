@@ -83,6 +83,14 @@ function resizeAdditionalGuestNames(
   return names;
 }
 
+function removeAdditionalGuestName(
+  index: number,
+  currentNames: string[],
+): { additionalGuests: string; additionalGuestNames: string[] } {
+  const names = currentNames.filter((_, i) => i !== index);
+  return { additionalGuests: String(names.length), additionalGuestNames: names };
+}
+
 export function GuestModal({
   mode,
   guest,
@@ -334,24 +342,42 @@ export function GuestModal({
             <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
               <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
               {form.additionalGuestNames.map((additionalName, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  maxLength={NAME_MAX_LENGTH}
-                  aria-label={`Name Gast ${index + 1}`}
-                  placeholder={`Gast_${index + 1}`}
-                  value={additionalName}
-                  disabled={saving}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setForm((current) => {
-                      const names = current.additionalGuestNames.slice();
-                      names[index] = value;
-                      return { ...current, additionalGuestNames: names };
-                    });
-                  }}
-                  className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-2"
-                />
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    maxLength={NAME_MAX_LENGTH}
+                    aria-label={`Name Gast ${index + 1}`}
+                    placeholder={`Gast_${index + 1}`}
+                    value={additionalName}
+                    disabled={saving}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setForm((current) => {
+                        const names = current.additionalGuestNames.slice();
+                        names[index] = value;
+                        return { ...current, additionalGuestNames: names };
+                      });
+                    }}
+                    className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-white px-3 py-2"
+                  />
+                  <Button
+                    variant="outline-danger"
+                    size="icon"
+                    aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
+                    onClick={() =>
+                      setForm((current) => ({
+                        ...current,
+                        ...removeAdditionalGuestName(
+                          index,
+                          current.additionalGuestNames,
+                        ),
+                      }))
+                    }
+                    disabled={saving}
+                  >
+                    <TrashIcon />
+                  </Button>
+                </div>
               ))}
             </div>
           ) : null}
@@ -489,6 +515,20 @@ function CloseIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 7h14M10 11v6M14 11v6M9 7V5h6v2M7 7l1 12h8l1-12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
