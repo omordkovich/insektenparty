@@ -1,5 +1,6 @@
 export const NAME_MAX_LENGTH = 100;
 export const BRINGING_DESCRIPTION_MAX_LENGTH = 1000;
+export const MESSAGE_MAX_LENGTH = 1000;
 export const MAX_ADDITIONAL_GUESTS = 30;
 export const ARRIVAL_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -10,6 +11,8 @@ export type GuestInput = {
   arrivalTime: string;
   bringingSomething: boolean;
   bringingDescription: string | null;
+  hasMessage: boolean;
+  message: string | null;
 };
 
 export type ValidationResult =
@@ -145,6 +148,26 @@ export function validateGuestInput(body: unknown): ValidationResult {
     bringingDescription = trimmedDescription;
   }
 
+  const hasMessage = body.hasMessage === true;
+
+  let message: string | null = null;
+  if (hasMessage) {
+    if (typeof body.message !== "string") {
+      return { ok: false, error: "Bitte gib eine Nachricht ein." };
+    }
+    const trimmedMessage = body.message.trim();
+    if (!trimmedMessage) {
+      return { ok: false, error: "Bitte gib eine Nachricht ein." };
+    }
+    if (trimmedMessage.length > MESSAGE_MAX_LENGTH) {
+      return {
+        ok: false,
+        error: `Die Nachricht darf höchstens ${MESSAGE_MAX_LENGTH} Zeichen lang sein.`,
+      };
+    }
+    message = trimmedMessage;
+  }
+
   return {
     ok: true,
     data: {
@@ -154,6 +177,8 @@ export function validateGuestInput(body: unknown): ValidationResult {
       arrivalTime,
       bringingSomething,
       bringingDescription,
+      hasMessage,
+      message,
     },
   };
 }

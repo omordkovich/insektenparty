@@ -4,6 +4,7 @@ import {
   ARRIVAL_TIME_PATTERN,
   BRINGING_DESCRIPTION_MAX_LENGTH,
   MAX_ADDITIONAL_GUESTS,
+  MESSAGE_MAX_LENGTH,
   NAME_MAX_LENGTH,
   validateGuestInput,
 } from "@/lib/validation";
@@ -28,6 +29,8 @@ type FormState = {
   arrivalTime: string;
   bringingSomething: boolean;
   bringingDescription: string;
+  hasMessage: boolean;
+  message: string;
 };
 
 function getInitialForm(
@@ -43,6 +46,8 @@ function getInitialForm(
       arrivalTime: guest.arrivalTime,
       bringingSomething: guest.bringingSomething,
       bringingDescription: guest.bringingDescription ?? "",
+      hasMessage: guest.hasMessage,
+      message: guest.message ?? "",
     };
   }
 
@@ -53,6 +58,8 @@ function getInitialForm(
     arrivalTime: defaultArrivalTime,
     bringingSomething: false,
     bringingDescription: "",
+    hasMessage: false,
+    message: "",
   };
 }
 
@@ -90,6 +97,8 @@ export function GuestModal({
   const arrivalId = useId();
   const bringingId = useId();
   const bringingDescriptionId = useId();
+  const messageCheckboxId = useId();
+  const messageId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const initialForm = getInitialForm(mode, guest, defaultArrivalTime);
 
@@ -107,7 +116,9 @@ export function GuestModal({
       initialForm.additionalGuestNames.join("\n") ||
     form.arrivalTime !== initialForm.arrivalTime ||
     form.bringingSomething !== initialForm.bringingSomething ||
-    form.bringingDescription !== initialForm.bringingDescription;
+    form.bringingDescription !== initialForm.bringingDescription ||
+    form.hasMessage !== initialForm.hasMessage ||
+    form.message !== initialForm.message;
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -167,6 +178,8 @@ export function GuestModal({
       arrivalTime: form.arrivalTime,
       bringingSomething: form.bringingSomething,
       bringingDescription: form.bringingDescription,
+      hasMessage: form.hasMessage,
+      message: form.message,
     });
 
     if (!validation.ok) {
@@ -395,6 +408,45 @@ export function GuestModal({
                   setForm((current) => ({
                     ...current,
                     bringingDescription: event.target.value,
+                  }))
+                }
+                className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+              />
+            ) : null}
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-bold">
+              <input
+                id={messageCheckboxId}
+                name="hasMessage"
+                type="checkbox"
+                checked={form.hasMessage}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    hasMessage: event.target.checked,
+                  }))
+                }
+                className="h-5 w-5 rounded border-leaf/40"
+              />
+              Nachricht hinzufügen
+            </label>
+
+            {form.hasMessage ? (
+              <textarea
+                id={messageId}
+                name="message"
+                rows={3}
+                maxLength={MESSAGE_MAX_LENGTH}
+                placeholder="Deine Nachricht"
+                value={form.message}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    message: event.target.value,
                   }))
                 }
                 className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"

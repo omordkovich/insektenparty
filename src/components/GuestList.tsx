@@ -11,6 +11,7 @@ type GuestListProps = {
   onDelete: (guest: GuestDto) => void;
   onShowBringing: (guest: GuestDto) => void;
   onShowAdditionalGuests: (guest: GuestDto) => void;
+  onShowMessage: (guest: GuestDto) => void;
   actionsDisabled?: boolean;
 };
 
@@ -23,6 +24,7 @@ export function GuestList({
   onDelete,
   onShowBringing,
   onShowAdditionalGuests,
+  onShowMessage,
   actionsDisabled = false,
 }: GuestListProps) {
   return (
@@ -67,6 +69,7 @@ export function GuestList({
                     <th className="px-2 py-2" aria-hidden="true" />
                     <th className="px-2 py-2 font-bold">Ankunftszeit</th>
                     <th className="px-2 py-2 font-bold">Ich bringe was mit</th>
+                    <th className="px-2 py-2 font-bold">Nachricht</th>
                     <th className="px-2 py-2" aria-hidden="true" />
                   </tr>
                 </thead>
@@ -79,6 +82,7 @@ export function GuestList({
                       onDelete={onDelete}
                       onShowBringing={onShowBringing}
                       onShowAdditionalGuests={onShowAdditionalGuests}
+                      onShowMessage={onShowMessage}
                       disabled={actionsDisabled}
                     />
                   ))}

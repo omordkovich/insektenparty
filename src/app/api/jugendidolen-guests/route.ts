@@ -15,6 +15,8 @@ function toGuestDto(row: typeof jugendidolenGuests.$inferSelect): GuestDto {
     arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
     bringingSomething: row.bringingSomething,
     bringingDescription: row.bringingDescription,
+    hasMessage: row.hasMessage,
+    message: row.message,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -73,6 +75,8 @@ export async function POST(request: Request) {
         arrivalTime: validation.data.arrivalTime,
         bringingSomething: validation.data.bringingSomething,
         bringingDescription: validation.data.bringingDescription,
+        hasMessage: validation.data.hasMessage,
+        message: validation.data.message,
       })
       .returning();
 

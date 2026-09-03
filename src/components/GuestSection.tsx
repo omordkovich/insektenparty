@@ -7,6 +7,7 @@ import { BringingDetailsDialog } from "./BringingDetailsDialog";
 import { DeleteGuestDialog } from "./DeleteGuestDialog";
 import { GuestList } from "./GuestList";
 import { GuestModal, type GuestModalMode } from "./GuestModal";
+import { MessageDetailsDialog } from "./MessageDetailsDialog";
 
 type ModalState = {
   isOpen: boolean;
@@ -56,6 +57,7 @@ export function GuestSection({
   const [bringingGuest, setBringingGuest] = useState<GuestDto | null>(null);
   const [additionalGuestsGuest, setAdditionalGuestsGuest] =
     useState<GuestDto | null>(null);
+  const [messageGuest, setMessageGuest] = useState<GuestDto | null>(null);
 
   // Used for user-triggered refreshes (after save/delete), where showing the
   // loading spinner and any error banner is the desired feedback.
@@ -150,6 +152,7 @@ export function GuestSection({
         onDelete={setDeleteGuest}
         onShowBringing={setBringingGuest}
         onShowAdditionalGuests={setAdditionalGuestsGuest}
+        onShowMessage={setMessageGuest}
       />
 
       {modal.isOpen ? (
@@ -193,6 +196,14 @@ export function GuestSection({
           apiBasePath={apiBasePath}
           onClose={() => setAdditionalGuestsGuest(null)}
           onSaved={loadGuests}
+        />
+      ) : null}
+
+      {messageGuest ? (
+        <MessageDetailsDialog
+          key={messageGuest.id}
+          guest={messageGuest}
+          onClose={() => setMessageGuest(null)}
         />
       ) : null}
     </>

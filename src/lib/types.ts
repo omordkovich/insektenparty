@@ -6,6 +6,8 @@ export type GuestDto = {
   arrivalTime: string;
   bringingSomething: boolean;
   bringingDescription: string | null;
+  hasMessage: boolean;
+  message: string | null;
   createdAt: string;
   updatedAt: string;
 };

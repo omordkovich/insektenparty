@@ -23,6 +23,8 @@ function toGuestDto(row: typeof jugendidolenGuests.$inferSelect): GuestDto {
     arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
     bringingSomething: row.bringingSomething,
     bringingDescription: row.bringingDescription,
+    hasMessage: row.hasMessage,
+    message: row.message,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -68,6 +70,8 @@ export async function PATCH(request: Request, context: RouteContext) {
         arrivalTime: validation.data.arrivalTime,
         bringingSomething: validation.data.bringingSomething,
         bringingDescription: validation.data.bringingDescription,
+        hasMessage: validation.data.hasMessage,
+        message: validation.data.message,
         updatedAt: new Date(),
       })
       .where(eq(jugendidolenGuests.id, id))

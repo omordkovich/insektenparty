@@ -7,6 +7,7 @@ type GuestItemProps = {
   onDelete: (guest: GuestDto) => void;
   onShowBringing: (guest: GuestDto) => void;
   onShowAdditionalGuests: (guest: GuestDto) => void;
+  onShowMessage: (guest: GuestDto) => void;
   disabled?: boolean;
 };
 
@@ -16,6 +17,7 @@ export function GuestItem({
   onDelete,
   onShowBringing,
   onShowAdditionalGuests,
+  onShowMessage,
   disabled = false,
 }: GuestItemProps) {
   return (
@@ -54,6 +56,24 @@ export function GuestItem({
         ) : (
           <span className="text-muted/40" aria-label="Bringt nichts mit" title="Bringt nichts mit">
             <GiftIcon />
+          </span>
+        )}
+      </td>
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
+        {guest.hasMessage ? (
+          <button
+            type="button"
+            onClick={() => onShowMessage(guest)}
+            disabled={disabled}
+            aria-label={`Nachricht von ${guest.name} anzeigen`}
+            title="Hat eine Nachricht hinterlassen"
+            className="text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+          >
+            <MessageIcon />
+          </button>
+        ) : (
+          <span className="text-muted/40" aria-label="Keine Nachricht" title="Keine Nachricht">
+            <MessageIcon />
           </span>
         )}
       </td>
@@ -116,6 +136,20 @@ function GiftIcon() {
         strokeWidth="2"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function MessageIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 5h16v11H8l-4 4V5Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M8 9h8M8 12.5h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

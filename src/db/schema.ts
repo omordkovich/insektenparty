@@ -20,6 +20,8 @@ export const guests = pgTable("guests", {
   arrivalTime: time("arrival_time").notNull(),
   bringingSomething: boolean("bringing_something").notNull().default(false),
   bringingDescription: varchar("bringing_description", { length: 1000 }),
+  hasMessage: boolean("has_message").notNull().default(false),
+  message: varchar("message", { length: 1000 }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -43,6 +45,8 @@ export const jugendidolenGuests = pgTable("jugendidolen_guests", {
   arrivalTime: time("arrival_time").notNull(),
   bringingSomething: boolean("bringing_something").notNull().default(false),
   bringingDescription: varchar("bringing_description", { length: 1000 }),
+  hasMessage: boolean("has_message").notNull().default(false),
+  message: varchar("message", { length: 1000 }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
