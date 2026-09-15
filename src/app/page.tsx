@@ -1,25 +1,55 @@
-import Link from "next/link";
+import { desc, eq } from "drizzle-orm";
+import { getDb } from "@/db";
+import { parties } from "@/db/schema";
+import { AuthButtons } from "@/components/AuthButtons";
+import { CreatePartyButton } from "@/components/CreatePartyButton";
+import { PartyList } from "@/components/PartyList";
+import { SiteHeader } from "@/components/SiteHeader";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  const name =
+    typeof claims?.user_metadata?.name === "string" ? claims.user_metadata.name : null;
+
+  const myParties = claims
+    ? await getDb()
+        .select({ id: parties.id, slug: parties.slug, title: parties.title })
+        .from(parties)
+        .where(eq(parties.ownerId, claims.sub))
+        .orderBy(desc(parties.createdAt))
+    : [];
+
   return (
-    <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
-      <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
-        Willkomen auf die Seite unserer Familie!
-      </h1>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Link
-          href="/milans7BD"
-          className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
-        >
-          Milans 7. Geburtstagsparty
-        </Link>
-        <Link
-          href="/xenis37BD"
-          className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
-        >
-          Jugendidolen Party
-        </Link>
-      </div>
-    </main>
+    <>
+      <SiteHeader user={claims ? { name } : null} />
+      <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
+        <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
+          {claims ? `Hi ${name ?? claims.email}` : "Willkommen bei GASTZILLA!"}
+        </h1>
+
+        {!claims ? (
+          <>
+            <p className="mt-3 max-w-md text-zinc-600">
+              Melde dich an, um deine Partys zu verwalten.
+            </p>
+            <div className="mt-6">
+              <AuthButtons />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mt-8">
+              <PartyList initialParties={myParties} />
+            </div>
+            <div className="mt-6">
+              <CreatePartyButton />
+            </div>
+          </>
+        )}
+      </main>
+    </>
   );
 }

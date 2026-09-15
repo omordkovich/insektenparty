@@ -13,8 +13,8 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Familie Mordkovich",
-  description: "Willkommen auf der Seite unserer Familie.",
+  title: "GASTZILLA",
+  description: "GASTZILLA - digitale Einladungen und Gästelisten für deine Party.",
 };
 
 export default function RootLayout({

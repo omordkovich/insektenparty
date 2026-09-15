@@ -16,7 +16,7 @@ export type GuestModalMode = "create" | "edit";
 type GuestModalProps = {
   mode: GuestModalMode;
   guest: GuestDto | null;
-  apiBasePath?: string;
+  apiBasePath: string;
   defaultArrivalTime?: string;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
@@ -94,7 +94,7 @@ function removeAdditionalGuestName(
 export function GuestModal({
   mode,
   guest,
-  apiBasePath = "/api/guests",
+  apiBasePath,
   defaultArrivalTime = "09:00",
   onClose,
   onSaved,

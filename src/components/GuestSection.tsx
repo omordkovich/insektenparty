@@ -41,12 +41,12 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
 const POLL_INTERVAL_MS = 15_000;
 
 type GuestSectionProps = {
-  apiBasePath?: string;
+  apiBasePath: string;
   defaultArrivalTime?: string;
 };
 
 export function GuestSection({
-  apiBasePath = "/api/guests",
+  apiBasePath,
   defaultArrivalTime = "09:00",
 }: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);

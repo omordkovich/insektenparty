@@ -1,20 +1,13 @@
 import { useEffect, useId, useRef, useState } from "react";
-import type { GuestDto } from "@/lib/types";
 import { Button } from "./Button";
 
-type DeleteGuestDialogProps = {
-  guest: GuestDto;
-  apiBasePath: string;
+type DeletePartyDialogProps = {
+  party: { id: string; title: string };
   onClose: () => void;
   onDeleted: () => Promise<void> | void;
 };
 
-export function DeleteGuestDialog({
-  guest,
-  apiBasePath,
-  onClose,
-  onDeleted,
-}: DeleteGuestDialogProps) {
+export function DeletePartyDialog({ party, onClose, onDeleted }: DeletePartyDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -52,7 +45,7 @@ export function DeleteGuestDialog({
     setError(null);
 
     try {
-      const response = await fetch(`${apiBasePath}/${guest.id}`, {
+      const response = await fetch(`/api/parties/${party.id}`, {
         method: "DELETE",
       });
 
@@ -62,7 +55,7 @@ export function DeleteGuestDialog({
           | null;
         setError(
           payload?.error ??
-            "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
+            "Die Party konnte nicht gelöscht werden. Bitte versuche es erneut.",
         );
         return;
       }
@@ -70,9 +63,7 @@ export function DeleteGuestDialog({
       await onDeleted();
       onClose();
     } catch {
-      setError(
-        "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
-      );
+      setError("Die Party konnte nicht gelöscht werden. Bitte versuche es erneut.");
     } finally {
       deletingRef.current = false;
       setDeleting(false);
@@ -100,10 +91,10 @@ export function DeleteGuestDialog({
           id={titleId}
           className="font-[family-name:var(--font-display)] text-2xl text-leaf-dark"
         >
-          Gast löschen?
+          Wirklich löschen?
         </h2>
         <p id={descriptionId} className="mt-3 text-muted">
-          Möchtest du „{guest.name}“ wirklich aus der Gästeliste entfernen?
+          Möchtest du „{party.title}“ und die komplette Gästeliste dazu wirklich löschen?
         </p>
 
         {error ? (

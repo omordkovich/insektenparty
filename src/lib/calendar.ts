@@ -29,7 +29,7 @@ export function buildCalendarLink(params: {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Insektenparty//Einladung//DE",
+    "PRODID:-//GASTZILLA//Einladung//DE",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:${stamp}-${params.title.replace(/\s+/g, "-")}@insektenparty`,
