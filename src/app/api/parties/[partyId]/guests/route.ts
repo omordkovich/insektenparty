@@ -30,7 +30,7 @@ export async function GET(_request: Request, context: RouteContext) {
   try {
     const { partyId } = await context.params;
     if (!isUuid(partyId)) {
-      return NextResponse.json({ error: "Ungültige Party-ID." }, { status: 400 });
+      return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
     const db = getDb();
@@ -54,7 +54,7 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const { partyId } = await context.params;
     if (!isUuid(partyId)) {
-      return NextResponse.json({ error: "Ungültige Party-ID." }, { status: 400 });
+      return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
     let body: unknown;
@@ -81,7 +81,7 @@ export async function POST(request: Request, context: RouteContext) {
       .from(parties)
       .where(eq(parties.id, partyId));
     if (!party) {
-      return NextResponse.json({ error: "Party wurde nicht gefunden." }, { status: 404 });
+      return NextResponse.json({ error: "Event wurde nicht gefunden." }, { status: 404 });
     }
 
     const [created] = await db

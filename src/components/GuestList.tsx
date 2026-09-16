@@ -34,7 +34,7 @@ export function GuestList({
           id="guest-heading"
           className="text-center font-[family-name:var(--font-display)] text-3xl text-leaf-dark sm:text-4xl"
         >
-          Wer kommt zur Party?
+          Wer kommt zum Event?
         </h2>
 
         {loading ? (

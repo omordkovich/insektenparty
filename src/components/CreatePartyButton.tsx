@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreatePartyDialog } from "./CreatePartyDialog";
+import { EventDialog } from "./EventDialog";
 import { Button } from "./Button";
 
 export function CreatePartyButton() {
@@ -10,9 +10,9 @@ export function CreatePartyButton() {
   return (
     <>
       <Button variant="primary" size="lg" onClick={() => setOpen(true)}>
-        + Party erstellen
+        + Event erstellen
       </Button>
-      {open ? <CreatePartyDialog onClose={() => setOpen(false)} /> : null}
+      {open ? <EventDialog mode="create" onClose={() => setOpen(false)} /> : null}
     </>
   );
 }

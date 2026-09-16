@@ -1,14 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
 import { DeletePartyDialog } from "./DeletePartyDialog";
+import { EventDialog } from "./EventDialog";
 
 type PartyListItem = {
   id: string;
   slug: string;
   title: string;
+  theme: ThemeKey;
 };
 
 type PartyListProps = {
@@ -17,6 +21,7 @@ type PartyListProps = {
 
 export function PartyList({ initialParties }: PartyListProps) {
   const [partyList, setPartyList] = useState(initialParties);
+  const [editTarget, setEditTarget] = useState<PartyListItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PartyListItem | null>(null);
 
   return (
@@ -24,23 +29,31 @@ export function PartyList({ initialParties }: PartyListProps) {
       <div className="flex flex-col items-center gap-3">
         {partyList.map((party) => (
           <div key={party.id} className="flex items-center gap-2">
+            <Image
+              src={THEME_ASSETS[party.theme].logo}
+              alt=""
+              width={40}
+              height={40}
+              className="h-10 w-10 shrink-0 rounded-full object-contain"
+            />
             <Link
               href={`/p/${party.slug}`}
               className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
             >
-              {party.title || "Unbenannte Party"}
+              {party.title || "Unbenanntes Event"}
             </Link>
-            <Link
-              href={`/p/${party.slug}/edit`}
-              aria-label={`${party.title || "Unbenannte Party"} bearbeiten`}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-leaf/30 font-semibold transition hover:bg-leaf/10"
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label={`${party.title || "Unbenanntes Event"} bearbeiten`}
+              onClick={() => setEditTarget(party)}
             >
               <PencilIcon />
-            </Link>
+            </Button>
             <Button
               variant="outline-danger"
               size="icon"
-              aria-label={`${party.title || "Unbenannte Party"} löschen`}
+              aria-label={`${party.title || "Unbenanntes Event"} löschen`}
               onClick={() => setDeleteTarget(party)}
             >
               <TrashIcon />
@@ -48,6 +61,19 @@ export function PartyList({ initialParties }: PartyListProps) {
           </div>
         ))}
       </div>
+
+      {editTarget ? (
+        <EventDialog
+          mode="edit"
+          event={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSaved={(updated) =>
+            setPartyList((current) =>
+              current.map((p) => (p.id === editTarget.id ? { ...p, ...updated } : p)),
+            )
+          }
+        />
+      ) : null}
 
       {deleteTarget ? (
         <DeletePartyDialog
@@ -64,7 +90,7 @@ export function PartyList({ initialParties }: PartyListProps) {
 
 function PencilIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
         stroke="currentColor"

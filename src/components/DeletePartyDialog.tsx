@@ -55,7 +55,7 @@ export function DeletePartyDialog({ party, onClose, onDeleted }: DeletePartyDial
           | null;
         setError(
           payload?.error ??
-            "Die Party konnte nicht gelöscht werden. Bitte versuche es erneut.",
+            "Das Event konnte nicht gelöscht werden. Bitte versuche es erneut.",
         );
         return;
       }
@@ -63,7 +63,7 @@ export function DeletePartyDialog({ party, onClose, onDeleted }: DeletePartyDial
       await onDeleted();
       onClose();
     } catch {
-      setError("Die Party konnte nicht gelöscht werden. Bitte versuche es erneut.");
+      setError("Das Event konnte nicht gelöscht werden. Bitte versuche es erneut.");
     } finally {
       deletingRef.current = false;
       setDeleting(false);

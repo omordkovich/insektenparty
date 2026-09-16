@@ -20,7 +20,7 @@ export async function generateMetadata({
   const [party] = await db.select().from(parties).where(eq(parties.slug, slug));
 
   if (!party) {
-    return { title: "Party nicht gefunden" };
+    return { title: "Event nicht gefunden" };
   }
 
   return {

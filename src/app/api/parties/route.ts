@@ -4,6 +4,7 @@ import { parties } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { generateSlug } from "@/lib/slug";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+import { validatePartyField } from "@/lib/validation";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
@@ -29,10 +30,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Ungültiges Theme." }, { status: 400 });
     }
 
-    // New parties start with empty content - the owner fills everything in
-    // via the edit page (placeholders guide them there); only the theme is
-    // picked up front.
-    const slug = generateSlug(THEME_LABELS[theme as ThemeKey]);
+    const rawTitle = (body as { title?: unknown })?.title;
+    const titleValidation = validatePartyField("title", rawTitle);
+    if (!titleValidation.ok) {
+      return NextResponse.json({ error: titleValidation.error }, { status: 400 });
+    }
+    if (!titleValidation.value) {
+      return NextResponse.json(
+        { error: "Bitte gib einen Namen für dein Event ein." },
+        { status: 400 },
+      );
+    }
+
+    // Every other field starts empty - the owner fills them in via the
+    // inline-editable fields on the event page (placeholders guide them
+    // there); only name and theme are picked up front.
+    const slug = generateSlug(titleValidation.value);
 
     const db = getDb();
     const [created] = await db
@@ -42,7 +55,7 @@ export async function POST(request: Request) {
         slug,
         theme,
         kicker: "",
-        title: "",
+        title: titleValidation.value,
         greeting: "",
         dateLabel: "",
         timeLabel: "",
@@ -61,7 +74,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("POST /api/parties failed:", error);
     return NextResponse.json(
-      { error: "Die Party konnte nicht erstellt werden. Bitte versuche es erneut." },
+      { error: "Das Event konnte nicht erstellt werden. Bitte versuche es erneut." },
       { status: 500 },
     );
   }

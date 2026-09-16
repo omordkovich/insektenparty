@@ -14,7 +14,7 @@ const fredoka = Fredoka({
 
 export const metadata: Metadata = {
   title: "GASTZILLA",
-  description: "GASTZILLA - digitale Einladungen und Gästelisten für deine Party.",
+  description: "GASTZILLA - digitale Einladungen und Gästelisten für dein Event.",
 };
 
 export default function RootLayout({

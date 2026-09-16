@@ -5,6 +5,7 @@ import { AuthButtons } from "@/components/AuthButtons";
 import { CreatePartyButton } from "@/components/CreatePartyButton";
 import { PartyList } from "@/components/PartyList";
 import { SiteHeader } from "@/components/SiteHeader";
+import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -15,11 +16,18 @@ export default async function Home() {
     typeof claims?.user_metadata?.name === "string" ? claims.user_metadata.name : null;
 
   const myParties = claims
-    ? await getDb()
-        .select({ id: parties.id, slug: parties.slug, title: parties.title })
-        .from(parties)
-        .where(eq(parties.ownerId, claims.sub))
-        .orderBy(desc(parties.createdAt))
+    ? (
+        await getDb()
+          .select({
+            id: parties.id,
+            slug: parties.slug,
+            title: parties.title,
+            theme: parties.theme,
+          })
+          .from(parties)
+          .where(eq(parties.ownerId, claims.sub))
+          .orderBy(desc(parties.createdAt))
+      ).map((party) => ({ ...party, theme: party.theme as ThemeKey }))
     : [];
 
   return (
@@ -33,7 +41,7 @@ export default async function Home() {
         {!claims ? (
           <>
             <p className="mt-3 max-w-md text-zinc-600">
-              Melde dich an, um deine Partys zu verwalten.
+              Melde dich an, um deine Events zu verwalten.
             </p>
             <div className="mt-6">
               <AuthButtons />

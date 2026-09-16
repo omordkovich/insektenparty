@@ -185,41 +185,43 @@ export function validateGuestInput(body: unknown): ValidationResult {
 
 export const PARTY_TEXT_MAX_LENGTH = 200;
 export const PARTY_GREETING_MAX_LENGTH = 1000;
-export const EVENT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-export type PartyInput = {
-  kicker: string;
-  title: string;
-  greeting: string;
-  dateLabel: string;
-  timeLabel: string;
-  locationLabel: string;
-  defaultArrivalTime: string;
-  eventDate: string | null;
-  eventStartTime: string | null;
-  eventEndTime: string | null;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-};
+// One entry per inline-editable field on a party's public page. Each field
+// is saved independently (see EditableField.tsx), so validation is per-field
+// rather than for a whole-party object - an empty value is always valid
+// (that's the "not filled in yet" placeholder state).
+export const PARTY_FIELDS = {
+  kicker: { label: "Kicker", maxLength: PARTY_TEXT_MAX_LENGTH },
+  title: { label: "Titel", maxLength: PARTY_TEXT_MAX_LENGTH },
+  greeting: { label: "Begrüßungstext", maxLength: PARTY_GREETING_MAX_LENGTH },
+  dateLabel: { label: "Datum", maxLength: PARTY_TEXT_MAX_LENGTH },
+  timeLabel: { label: "Uhrzeit", maxLength: PARTY_TEXT_MAX_LENGTH },
+  locationLabel: { label: "Ort", maxLength: PARTY_TEXT_MAX_LENGTH },
+  contactName: { label: "Kontaktname", maxLength: PARTY_TEXT_MAX_LENGTH },
+  contactPhone: { label: "Telefonnummer", maxLength: PARTY_TEXT_MAX_LENGTH },
+  contactEmail: { label: "E-Mail", maxLength: PARTY_TEXT_MAX_LENGTH },
+} as const;
 
-export type PartyValidationResult =
-  | { ok: true; data: PartyInput }
+export type PartyFieldKey = keyof typeof PARTY_FIELDS;
+
+export function isPartyFieldKey(key: string): key is PartyFieldKey {
+  return key in PARTY_FIELDS;
+}
+
+export type PartyFieldValidationResult =
+  | { ok: true; value: string }
   | { ok: false; error: string };
 
-// Every field is allowed to be empty - that's the expected "not filled in
-// yet" state for a freshly created party - this only caps length/format.
-function validateOptionalText(
-  body: Record<string, unknown>,
-  key: string,
-  label: string,
-  maxLength: number,
-): { ok: true; value: string } | { ok: false; error: string } {
-  const raw = body[key];
-  if (typeof raw !== "string") {
+export function validatePartyField(
+  key: PartyFieldKey,
+  rawValue: unknown,
+): PartyFieldValidationResult {
+  const { label, maxLength } = PARTY_FIELDS[key];
+
+  if (typeof rawValue !== "string") {
     return { ok: false, error: `${label} ist ungültig.` };
   }
-  const trimmed = raw.trim();
+  const trimmed = rawValue.trim();
   if (trimmed.length > maxLength) {
     return {
       ok: false,
@@ -227,102 +229,6 @@ function validateOptionalText(
     };
   }
   return { ok: true, value: trimmed };
-}
-
-export function validatePartyInput(body: unknown): PartyValidationResult {
-  if (!isPlainObject(body)) {
-    return { ok: false, error: "Ungültige Anfragedaten." };
-  }
-
-  const fields: Record<string, string> = {};
-  const textFields: Array<[key: string, label: string, maxLength: number]> = [
-    ["kicker", "Kicker", PARTY_TEXT_MAX_LENGTH],
-    ["title", "Titel", PARTY_TEXT_MAX_LENGTH],
-    ["greeting", "Begrüßungstext", PARTY_GREETING_MAX_LENGTH],
-    ["dateLabel", "Datum", PARTY_TEXT_MAX_LENGTH],
-    ["timeLabel", "Uhrzeit", PARTY_TEXT_MAX_LENGTH],
-    ["locationLabel", "Ort", PARTY_TEXT_MAX_LENGTH],
-    ["contactName", "Kontaktname", PARTY_TEXT_MAX_LENGTH],
-    ["contactPhone", "Telefonnummer", PARTY_TEXT_MAX_LENGTH],
-    ["contactEmail", "E-Mail", PARTY_TEXT_MAX_LENGTH],
-  ];
-
-  for (const [key, label, maxLength] of textFields) {
-    const result = validateOptionalText(body, key, label, maxLength);
-    if (!result.ok) return result;
-    fields[key] = result.value;
-  }
-
-  const defaultArrivalResult = validateOptionalText(
-    body,
-    "defaultArrivalTime",
-    "Standard-Ankunftszeit",
-    5,
-  );
-  if (!defaultArrivalResult.ok) return defaultArrivalResult;
-  if (
-    defaultArrivalResult.value &&
-    !ARRIVAL_TIME_PATTERN.test(defaultArrivalResult.value)
-  ) {
-    return {
-      ok: false,
-      error: "Standard-Ankunftszeit muss im Format HH:mm angegeben werden.",
-    };
-  }
-
-  const rawEventDate = body.eventDate;
-  const rawEventStartTime = body.eventStartTime;
-  const rawEventEndTime = body.eventEndTime;
-
-  const eventDate =
-    typeof rawEventDate === "string" ? rawEventDate.trim() : "";
-  const eventStartTime =
-    typeof rawEventStartTime === "string" ? rawEventStartTime.trim() : "";
-  const eventEndTime =
-    typeof rawEventEndTime === "string" ? rawEventEndTime.trim() : "";
-
-  const eventFieldsSet = [eventDate, eventStartTime, eventEndTime].filter(
-    (value) => value !== "",
-  ).length;
-
-  if (eventFieldsSet !== 0 && eventFieldsSet !== 3) {
-    return {
-      ok: false,
-      error:
-        "Für den Kalender-Link müssen Datum, Start- und Endzeit entweder alle drei oder gar nicht gesetzt sein.",
-    };
-  }
-
-  if (eventFieldsSet === 3) {
-    if (!EVENT_DATE_PATTERN.test(eventDate)) {
-      return { ok: false, error: "Datum muss im Format JJJJ-MM-TT angegeben werden." };
-    }
-    if (!ARRIVAL_TIME_PATTERN.test(eventStartTime)) {
-      return { ok: false, error: "Startzeit muss im Format HH:mm angegeben werden." };
-    }
-    if (!ARRIVAL_TIME_PATTERN.test(eventEndTime)) {
-      return { ok: false, error: "Endzeit muss im Format HH:mm angegeben werden." };
-    }
-  }
-
-  return {
-    ok: true,
-    data: {
-      kicker: fields.kicker,
-      title: fields.title,
-      greeting: fields.greeting,
-      dateLabel: fields.dateLabel,
-      timeLabel: fields.timeLabel,
-      locationLabel: fields.locationLabel,
-      defaultArrivalTime: defaultArrivalResult.value,
-      eventDate: eventFieldsSet === 3 ? eventDate : null,
-      eventStartTime: eventFieldsSet === 3 ? eventStartTime : null,
-      eventEndTime: eventFieldsSet === 3 ? eventEndTime : null,
-      contactName: fields.contactName,
-      contactPhone: fields.contactPhone,
-      contactEmail: fields.contactEmail,
-    },
-  };
 }
 
 export function normalizeArrivalTime(value: string): string {

@@ -9,6 +9,7 @@ import { Hero } from "@/components/Hero";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import type { PartyConfig } from "@/lib/party-config";
+import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 
 type PartyPageProps = {
@@ -23,6 +24,10 @@ export default async function PartyPage({ params }: PartyPageProps) {
   if (!party) {
     notFound();
   }
+
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const isOwner = data?.claims?.sub === party.ownerId;
 
   const config: PartyConfig = {
     kicker: party.kicker,
@@ -47,13 +52,13 @@ export default async function PartyPage({ params }: PartyPageProps) {
     <div className="relative flex min-h-full flex-col" style={{ isolation: "isolate" }}>
       <Header config={config} />
       <main className="flex-1">
-        <Hero config={config} />
+        <Hero config={config} partyId={party.id} isOwner={isOwner} />
         <GuestSection
           apiBasePath={`/api/parties/${party.id}/guests`}
           defaultArrivalTime={config.defaultArrivalTime}
         />
       </main>
-      <Footer config={config} />
+      <Footer config={config} partyId={party.id} isOwner={isOwner} />
       <MadeWithBadge />
 
       <ParallaxSideGraphics
