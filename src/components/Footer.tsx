@@ -1,4 +1,5 @@
 import { EditableField } from "@/components/EditableField";
+import { MadeWithBadge } from "@/components/MadeWithBadge";
 import type { PartyConfig } from "@/lib/party-config";
 
 type FooterProps = {
@@ -10,8 +11,8 @@ type FooterProps = {
 export function Footer({ config, partyId, isOwner }: FooterProps) {
   return (
     <footer className="page-shell py-6">
-      <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-[var(--shadow)] sm:p-8">
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-leaf-dark">
+      <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-(--shadow) sm:p-8">
+        <h2 className="font-display text-2xl text-leaf-dark">
           Kontakt
         </h2>
         <p className="mt-3 text-muted">
@@ -25,7 +26,6 @@ export function Footer({ config, partyId, isOwner }: FooterProps) {
             className="text-muted"
           />
           <br />
-          Tel.{" "}
           <EditableField
             partyId={partyId}
             fieldKey="contactPhone"
@@ -47,6 +47,7 @@ export function Footer({ config, partyId, isOwner }: FooterProps) {
             link={{ href: `mailto:${config.contact.email}` }}
           />
         </p>
+        <MadeWithBadge />
       </div>
     </footer>
   );

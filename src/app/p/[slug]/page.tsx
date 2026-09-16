@@ -6,11 +6,11 @@ import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { MadeWithBadge } from "@/components/MadeWithBadge";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import type { PartyConfig } from "@/lib/party-config";
 import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
+import { normalizeArrivalTime } from "@/lib/validation";
 
 type PartyPageProps = {
   params: Promise<{ slug: string }>;
@@ -38,8 +38,8 @@ export default async function PartyPage({ params }: PartyPageProps) {
     locationLabel: party.locationLabel,
     defaultArrivalTime: party.defaultArrivalTime,
     eventDate: party.eventDate,
-    eventStartTime: party.eventStartTime,
-    eventEndTime: party.eventEndTime,
+    eventStartTime: party.eventStartTime ? normalizeArrivalTime(party.eventStartTime) : null,
+    eventEndTime: party.eventEndTime ? normalizeArrivalTime(party.eventEndTime) : null,
     contact: {
       name: party.contactName,
       phone: party.contactPhone,
@@ -59,7 +59,6 @@ export default async function PartyPage({ params }: PartyPageProps) {
         />
       </main>
       <Footer config={config} partyId={party.id} isOwner={isOwner} />
-      <MadeWithBadge />
 
       <ParallaxSideGraphics
         leftSrc={config.assets.plantsLeft}

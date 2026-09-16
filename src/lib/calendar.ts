@@ -73,3 +73,29 @@ export function buildGoogleCalendarLink(params: {
 export function buildMapsLink(location: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 }
+
+const dateLabelFormatter = new Intl.DateTimeFormat("de-DE", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+// Formats an ISO date (YYYY-MM-DD) into the human-readable label shown on
+// the party page, e.g. "Sonntag, 13. September 2026". Parsed and formatted
+// in UTC throughout so the result never shifts by a day depending on the
+// server's local timezone.
+export function formatDateLabel(date: string | null): string {
+  if (!date) return "";
+  return dateLabelFormatter.format(new Date(`${date}T00:00:00Z`));
+}
+
+// Formats the event's start/end times into the human-readable label shown
+// on the party page, e.g. "09:30 - 12:00 Uhr" or "ab 09:30 Uhr" when no end
+// time is set.
+export function formatTimeLabel(startTime: string | null, endTime: string | null): string {
+  if (!startTime) return "";
+  if (!endTime) return `ab ${startTime} Uhr`;
+  return `${startTime} - ${endTime} Uhr`;
+}

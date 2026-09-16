@@ -12,7 +12,7 @@ export function CreatePartyButton() {
       <Button variant="primary" size="lg" onClick={() => setOpen(true)}>
         + Event erstellen
       </Button>
-      {open ? <EventDialog mode="create" onClose={() => setOpen(false)} /> : null}
+      {open ? <EventDialog mode="create" onCloseAction={() => setOpen(false)} /> : null}
     </>
   );
 }

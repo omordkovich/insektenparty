@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
+import React from "react";
 
 const nunito = Nunito({
   variable: "--font-nunito",

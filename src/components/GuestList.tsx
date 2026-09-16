@@ -29,10 +29,10 @@ export function GuestList({
 }: GuestListProps) {
   return (
     <section className="page-shell py-6" aria-labelledby="guest-heading">
-      <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-[var(--shadow)] sm:p-8">
+      <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
         <h2
           id="guest-heading"
-          className="text-center font-[family-name:var(--font-display)] text-3xl text-leaf-dark sm:text-4xl"
+          className="text-center font-display text-3xl text-leaf-dark sm:text-4xl"
         >
           Wer kommt zum Event?
         </h2>

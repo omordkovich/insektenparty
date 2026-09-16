@@ -2,11 +2,14 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { parties } from "@/db/schema";
+import { formatDateLabel, formatTimeLabel } from "@/lib/calendar";
 import { createClient } from "@/lib/supabase/server";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 import {
   isPartyFieldKey,
   isUuid,
+  validateEventDate,
+  validateEventTime,
   validatePartyField,
   type PartyFieldKey,
 } from "@/lib/validation";
@@ -49,12 +52,36 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const updates: Partial<Record<PartyFieldKey, string>> = {};
     let themeUpdate: ThemeKey | undefined;
+    let eventDateUpdate: string | null | undefined;
+    let eventStartTimeUpdate: string | null | undefined;
+    let eventEndTimeUpdate: string | null | undefined;
+
     for (const [key, rawValue] of Object.entries(body as Record<string, unknown>)) {
       if (key === "theme") {
         if (typeof rawValue !== "string" || !THEME_KEYS.includes(rawValue as ThemeKey)) {
           return NextResponse.json({ error: "Ungültiges Theme." }, { status: 400 });
         }
         themeUpdate = rawValue as ThemeKey;
+        continue;
+      }
+      if (key === "eventDate") {
+        const validation = validateEventDate(rawValue);
+        if (!validation.ok) {
+          return NextResponse.json({ error: validation.error }, { status: 400 });
+        }
+        eventDateUpdate = validation.value;
+        continue;
+      }
+      if (key === "eventStartTime" || key === "eventEndTime") {
+        const validation = validateEventTime(rawValue);
+        if (!validation.ok) {
+          return NextResponse.json({ error: validation.error }, { status: 400 });
+        }
+        if (key === "eventStartTime") {
+          eventStartTimeUpdate = validation.value;
+        } else {
+          eventEndTimeUpdate = validation.value;
+        }
         continue;
       }
       if (!isPartyFieldKey(key)) continue;
@@ -65,7 +92,32 @@ export async function PATCH(request: Request, context: RouteContext) {
       updates[key] = validation.value;
     }
 
-    if (Object.keys(updates).length === 0 && !themeUpdate) {
+    // Start/end time are edited together as one "Uhrzeit" field (see
+    // EditableTimeRangeField) and the derived label below needs both, so a
+    // request touching only one of them is rejected rather than guessed at.
+    if (
+      (eventStartTimeUpdate !== undefined) !== (eventEndTimeUpdate !== undefined)
+    ) {
+      return NextResponse.json(
+        { error: "Start- und Endzeit müssen gemeinsam angegeben werden." },
+        { status: 400 },
+      );
+    }
+
+    if (eventDateUpdate !== undefined) {
+      updates.dateLabel = formatDateLabel(eventDateUpdate);
+    }
+    if (eventStartTimeUpdate !== undefined) {
+      updates.timeLabel = formatTimeLabel(eventStartTimeUpdate, eventEndTimeUpdate ?? null);
+    }
+
+    const hasAnyUpdate =
+      Object.keys(updates).length > 0 ||
+      themeUpdate !== undefined ||
+      eventDateUpdate !== undefined ||
+      eventStartTimeUpdate !== undefined;
+
+    if (!hasAnyUpdate) {
       return NextResponse.json({ error: "Kein gültiges Feld angegeben." }, { status: 400 });
     }
 
@@ -75,10 +127,13 @@ export async function PATCH(request: Request, context: RouteContext) {
       .set({
         ...updates,
         ...(themeUpdate ? { theme: themeUpdate } : {}),
+        ...(eventDateUpdate !== undefined ? { eventDate: eventDateUpdate } : {}),
+        ...(eventStartTimeUpdate !== undefined ? { eventStartTime: eventStartTimeUpdate } : {}),
+        ...(eventEndTimeUpdate !== undefined ? { eventEndTime: eventEndTimeUpdate } : {}),
         updatedAt: new Date(),
       })
       .where(and(eq(parties.id, partyId), eq(parties.ownerId, userId)))
-      .returning({ slug: parties.slug, title: parties.title, theme: parties.theme });
+      .returning();
 
     if (!updated) {
       return NextResponse.json({ error: "Event wurde nicht gefunden." }, { status: 404 });

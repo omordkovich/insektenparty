@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
 import type { PartyFieldKey } from "@/lib/validation";
+import { InlineEditShell } from "./InlineEditShell";
 
 type EditableFieldProps = {
   partyId: string;
@@ -63,16 +64,11 @@ export function EditableField({
   }
 
   const [currentValue, setCurrentValue] = useState(value);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  async function handleSave() {
+  async function handleSaveAction() {
     const newValue = (as === "textarea" ? textareaRef.current?.value : inputRef.current?.value) ?? "";
-    setSaving(true);
-    setError(null);
 
     try {
       const response = await fetch(`/api/parties/${partyId}`, {
@@ -85,131 +81,46 @@ export function EditableField({
         const body = (await response.json().catch(() => null)) as
           | { error?: string }
           | null;
-        setError(body?.error ?? "Konnte nicht gespeichert werden.");
-        setSaving(false);
-        return;
+        return { ok: false as const, error: body?.error ?? "Konnte nicht gespeichert werden." };
       }
 
       setCurrentValue(newValue);
-      setEditing(false);
+      return { ok: true as const };
     } catch {
-      setError("Konnte nicht gespeichert werden.");
-    } finally {
-      setSaving(false);
+      return { ok: false as const, error: "Konnte nicht gespeichert werden." };
     }
   }
 
-  // Non-owners (and logged-out visitors) get exactly the plain text/link
-  // they always got - no wrapper, no extra markup, zero behavior change.
-  if (!isOwner) {
-    return <>{currentValue ? renderDisplayValue(currentValue) : null}</>;
-  }
-
-  if (!editing) {
-    return (
-      <span className="inline-flex items-center gap-2">
-        <span className={currentValue ? className : `${className} opacity-40`}>
-          {currentValue ? renderDisplayValue(currentValue) : placeholder}
-        </span>
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          aria-label={ariaLabel}
-          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-leaf/30 text-leaf-dark transition hover:bg-leaf/10"
-        >
-          <PencilIcon />
-        </button>
-      </span>
-    );
-  }
-
   return (
-    <span className="block">
-      {as === "textarea" ? (
-        <textarea
-          ref={textareaRef}
-          defaultValue={currentValue}
-          placeholder={placeholder}
-          disabled={saving}
-          rows={2}
-          className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-white px-2 py-1`}
-        />
-      ) : (
-        <input
-          ref={inputRef}
-          type="text"
-          defaultValue={currentValue}
-          placeholder={placeholder}
-          disabled={saving}
-          className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
-        />
-      )}
-      <span className="mt-1 inline-flex gap-2">
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          aria-label="Speichern"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-leaf/30 text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
-        >
-          <CheckIcon />
-        </button>
-        <button
-          type="button"
-          onClick={() => setEditing(false)}
-          disabled={saving}
-          aria-label="Abbrechen"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-danger/30 text-danger transition hover:bg-red-50 disabled:opacity-50"
-        >
-          <CloseIcon />
-        </button>
-      </span>
-      {error ? (
-        <span className="mt-1 block text-sm text-danger" role="alert">
-          {error}
-        </span>
-      ) : null}
-    </span>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path d="M13 6l3 3" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M5 13l4 4L19 7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
+    <InlineEditShell
+      isOwner={isOwner}
+      ariaLabel={ariaLabel}
+      className={className}
+      isEmpty={!currentValue}
+      placeholder={placeholder}
+      displayContent={currentValue ? renderDisplayValue(currentValue) : null}
+      onSaveAction={handleSaveAction}
+      renderEditor={({ saving }) =>
+        as === "textarea" ? (
+          <textarea
+            ref={textareaRef}
+            defaultValue={currentValue}
+            placeholder={placeholder}
+            disabled={saving}
+            rows={2}
+            className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+          />
+        ) : (
+          <input
+            ref={inputRef}
+            type="text"
+            defaultValue={currentValue}
+            placeholder={placeholder}
+            disabled={saving}
+            className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+          />
+        )
+      }
+    />
   );
 }

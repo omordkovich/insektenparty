@@ -66,8 +66,8 @@ export function PartyList({ initialParties }: PartyListProps) {
         <EventDialog
           mode="edit"
           event={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSaved={(updated) =>
+          onCloseAction={() => setEditTarget(null)}
+          onSavedAction={(updated) =>
             setPartyList((current) =>
               current.map((p) => (p.id === editTarget.id ? { ...p, ...updated } : p)),
             )
@@ -78,8 +78,8 @@ export function PartyList({ initialParties }: PartyListProps) {
       {deleteTarget ? (
         <DeletePartyDialog
           party={deleteTarget}
-          onClose={() => setDeleteTarget(null)}
-          onDeleted={() =>
+          onCloseAction={() => setDeleteTarget(null)}
+          onDeletedAction={() =>
             setPartyList((current) => current.filter((p) => p.id !== deleteTarget.id))
           }
         />

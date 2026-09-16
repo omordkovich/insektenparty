@@ -241,3 +241,41 @@ export function isUuid(value: string): boolean {
     value,
   );
 }
+
+const EVENT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+export type NullableFieldValidationResult =
+  | { ok: true; value: string | null }
+  | { ok: false; error: string };
+
+// Event date/time fields are nullable (the owner may clear a date/time they
+// already set) and use native <input type="date"/"time"> values, so an
+// empty string is treated the same as null rather than rejected.
+export function validateEventDate(rawValue: unknown): NullableFieldValidationResult {
+  if (rawValue === null || rawValue === "") {
+    return { ok: true, value: null };
+  }
+  if (typeof rawValue !== "string" || !EVENT_DATE_PATTERN.test(rawValue)) {
+    return { ok: false, error: "Datum ist ungültig." };
+  }
+  const [year, month, day] = rawValue.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  const isRealDate =
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day;
+  if (!isRealDate) {
+    return { ok: false, error: "Datum ist ungültig." };
+  }
+  return { ok: true, value: rawValue };
+}
+
+export function validateEventTime(rawValue: unknown): NullableFieldValidationResult {
+  if (rawValue === null || rawValue === "") {
+    return { ok: true, value: null };
+  }
+  if (typeof rawValue !== "string" || !ARRIVAL_TIME_PATTERN.test(rawValue)) {
+    return { ok: false, error: "Uhrzeit ist ungültig." };
+  }
+  return { ok: true, value: rawValue };
+}

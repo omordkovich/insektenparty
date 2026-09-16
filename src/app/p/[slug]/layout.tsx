@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getDb } from "@/db";
 import { parties } from "@/db/schema";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
+import React from "react";
 
 type PartyLayoutProps = {
   children: React.ReactNode;

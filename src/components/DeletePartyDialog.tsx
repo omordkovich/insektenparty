@@ -1,46 +1,27 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Button } from "./Button";
+import { Modal } from "./Modal";
 
 type DeletePartyDialogProps = {
   party: { id: string; title: string };
-  onClose: () => void;
-  onDeleted: () => Promise<void> | void;
+  onCloseAction: () => void;
+  onDeletedAction: () => Promise<void> | void;
 };
 
-export function DeletePartyDialog({ party, onClose, onDeleted }: DeletePartyDialogProps) {
+export function DeletePartyDialog({
+  party,
+  onCloseAction,
+  onDeletedAction,
+}: DeletePartyDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const deletingRef = useRef(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.classList.add("modal-open");
-    document.body.style.overflow = "hidden";
-    cancelRef.current?.focus();
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !deletingRef.current) {
-        event.preventDefault();
-        onClose();
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      document.body.classList.remove("modal-open");
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [onClose]);
 
   async function handleDelete() {
     if (deleting) return;
 
-    deletingRef.current = true;
     setDeleting(true);
     setError(null);
 
@@ -60,58 +41,45 @@ export function DeletePartyDialog({ party, onClose, onDeleted }: DeletePartyDial
         return;
       }
 
-      await onDeleted();
-      onClose();
+      await onDeletedAction();
+      onCloseAction();
     } catch {
       setError("Das Event konnte nicht gelöscht werden. Bitte versuche es erneut.");
     } finally {
-      deletingRef.current = false;
       setDeleting(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-6">
-      <button
-        type="button"
-        className="absolute inset-0 bg-black/55"
-        aria-label="Dialog schließen"
-        onClick={() => {
-          if (!deleting) onClose();
-        }}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        className="relative z-10 w-full max-w-md rounded-3xl bg-surface p-5 shadow-[var(--shadow)] sm:p-7"
-      >
-        <h2
-          id={titleId}
-          className="font-[family-name:var(--font-display)] text-2xl text-leaf-dark"
-        >
-          Wirklich löschen?
-        </h2>
-        <p id={descriptionId} className="mt-3 text-muted">
-          Möchtest du „{party.title}“ und die komplette Gästeliste dazu wirklich löschen?
+    <Modal
+      titleId={titleId}
+      descriptionId={descriptionId}
+      onCloseAction={onCloseAction}
+      closeDisabled={deleting}
+      initialFocusRef={cancelRef}
+      showCloseButton={false}
+    >
+      <h2 id={titleId} className="font-display text-2xl text-leaf-dark">
+        Wirklich löschen?
+      </h2>
+      <p id={descriptionId} className="mt-3 text-muted">
+        Möchtest du „{party.title}“ und die komplette Gästeliste dazu wirklich löschen?
+      </p>
+
+      {error ? (
+        <p className="mt-3 text-sm text-danger" role="alert">
+          {error}
         </p>
+      ) : null}
 
-        {error ? (
-          <p className="mt-3 text-sm text-danger" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button ref={cancelRef} variant="outline" onClick={onClose} disabled={deleting}>
-            Abbrechen
-          </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-            {deleting ? "Wird gelöscht ..." : "Löschen"}
-          </Button>
-        </div>
+      <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button ref={cancelRef} variant="outline" onClick={onCloseAction} disabled={deleting}>
+          Abbrechen
+        </Button>
+        <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          {deleting ? "Wird gelöscht ..." : "Löschen"}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 }

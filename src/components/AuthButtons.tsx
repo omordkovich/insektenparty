@@ -19,7 +19,7 @@ export function AuthButtons() {
       </div>
 
       {authMode ? (
-        <AuthDialog initialMode={authMode} onClose={() => setAuthMode(null)} />
+        <AuthDialog initialMode={authMode} onCloseAction={() => setAuthMode(null)} />
       ) : null}
     </>
   );

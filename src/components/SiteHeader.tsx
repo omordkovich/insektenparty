@@ -8,7 +8,7 @@ type SiteHeaderProps = {
 export function SiteHeader({ user }: SiteHeaderProps) {
   return (
     <header className="flex items-center justify-between p-4">
-      <span className="font-[family-name:var(--font-display)] text-xl text-leaf-dark">
+      <span className="font-display text-xl text-leaf-dark">
         GASTZILLA
       </span>
 

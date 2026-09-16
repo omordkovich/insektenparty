@@ -176,8 +176,8 @@ export function GuestSection({
           key={deleteGuest.id}
           guest={deleteGuest}
           apiBasePath={apiBasePath}
-          onClose={() => setDeleteGuest(null)}
-          onDeleted={loadGuests}
+          onCloseAction={() => setDeleteGuest(null)}
+          onDeletedAction={loadGuests}
         />
       ) : null}
 
@@ -185,7 +185,7 @@ export function GuestSection({
         <BringingDetailsDialog
           key={bringingGuest.id}
           guest={bringingGuest}
-          onClose={() => setBringingGuest(null)}
+          onCloseAction={() => setBringingGuest(null)}
         />
       ) : null}
 
@@ -193,7 +193,7 @@ export function GuestSection({
         <AdditionalGuestsDialog
           key={additionalGuestsGuest.id}
           guest={additionalGuestsGuest}
-          onClose={() => setAdditionalGuestsGuest(null)}
+          onCloseAction={() => setAdditionalGuestsGuest(null)}
         />
       ) : null}
 
@@ -201,7 +201,7 @@ export function GuestSection({
         <MessageDetailsDialog
           key={messageGuest.id}
           guest={messageGuest}
-          onClose={() => setMessageGuest(null)}
+          onCloseAction={() => setMessageGuest(null)}
         />
       ) : null}
     </>

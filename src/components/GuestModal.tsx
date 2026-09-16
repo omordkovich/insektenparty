@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState, type SubmitEvent } from "react";
 import type { GuestDto } from "@/lib/types";
 import {
   ARRIVAL_TIME_PATTERN,
@@ -9,6 +9,7 @@ import {
   validateGuestInput,
 } from "@/lib/validation";
 import { Button } from "./Button";
+import { FormModal } from "./FormModal";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type GuestModalMode = "create" | "edit";
@@ -128,36 +129,6 @@ export function GuestModal({
     form.hasMessage !== initialForm.hasMessage ||
     form.message !== initialForm.message;
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.classList.add("modal-open");
-    document.body.style.overflow = "hidden";
-    nameInputRef.current?.focus();
-
-    return () => {
-      document.body.classList.remove("modal-open");
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
-
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      if (saving) return;
-      if (isDirty) {
-        const confirmed = window.confirm(
-          "Es gibt ungespeicherte Änderungen. Modal wirklich schließen?",
-        );
-        if (!confirmed) return;
-      }
-      onClose();
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [saving, isDirty, onClose]);
-
   function requestClose() {
     if (saving) return;
     if (isDirty) {
@@ -169,7 +140,7 @@ export function GuestModal({
     onClose();
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
 
@@ -250,273 +221,226 @@ export function GuestModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-6">
-      <button
-        type="button"
-        className="absolute inset-0 bg-black/55"
-        aria-label="Dialog schließen"
-        onClick={requestClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className="relative z-10 flex max-h-[95dvh] w-full max-w-md flex-col overflow-hidden rounded-3xl bg-surface p-1 shadow-[var(--shadow)]"
-      >
-        <form onSubmit={handleSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
-        <div className="shrink-0 p-5 pb-4 sm:p-7 sm:pb-4">
-        <button
-          type="button"
-          onClick={requestClose}
-          disabled={saving}
-          aria-label="Schließen"
-          className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
-        >
-          <CloseIcon />
-        </button>
-
-        <h2
-          id={titleId}
-          className="pr-8 font-[family-name:var(--font-display)] text-2xl text-leaf-dark"
-        >
-          {mode === "create" ? "Gast hinzufügen" : "Gast bearbeiten"}
-        </h2>
-        </div>
-
-        <div
-          className="mr-4 min-h-0 flex-1 overflow-y-auto px-5 pb-5 sm:px-7 sm:pb-7"
-          style={{ scrollbarGutter: "stable" }}
-        >
-        <div className="space-y-4">
-          <div>
-            <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-              Name
-            </label>
-            <input
-              ref={nameInputRef}
-              id={nameId}
-              name="name"
-              type="text"
-              autoComplete="name"
-              maxLength={NAME_MAX_LENGTH}
-              placeholder="Name des Gastes"
-              value={form.name}
-              disabled={saving}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, name: event.target.value }))
-              }
-              className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-            />
-          </div>
-
-          <div>
-            <label htmlFor={additionalId} className="mb-1 block text-sm font-bold">
-              Zusätzliche Personen
-            </label>
-            <input
-              id={additionalId}
-              name="additionalGuests"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={MAX_ADDITIONAL_GUESTS}
-              step={1}
-              value={form.additionalGuests}
-              disabled={saving}
-              onChange={(event) => {
-                const rawValue = event.target.value;
-                setForm((current) => ({
-                  ...current,
-                  additionalGuests: rawValue,
-                  additionalGuestNames: resizeAdditionalGuestNames(
-                    rawValue,
-                    current.additionalGuestNames,
-                  ),
-                }));
-              }}
-              className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-            />
-          </div>
-
-          {form.additionalGuestNames.length > 0 ? (
-            <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
-              <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
-              {form.additionalGuestNames.map((additionalName, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    maxLength={NAME_MAX_LENGTH}
-                    aria-label={`Name Gast ${index + 1}`}
-                    placeholder={`Gast_${index + 1}`}
-                    value={additionalName}
-                    disabled={saving}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      setForm((current) => {
-                        const names = current.additionalGuestNames.slice();
-                        names[index] = value;
-                        return { ...current, additionalGuestNames: names };
-                      });
-                    }}
-                    className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-white px-3 py-2"
-                  />
-                  <Button
-                    variant="outline-danger"
-                    size="icon"
-                    aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
-                    onClick={() =>
-                      setForm((current) => ({
-                        ...current,
-                        ...removeAdditionalGuestName(
-                          index,
-                          current.additionalGuestNames,
-                        ),
-                      }))
-                    }
-                    disabled={saving}
-                  >
-                    <TrashIcon />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <div>
-            <label htmlFor={arrivalId} className="mb-1 block text-sm font-bold">
-              Ankunftszeit
-            </label>
-            <input
-              id={arrivalId}
-              name="arrivalTime"
-              type="time"
-              value={form.arrivalTime}
-              disabled={saving}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  arrivalTime: event.target.value,
-                }))
-              }
-              className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-            />
-          </div>
-
-          <div>
-            <label className="flex items-center gap-2 text-sm font-bold">
-              <input
-                id={bringingId}
-                name="bringingSomething"
-                type="checkbox"
-                checked={form.bringingSomething}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    bringingSomething: event.target.checked,
-                  }))
-                }
-                className="h-5 w-5 rounded border-leaf/40"
-              />
-              Ich bringe was mit
-            </label>
-
-            {form.bringingSomething ? (
-              <input
-                id={bringingDescriptionId}
-                name="bringingDescription"
-                type="text"
-                maxLength={BRINGING_DESCRIPTION_MAX_LENGTH}
-                placeholder="Was bringst du mit?"
-                value={form.bringingDescription}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    bringingDescription: event.target.value,
-                  }))
-                }
-                className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-              />
-            ) : null}
-          </div>
-
-          <div>
-            <label className="flex items-center gap-2 text-sm font-bold">
-              <input
-                id={messageCheckboxId}
-                name="hasMessage"
-                type="checkbox"
-                checked={form.hasMessage}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    hasMessage: event.target.checked,
-                  }))
-                }
-                className="h-5 w-5 rounded border-leaf/40"
-              />
-              Nachricht hinzufügen
-            </label>
-
-            {form.hasMessage ? (
-              <textarea
-                id={messageId}
-                name="message"
-                rows={3}
-                maxLength={MESSAGE_MAX_LENGTH}
-                placeholder="Deine Nachricht"
-                value={form.message}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    message: event.target.value,
-                  }))
-                }
-                className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-              />
-            ) : null}
-          </div>
-
-          <RecaptchaCheckbox
-            onTokenChange={setRecaptchaToken}
-            resetSignal={recaptchaReset}
-          />
-
-          {fieldError || submitError ? (
-            <p className="text-sm text-danger" role="alert">
-              {fieldError ?? submitError}
-            </p>
-          ) : null}
-        </div>
-        </div>
-
-        <div className="flex shrink-0 flex-col-reverse gap-2 p-5 pt-3 sm:flex-row sm:justify-end sm:p-7 sm:pt-4">
+    <FormModal
+      titleId={titleId}
+      onSubmitAction={handleSubmit}
+      onCloseAction={requestClose}
+      closeDisabled={saving}
+      initialFocusRef={nameInputRef}
+      header={mode === "create" ? "Gast hinzufügen" : "Gast bearbeiten"}
+      footer={
+        <>
           <Button variant="outline" onClick={requestClose} disabled={saving}>
             Abbrechen
           </Button>
           <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
             {saving ? "Wird gespeichert ..." : "Bestätigen"}
           </Button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <div>
+          <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
+            Name
+          </label>
+          <input
+            ref={nameInputRef}
+            id={nameId}
+            name="name"
+            type="text"
+            autoComplete="name"
+            maxLength={NAME_MAX_LENGTH}
+            placeholder="Name des Gastes"
+            value={form.name}
+            disabled={saving}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, name: event.target.value }))
+            }
+            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+          />
         </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
-function CloseIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
+        <div>
+          <label htmlFor={additionalId} className="mb-1 block text-sm font-bold">
+            Zusätzliche Personen
+          </label>
+          <input
+            id={additionalId}
+            name="additionalGuests"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={MAX_ADDITIONAL_GUESTS}
+            step={1}
+            value={form.additionalGuests}
+            disabled={saving}
+            onChange={(event) => {
+              const rawValue = event.target.value;
+              setForm((current) => ({
+                ...current,
+                additionalGuests: rawValue,
+                additionalGuestNames: resizeAdditionalGuestNames(
+                  rawValue,
+                  current.additionalGuestNames,
+                ),
+              }));
+            }}
+            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+          />
+        </div>
+
+        {form.additionalGuestNames.length > 0 ? (
+          <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
+            <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
+            {form.additionalGuestNames.map((additionalName, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength={NAME_MAX_LENGTH}
+                  aria-label={`Name Gast ${index + 1}`}
+                  placeholder={`Gast_${index + 1}`}
+                  value={additionalName}
+                  disabled={saving}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setForm((current) => {
+                      const names = current.additionalGuestNames.slice();
+                      names[index] = value;
+                      return { ...current, additionalGuestNames: names };
+                    });
+                  }}
+                  className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-white px-3 py-2"
+                />
+                <Button
+                  variant="outline-danger"
+                  size="icon"
+                  aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
+                  onClick={() =>
+                    setForm((current) => ({
+                      ...current,
+                      ...removeAdditionalGuestName(
+                        index,
+                        current.additionalGuestNames,
+                      ),
+                    }))
+                  }
+                  disabled={saving}
+                >
+                  <TrashIcon />
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        <div>
+          <label htmlFor={arrivalId} className="mb-1 block text-sm font-bold">
+            Ankunftszeit
+          </label>
+          <input
+            id={arrivalId}
+            name="arrivalTime"
+            type="time"
+            value={form.arrivalTime}
+            disabled={saving}
+            onChange={(event) =>
+              setForm((current) => ({
+                ...current,
+                arrivalTime: event.target.value,
+              }))
+            }
+            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+          />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 text-sm font-bold">
+            <input
+              id={bringingId}
+              name="bringingSomething"
+              type="checkbox"
+              checked={form.bringingSomething}
+              disabled={saving}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  bringingSomething: event.target.checked,
+                }))
+              }
+              className="h-5 w-5 rounded border-leaf/40"
+            />
+            Ich bringe was mit
+          </label>
+
+          {form.bringingSomething ? (
+            <input
+              id={bringingDescriptionId}
+              name="bringingDescription"
+              type="text"
+              maxLength={BRINGING_DESCRIPTION_MAX_LENGTH}
+              placeholder="Was bringst du mit?"
+              value={form.bringingDescription}
+              disabled={saving}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  bringingDescription: event.target.value,
+                }))
+              }
+              className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+            />
+          ) : null}
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 text-sm font-bold">
+            <input
+              id={messageCheckboxId}
+              name="hasMessage"
+              type="checkbox"
+              checked={form.hasMessage}
+              disabled={saving}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  hasMessage: event.target.checked,
+                }))
+              }
+              className="h-5 w-5 rounded border-leaf/40"
+            />
+            Nachricht hinzufügen
+          </label>
+
+          {form.hasMessage ? (
+            <textarea
+              id={messageId}
+              name="message"
+              rows={3}
+              maxLength={MESSAGE_MAX_LENGTH}
+              placeholder="Deine Nachricht"
+              value={form.message}
+              disabled={saving}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  message: event.target.value,
+                }))
+              }
+              className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+            />
+          ) : null}
+        </div>
+
+        <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
+
+        {fieldError || submitError ? (
+          <p className="text-sm text-danger" role="alert">
+            {fieldError ?? submitError}
+          </p>
+        ) : null}
+      </div>
+    </FormModal>
   );
 }
 
