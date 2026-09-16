@@ -7,16 +7,23 @@ type HeroProps = {
 };
 
 export function Hero({ config }: HeroProps) {
-  const calendarParams = {
-    title: config.title,
-    description: config.greeting,
-    location: config.locationLabel,
-    date: config.eventDate,
-    startTime: config.eventStartTime,
-    endTime: config.eventEndTime,
-  };
-  const icsLink = buildCalendarLink(calendarParams);
-  const googleCalendarLink = buildGoogleCalendarLink(calendarParams);
+  const hasEventDateTime =
+    !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
+
+  const calendarParams = hasEventDateTime
+    ? {
+        title: config.title,
+        description: config.greeting,
+        location: config.locationLabel,
+        date: config.eventDate as string,
+        startTime: config.eventStartTime as string,
+        endTime: config.eventEndTime as string,
+      }
+    : null;
+  const icsLink = calendarParams ? buildCalendarLink(calendarParams) : null;
+  const googleCalendarLink = calendarParams
+    ? buildGoogleCalendarLink(calendarParams)
+    : null;
   const mapsLink = buildMapsLink(config.locationLabel);
 
   return (
@@ -36,13 +43,17 @@ export function Hero({ config }: HeroProps) {
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
             <dd className="mt-1 font-semibold">
-              <AddToCalendarLink
-                icsHref={icsLink}
-                googleHref={googleCalendarLink}
-                className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
-              >
-                {config.dateLabel}
-              </AddToCalendarLink>
+              {icsLink && googleCalendarLink ? (
+                <AddToCalendarLink
+                  icsHref={icsLink}
+                  googleHref={googleCalendarLink}
+                  className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
+                >
+                  {config.dateLabel}
+                </AddToCalendarLink>
+              ) : (
+                config.dateLabel
+              )}
             </dd>
           </div>
           <div>

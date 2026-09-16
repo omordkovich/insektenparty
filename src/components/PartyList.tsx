@@ -28,12 +28,19 @@ export function PartyList({ initialParties }: PartyListProps) {
               href={`/p/${party.slug}`}
               className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
             >
-              {party.title}
+              {party.title || "Unbenannte Party"}
+            </Link>
+            <Link
+              href={`/p/${party.slug}/edit`}
+              aria-label={`${party.title || "Unbenannte Party"} bearbeiten`}
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-leaf/30 font-semibold transition hover:bg-leaf/10"
+            >
+              <PencilIcon />
             </Link>
             <Button
               variant="outline-danger"
               size="icon"
-              aria-label={`${party.title} löschen`}
+              aria-label={`${party.title || "Unbenannte Party"} löschen`}
               onClick={() => setDeleteTarget(party)}
             >
               <TrashIcon />
@@ -52,6 +59,20 @@ export function PartyList({ initialParties }: PartyListProps) {
         />
       ) : null}
     </>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M13 6l3 3" stroke="currentColor" strokeWidth="2" />
+    </svg>
   );
 }
 

@@ -3,9 +3,9 @@ import { getDb } from "@/db";
 import { parties } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { generateSlug } from "@/lib/slug";
-import { THEME_PRESETS, type ThemeKey } from "@/lib/theme-presets";
+import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 
-const THEME_KEYS = Object.keys(THEME_PRESETS) as ThemeKey[];
+const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
 export async function POST(request: Request) {
   try {
@@ -29,8 +29,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Ungültiges Theme." }, { status: 400 });
     }
 
-    const preset = THEME_PRESETS[theme as ThemeKey];
-    const slug = generateSlug(preset.title);
+    // New parties start with empty content - the owner fills everything in
+    // via the edit page (placeholders guide them there); only the theme is
+    // picked up front.
+    const slug = generateSlug(THEME_LABELS[theme as ThemeKey]);
 
     const db = getDb();
     const [created] = await db
@@ -39,19 +41,19 @@ export async function POST(request: Request) {
         ownerId: userId,
         slug,
         theme,
-        kicker: preset.kicker,
-        title: preset.title,
-        greeting: preset.greeting,
-        dateLabel: preset.dateLabel,
-        timeLabel: preset.timeLabel,
-        locationLabel: preset.locationLabel,
-        defaultArrivalTime: preset.defaultArrivalTime,
-        eventDate: preset.eventDate,
-        eventStartTime: preset.eventStartTime,
-        eventEndTime: preset.eventEndTime,
-        contactName: preset.contact.name,
-        contactPhone: preset.contact.phone,
-        contactEmail: preset.contact.email,
+        kicker: "",
+        title: "",
+        greeting: "",
+        dateLabel: "",
+        timeLabel: "",
+        locationLabel: "",
+        defaultArrivalTime: "",
+        eventDate: null,
+        eventStartTime: null,
+        eventEndTime: null,
+        contactName: "",
+        contactPhone: "",
+        contactEmail: "",
       })
       .returning({ slug: parties.slug });
 
