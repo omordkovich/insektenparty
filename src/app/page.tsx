@@ -2,6 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { parties } from "@/db/schema";
 import { AuthButtons } from "@/components/AuthButtons";
+import { Button } from "@/components/Button";
 import { CreatePartyButton } from "@/components/CreatePartyButton";
 import { PartyList } from "@/components/PartyList";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -32,7 +33,7 @@ export default async function Home() {
 
   return (
     <>
-      <SiteHeader user={claims ? { name } : null} />
+      <SiteHeader />
       <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
         <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
           {claims ? `Hi ${name ?? claims.email}` : "Willkommen bei GASTZILLA!"}
@@ -54,6 +55,13 @@ export default async function Home() {
             </div>
             <div className="mt-6">
               <CreatePartyButton />
+            </div>
+            <div className="mt-6">
+              <form action="/auth/signout" method="post">
+                <Button variant="outline" type="submit">
+                  Logout
+                </Button>
+              </form>
             </div>
           </>
         )}

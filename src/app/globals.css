@@ -60,6 +60,11 @@ body {
   /* noinspection CssUnresolvedCustomProperty */
   font-family: var(--font-nunito), system-ui, sans-serif;
   background: #f4f4f5;
+  /* Inherited by every element below it, so any user-entered text (a long
+     name, email, or unbroken word) wraps inside its container instead of
+     overflowing it - flex/grid children still need their own min-width: 0
+     for this to actually kick in (see InlineEditShell, PartyList). */
+  overflow-wrap: anywhere;
 }
 
 .party-theme {
