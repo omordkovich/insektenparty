@@ -119,7 +119,7 @@ export function EventDialog(props: EventDialogProps) {
         type="text"
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="z. B. Milans 7. Geburtstag"
+        placeholder="z. B. Geburtstagsfeier 2026"
         disabled={saving}
         maxLength={PARTY_TEXT_MAX_LENGTH}
         className="mt-1 w-full rounded-xl border border-leaf/25 bg-white px-3 py-2 text-zinc-800"
