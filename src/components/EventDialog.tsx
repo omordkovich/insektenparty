@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
-import { PARTY_TEXT_MAX_LENGTH } from "@/lib/validation";
+import { EVENT_TEXT_MAX_LENGTH } from "@/lib/validation";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 
@@ -43,8 +43,8 @@ export function EventDialog(props: EventDialogProps) {
       nameInputRef.current?.focus();
       return;
     }
-    if (trimmedName.length > PARTY_TEXT_MAX_LENGTH) {
-      setError(`Name darf höchstens ${PARTY_TEXT_MAX_LENGTH} Zeichen lang sein.`);
+    if (trimmedName.length > EVENT_TEXT_MAX_LENGTH) {
+      setError(`Name darf höchstens ${EVENT_TEXT_MAX_LENGTH} Zeichen lang sein.`);
       return;
     }
 
@@ -53,7 +53,7 @@ export function EventDialog(props: EventDialogProps) {
 
     try {
       if (mode === "create") {
-        const response = await fetch("/api/parties", {
+        const response = await fetch("/api/events", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ theme, title: trimmedName }),
@@ -75,7 +75,7 @@ export function EventDialog(props: EventDialogProps) {
         return;
       }
 
-      const response = await fetch(`/api/parties/${props.event.id}`, {
+      const response = await fetch(`/api/events/${props.event.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme, title: trimmedName }),
@@ -121,7 +121,7 @@ export function EventDialog(props: EventDialogProps) {
         onChange={(event) => setName(event.target.value)}
         placeholder="z. B. Geburtstagsfeier 2026"
         disabled={saving}
-        maxLength={PARTY_TEXT_MAX_LENGTH}
+        maxLength={EVENT_TEXT_MAX_LENGTH}
         className="mt-1 w-full rounded-xl border border-leaf/25 bg-white px-3 py-2 text-zinc-800"
       />
 

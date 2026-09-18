@@ -5,7 +5,7 @@ import { normalizeArrivalTime } from "@/lib/validation";
 import { InlineEditShell } from "./InlineEditShell";
 
 type EditableTimeRangeFieldProps = {
-  partyId: string;
+  eventId: string;
   startValue: string | null;
   endValue: string | null;
   displayLabel: string;
@@ -15,7 +15,7 @@ type EditableTimeRangeFieldProps = {
 };
 
 export function EditableTimeRangeField({
-  partyId,
+  eventId,
   startValue,
   endValue,
   displayLabel,
@@ -34,7 +34,7 @@ export function EditableTimeRangeField({
     const newEnd = endRef.current?.value || null;
 
     try {
-      const response = await fetch(`/api/parties/${partyId}`, {
+      const response = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ eventStartTime: newStart, eventEndTime: newEnd }),

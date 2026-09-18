@@ -1,13 +1,13 @@
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { guests, parties } from "@/db/schema";
+import { events, guests } from "@/db/schema";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import { isUuid, normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
 import type { GuestDto } from "@/lib/types";
 
 type RouteContext = {
-  params: Promise<{ partyId: string }>;
+  params: Promise<{ eventId: string }>;
 };
 
 function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
@@ -28,8 +28,8 @@ function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
@@ -37,12 +37,12 @@ export async function GET(_request: Request, context: RouteContext) {
     const rows = await db
       .select()
       .from(guests)
-      .where(eq(guests.partyId, partyId))
+      .where(eq(guests.eventId, eventId))
       .orderBy(asc(guests.arrivalTime), asc(guests.name));
 
     return NextResponse.json(rows.map(toGuestDto));
   } catch (error) {
-    console.error("GET /api/parties/[partyId]/guests failed:", error);
+    console.error("GET /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(
       { error: "Die Gästeliste konnte nicht geladen werden." },
       { status: 500 },
@@ -52,8 +52,8 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function POST(request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
@@ -76,18 +76,18 @@ export async function POST(request: Request, context: RouteContext) {
 
     const db = getDb();
 
-    const [party] = await db
-      .select({ id: parties.id })
-      .from(parties)
-      .where(eq(parties.id, partyId));
-    if (!party) {
+    const [event] = await db
+      .select({ id: events.id })
+      .from(events)
+      .where(eq(events.id, eventId));
+    if (!event) {
       return NextResponse.json({ error: "Event wurde nicht gefunden." }, { status: 404 });
     }
 
     const [created] = await db
       .insert(guests)
       .values({
-        partyId,
+        eventId,
         name: validation.data.name,
         additionalGuests: validation.data.additionalGuests,
         additionalGuestNames: validation.data.additionalGuestNames,
@@ -101,7 +101,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     return NextResponse.json(toGuestDto(created), { status: 201 });
   } catch (error) {
-    console.error("POST /api/parties/[partyId]/guests failed:", error);
+    console.error("POST /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",

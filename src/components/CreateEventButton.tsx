@@ -4,7 +4,7 @@ import { useState } from "react";
 import { EventDialog } from "./EventDialog";
 import { Button } from "./Button";
 
-export function CreatePartyButton() {
+export function CreateEventButton() {
   const [open, setOpen] = useState(false);
 
   return (

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
-import { parties } from "@/db/schema";
+import { events } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { generateSlug } from "@/lib/slug";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
-import { validatePartyField } from "@/lib/validation";
+import { validateEventField } from "@/lib/validation";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const rawTitle = (body as { title?: unknown })?.title;
-    const titleValidation = validatePartyField("title", rawTitle);
+    const titleValidation = validateEventField("title", rawTitle);
     if (!titleValidation.ok) {
       return NextResponse.json({ error: titleValidation.error }, { status: 400 });
     }
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     const db = getDb();
     const [created] = await db
-      .insert(parties)
+      .insert(events)
       .values({
         ownerId: userId,
         slug,
@@ -68,11 +68,11 @@ export async function POST(request: Request) {
         contactPhone: "",
         contactEmail: "",
       })
-      .returning({ slug: parties.slug });
+      .returning({ slug: events.slug });
 
     return NextResponse.json({ slug: created.slug }, { status: 201 });
   } catch (error) {
-    console.error("POST /api/parties failed:", error);
+    console.error("POST /api/events failed:", error);
     return NextResponse.json(
       { error: "Das Event konnte nicht erstellt werden. Bitte versuche es erneut." },
       { status: 500 },

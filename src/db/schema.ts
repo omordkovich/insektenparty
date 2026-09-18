@@ -10,7 +10,7 @@ import {
   time,
 } from "drizzle-orm/pg-core";
 
-export const parties = pgTable("parties", {
+export const events = pgTable("events", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   ownerId: uuid("owner_id"),
   slug: text("slug").notNull().unique(),
@@ -37,12 +37,13 @@ export const parties = pgTable("parties", {
     .$onUpdate(() => new Date()),
 });
 
-export type Party = typeof parties.$inferSelect;
-export type NewParty = typeof parties.$inferInsert;
+// Named EventRecord (not "Event") to avoid shadowing the global DOM Event type.
+export type EventRecord = typeof events.$inferSelect;
+export type NewEventRecord = typeof events.$inferInsert;
 
 export const guests = pgTable("guests", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  partyId: uuid("party_id").notNull(),
+  eventId: uuid("event_id").notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   additionalGuests: integer("additional_guests").notNull().default(0),
   additionalGuestNames: text("additional_guest_names")

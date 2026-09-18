@@ -37,7 +37,7 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
 // How often to poll for guest-list changes made by other visitors. Kept
 // simple (plain polling) rather than Supabase Realtime since traffic here is
 // low - a websocket subscription would be instant but isn't worth the setup
-// cost for a party guest list.
+// cost for an event guest list.
 const POLL_INTERVAL_MS = 15_000;
 
 type GuestSectionProps = {

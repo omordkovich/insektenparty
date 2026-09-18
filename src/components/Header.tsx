@@ -1,8 +1,8 @@
 import Image from "next/image";
-import type { PartyConfig } from "@/lib/party-config";
+import type { EventConfig } from "@/lib/event-config";
 
 type HeaderProps = {
-  config: PartyConfig;
+  config: EventConfig;
 };
 
 // Logo is fixed at w-64 (256px), so half its width is a constant here.

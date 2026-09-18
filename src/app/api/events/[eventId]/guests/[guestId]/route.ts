@@ -7,7 +7,7 @@ import { isUuid, normalizeArrivalTime, validateGuestInput } from "@/lib/validati
 import type { GuestDto } from "@/lib/types";
 
 type RouteContext = {
-  params: Promise<{ partyId: string; guestId: string }>;
+  params: Promise<{ eventId: string; guestId: string }>;
 };
 
 function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
@@ -28,8 +28,8 @@ function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const { partyId, guestId } = await context.params;
-    if (!isUuid(partyId) || !isUuid(guestId)) {
+    const { eventId, guestId } = await context.params;
+    if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
@@ -64,7 +64,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         message: validation.data.message,
         updatedAt: new Date(),
       })
-      .where(and(eq(guests.id, guestId), eq(guests.partyId, partyId)))
+      .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
       .returning();
 
     if (!updated) {
@@ -73,7 +73,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     return NextResponse.json(toGuestDto(updated));
   } catch (error) {
-    console.error("PATCH /api/parties/[partyId]/guests/[guestId] failed:", error);
+    console.error("PATCH /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
@@ -85,15 +85,15 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
-    const { partyId, guestId } = await context.params;
-    if (!isUuid(partyId) || !isUuid(guestId)) {
+    const { eventId, guestId } = await context.params;
+    if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
     const db = getDb();
     const [deleted] = await db
       .delete(guests)
-      .where(and(eq(guests.id, guestId), eq(guests.partyId, partyId)))
+      .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
       .returning({ id: guests.id });
 
     if (!deleted) {
@@ -102,7 +102,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("DELETE /api/parties/[partyId]/guests/[guestId] failed:", error);
+    console.error("DELETE /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",

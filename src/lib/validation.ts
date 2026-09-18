@@ -183,40 +183,40 @@ export function validateGuestInput(body: unknown): ValidationResult {
   };
 }
 
-export const PARTY_TEXT_MAX_LENGTH = 200;
-export const PARTY_GREETING_MAX_LENGTH = 1000;
+export const EVENT_TEXT_MAX_LENGTH = 200;
+export const EVENT_GREETING_MAX_LENGTH = 1000;
 
-// One entry per inline-editable field on a party's public page. Each field
+// One entry per inline-editable field on an event's public page. Each field
 // is saved independently (see EditableField.tsx), so validation is per-field
-// rather than for a whole-party object - an empty value is always valid
+// rather than for a whole-event object - an empty value is always valid
 // (that's the "not filled in yet" placeholder state).
-export const PARTY_FIELDS = {
-  kicker: { label: "Kicker", maxLength: PARTY_TEXT_MAX_LENGTH },
-  title: { label: "Titel", maxLength: PARTY_TEXT_MAX_LENGTH },
-  greeting: { label: "Begrüßungstext", maxLength: PARTY_GREETING_MAX_LENGTH },
-  dateLabel: { label: "Datum", maxLength: PARTY_TEXT_MAX_LENGTH },
-  timeLabel: { label: "Uhrzeit", maxLength: PARTY_TEXT_MAX_LENGTH },
-  locationLabel: { label: "Ort", maxLength: PARTY_TEXT_MAX_LENGTH },
-  contactName: { label: "Kontaktname", maxLength: PARTY_TEXT_MAX_LENGTH },
-  contactPhone: { label: "Telefonnummer", maxLength: PARTY_TEXT_MAX_LENGTH },
-  contactEmail: { label: "E-Mail", maxLength: PARTY_TEXT_MAX_LENGTH },
+export const EVENT_FIELDS = {
+  kicker: { label: "Kicker", maxLength: EVENT_TEXT_MAX_LENGTH },
+  title: { label: "Titel", maxLength: EVENT_TEXT_MAX_LENGTH },
+  greeting: { label: "Begrüßungstext", maxLength: EVENT_GREETING_MAX_LENGTH },
+  dateLabel: { label: "Datum", maxLength: EVENT_TEXT_MAX_LENGTH },
+  timeLabel: { label: "Uhrzeit", maxLength: EVENT_TEXT_MAX_LENGTH },
+  locationLabel: { label: "Ort", maxLength: EVENT_TEXT_MAX_LENGTH },
+  contactName: { label: "Kontaktname", maxLength: EVENT_TEXT_MAX_LENGTH },
+  contactPhone: { label: "Telefonnummer", maxLength: EVENT_TEXT_MAX_LENGTH },
+  contactEmail: { label: "E-Mail", maxLength: EVENT_TEXT_MAX_LENGTH },
 } as const;
 
-export type PartyFieldKey = keyof typeof PARTY_FIELDS;
+export type EventFieldKey = keyof typeof EVENT_FIELDS;
 
-export function isPartyFieldKey(key: string): key is PartyFieldKey {
-  return key in PARTY_FIELDS;
+export function isEventFieldKey(key: string): key is EventFieldKey {
+  return key in EVENT_FIELDS;
 }
 
-export type PartyFieldValidationResult =
+export type EventFieldValidationResult =
   | { ok: true; value: string }
   | { ok: false; error: string };
 
-export function validatePartyField(
-  key: PartyFieldKey,
+export function validateEventField(
+  key: EventFieldKey,
   rawValue: unknown,
-): PartyFieldValidationResult {
-  const { label, maxLength } = PARTY_FIELDS[key];
+): EventFieldValidationResult {
+  const { label, maxLength } = EVENT_FIELDS[key];
 
   if (typeof rawValue !== "string") {
     return { ok: false, error: `${label} ist ungültig.` };

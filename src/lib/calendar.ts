@@ -32,7 +32,7 @@ export function buildCalendarLink(params: {
     "PRODID:-//GASTZILLA//Einladung//DE",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
-    `UID:${stamp}-${params.title.replace(/\s+/g, "-")}@insektenparty`,
+    `UID:${stamp}-${params.title.replace(/\s+/g, "-")}@gastzilla`,
     `DTSTAMP:${stamp}`,
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
@@ -83,7 +83,7 @@ const dateLabelFormatter = new Intl.DateTimeFormat("de-DE", {
 });
 
 // Formats an ISO date (YYYY-MM-DD) into the human-readable label shown on
-// the party page, e.g. "Sonntag, 13. September 2026". Parsed and formatted
+// the event page, e.g. "Sonntag, 13. September 2026". Parsed and formatted
 // in UTC throughout so the result never shifts by a day depending on the
 // server's local timezone.
 export function formatDateLabel(date: string | null): string {
@@ -92,7 +92,7 @@ export function formatDateLabel(date: string | null): string {
 }
 
 // Formats the event's start/end times into the human-readable label shown
-// on the party page, e.g. "09:30 - 12:00 Uhr" or "ab 09:30 Uhr" when no end
+// on the event page, e.g. "09:30 - 12:00 Uhr" or "ab 09:30 Uhr" when no end
 // time is set.
 export function formatTimeLabel(startTime: string | null, endTime: string | null): string {
   if (!startTime) return "";

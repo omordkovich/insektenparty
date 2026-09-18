@@ -2,17 +2,17 @@ import { useId, useRef, useState } from "react";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 
-type DeletePartyDialogProps = {
-  party: { id: string; title: string };
+type DeleteEventDialogProps = {
+  event: { id: string; title: string };
   onCloseAction: () => void;
   onDeletedAction: () => Promise<void> | void;
 };
 
-export function DeletePartyDialog({
-  party,
+export function DeleteEventDialog({
+  event,
   onCloseAction,
   onDeletedAction,
-}: DeletePartyDialogProps) {
+}: DeleteEventDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -26,7 +26,7 @@ export function DeletePartyDialog({
     setError(null);
 
     try {
-      const response = await fetch(`/api/parties/${party.id}`, {
+      const response = await fetch(`/api/events/${event.id}`, {
         method: "DELETE",
       });
 
@@ -63,7 +63,7 @@ export function DeletePartyDialog({
         Wirklich löschen?
       </h2>
       <p id={descriptionId} className="mt-3 text-muted">
-        Möchtest du „{party.title}“ und die komplette Gästeliste dazu wirklich löschen?
+        Möchtest du „{event.title}“ und die komplette Gästeliste dazu wirklich löschen?
       </p>
 
       {error ? (

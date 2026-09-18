@@ -50,11 +50,15 @@ src/
   components/               # UI, unverändert
 ```
 
-**Namenskonvention:** Neue Dateien/Funktionen für die `parties`-Domäne heißen
-konsequent "Event" (`event-repository.ts`, `event-service.ts`, `getEventBySlug()`,
-`updateEvent()`, ...), passend zur bereits erfolgten Umbenennung in der Nutzeroberfläche.
-Die Drizzle-Tabelle selbst bleibt `parties` (DB-Rename ist bewusst nicht Teil dieser
-Umstellung, siehe unten).
+**Namenskonvention (erweitert, 2026-09-18):** "Party"/"parties" wird vollständig
+aus Code und Datenbank entfernt — nicht nur in neuen Dateien. Betroffen: die
+Drizzle-Tabelle `parties` → `events`, die Spalte `guests.party_id` → `event_id`,
+alle Constraint-Namen, alle TypeScript-Typen/Funktionen/Props (`PartyConfig`,
+`PartyFieldKey`, `partyId`, `PartyList.tsx`, `CreatePartyButton.tsx`,
+`DeletePartyDialog.tsx`, ...), die API-Routen `/api/parties/**` → `/api/events/**`,
+sowie CSS-Klassen (`.party-theme` → `.event-theme`). Ausgenommen bleibt bewusst nur
+die Seiten-Route `/p/[slug]` (das "p" liest sich nicht als "party" und ein Umbau
+würde bereits geteilte Einladungslinks brechen — z. B. `milans7BD`, `xenis37BD`).
 
 **Kein Einsatz von:** Klassen, Interfaces/Dependency Injection, Dependency-Inversion-
 Abstraktionen. `services/` rufen `repositories/` direkt auf. Grund: Es ist nicht

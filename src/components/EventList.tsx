@@ -5,56 +5,56 @@ import Link from "next/link";
 import { useState } from "react";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
-import { DeletePartyDialog } from "./DeletePartyDialog";
+import { DeleteEventDialog } from "./DeleteEventDialog";
 import { EventDialog } from "./EventDialog";
 
-type PartyListItem = {
+type EventListItem = {
   id: string;
   slug: string;
   title: string;
   theme: ThemeKey;
 };
 
-type PartyListProps = {
-  initialParties: PartyListItem[];
+type EventListProps = {
+  initialEvents: EventListItem[];
 };
 
-export function PartyList({ initialParties }: PartyListProps) {
-  const [partyList, setPartyList] = useState(initialParties);
-  const [editTarget, setEditTarget] = useState<PartyListItem | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<PartyListItem | null>(null);
+export function EventList({ initialEvents }: EventListProps) {
+  const [eventList, setEventList] = useState(initialEvents);
+  const [editTarget, setEditTarget] = useState<EventListItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<EventListItem | null>(null);
 
   return (
     <>
       <div className="flex flex-col items-center gap-3">
-        {partyList.map((party) => (
-          <div key={party.id} className="flex items-center gap-2">
+        {eventList.map((event) => (
+          <div key={event.id} className="flex items-center gap-2">
             <Image
-              src={THEME_ASSETS[party.theme].logo}
+              src={THEME_ASSETS[event.theme].logo}
               alt=""
               width={40}
               height={40}
               className="h-10 w-10 shrink-0 rounded-full object-contain"
             />
             <Link
-              href={`/p/${party.slug}`}
+              href={`/p/${event.slug}`}
               className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
             >
-              {party.title || "Unbenanntes Event"}
+              {event.title || "Unbenanntes Event"}
             </Link>
             <Button
               variant="outline"
               size="icon"
-              aria-label={`${party.title || "Unbenanntes Event"} bearbeiten`}
-              onClick={() => setEditTarget(party)}
+              aria-label={`${event.title || "Unbenanntes Event"} bearbeiten`}
+              onClick={() => setEditTarget(event)}
             >
               <PencilIcon />
             </Button>
             <Button
               variant="outline-danger"
               size="icon"
-              aria-label={`${party.title || "Unbenanntes Event"} löschen`}
-              onClick={() => setDeleteTarget(party)}
+              aria-label={`${event.title || "Unbenanntes Event"} löschen`}
+              onClick={() => setDeleteTarget(event)}
             >
               <TrashIcon />
             </Button>
@@ -68,19 +68,19 @@ export function PartyList({ initialParties }: PartyListProps) {
           event={editTarget}
           onCloseAction={() => setEditTarget(null)}
           onSavedAction={(updated) =>
-            setPartyList((current) =>
-              current.map((p) => (p.id === editTarget.id ? { ...p, ...updated } : p)),
+            setEventList((current) =>
+              current.map((e) => (e.id === editTarget.id ? { ...e, ...updated } : e)),
             )
           }
         />
       ) : null}
 
       {deleteTarget ? (
-        <DeletePartyDialog
-          party={deleteTarget}
+        <DeleteEventDialog
+          event={deleteTarget}
           onCloseAction={() => setDeleteTarget(null)}
           onDeletedAction={() =>
-            setPartyList((current) => current.filter((p) => p.id !== deleteTarget.id))
+            setEventList((current) => current.filter((e) => e.id !== deleteTarget.id))
           }
         />
       ) : null}

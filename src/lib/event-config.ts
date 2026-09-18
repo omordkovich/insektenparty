@@ -1,4 +1,4 @@
-export type PartyConfig = {
+export type EventConfig = {
   kicker: string;
   title: string;
   greeting: string;

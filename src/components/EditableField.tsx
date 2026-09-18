@@ -2,12 +2,12 @@
 
 import { useRef, useState } from "react";
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
-import type { PartyFieldKey } from "@/lib/validation";
+import type { EventFieldKey } from "@/lib/validation";
 import { InlineEditShell } from "./InlineEditShell";
 
 type EditableFieldProps = {
-  partyId: string;
-  fieldKey: PartyFieldKey;
+  eventId: string;
+  fieldKey: EventFieldKey;
   value: string;
   placeholder: string;
   isOwner: boolean;
@@ -25,7 +25,7 @@ type EditableFieldProps = {
 };
 
 export function EditableField({
-  partyId,
+  eventId,
   fieldKey,
   value,
   placeholder,
@@ -71,7 +71,7 @@ export function EditableField({
     const newValue = (as === "textarea" ? textareaRef.current?.value : inputRef.current?.value) ?? "";
 
     try {
-      const response = await fetch(`/api/parties/${partyId}`, {
+      const response = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [fieldKey]: newValue }),

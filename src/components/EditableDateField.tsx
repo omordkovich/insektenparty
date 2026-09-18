@@ -5,7 +5,7 @@ import { AddToCalendarLink } from "@/components/AddToCalendarLink";
 import { InlineEditShell } from "./InlineEditShell";
 
 type EditableDateFieldProps = {
-  partyId: string;
+  eventId: string;
   value: string | null;
   displayLabel: string;
   isOwner: boolean;
@@ -15,7 +15,7 @@ type EditableDateFieldProps = {
 };
 
 export function EditableDateField({
-  partyId,
+  eventId,
   value,
   displayLabel,
   isOwner,
@@ -46,7 +46,7 @@ export function EditableDateField({
     const newValue = inputRef.current?.value || null;
 
     try {
-      const response = await fetch(`/api/parties/${partyId}`, {
+      const response = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ eventDate: newValue }),

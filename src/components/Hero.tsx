@@ -2,15 +2,15 @@ import { EditableDateField } from "@/components/EditableDateField";
 import { EditableField } from "@/components/EditableField";
 import { EditableTimeRangeField } from "@/components/EditableTimeRangeField";
 import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
-import type { PartyConfig } from "@/lib/party-config";
+import type { EventConfig } from "@/lib/event-config";
 
 type HeroProps = {
-  config: PartyConfig;
-  partyId: string;
+  config: EventConfig;
+  eventId: string;
   isOwner: boolean;
 };
 
-export function Hero({ config, partyId, isOwner }: HeroProps) {
+export function Hero({ config, eventId, isOwner }: HeroProps) {
   const hasEventDateTime =
     !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
 
@@ -34,7 +34,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
       <div className="animate-fade-up rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-(--shadow) sm:p-8">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark">
           <EditableField
-            partyId={partyId}
+            eventId={eventId}
             fieldKey="kicker"
             value={config.kicker}
             placeholder="z. B. Kindergeburtstag"
@@ -45,7 +45,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
         </p>
         <h1 className="font-display text-[clamp(1.5rem,9vw,3rem)] leading-none text-leaf-dark sm:text-6xl md:text-7xl">
           <EditableField
-            partyId={partyId}
+            eventId={eventId}
             fieldKey="title"
             value={config.title}
             placeholder="Titel deines Events"
@@ -56,7 +56,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">
           <EditableField
-            partyId={partyId}
+            eventId={eventId}
             fieldKey="greeting"
             value={config.greeting}
             placeholder="Begrüßungstext für deine Gäste"
@@ -72,7 +72,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
             <dd className="mt-1 font-semibold">
               <EditableDateField
-                partyId={partyId}
+                eventId={eventId}
                 value={config.eventDate}
                 displayLabel={config.dateLabel}
                 isOwner={isOwner}
@@ -90,7 +90,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Uhrzeit</dt>
             <dd className="mt-1 font-semibold">
               <EditableTimeRangeField
-                partyId={partyId}
+                eventId={eventId}
                 startValue={config.eventStartTime}
                 endValue={config.eventEndTime}
                 displayLabel={config.timeLabel}
@@ -104,7 +104,7 @@ export function Hero({ config, partyId, isOwner }: HeroProps) {
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Ort</dt>
             <dd className="mt-1 font-semibold">
               <EditableField
-                partyId={partyId}
+                eventId={eventId}
                 fieldKey="locationLabel"
                 value={config.locationLabel}
                 placeholder="Adresse oder Ort der Feier"

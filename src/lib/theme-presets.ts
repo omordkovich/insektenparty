@@ -1,20 +1,19 @@
-import type { PartyConfig } from "@/lib/party-config";
+import type { EventConfig } from "@/lib/event-config";
 
-export type ThemeKey = "insekten" | "helden";
+export type ThemeKey = "insekten" | "baloons";
 
 export const THEME_LABELS: Record<ThemeKey, string> = {
   insekten: "Insekten",
-  helden: "Baloons",
+  baloons: "Baloons",
 };
 
-// Maps to the existing CSS theme classes in globals.css (kept as-is - a
-// rename would be purely cosmetic and not worth the churn/risk).
+// Maps to the CSS theme classes defined in globals.css.
 export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
-  insekten: "party-theme",
-  helden: "party-theme-jugendidolen",
+  insekten: "event-theme",
+  baloons: "event-theme-baloons",
 };
 
-export const THEME_ASSETS: Record<ThemeKey, PartyConfig["assets"]> = {
+export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
   insekten: {
     logo: "/theme-insekten/logo.png",
     plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1789642266/plants-left.webp",
@@ -22,11 +21,11 @@ export const THEME_ASSETS: Record<ThemeKey, PartyConfig["assets"]> = {
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1789642265/accent-1.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1789642266/accent-2.webp",
   },
-  helden: {
-    logo: "/theme-helden/logo.png",
-    plantsLeft: "/theme-helden/plants-left.png",
-    plantsRight: "/theme-helden/plants-right.png",
-    accentOne: "/theme-helden/accent-1.png",
-    accentTwo: "/theme-helden/accent-2.png",
+  baloons: {
+    logo: "/theme-baloons/logo.png",
+    plantsLeft: "/theme-baloons/plants-left.png",
+    plantsRight: "/theme-baloons/plants-right.png",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741690/accent-1.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741691/accent-2.webp",
   },
 };

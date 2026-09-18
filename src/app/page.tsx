@@ -1,10 +1,10 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { parties } from "@/db/schema";
+import { events } from "@/db/schema";
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
-import { CreatePartyButton } from "@/components/CreatePartyButton";
-import { PartyList } from "@/components/PartyList";
+import { CreateEventButton } from "@/components/CreateEventButton";
+import { EventList } from "@/components/EventList";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -16,19 +16,19 @@ export default async function Home() {
   const name =
     typeof claims?.user_metadata?.name === "string" ? claims.user_metadata.name : null;
 
-  const myParties = claims
+  const myEvents = claims
     ? (
         await getDb()
           .select({
-            id: parties.id,
-            slug: parties.slug,
-            title: parties.title,
-            theme: parties.theme,
+            id: events.id,
+            slug: events.slug,
+            title: events.title,
+            theme: events.theme,
           })
-          .from(parties)
-          .where(eq(parties.ownerId, claims.sub))
-          .orderBy(desc(parties.createdAt))
-      ).map((party) => ({ ...party, theme: party.theme as ThemeKey }))
+          .from(events)
+          .where(eq(events.ownerId, claims.sub))
+          .orderBy(desc(events.createdAt))
+      ).map((event) => ({ ...event, theme: event.theme as ThemeKey }))
     : [];
 
   return (
@@ -51,10 +51,10 @@ export default async function Home() {
         ) : (
           <>
             <div className="mt-8">
-              <PartyList initialParties={myParties} />
+              <EventList initialEvents={myEvents} />
             </div>
             <div className="mt-6">
-              <CreatePartyButton />
+              <CreateEventButton />
             </div>
             <div className="mt-6">
               <form action="/auth/signout" method="post">
