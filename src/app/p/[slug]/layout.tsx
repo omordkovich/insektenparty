@@ -1,9 +1,7 @@
-import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getDb } from "@/db";
-import { events } from "@/db/schema";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
+import { getEventBySlug } from "@/repositories/event-repository";
 import React from "react";
 
 type EventLayoutProps = {
@@ -17,8 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const db = getDb();
-  const [event] = await db.select().from(events).where(eq(events.slug, slug));
+  const event = await getEventBySlug(slug);
 
   if (!event) {
     return { title: "Event nicht gefunden" };
@@ -32,8 +29,7 @@ export async function generateMetadata({
 
 export default async function EventLayout({ children, params }: EventLayoutProps) {
   const { slug } = await params;
-  const db = getDb();
-  const [event] = await db.select().from(events).where(eq(events.slug, slug));
+  const event = await getEventBySlug(slug);
 
   if (!event) {
     notFound();

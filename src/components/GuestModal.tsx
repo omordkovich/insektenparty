@@ -19,6 +19,7 @@ type GuestModalProps = {
   guest: GuestDto | null;
   apiBasePath: string;
   defaultArrivalTime?: string;
+  isOwner?: boolean;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
 };
@@ -97,6 +98,7 @@ export function GuestModal({
   guest,
   apiBasePath,
   defaultArrivalTime = "09:00",
+  isOwner = false,
   onClose,
   onSaved,
 }: GuestModalProps) {
@@ -176,7 +178,7 @@ export function GuestModal({
       return;
     }
 
-    if (!recaptchaToken) {
+    if (!isOwner && !recaptchaToken) {
       setFieldError("Bitte bestätige, dass du kein Roboter bist.");
       return;
     }
@@ -233,7 +235,11 @@ export function GuestModal({
           <Button variant="outline" onClick={requestClose} disabled={saving}>
             Abbrechen
           </Button>
-          <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={saving || (!isOwner && !recaptchaToken)}
+          >
             {saving ? "Wird gespeichert ..." : "Bestätigen"}
           </Button>
         </>
@@ -432,7 +438,9 @@ export function GuestModal({
           ) : null}
         </div>
 
-        <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
+        {!isOwner ? (
+          <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
+        ) : null}
 
         {fieldError || submitError ? (
           <p className="text-sm text-danger" role="alert">

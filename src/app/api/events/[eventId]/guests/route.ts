@@ -1,30 +1,11 @@
-import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { getDb } from "@/db";
-import { events, guests } from "@/db/schema";
-import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
-import { isUuid, normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
-import type { GuestDto } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
+import { isUuid } from "@/lib/validation";
+import { createGuestForEvent, listGuestsForEvent } from "@/services/guest-service";
 
 type RouteContext = {
   params: Promise<{ eventId: string }>;
 };
-
-function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
-  return {
-    id: row.id,
-    name: row.name,
-    additionalGuests: row.additionalGuests,
-    additionalGuestNames: row.additionalGuestNames,
-    arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
-    bringingSomething: row.bringingSomething,
-    bringingDescription: row.bringingDescription,
-    hasMessage: row.hasMessage,
-    message: row.message,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-  };
-}
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
@@ -33,14 +14,8 @@ export async function GET(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
-    const db = getDb();
-    const rows = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.eventId, eventId))
-      .orderBy(asc(guests.arrivalTime), asc(guests.name));
-
-    return NextResponse.json(rows.map(toGuestDto));
+    const guests = await listGuestsForEvent(eventId);
+    return NextResponse.json(guests);
   } catch (error) {
     console.error("GET /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(
@@ -64,42 +39,17 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
-    if (!recaptcha.ok) {
-      return NextResponse.json({ error: recaptcha.error }, { status: recaptcha.status });
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    const requesterId = data?.claims?.sub;
+
+    const result = await createGuestForEvent(eventId, body, requesterId);
+
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    const validation = validateGuestInput(body);
-    if (!validation.ok) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
-    }
-
-    const db = getDb();
-
-    const [event] = await db
-      .select({ id: events.id })
-      .from(events)
-      .where(eq(events.id, eventId));
-    if (!event) {
-      return NextResponse.json({ error: "Event wurde nicht gefunden." }, { status: 404 });
-    }
-
-    const [created] = await db
-      .insert(guests)
-      .values({
-        eventId,
-        name: validation.data.name,
-        additionalGuests: validation.data.additionalGuests,
-        additionalGuestNames: validation.data.additionalGuestNames,
-        arrivalTime: validation.data.arrivalTime,
-        bringingSomething: validation.data.bringingSomething,
-        bringingDescription: validation.data.bringingDescription,
-        hasMessage: validation.data.hasMessage,
-        message: validation.data.message,
-      })
-      .returning();
-
-    return NextResponse.json(toGuestDto(created), { status: 201 });
+    return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
     console.error("POST /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(

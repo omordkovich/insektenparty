@@ -43,11 +43,13 @@ const POLL_INTERVAL_MS = 15_000;
 type GuestSectionProps = {
   apiBasePath: string;
   defaultArrivalTime?: string;
+  isOwner?: boolean;
 };
 
 export function GuestSection({
   apiBasePath,
   defaultArrivalTime = "09:00",
+  isOwner = false,
 }: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,6 +168,7 @@ export function GuestSection({
           guest={modal.selectedGuest}
           apiBasePath={apiBasePath}
           defaultArrivalTime={defaultArrivalTime}
+          isOwner={isOwner}
           onClose={closeModal}
           onSaved={loadGuests}
         />

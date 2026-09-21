@@ -1,13 +1,11 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { getDb } from "@/db";
-import { events } from "@/db/schema";
 import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import type { EventConfig } from "@/lib/event-config";
+import { getEventBySlug } from "@/repositories/event-repository";
 import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { normalizeArrivalTime } from "@/lib/validation";
@@ -18,8 +16,7 @@ type EventPageProps = {
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
-  const db = getDb();
-  const [event] = await db.select().from(events).where(eq(events.slug, slug));
+  const event = await getEventBySlug(slug);
 
   if (!event) {
     notFound();
@@ -56,6 +53,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <GuestSection
           apiBasePath={`/api/events/${event.id}/guests`}
           defaultArrivalTime={config.defaultArrivalTime}
+          isOwner={isOwner}
         />
       </main>
       <Footer config={config} eventId={event.id} isOwner={isOwner} />
