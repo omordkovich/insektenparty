@@ -1,6 +1,5 @@
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
-import { CreateEventButton } from "@/components/CreateEventButton";
 import { EventList } from "@/components/EventList";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
@@ -24,7 +23,7 @@ export default async function Home() {
   return (
     <>
       <SiteHeader />
-      <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
+      <main className="flex min-h-full flex-col items-center px-6 py-16 text-center">
         <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
           {claims ? `Hi ${name ?? claims.email}` : "Willkommen bei GASTZILLA!"}
         </h1>
@@ -40,11 +39,8 @@ export default async function Home() {
           </>
         ) : (
           <>
-            <div className="mt-8">
+            <div className="mt-8 w-full">
               <EventList initialEvents={myEvents} />
-            </div>
-            <div className="mt-6">
-              <CreateEventButton />
             </div>
             <div className="mt-6">
               <form action="/auth/signout" method="post">

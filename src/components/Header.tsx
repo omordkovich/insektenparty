@@ -1,8 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { EventConfig } from "@/lib/event-config";
 
 type HeaderProps = {
   config: EventConfig;
+  logoHref: string;
 };
 
 // Logo is fixed at w-64 (256px), so half its width is a constant here.
@@ -10,7 +12,7 @@ const LOGO_HALF_WIDTH = 128;
 const ACCENT_GAP = 24;
 const ACCENT_OFFSET = `calc(50% + ${LOGO_HALF_WIDTH}px + ${ACCENT_GAP}px)`;
 
-export function Header({ config }: HeaderProps) {
+export function Header({ config, logoHref }: HeaderProps) {
   return (
     <header className="relative flex items-center justify-center overflow-hidden pt-6 pb-4">
       <Image
@@ -34,14 +36,16 @@ export function Header({ config }: HeaderProps) {
         priority
       />
 
-      <Image
-        src={config.assets.logo}
-        alt={`${config.title} Logo`}
-        width={256}
-        height={256}
-        className="relative h-auto w-64"
-        priority
-      />
+      <Link href={logoHref} className="relative">
+        <Image
+          src={config.assets.logo}
+          alt={`${config.title} Logo`}
+          width={256}
+          height={256}
+          className="h-auto w-64"
+          priority
+        />
+      </Link>
     </header>
   );
 }

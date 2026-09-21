@@ -23,8 +23,8 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
   },
   baloons: {
     logo: "/theme-baloons/logo.png",
-    plantsLeft: "/theme-baloons/plants-left.png",
-    plantsRight: "/theme-baloons/plants-right.png",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1789993863/baloons-left.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1789993865/baloons-right.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741690/accent-1.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741691/accent-2.webp",
   },

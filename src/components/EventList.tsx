@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
+import { CreateEventButton } from "./CreateEventButton";
 import { DeleteEventDialog } from "./DeleteEventDialog";
 import { EventDialog } from "./EventDialog";
 
@@ -26,41 +27,70 @@ export function EventList({ initialEvents }: EventListProps) {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-3">
-        {eventList.map((event) => (
-          <div key={event.id} className="flex items-center gap-2">
-            <Image
-              src={THEME_ASSETS[event.theme].logo}
-              alt=""
-              width={40}
-              height={40}
-              className="h-10 w-10 shrink-0 rounded-full object-contain"
-            />
-            <Link
-              href={`/p/${event.slug}`}
-              className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 bg-white px-6 text-base font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50"
-            >
-              {event.title || "Unbenanntes Event"}
-            </Link>
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label={`${event.title || "Unbenanntes Event"} bearbeiten`}
-              onClick={() => setEditTarget(event)}
-            >
-              <PencilIcon />
-            </Button>
-            <Button
-              variant="outline-danger"
-              size="icon"
-              aria-label={`${event.title || "Unbenanntes Event"} löschen`}
-              onClick={() => setDeleteTarget(event)}
-            >
-              <TrashIcon />
-            </Button>
-          </div>
-        ))}
-      </div>
+      <section className="mx-auto w-full max-w-xl">
+        <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
+          <h2 className="text-center font-display text-3xl text-leaf-dark sm:text-4xl">
+            Meine Events
+          </h2>
+
+          {eventList.length === 0 ? (
+            <div className="mt-8 text-center">
+              <p className="text-lg text-muted">Du hast noch keine Events erstellt.</p>
+              <p className="mt-1 text-xl font-bold text-leaf-dark">Leg direkt los!</p>
+              <div className="mt-6 flex justify-center">
+                <CreateEventButton />
+              </div>
+            </div>
+          ) : (
+            <>
+              <ul className="mt-8 space-y-3">
+                {eventList.map((event) => (
+                  <li
+                    key={event.id}
+                    className="flex items-center gap-3 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm transition hover:border-leaf/30 hover:bg-white"
+                  >
+                    <Image
+                      src={THEME_ASSETS[event.theme].logo}
+                      alt=""
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 shrink-0 rounded-full object-contain"
+                    />
+                    <Link
+                      href={`/p/${event.slug}`}
+                      className="min-w-0 flex-1 truncate text-base font-bold text-leaf-dark transition hover:text-leaf"
+                    >
+                      {event.title || "Unbenanntes Event"}
+                    </Link>
+                    <div className="flex shrink-0 gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-white"
+                        aria-label={`${event.title || "Unbenanntes Event"} bearbeiten`}
+                        onClick={() => setEditTarget(event)}
+                      >
+                        <PencilIcon />
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="icon"
+                        aria-label={`${event.title || "Unbenanntes Event"} löschen`}
+                        onClick={() => setDeleteTarget(event)}
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex justify-center">
+                <CreateEventButton />
+              </div>
+            </>
+          )}
+        </div>
+      </section>
 
       {editTarget ? (
         <EventDialog
