@@ -1,10 +1,12 @@
 # Layered Architecture (Event/Guest Repositories & Services) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Commit policy:** This plan executes on an isolated worktree/branch, never directly on `main`. Per-task commits on that branch are expected and required (the review tooling diffs BASE..HEAD commit ranges). Nothing from this branch reaches `main` or gets pushed until the user explicitly reviews and approves the merge at the end (see superpowers:finishing-a-development-branch).
 
-**Goal:** Introduce a lightweight layered structure (`repositories/` for DB access, `services/` for business rules) for the `parties` ("Event") and `guests` domains, so API routes and Server Components stop mixing HTTP handling, business rules, and raw Drizzle queries in one place.
+**Goal:** Introduce a lightweight layered structure (`repositories/` for DB access, `services/` for business rules) for the `events` and `guests` domains, so API routes and Server Components stop mixing HTTP handling, business rules, and raw Drizzle queries in one place.
 
-**Architecture:** Classic 3-tier layering (Repository Pattern + Service Layer Pattern), no classes, no dependency injection/interfaces. `api/**/route.ts` handlers stay thin (parse request, call a service, return `NextResponse`). Server Components call repository functions directly for plain reads. Services call repositories; repositories are 1:1 wrappers around Drizzle queries for one table each. New files use "Event" naming (matching the app's existing Party→Event UI rename); the underlying Drizzle table stays `parties` (not renamed — out of scope).
+**Architecture:** Classic 3-tier layering (Repository Pattern + Service Layer Pattern), no classes, no dependency injection/interfaces. `api/**/route.ts` handlers stay thin (parse request, call a service, return `NextResponse`). Server Components call repository functions directly for plain reads. Services call repositories; repositories are 1:1 wrappers around Drizzle queries for one table each. The Drizzle table is already named `events` (renamed from `parties` in a prior pass, 2026-09-18) and the guests FK column is `event_id`/`eventId` — this plan builds directly on that naming, no further renaming needed.
 
 **Tech Stack:** Next.js 16 (App Router), Drizzle ORM (`postgres-js`), Supabase Auth, TypeScript. No test framework exists in this project — verification is `tsc --noEmit` + `eslint` + `next build` + manual live checks via the Claude Browser tools, matching how every prior change in this project has been verified.
 
@@ -13,11 +15,12 @@
 ## Global Constraints
 
 - No behavior change: HTTP status codes, error messages (German), response JSON shapes callers rely on, and DB schema must stay exactly as they are today — this is a pure internal restructuring.
-- New files/functions for the `parties` domain are named "Event" (`event-repository.ts`, `event-service.ts`, `getEventBySlug`, `createEvent`, ...). The Drizzle table stays `parties` / `partyId`.
+- New files/functions for the `events` domain are named "Event" (`event-repository.ts`, `event-service.ts`, `getEventBySlug()`, `createEvent()`, ...), matching the table name and the rest of the already-renamed codebase.
 - No classes, no interfaces, no dependency injection. Plain exported async functions only, matching the rest of the codebase (`getDb()`, `validation.ts`).
 - `repositories/*` return raw Drizzle rows (or thin projections); `services/*` do validation, business rules, and shape DTOs.
 - Every task must leave the app in a working, verifiable state (`tsc --noEmit`, `eslint`, `next build` all clean) before moving to the next task.
-- Disposable test accounts: use the Supabase project id `znwlcmfrxtcfvesgbudg` and anon key `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpud2xjbWZyeHRjZnZlc2didWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NzY0NzIsImV4cCI6MjA4NDQ1MjQ3Mn0.XM2A4PmHyck34dZEFmU6FITKFBeLvNQGd11VyVUTezQ` for any signup/login used in live verification; always clean up (delete `public.parties`, `public.profiles`, `auth.users` rows for that test account) after each live check.
+- Commit per task as specified below (see commit policy above) — this branch is isolated from `main` until the user approves the merge.
+- Disposable test accounts: use the Supabase project id `znwlcmfrxtcfvesgbudg` and anon key `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpud2xjbWZyeHRjZnZlc2didWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4NzY0NzIsImV4cCI6MjA4NDQ1MjQ3Mn0.XM2A4PmHyck34dZEFmU6FITKFBeLvNQGd11VyVUTezQ` for any signup/login used in live verification; always clean up (delete `public.events`, `public.profiles`, `auth.users` rows for that test account) after each live check.
 
 ---
 
@@ -27,15 +30,15 @@
 - Create: `src/repositories/event-repository.ts`
 
 **Interfaces:**
-- Consumes: `getDb()` from `@/db`, `parties` table from `@/db/schema`.
+- Consumes: `getDb()` from `@/db`, `events` table from `@/db/schema`.
 - Produces (used by Task 2, Task 5, Task 6, Task 10):
-  - `type EventRow = typeof parties.$inferSelect`
+  - `type EventRow = typeof events.$inferSelect`
   - `type EventListItem = { id: string; slug: string; title: string; theme: string }`
   - `getEventBySlug(slug: string): Promise<EventRow | undefined>`
   - `eventExistsById(id: string): Promise<boolean>`
   - `getEventsByOwner(ownerId: string): Promise<EventListItem[]>`
   - `createEvent(input: { ownerId: string; slug: string; theme: string; title: string }): Promise<{ slug: string }>`
-  - `updateEvent(id: string, ownerId: string, fields: Partial<typeof parties.$inferInsert>): Promise<EventRow | undefined>`
+  - `updateEvent(id: string, ownerId: string, fields: Partial<typeof events.$inferInsert>): Promise<EventRow | undefined>`
   - `deleteEvent(id: string, ownerId: string): Promise<{ id: string } | undefined>`
 
 - [ ] **Step 1: Write the repository file**
@@ -43,20 +46,20 @@
 ```ts
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { parties } from "@/db/schema";
+import { events } from "@/db/schema";
 
-export type EventRow = typeof parties.$inferSelect;
+export type EventRow = typeof events.$inferSelect;
 
 export async function getEventBySlug(slug: string): Promise<EventRow | undefined> {
-  const [event] = await getDb().select().from(parties).where(eq(parties.slug, slug));
+  const [event] = await getDb().select().from(events).where(eq(events.slug, slug));
   return event;
 }
 
 export async function eventExistsById(id: string): Promise<boolean> {
   const [event] = await getDb()
-    .select({ id: parties.id })
-    .from(parties)
-    .where(eq(parties.id, id));
+    .select({ id: events.id })
+    .from(events)
+    .where(eq(events.id, id));
   return !!event;
 }
 
@@ -69,10 +72,10 @@ export type EventListItem = {
 
 export async function getEventsByOwner(ownerId: string): Promise<EventListItem[]> {
   return getDb()
-    .select({ id: parties.id, slug: parties.slug, title: parties.title, theme: parties.theme })
-    .from(parties)
-    .where(eq(parties.ownerId, ownerId))
-    .orderBy(desc(parties.createdAt));
+    .select({ id: events.id, slug: events.slug, title: events.title, theme: events.theme })
+    .from(events)
+    .where(eq(events.ownerId, ownerId))
+    .orderBy(desc(events.createdAt));
 }
 
 export async function createEvent(input: {
@@ -82,7 +85,7 @@ export async function createEvent(input: {
   title: string;
 }): Promise<{ slug: string }> {
   const [created] = await getDb()
-    .insert(parties)
+    .insert(events)
     .values({
       ownerId: input.ownerId,
       slug: input.slug,
@@ -101,19 +104,19 @@ export async function createEvent(input: {
       contactPhone: "",
       contactEmail: "",
     })
-    .returning({ slug: parties.slug });
+    .returning({ slug: events.slug });
   return created;
 }
 
 export async function updateEvent(
   id: string,
   ownerId: string,
-  fields: Partial<typeof parties.$inferInsert>,
+  fields: Partial<typeof events.$inferInsert>,
 ): Promise<EventRow | undefined> {
   const [updated] = await getDb()
-    .update(parties)
+    .update(events)
     .set({ ...fields, updatedAt: new Date() })
-    .where(and(eq(parties.id, id), eq(parties.ownerId, ownerId)))
+    .where(and(eq(events.id, id), eq(events.ownerId, ownerId)))
     .returning();
   return updated;
 }
@@ -123,9 +126,9 @@ export async function deleteEvent(
   ownerId: string,
 ): Promise<{ id: string } | undefined> {
   const [deleted] = await getDb()
-    .delete(parties)
-    .where(and(eq(parties.id, id), eq(parties.ownerId, ownerId)))
-    .returning({ id: parties.id });
+    .delete(events)
+    .where(and(eq(events.id, id), eq(events.ownerId, ownerId)))
+    .returning({ id: events.id });
   return deleted;
 }
 ```
@@ -144,7 +147,7 @@ Expected: no output (clean).
 
 ```bash
 git add src/repositories/event-repository.ts
-git commit -m "Add event-repository.ts wrapping parties table Drizzle queries"
+git commit -m "Add event-repository.ts wrapping events table Drizzle queries"
 ```
 
 ---
@@ -155,7 +158,7 @@ git commit -m "Add event-repository.ts wrapping parties table Drizzle queries"
 - Create: `src/services/event-service.ts`
 
 **Interfaces:**
-- Consumes: `EventRow`, `createEvent`, `updateEvent`, `deleteEvent` from `@/repositories/event-repository` (Task 1); `generateSlug` from `@/lib/slug`; `formatDateLabel`, `formatTimeLabel` from `@/lib/calendar`; `THEME_LABELS`, `ThemeKey` from `@/lib/theme-presets`; `isPartyFieldKey`, `validateEventDate`, `validateEventTime`, `validatePartyField`, `PartyFieldKey` from `@/lib/validation`.
+- Consumes: `EventRow`, `createEvent`, `updateEvent`, `deleteEvent` from `@/repositories/event-repository` (Task 1); `generateSlug` from `@/lib/slug`; `formatDateLabel`, `formatTimeLabel` from `@/lib/calendar`; `THEME_LABELS`, `ThemeKey` from `@/lib/theme-presets`; `isEventFieldKey`, `validateEventDate`, `validateEventTime`, `validateEventField`, `EventFieldKey` from `@/lib/validation`.
 - Produces (used by Task 3, Task 4):
   - `type EventServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string }`
   - `createEventForOwner(ownerId: string, input: { theme: unknown; title: unknown }): Promise<EventServiceResult<{ slug: string }>>`
@@ -169,11 +172,11 @@ import { formatDateLabel, formatTimeLabel } from "@/lib/calendar";
 import { generateSlug } from "@/lib/slug";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 import {
-  isPartyFieldKey,
+  isEventFieldKey,
   validateEventDate,
+  validateEventField,
   validateEventTime,
-  validatePartyField,
-  type PartyFieldKey,
+  type EventFieldKey,
 } from "@/lib/validation";
 import {
   createEvent,
@@ -198,7 +201,7 @@ export async function createEventForOwner(
     return { ok: false, status: 400, error: "Ungültiges Theme." };
   }
 
-  const titleValidation = validatePartyField("title", title);
+  const titleValidation = validateEventField("title", title);
   if (!titleValidation.ok) {
     return { ok: false, status: 400, error: titleValidation.error };
   }
@@ -226,7 +229,7 @@ export async function updateEventForOwner(
   ownerId: string,
   body: Record<string, unknown>,
 ): Promise<EventServiceResult<EventRow>> {
-  const updates: Partial<Record<PartyFieldKey, string>> = {};
+  const updates: Partial<Record<EventFieldKey, string>> = {};
   let themeUpdate: ThemeKey | undefined;
   let eventDateUpdate: string | null | undefined;
   let eventStartTimeUpdate: string | null | undefined;
@@ -260,8 +263,8 @@ export async function updateEventForOwner(
       }
       continue;
     }
-    if (!isPartyFieldKey(key)) continue;
-    const validation = validatePartyField(key, rawValue);
+    if (!isEventFieldKey(key)) continue;
+    const validation = validateEventField(key, rawValue);
     if (!validation.ok) {
       return { ok: false, status: 400, error: validation.error };
     }
@@ -339,17 +342,17 @@ git commit -m "Add event-service.ts with owner-scoped create/update/delete rules
 
 ---
 
-### Task 3: Migrate `POST /api/parties` to the service layer
+### Task 3: Migrate `POST /api/events` to the service layer
 
 **Files:**
-- Modify: `src/app/api/parties/route.ts`
+- Modify: `src/app/api/events/route.ts`
 
 **Interfaces:**
 - Consumes: `createEventForOwner` from `@/services/event-service` (Task 2).
 
 - [ ] **Step 1: Replace the route body**
 
-Replace the full contents of `src/app/api/parties/route.ts` with:
+Replace the full contents of `src/app/api/events/route.ts` with:
 
 ```ts
 import { NextResponse } from "next/server";
@@ -384,7 +387,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
-    console.error("POST /api/parties failed:", error);
+    console.error("POST /api/events failed:", error);
     return NextResponse.json(
       { error: "Das Event konnte nicht erstellt werden. Bitte versuche es erneut." },
       { status: 500 },
@@ -395,13 +398,13 @@ export async function POST(request: Request) {
 
 - [ ] **Step 2: Verify types and lint**
 
-Run: `npx tsc --noEmit && npx eslint src/app/api/parties/route.ts`
+Run: `npx tsc --noEmit && npx eslint src/app/api/events/route.ts`
 Expected: no output (clean).
 
 - [ ] **Step 3: Verify production build**
 
 Run: `npx next build`
-Expected: build succeeds, route table lists `POST /api/parties` as before.
+Expected: build succeeds, route table lists `POST /api/events` as before.
 
 - [ ] **Step 4: Live verification**
 
@@ -423,7 +426,7 @@ Start the dev server (`preview_start` with the `insektenparty-dev` launch config
 
 Via Supabase `execute_sql`:
 ```sql
-delete from public.parties where owner_id = '<id>';
+delete from public.events where owner_id = '<id>';
 delete from public.profiles where id = '<id>';
 delete from auth.users where id = '<id>';
 ```
@@ -431,23 +434,23 @@ delete from auth.users where id = '<id>';
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/app/api/parties/route.ts
-git commit -m "Migrate POST /api/parties to event-service"
+git add src/app/api/events/route.ts
+git commit -m "Migrate POST /api/events to event-service"
 ```
 
 ---
 
-### Task 4: Migrate `PATCH`/`DELETE /api/parties/[partyId]` to the service layer
+### Task 4: Migrate `PATCH`/`DELETE /api/events/[eventId]` to the service layer
 
 **Files:**
-- Modify: `src/app/api/parties/[partyId]/route.ts`
+- Modify: `src/app/api/events/[eventId]/route.ts`
 
 **Interfaces:**
 - Consumes: `updateEventForOwner`, `deleteEventForOwner` from `@/services/event-service` (Task 2); `isUuid` from `@/lib/validation`.
 
 - [ ] **Step 1: Replace the route body**
 
-Replace the full contents of `src/app/api/parties/[partyId]/route.ts` with:
+Replace the full contents of `src/app/api/events/[eventId]/route.ts` with:
 
 ```ts
 import { NextResponse } from "next/server";
@@ -456,17 +459,17 @@ import { isUuid } from "@/lib/validation";
 import { deleteEventForOwner, updateEventForOwner } from "@/services/event-service";
 
 type RouteContext = {
-  params: Promise<{ partyId: string }>;
+  params: Promise<{ eventId: string }>;
 };
 
-// Partial update: the body may contain any subset of the known party fields
+// Partial update: the body may contain any subset of the known event fields
 // plus an optional "theme" (in practice either one field from the inline
 // EditableField save, or {theme, title} together from EventDialog's edit
 // mode). Unknown keys are ignored (see event-service.ts).
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
@@ -489,7 +492,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const result = await updateEventForOwner(partyId, userId, body as Record<string, unknown>);
+    const result = await updateEventForOwner(eventId, userId, body as Record<string, unknown>);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -497,7 +500,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     return NextResponse.json(result.data);
   } catch (error) {
-    console.error("PATCH /api/parties/[partyId] failed:", error);
+    console.error("PATCH /api/events/[eventId] failed:", error);
     return NextResponse.json(
       { error: "Das Event konnte nicht gespeichert werden. Bitte versuche es erneut." },
       { status: 500 },
@@ -507,8 +510,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
@@ -520,7 +523,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
     }
 
-    const result = await deleteEventForOwner(partyId, userId);
+    const result = await deleteEventForOwner(eventId, userId);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -528,7 +531,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     return NextResponse.json(result.data);
   } catch (error) {
-    console.error("DELETE /api/parties/[partyId] failed:", error);
+    console.error("DELETE /api/events/[eventId] failed:", error);
     return NextResponse.json(
       { error: "Das Event konnte nicht gelöscht werden. Bitte versuche es erneut." },
       { status: 500 },
@@ -539,7 +542,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
 - [ ] **Step 2: Verify types and lint**
 
-Run: `npx tsc --noEmit && npx eslint "src/app/api/parties/[partyId]/route.ts"`
+Run: `npx tsc --noEmit && npx eslint "src/app/api/events/[eventId]/route.ts"`
 Expected: no output (clean).
 
 - [ ] **Step 3: Verify production build**
@@ -562,19 +565,19 @@ Using a fresh disposable test account (same process as Task 3, Step 4):
 4. Delete the event via the home screen's trash icon, confirm it disappears from
    the list.
 5. Verify the "start/end time together" rule: with browser dev tools or a direct
-   `fetch('/api/parties/<id>', {method:'PATCH', body: JSON.stringify({eventStartTime: '09:00'})})`,
+   `fetch('/api/events/<id>', {method:'PATCH', body: JSON.stringify({eventStartTime: '09:00'})})`,
    confirm you get a 400 with "Start- und Endzeit müssen gemeinsam angegeben werden."
 
 - [ ] **Step 5: Clean up test data**
 
-Same as Task 3, Step 5 (delete parties/profiles/auth.users rows for the test account —
+Same as Task 3, Step 5 (delete events/profiles/auth.users rows for the test account —
 skip if already deleted in Step 4's own delete-event check).
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add "src/app/api/parties/[partyId]/route.ts"
-git commit -m "Migrate PATCH/DELETE /api/parties/[partyId] to event-service"
+git add "src/app/api/events/[eventId]/route.ts"
+git commit -m "Migrate PATCH/DELETE /api/events/[eventId] to event-service"
 ```
 
 ---
@@ -587,18 +590,18 @@ git commit -m "Migrate PATCH/DELETE /api/parties/[partyId] to event-service"
 **Interfaces:**
 - Consumes: `getEventsByOwner` from `@/repositories/event-repository` (Task 1).
 
-- [ ] **Step 1: Replace the imports and `myParties` query**
+- [ ] **Step 1: Replace the imports and `myEvents` query**
 
 In `src/app/page.tsx`, replace:
 
 ```ts
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { parties } from "@/db/schema";
+import { events } from "@/db/schema";
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
-import { CreatePartyButton } from "@/components/CreatePartyButton";
-import { PartyList } from "@/components/PartyList";
+import { CreateEventButton } from "@/components/CreateEventButton";
+import { EventList } from "@/components/EventList";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -609,8 +612,8 @@ with:
 ```ts
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
-import { CreatePartyButton } from "@/components/CreatePartyButton";
-import { PartyList } from "@/components/PartyList";
+import { CreateEventButton } from "@/components/CreateEventButton";
+import { EventList } from "@/components/EventList";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -620,26 +623,26 @@ import { getEventsByOwner } from "@/repositories/event-repository";
 and replace:
 
 ```ts
-  const myParties = claims
+  const myEvents = claims
     ? (
         await getDb()
           .select({
-            id: parties.id,
-            slug: parties.slug,
-            title: parties.title,
-            theme: parties.theme,
+            id: events.id,
+            slug: events.slug,
+            title: events.title,
+            theme: events.theme,
           })
-          .from(parties)
-          .where(eq(parties.ownerId, claims.sub))
-          .orderBy(desc(parties.createdAt))
-      ).map((party) => ({ ...party, theme: party.theme as ThemeKey }))
+          .from(events)
+          .where(eq(events.ownerId, claims.sub))
+          .orderBy(desc(events.createdAt))
+      ).map((event) => ({ ...event, theme: event.theme as ThemeKey }))
     : [];
 ```
 
 with:
 
 ```ts
-  const myParties = claims
+  const myEvents = claims
     ? (await getEventsByOwner(claims.sub)).map((event) => ({
         ...event,
         theme: event.theme as ThemeKey,
@@ -682,7 +685,7 @@ git commit -m "Migrate home page owner event listing to event-repository"
 **Interfaces:**
 - Consumes: `getEventBySlug` from `@/repositories/event-repository` (Task 1).
 
-- [ ] **Step 1: Replace the imports and party lookup**
+- [ ] **Step 1: Replace the imports and event lookup**
 
 In `src/app/p/[slug]/page.tsx`, replace:
 
@@ -690,7 +693,7 @@ In `src/app/p/[slug]/page.tsx`, replace:
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getDb } from "@/db";
-import { parties } from "@/db/schema";
+import { events } from "@/db/schema";
 import { Footer } from "@/components/Footer";
 ```
 
@@ -701,7 +704,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 ```
 
-and add this import alongside the others (e.g. after the `party-config` import):
+and add this import alongside the others (e.g. after the `event-config` import):
 
 ```ts
 import { getEventBySlug } from "@/repositories/event-repository";
@@ -712,9 +715,9 @@ then replace:
 ```ts
   const { slug } = await params;
   const db = getDb();
-  const [party] = await db.select().from(parties).where(eq(parties.slug, slug));
+  const [event] = await db.select().from(events).where(eq(events.slug, slug));
 
-  if (!party) {
+  if (!event) {
     notFound();
   }
 ```
@@ -723,9 +726,9 @@ with:
 
 ```ts
   const { slug } = await params;
-  const party = await getEventBySlug(slug);
+  const event = await getEventBySlug(slug);
 
-  if (!party) {
+  if (!event) {
     notFound();
   }
 ```
@@ -767,10 +770,10 @@ git commit -m "Migrate event page lookup to event-repository"
 - Consumes: `getDb()` from `@/db`, `guests` table from `@/db/schema`, `GuestInput` type from `@/lib/validation`.
 - Produces (used by Task 8):
   - `type GuestRow = typeof guests.$inferSelect`
-  - `getGuestsByEventId(partyId: string): Promise<GuestRow[]>`
-  - `createGuest(partyId: string, input: GuestInput): Promise<GuestRow>`
-  - `updateGuest(partyId: string, guestId: string, input: GuestInput): Promise<GuestRow | undefined>`
-  - `deleteGuest(partyId: string, guestId: string): Promise<{ id: string } | undefined>`
+  - `getGuestsByEventId(eventId: string): Promise<GuestRow[]>`
+  - `createGuest(eventId: string, input: GuestInput): Promise<GuestRow>`
+  - `updateGuest(eventId: string, guestId: string, input: GuestInput): Promise<GuestRow | undefined>`
+  - `deleteGuest(eventId: string, guestId: string): Promise<{ id: string } | undefined>`
 
 - [ ] **Step 1: Write the repository file**
 
@@ -782,19 +785,19 @@ import type { GuestInput } from "@/lib/validation";
 
 export type GuestRow = typeof guests.$inferSelect;
 
-export async function getGuestsByEventId(partyId: string): Promise<GuestRow[]> {
+export async function getGuestsByEventId(eventId: string): Promise<GuestRow[]> {
   return getDb()
     .select()
     .from(guests)
-    .where(eq(guests.partyId, partyId))
+    .where(eq(guests.eventId, eventId))
     .orderBy(asc(guests.arrivalTime), asc(guests.name));
 }
 
-export async function createGuest(partyId: string, input: GuestInput): Promise<GuestRow> {
+export async function createGuest(eventId: string, input: GuestInput): Promise<GuestRow> {
   const [created] = await getDb()
     .insert(guests)
     .values({
-      partyId,
+      eventId,
       name: input.name,
       additionalGuests: input.additionalGuests,
       additionalGuestNames: input.additionalGuestNames,
@@ -809,7 +812,7 @@ export async function createGuest(partyId: string, input: GuestInput): Promise<G
 }
 
 export async function updateGuest(
-  partyId: string,
+  eventId: string,
   guestId: string,
   input: GuestInput,
 ): Promise<GuestRow | undefined> {
@@ -826,18 +829,18 @@ export async function updateGuest(
       message: input.message,
       updatedAt: new Date(),
     })
-    .where(and(eq(guests.id, guestId), eq(guests.partyId, partyId)))
+    .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
     .returning();
   return updated;
 }
 
 export async function deleteGuest(
-  partyId: string,
+  eventId: string,
   guestId: string,
 ): Promise<{ id: string } | undefined> {
   const [deleted] = await getDb()
     .delete(guests)
-    .where(and(eq(guests.id, guestId), eq(guests.partyId, partyId)))
+    .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
     .returning({ id: guests.id });
   return deleted;
 }
@@ -866,10 +869,10 @@ git commit -m "Add guest-repository.ts wrapping guests table Drizzle queries"
 - Consumes: `eventExistsById` from `@/repositories/event-repository` (Task 1); `GuestRow`, `createGuest`, `updateGuest`, `deleteGuest`, `getGuestsByEventId` from `@/repositories/guest-repository` (Task 7); `getRecaptchaToken`, `verifyRecaptchaToken` from `@/lib/recaptcha`; `normalizeArrivalTime`, `validateGuestInput` from `@/lib/validation`; `GuestDto` from `@/lib/types`.
 - Produces (used by Task 9):
   - `type GuestServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string }`
-  - `listGuestsForEvent(partyId: string): Promise<GuestDto[]>`
-  - `createGuestForEvent(partyId: string, body: unknown): Promise<GuestServiceResult<GuestDto>>`
-  - `updateGuestForEvent(partyId: string, guestId: string, body: unknown): Promise<GuestServiceResult<GuestDto>>`
-  - `deleteGuestForEvent(partyId: string, guestId: string): Promise<GuestServiceResult<{ ok: true }>>`
+  - `listGuestsForEvent(eventId: string): Promise<GuestDto[]>`
+  - `createGuestForEvent(eventId: string, body: unknown): Promise<GuestServiceResult<GuestDto>>`
+  - `updateGuestForEvent(eventId: string, guestId: string, body: unknown): Promise<GuestServiceResult<GuestDto>>`
+  - `deleteGuestForEvent(eventId: string, guestId: string): Promise<GuestServiceResult<{ ok: true }>>`
 
 - [ ] **Step 1: Write the service file**
 
@@ -906,13 +909,13 @@ function toGuestDto(row: GuestRow): GuestDto {
   };
 }
 
-export async function listGuestsForEvent(partyId: string): Promise<GuestDto[]> {
-  const rows = await getGuestsByEventId(partyId);
+export async function listGuestsForEvent(eventId: string): Promise<GuestDto[]> {
+  const rows = await getGuestsByEventId(eventId);
   return rows.map(toGuestDto);
 }
 
 export async function createGuestForEvent(
-  partyId: string,
+  eventId: string,
   body: unknown,
 ): Promise<GuestServiceResult<GuestDto>> {
   const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
@@ -925,17 +928,17 @@ export async function createGuestForEvent(
     return { ok: false, status: 400, error: validation.error };
   }
 
-  const exists = await eventExistsById(partyId);
+  const exists = await eventExistsById(eventId);
   if (!exists) {
     return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
 
-  const created = await createGuest(partyId, validation.data);
+  const created = await createGuest(eventId, validation.data);
   return { ok: true, data: toGuestDto(created) };
 }
 
 export async function updateGuestForEvent(
-  partyId: string,
+  eventId: string,
   guestId: string,
   body: unknown,
 ): Promise<GuestServiceResult<GuestDto>> {
@@ -949,7 +952,7 @@ export async function updateGuestForEvent(
     return { ok: false, status: 400, error: validation.error };
   }
 
-  const updated = await updateGuest(partyId, guestId, validation.data);
+  const updated = await updateGuest(eventId, guestId, validation.data);
   if (!updated) {
     return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
   }
@@ -958,10 +961,10 @@ export async function updateGuestForEvent(
 }
 
 export async function deleteGuestForEvent(
-  partyId: string,
+  eventId: string,
   guestId: string,
 ): Promise<GuestServiceResult<{ ok: true }>> {
-  const deleted = await deleteGuest(partyId, guestId);
+  const deleted = await deleteGuest(eventId, guestId);
   if (!deleted) {
     return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
   }
@@ -986,8 +989,8 @@ git commit -m "Add guest-service.ts with recaptcha/validation/DTO rules"
 ### Task 9: Migrate guest routes to the service layer
 
 **Files:**
-- Modify: `src/app/api/parties/[partyId]/guests/route.ts`
-- Modify: `src/app/api/parties/[partyId]/guests/[guestId]/route.ts`
+- Modify: `src/app/api/events/[eventId]/guests/route.ts`
+- Modify: `src/app/api/events/[eventId]/guests/[guestId]/route.ts`
 
 **Interfaces:**
 - Consumes: `listGuestsForEvent`, `createGuestForEvent`, `updateGuestForEvent`, `deleteGuestForEvent` from `@/services/guest-service` (Task 8); `isUuid` from `@/lib/validation`.
@@ -999,7 +1002,7 @@ buttons on the event page work because only the owner is shown those buttons in
 the UI — there is no server-side owner check on these specific endpoints today).
 Do **not** add one as part of this migration.
 
-- [ ] **Step 1: Replace `src/app/api/parties/[partyId]/guests/route.ts`**
+- [ ] **Step 1: Replace `src/app/api/events/[eventId]/guests/route.ts`**
 
 ```ts
 import { NextResponse } from "next/server";
@@ -1007,20 +1010,20 @@ import { isUuid } from "@/lib/validation";
 import { createGuestForEvent, listGuestsForEvent } from "@/services/guest-service";
 
 type RouteContext = {
-  params: Promise<{ partyId: string }>;
+  params: Promise<{ eventId: string }>;
 };
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
-    const guests = await listGuestsForEvent(partyId);
+    const guests = await listGuestsForEvent(eventId);
     return NextResponse.json(guests);
   } catch (error) {
-    console.error("GET /api/parties/[partyId]/guests failed:", error);
+    console.error("GET /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(
       { error: "Die Gästeliste konnte nicht geladen werden." },
       { status: 500 },
@@ -1030,8 +1033,8 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function POST(request: Request, context: RouteContext) {
   try {
-    const { partyId } = await context.params;
-    if (!isUuid(partyId)) {
+    const { eventId } = await context.params;
+    if (!isUuid(eventId)) {
       return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
     }
 
@@ -1042,7 +1045,7 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const result = await createGuestForEvent(partyId, body);
+    const result = await createGuestForEvent(eventId, body);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -1050,7 +1053,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
-    console.error("POST /api/parties/[partyId]/guests failed:", error);
+    console.error("POST /api/events/[eventId]/guests failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
@@ -1061,7 +1064,7 @@ export async function POST(request: Request, context: RouteContext) {
 }
 ```
 
-- [ ] **Step 2: Replace `src/app/api/parties/[partyId]/guests/[guestId]/route.ts`**
+- [ ] **Step 2: Replace `src/app/api/events/[eventId]/guests/[guestId]/route.ts`**
 
 ```ts
 import { NextResponse } from "next/server";
@@ -1069,13 +1072,13 @@ import { isUuid } from "@/lib/validation";
 import { deleteGuestForEvent, updateGuestForEvent } from "@/services/guest-service";
 
 type RouteContext = {
-  params: Promise<{ partyId: string; guestId: string }>;
+  params: Promise<{ eventId: string; guestId: string }>;
 };
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const { partyId, guestId } = await context.params;
-    if (!isUuid(partyId) || !isUuid(guestId)) {
+    const { eventId, guestId } = await context.params;
+    if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
@@ -1086,7 +1089,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const result = await updateGuestForEvent(partyId, guestId, body);
+    const result = await updateGuestForEvent(eventId, guestId, body);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -1094,7 +1097,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     return NextResponse.json(result.data);
   } catch (error) {
-    console.error("PATCH /api/parties/[partyId]/guests/[guestId] failed:", error);
+    console.error("PATCH /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
@@ -1106,12 +1109,12 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
-    const { partyId, guestId } = await context.params;
-    if (!isUuid(partyId) || !isUuid(guestId)) {
+    const { eventId, guestId } = await context.params;
+    if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
-    const result = await deleteGuestForEvent(partyId, guestId);
+    const result = await deleteGuestForEvent(eventId, guestId);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });
@@ -1119,7 +1122,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     return NextResponse.json(result.data);
   } catch (error) {
-    console.error("DELETE /api/parties/[partyId]/guests/[guestId] failed:", error);
+    console.error("DELETE /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
       {
         error: "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
@@ -1135,7 +1138,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 Run:
 ```bash
 npx tsc --noEmit
-npx eslint "src/app/api/parties/[partyId]/guests/route.ts" "src/app/api/parties/[partyId]/guests/[guestId]/route.ts"
+npx eslint "src/app/api/events/[eventId]/guests/route.ts" "src/app/api/events/[eventId]/guests/[guestId]/route.ts"
 ```
 Expected: no output (clean).
 
@@ -1158,7 +1161,7 @@ On any existing event's page (no login required for RSVP):
 - [ ] **Step 6: Commit**
 
 ```bash
-git add "src/app/api/parties/[partyId]/guests/route.ts" "src/app/api/parties/[partyId]/guests/[guestId]/route.ts"
+git add "src/app/api/events/[eventId]/guests/route.ts" "src/app/api/events/[eventId]/guests/[guestId]/route.ts"
 git commit -m "Migrate guest routes to guest-service"
 ```
 
@@ -1174,7 +1177,7 @@ git commit -m "Migrate guest routes to guest-service"
 
 - [ ] **Step 1: Replace `src/app/p/[slug]/layout.tsx`**
 
-This file currently runs the same `parties` lookup twice (once in
+This file currently runs the same `events` lookup twice (once in
 `generateMetadata`, once in the layout component) via direct `getDb()` calls.
 Replace the full file with:
 
@@ -1185,7 +1188,7 @@ import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
 import { getEventBySlug } from "@/repositories/event-repository";
 import React from "react";
 
-type PartyLayoutProps = {
+type EventLayoutProps = {
   children: React.ReactNode;
   params: Promise<{ slug: string }>;
 };
@@ -1196,27 +1199,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const party = await getEventBySlug(slug);
+  const event = await getEventBySlug(slug);
 
-  if (!party) {
+  if (!event) {
     return { title: "Event nicht gefunden" };
   }
 
   return {
-    title: `${party.title} - Einladung`,
+    title: `${event.title} - Einladung`,
     description: `Digitale Einladung: Infos ansehen und Gästeliste verwalten.`,
   };
 }
 
-export default async function PartyLayout({ children, params }: PartyLayoutProps) {
+export default async function EventLayout({ children, params }: EventLayoutProps) {
   const { slug } = await params;
-  const party = await getEventBySlug(slug);
+  const event = await getEventBySlug(slug);
 
-  if (!party) {
+  if (!event) {
     notFound();
   }
 
-  const themeClassName = THEME_CLASS_NAMES[party.theme as ThemeKey];
+  const themeClassName = THEME_CLASS_NAMES[event.theme as ThemeKey];
 
   return <div className={themeClassName}>{children}</div>;
 }

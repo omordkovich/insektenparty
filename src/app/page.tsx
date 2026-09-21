@@ -1,6 +1,3 @@
-import { desc, eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { events } from "@/db/schema";
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
 import { CreateEventButton } from "@/components/CreateEventButton";
@@ -8,6 +5,7 @@ import { EventList } from "@/components/EventList";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
+import { getEventsByOwner } from "@/repositories/event-repository";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -17,18 +15,10 @@ export default async function Home() {
     typeof claims?.user_metadata?.name === "string" ? claims.user_metadata.name : null;
 
   const myEvents = claims
-    ? (
-        await getDb()
-          .select({
-            id: events.id,
-            slug: events.slug,
-            title: events.title,
-            theme: events.theme,
-          })
-          .from(events)
-          .where(eq(events.ownerId, claims.sub))
-          .orderBy(desc(events.createdAt))
-      ).map((event) => ({ ...event, theme: event.theme as ThemeKey }))
+    ? (await getEventsByOwner(claims.sub)).map((event) => ({
+        ...event,
+        theme: event.theme as ThemeKey,
+      }))
     : [];
 
   return (
