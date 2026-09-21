@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
 import { createGuestForEvent, listGuestsForEvent } from "@/services/guest-service";
 
@@ -38,7 +39,11 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const result = await createGuestForEvent(eventId, body);
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    const requesterId = data?.claims?.sub;
+
+    const result = await createGuestForEvent(eventId, body, requesterId);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });

@@ -53,6 +53,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <GuestSection
           apiBasePath={`/api/events/${event.id}/guests`}
           defaultArrivalTime={config.defaultArrivalTime}
+          isOwner={isOwner}
         />
       </main>
       <Footer config={config} eventId={event.id} isOwner={isOwner} />
