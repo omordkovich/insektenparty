@@ -148,6 +148,12 @@ input {
   object-fit: contain;
 }
 
+@media (max-width: 599px) {
+  .floating-accent {
+    display: none;
+  }
+}
+
 @keyframes float-soft {
   0%,
   100% {
