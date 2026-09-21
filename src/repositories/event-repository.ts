@@ -17,6 +17,16 @@ export async function eventExistsById(id: string): Promise<boolean> {
   return !!event;
 }
 
+// Returns undefined when the event does not exist, distinct from a null
+// ownerId (an event that exists but has no recorded owner).
+export async function getEventOwnerId(id: string): Promise<string | null | undefined> {
+  const [event] = await getDb()
+    .select({ ownerId: events.ownerId })
+    .from(events)
+    .where(eq(events.id, id));
+  return event ? event.ownerId : undefined;
+}
+
 export type EventListItem = {
   id: string;
   slug: string;

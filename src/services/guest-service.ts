@@ -1,7 +1,7 @@
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import type { GuestDto } from "@/lib/types";
 import { normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
-import { eventExistsById } from "@/repositories/event-repository";
+import { getEventOwnerId } from "@/repositories/event-repository";
 import {
   createGuest,
   deleteGuest,
@@ -38,20 +38,26 @@ export async function listGuestsForEvent(eventId: string): Promise<GuestDto[]> {
 export async function createGuestForEvent(
   eventId: string,
   body: unknown,
+  requesterId?: string,
 ): Promise<GuestServiceResult<GuestDto>> {
-  const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
-  if (!recaptcha.ok) {
-    return { ok: false, status: recaptcha.status, error: recaptcha.error };
+  const ownerId = await getEventOwnerId(eventId);
+  if (ownerId === undefined) {
+    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+  }
+
+  // The event owner manages their own guest list while signed in, so the
+  // bot check (aimed at the public RSVP form) doesn't apply to them.
+  const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+  if (!isOwnerRequest) {
+    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
+    if (!recaptcha.ok) {
+      return { ok: false, status: recaptcha.status, error: recaptcha.error };
+    }
   }
 
   const validation = validateGuestInput(body);
   if (!validation.ok) {
     return { ok: false, status: 400, error: validation.error };
-  }
-
-  const exists = await eventExistsById(eventId);
-  if (!exists) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
 
   const created = await createGuest(eventId, validation.data);
@@ -62,10 +68,15 @@ export async function updateGuestForEvent(
   eventId: string,
   guestId: string,
   body: unknown,
+  requesterId?: string,
 ): Promise<GuestServiceResult<GuestDto>> {
-  const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
-  if (!recaptcha.ok) {
-    return { ok: false, status: recaptcha.status, error: recaptcha.error };
+  const ownerId = await getEventOwnerId(eventId);
+  const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+  if (!isOwnerRequest) {
+    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
+    if (!recaptcha.ok) {
+      return { ok: false, status: recaptcha.status, error: recaptcha.error };
+    }
   }
 
   const validation = validateGuestInput(body);
