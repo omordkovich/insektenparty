@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/db";
-import { events } from "@/db/schema";
+import { createEventForOwner } from "@/services/event-service";
 import { createClient } from "@/lib/supabase/server";
-import { generateSlug } from "@/lib/slug";
-import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
-import { validateEventField } from "@/lib/validation";
-
-const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
 export async function POST(request: Request) {
   try {
@@ -25,52 +19,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const theme = (body as { theme?: unknown })?.theme;
-    if (typeof theme !== "string" || !THEME_KEYS.includes(theme as ThemeKey)) {
-      return NextResponse.json({ error: "Ungültiges Theme." }, { status: 400 });
+    const result = await createEventForOwner(userId, {
+      theme: (body as { theme?: unknown })?.theme,
+      title: (body as { title?: unknown })?.title,
+    });
+
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    const rawTitle = (body as { title?: unknown })?.title;
-    const titleValidation = validateEventField("title", rawTitle);
-    if (!titleValidation.ok) {
-      return NextResponse.json({ error: titleValidation.error }, { status: 400 });
-    }
-    if (!titleValidation.value) {
-      return NextResponse.json(
-        { error: "Bitte gib einen Namen für dein Event ein." },
-        { status: 400 },
-      );
-    }
-
-    // Every other field starts empty - the owner fills them in via the
-    // inline-editable fields on the event page (placeholders guide them
-    // there); only name and theme are picked up front.
-    const slug = generateSlug(titleValidation.value);
-
-    const db = getDb();
-    const [created] = await db
-      .insert(events)
-      .values({
-        ownerId: userId,
-        slug,
-        theme,
-        kicker: "",
-        title: titleValidation.value,
-        greeting: "",
-        dateLabel: "",
-        timeLabel: "",
-        locationLabel: "",
-        defaultArrivalTime: "",
-        eventDate: null,
-        eventStartTime: null,
-        eventEndTime: null,
-        contactName: "",
-        contactPhone: "",
-        contactEmail: "",
-      })
-      .returning({ slug: events.slug });
-
-    return NextResponse.json({ slug: created.slug }, { status: 201 });
+    return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
     console.error("POST /api/events failed:", error);
     return NextResponse.json(
