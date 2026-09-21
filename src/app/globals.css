@@ -19,7 +19,7 @@
   --shadow: 0 18px 40px rgba(36, 53, 40, 0.12);
   /* Text color for content sitting on a --honey background. Kept as its own
      variable (not just leaf-dark) because a theme can darken honey itself
-     (see .event-theme-baloons) - the text needs to invert with it. */
+     (see .event-theme-ballons) - the text needs to invert with it. */
   --on-honey: var(--leaf-dark);
 }
 
@@ -84,11 +84,11 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
 }
 
-/* Baloons theme: modern blue / slate / near-black palette instead of
+/* Ballons theme: modern blue / slate / near-black palette instead of
    the green/honey/pink garden theme. Overriding these custom properties is
    enough - every Tailwind utility (text-leaf-dark, bg-honey, etc.) reads
    its color through them, so components don't need theme-specific classes. */
-.event-theme-baloons {
+.event-theme-ballons {
   --bg-top: #dbeafe;
   --bg-mid: #eef2f7;
   --bg-bottom: #cbd5e1;
@@ -111,7 +111,7 @@ body {
   color: var(--ink);
 }
 
-.event-theme-baloons .parallax-background {
+.event-theme-ballons .parallax-background {
   background:
     radial-gradient(circle at 12% 18%, rgba(37, 99, 235, 0.18), transparent 28%),
     radial-gradient(circle at 88% 12%, rgba(100, 116, 139, 0.22), transparent 26%),
