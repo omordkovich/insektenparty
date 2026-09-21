@@ -1,30 +1,10 @@
-import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { getDb } from "@/db";
-import { guests } from "@/db/schema";
-import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
-import { isUuid, normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
-import type { GuestDto } from "@/lib/types";
+import { isUuid } from "@/lib/validation";
+import { deleteGuestForEvent, updateGuestForEvent } from "@/services/guest-service";
 
 type RouteContext = {
   params: Promise<{ eventId: string; guestId: string }>;
 };
-
-function toGuestDto(row: typeof guests.$inferSelect): GuestDto {
-  return {
-    id: row.id,
-    name: row.name,
-    additionalGuests: row.additionalGuests,
-    additionalGuestNames: row.additionalGuestNames,
-    arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
-    bringingSomething: row.bringingSomething,
-    bringingDescription: row.bringingDescription,
-    hasMessage: row.hasMessage,
-    message: row.message,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-  };
-}
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
@@ -40,38 +20,13 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
-    if (!recaptcha.ok) {
-      return NextResponse.json({ error: recaptcha.error }, { status: recaptcha.status });
+    const result = await updateGuestForEvent(eventId, guestId, body);
+
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    const validation = validateGuestInput(body);
-    if (!validation.ok) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
-    }
-
-    const db = getDb();
-    const [updated] = await db
-      .update(guests)
-      .set({
-        name: validation.data.name,
-        additionalGuests: validation.data.additionalGuests,
-        additionalGuestNames: validation.data.additionalGuestNames,
-        arrivalTime: validation.data.arrivalTime,
-        bringingSomething: validation.data.bringingSomething,
-        bringingDescription: validation.data.bringingDescription,
-        hasMessage: validation.data.hasMessage,
-        message: validation.data.message,
-        updatedAt: new Date(),
-      })
-      .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
-      .returning();
-
-    if (!updated) {
-      return NextResponse.json({ error: "Gast wurde nicht gefunden." }, { status: 404 });
-    }
-
-    return NextResponse.json(toGuestDto(updated));
+    return NextResponse.json(result.data);
   } catch (error) {
     console.error("PATCH /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
@@ -90,17 +45,13 @@ export async function DELETE(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
-    const db = getDb();
-    const [deleted] = await db
-      .delete(guests)
-      .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
-      .returning({ id: guests.id });
+    const result = await deleteGuestForEvent(eventId, guestId);
 
-    if (!deleted) {
-      return NextResponse.json({ error: "Gast wurde nicht gefunden." }, { status: 404 });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json(result.data);
   } catch (error) {
     console.error("DELETE /api/events/[eventId]/guests/[guestId] failed:", error);
     return NextResponse.json(
