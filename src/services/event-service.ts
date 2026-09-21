@@ -101,6 +101,9 @@ export async function updateEventForOwner(
     updates[key] = validation.value;
   }
 
+  // Start/end time are edited together as one "Uhrzeit" field (see
+  // EditableTimeRangeField) and the derived label below needs both, so a
+  // request touching only one of them is rejected rather than guessed at.
   if ((eventStartTimeUpdate !== undefined) !== (eventEndTimeUpdate !== undefined)) {
     return {
       ok: false,

@@ -38,6 +38,9 @@ export async function createEvent(input: {
   theme: string;
   title: string;
 }): Promise<{ slug: string }> {
+  // Every other field starts empty - the owner fills them in via the
+  // inline-editable fields on the event page (placeholders guide them
+  // there); only name and theme are picked up front.
   const [created] = await getDb()
     .insert(events)
     .values({
