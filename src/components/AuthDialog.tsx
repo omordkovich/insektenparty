@@ -7,10 +7,10 @@ import { Button } from "./Button";
 import { FormModal } from "./FormModal";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
-export type AuthDialogMode = "login" | "register";
+export type AuthDialogMode = "login" | "register" | "reset";
 
 const NAME_MAX_LENGTH = 100;
-const PASSWORD_MIN_LENGTH = 6;
+export const PASSWORD_MIN_LENGTH = 6;
 
 type FormState = {
   name: string;
@@ -40,6 +40,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaReset, setRecaptchaReset] = useState(0);
@@ -49,6 +50,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     setFieldError(null);
     setSubmitError(null);
     setConfirmationSent(false);
+    setResetSent(false);
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -61,6 +63,28 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     const email = form.email.trim();
     if (!email) {
       setFieldError("E-Mail ist erforderlich.");
+      return;
+    }
+
+    if (mode === "reset") {
+      setSaving(true);
+      try {
+        const supabase = createClient();
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) {
+          setSubmitError(error.message);
+          return;
+        }
+        // Supabase never reveals whether the email is actually registered
+        // here (to avoid leaking that), so this message is shown either way.
+        setResetSent(true);
+      } catch {
+        setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      } finally {
+        setSaving(false);
+      }
       return;
     }
 
@@ -109,7 +133,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         return;
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password: form.password,
         options: { data: { name: form.name.trim() } },
@@ -119,6 +143,18 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         setRecaptchaReset((value) => value + 1);
         return;
       }
+
+      // Supabase never returns an error for a duplicate email (to avoid
+      // leaking which addresses are registered) - it returns a user with an
+      // empty identities array instead. That's the only way to detect it.
+      if (data.user && data.user.identities?.length === 0) {
+        setSubmitError(
+          "Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich stattdessen an.",
+        );
+        setRecaptchaReset((value) => value + 1);
+        return;
+      }
+
       setConfirmationSent(true);
     } catch {
       setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
@@ -135,13 +171,15 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
       onCloseAction={onCloseAction}
       closeDisabled={saving}
       initialFocusRef={emailInputRef}
-      header={mode === "login" ? "Login" : "Registrieren"}
+      header={
+        mode === "login" ? "Login" : mode === "register" ? "Registrieren" : "Passwort zurücksetzen"
+      }
       footer={
         <>
           <Button variant="outline" onClick={onCloseAction} disabled={saving}>
-            {confirmationSent ? "Schließen" : "Abbrechen"}
+            {confirmationSent || resetSent ? "Schließen" : "Abbrechen"}
           </Button>
-          {confirmationSent ? null : (
+          {confirmationSent || resetSent ? null : (
             <Button
               variant="primary"
               type="submit"
@@ -151,16 +189,19 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                 ? "Wird gesendet ..."
                 : mode === "login"
                   ? "Einloggen"
-                  : "Registrieren"}
+                  : mode === "register"
+                    ? "Registrieren"
+                    : "Passwort zurücksetzen"}
             </Button>
           )}
         </>
       }
     >
-      {confirmationSent ? (
+      {confirmationSent || resetSent ? (
         <p>
-          Fast geschafft! Wir haben dir eine E-Mail geschickt — bitte klicke auf
-          den Bestätigungslink, um dein Konto zu aktivieren.
+          {confirmationSent
+            ? "Fast geschafft! Wir haben dir eine E-Mail geschickt — bitte klicke auf den Bestätigungslink, um dein Konto zu aktivieren."
+            : "Falls diese E-Mail-Adresse bei uns registriert ist, haben wir dir eine E-Mail mit einem Link zum Zurücksetzen deines Passworts geschickt."}
         </p>
       ) : (
         <div className="space-y-4">
@@ -206,27 +247,29 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
             />
           </div>
 
-          <div>
-            <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
-              Passwort
-            </label>
-            <input
-              id={passwordId}
-              name="password"
-              type="password"
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              minLength={PASSWORD_MIN_LENGTH}
-              value={form.password}
-              disabled={saving}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  password: event.target.value,
-                }))
-              }
-              className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
-            />
-          </div>
+          {mode !== "reset" ? (
+            <div>
+              <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
+                Passwort
+              </label>
+              <input
+                id={passwordId}
+                name="password"
+                type="password"
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                minLength={PASSWORD_MIN_LENGTH}
+                value={form.password}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    password: event.target.value,
+                  }))
+                }
+                className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+              />
+            </div>
+          ) : null}
 
           {mode === "register" ? (
             <>
@@ -268,16 +311,40 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
             </p>
           ) : null}
 
-          <button
-            type="button"
-            onClick={() => switchMode(mode === "login" ? "register" : "login")}
-            disabled={saving}
-            className="text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
-          >
-            {mode === "login"
-              ? "Noch kein Konto? Registrieren"
-              : "Schon ein Konto? Einloggen"}
-          </button>
+          {mode === "reset" ? (
+            <button
+              type="button"
+              onClick={() => switchMode("login")}
+              disabled={saving}
+              className="text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
+            >
+              Zurück zum Login
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => switchMode(mode === "login" ? "register" : "login")}
+                disabled={saving}
+                className="block text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
+              >
+                {mode === "login"
+                  ? "Noch kein Konto? Registrieren"
+                  : "Schon ein Konto? Einloggen"}
+              </button>
+
+              {mode === "login" ? (
+                <button
+                  type="button"
+                  onClick={() => switchMode("reset")}
+                  disabled={saving}
+                  className="block text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
+                >
+                  Passwort vergessen?
+                </button>
+              ) : null}
+            </div>
+          )}
         </div>
       )}
     </FormModal>

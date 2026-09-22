@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
 
   const redirectTo = request.nextUrl.clone();
-  redirectTo.pathname = "/";
+  redirectTo.pathname = type === "recovery" ? "/auth/reset-password" : "/";
   redirectTo.searchParams.delete("token_hash");
   redirectTo.searchParams.delete("type");
 
