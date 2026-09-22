@@ -2,10 +2,12 @@ import { useId, useRef, useState } from "react";
 import type { GuestDto } from "@/lib/types";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
+import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 type DeleteGuestDialogProps = {
   guest: GuestDto;
   apiBasePath: string;
+  isOwner?: boolean;
   onCloseAction: () => void;
   onDeletedAction: () => Promise<void> | void;
 };
@@ -13,6 +15,7 @@ type DeleteGuestDialogProps = {
 export function DeleteGuestDialog({
   guest,
   apiBasePath,
+  isOwner = false,
   onCloseAction,
   onDeletedAction,
 }: DeleteGuestDialogProps) {
@@ -21,9 +24,15 @@ export function DeleteGuestDialog({
   const cancelRef = useRef<HTMLButtonElement>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaReset, setRecaptchaReset] = useState(0);
 
   async function handleDelete() {
     if (deleting) return;
+    if (!isOwner && !recaptchaToken) {
+      setError("Bitte bestätige, dass du kein Roboter bist.");
+      return;
+    }
 
     setDeleting(true);
     setError(null);
@@ -31,6 +40,8 @@ export function DeleteGuestDialog({
     try {
       const response = await fetch(`${apiBasePath}/${guest.id}`, {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recaptchaToken }),
       });
 
       if (!response.ok) {
@@ -41,6 +52,7 @@ export function DeleteGuestDialog({
           payload?.error ??
             "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
         );
+        setRecaptchaReset((value) => value + 1);
         return;
       }
 
@@ -48,6 +60,7 @@ export function DeleteGuestDialog({
       onCloseAction();
     } catch {
       setError("Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.");
+      setRecaptchaReset((value) => value + 1);
     } finally {
       setDeleting(false);
     }
@@ -69,6 +82,12 @@ export function DeleteGuestDialog({
         Möchtest du „{guest.name}“ wirklich aus der Gästeliste entfernen?
       </p>
 
+      {!isOwner ? (
+        <div className="mt-4">
+          <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
+        </div>
+      ) : null}
+
       {error ? (
         <p className="mt-3 text-sm text-danger" role="alert">
           {error}
@@ -79,7 +98,11 @@ export function DeleteGuestDialog({
         <Button ref={cancelRef} variant="outline" onClick={onCloseAction} disabled={deleting}>
           Abbrechen
         </Button>
-        <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+        <Button
+          variant="danger"
+          onClick={handleDelete}
+          disabled={deleting || (!isOwner && !recaptchaToken)}
+        >
           {deleting ? "Wird gelöscht ..." : "Löschen"}
         </Button>
       </div>

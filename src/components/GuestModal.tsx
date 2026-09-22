@@ -120,25 +120,8 @@ export function GuestModal({
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaReset, setRecaptchaReset] = useState(0);
 
-  const isDirty =
-    form.name !== initialForm.name ||
-    form.additionalGuests !== initialForm.additionalGuests ||
-    form.additionalGuestNames.join("\n") !==
-      initialForm.additionalGuestNames.join("\n") ||
-    form.arrivalTime !== initialForm.arrivalTime ||
-    form.bringingSomething !== initialForm.bringingSomething ||
-    form.bringingDescription !== initialForm.bringingDescription ||
-    form.hasMessage !== initialForm.hasMessage ||
-    form.message !== initialForm.message;
-
   function requestClose() {
     if (saving) return;
-    if (isDirty) {
-      const confirmed = window.confirm(
-        "Es gibt ungespeicherte Änderungen. Modal wirklich schließen?",
-      );
-      if (!confirmed) return;
-    }
     onClose();
   }
 

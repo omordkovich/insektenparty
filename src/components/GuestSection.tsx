@@ -179,6 +179,7 @@ export function GuestSection({
           key={deleteGuest.id}
           guest={deleteGuest}
           apiBasePath={apiBasePath}
+          isOwner={isOwner}
           onCloseAction={() => setDeleteGuest(null)}
           onDeletedAction={loadGuests}
         />

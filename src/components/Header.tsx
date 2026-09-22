@@ -36,7 +36,10 @@ export function Header({ config, logoHref }: HeaderProps) {
         priority
       />
 
-      <Link href={logoHref} className="relative">
+      <Link
+        href={logoHref}
+        className="relative inline-block rounded-full transition-all duration-500 ease-in-out hover:scale-[1.03] hover:shadow-lg hover:brightness-105 active:scale-[0.97] active:brightness-90 active:duration-150"
+      >
         <Image
           src={config.assets.logo}
           alt={`${config.title} Logo`}

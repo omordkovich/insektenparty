@@ -9,6 +9,7 @@ import {
   updateGuest,
   type GuestRow,
 } from "@/repositories/guest-repository";
+import { notifyOwnerOfGuestChange } from "@/services/notification-service";
 
 export type GuestServiceResult<T> =
   | { ok: true; data: T }
@@ -61,6 +62,11 @@ export async function createGuestForEvent(
   }
 
   const created = await createGuest(eventId, validation.data);
+
+  if (!isOwnerRequest) {
+    await notifyOwnerOfGuestChange(eventId, "created", created.name);
+  }
+
   return { ok: true, data: toGuestDto(created) };
 }
 
@@ -89,16 +95,37 @@ export async function updateGuestForEvent(
     return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
   }
 
+  if (!isOwnerRequest) {
+    await notifyOwnerOfGuestChange(eventId, "updated", updated.name);
+  }
+
   return { ok: true, data: toGuestDto(updated) };
 }
 
 export async function deleteGuestForEvent(
   eventId: string,
   guestId: string,
+  body: unknown,
+  requesterId?: string,
 ): Promise<GuestServiceResult<{ ok: true }>> {
+  const ownerId = await getEventOwnerId(eventId);
+  const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+
+  if (!isOwnerRequest) {
+    const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
+    if (!recaptcha.ok) {
+      return { ok: false, status: recaptcha.status, error: recaptcha.error };
+    }
+  }
+
   const deleted = await deleteGuest(eventId, guestId);
   if (!deleted) {
     return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
   }
+
+  if (!isOwnerRequest) {
+    await notifyOwnerOfGuestChange(eventId, "deleted", deleted.name);
+  }
+
   return { ok: true, data: { ok: true } };
 }

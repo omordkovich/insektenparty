@@ -20,6 +20,18 @@ export function useModalBehavior({
 }: UseModalBehaviorOptions) {
   const internalCloseRef = useRef<HTMLButtonElement>(null);
 
+  // requestClose-style callbacks are re-created on every render (e.g. on
+  // every keystroke in the form), so the effect below must not depend on
+  // them directly - that would re-run it (and re-steal focus to the first
+  // field) on every keystroke. Refs give the keydown handler the latest
+  // values without adding them as effect dependencies.
+  const onCloseActionRef = useRef(onCloseAction);
+  const closeDisabledRef = useRef(closeDisabled);
+  useEffect(() => {
+    onCloseActionRef.current = onCloseAction;
+    closeDisabledRef.current = closeDisabled;
+  });
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.classList.add("modal-open");
@@ -29,8 +41,8 @@ export function useModalBehavior({
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        if (closeDisabled) return;
-        onCloseAction();
+        if (closeDisabledRef.current) return;
+        onCloseActionRef.current();
       }
     }
 
@@ -41,7 +53,7 @@ export function useModalBehavior({
       document.body.classList.remove("modal-open");
       document.body.style.overflow = previousOverflow;
     };
-  }, [closeDisabled, onCloseAction, initialFocusRef]);
+  }, [initialFocusRef]);
 
   return internalCloseRef;
 }

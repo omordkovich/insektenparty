@@ -14,3 +14,13 @@ export async function getUserDisplayName(userId: string): Promise<string | null>
   const row = rows[0];
   return row?.name ?? row?.email ?? null;
 }
+
+export type UserContact = { name: string | null; email: string | null };
+
+export async function getUserContact(userId: string): Promise<UserContact | null> {
+  const rows = (await getDb().execute(
+    sql`select raw_user_meta_data ->> 'name' as name, email from auth.users where id = ${userId}`,
+  )) as unknown as AuthUserRow[];
+
+  return rows[0] ?? null;
+}

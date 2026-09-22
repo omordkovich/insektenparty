@@ -27,6 +27,18 @@ export async function getEventOwnerId(id: string): Promise<string | null | undef
   return event ? event.ownerId : undefined;
 }
 
+export type EventNotificationInfo = { ownerId: string | null; title: string; slug: string };
+
+export async function getEventForNotification(
+  id: string,
+): Promise<EventNotificationInfo | undefined> {
+  const [event] = await getDb()
+    .select({ ownerId: events.ownerId, title: events.title, slug: events.slug })
+    .from(events)
+    .where(eq(events.id, id));
+  return event;
+}
+
 export type EventListItem = {
   id: string;
   slug: string;

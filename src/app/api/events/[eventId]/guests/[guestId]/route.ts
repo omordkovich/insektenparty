@@ -43,14 +43,27 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
   try {
     const { eventId, guestId } = await context.params;
     if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
 
-    const result = await deleteGuestForEvent(eventId, guestId);
+    let body: unknown = null;
+    try {
+      body = await request.json();
+    } catch {
+      // A missing/empty body is fine for owner requests (see the recaptcha
+      // check inside deleteGuestForEvent); public requests without a token
+      // are rejected there.
+    }
+
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    const requesterId = data?.claims?.sub;
+
+    const result = await deleteGuestForEvent(eventId, guestId, body, requesterId);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });

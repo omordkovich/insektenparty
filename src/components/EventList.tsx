@@ -47,20 +47,22 @@ export function EventList({ initialEvents }: EventListProps) {
                 {eventList.map((event) => (
                   <li
                     key={event.id}
-                    className="flex items-center gap-3 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm transition hover:border-leaf/30 hover:bg-white"
+                    className="flex items-center gap-3 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm transition-all duration-500 ease-in-out hover:scale-[1.03] hover:border-leaf/30 hover:bg-white hover:shadow-lg hover:brightness-105 active:scale-[0.97] active:brightness-90 active:duration-150"
                   >
-                    <Image
-                      src={THEME_ASSETS[event.theme].logo}
-                      alt=""
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 shrink-0 rounded-full object-contain"
-                    />
                     <Link
                       href={`/p/${event.slug}`}
-                      className="min-w-0 flex-1 truncate text-base font-bold text-leaf-dark transition hover:text-leaf"
+                      className="flex min-w-0 flex-1 items-center gap-3"
                     >
-                      {event.title || "Unbenanntes Event"}
+                      <Image
+                        src={THEME_ASSETS[event.theme].logo}
+                        alt=""
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 shrink-0 rounded-full object-contain"
+                      />
+                      <span className="min-w-0 flex-1 truncate text-base font-bold text-leaf-dark">
+                        {event.title || "Unbenanntes Event"}
+                      </span>
                     </Link>
                     <div className="flex shrink-0 gap-2">
                       <Button

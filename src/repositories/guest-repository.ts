@@ -57,10 +57,10 @@ export async function updateGuest(
 export async function deleteGuest(
   eventId: string,
   guestId: string,
-): Promise<{ id: string } | undefined> {
+): Promise<{ id: string; name: string } | undefined> {
   const [deleted] = await getDb()
     .delete(guests)
     .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))
-    .returning({ id: guests.id });
+    .returning({ id: guests.id, name: guests.name });
   return deleted;
 }
