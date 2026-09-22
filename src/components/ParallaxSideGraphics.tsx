@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 type ParallaxSideGraphicsProps = {
-  leftSrc: string;
-  rightSrc: string;
+  leftSrc?: string;
+  rightSrc?: string;
 };
 
 // <1 makes the graphics lag behind the normal scroll speed, reading as
@@ -49,24 +49,28 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
         aria-hidden="true"
         className="parallax-background pointer-events-none absolute inset-0 -z-20 will-change-transform"
       />
-      <Image
-        ref={rightRef}
-        src={rightSrc}
-        alt=""
-        width={283}
-        height={1024}
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
-      />
-      <Image
-        ref={leftRef}
-        src={leftSrc}
-        alt=""
-        width={434}
-        height={1024}
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
-      />
+      {rightSrc ? (
+        <Image
+          ref={rightRef}
+          src={rightSrc}
+          alt=""
+          width={283}
+          height={1024}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 bottom-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
+        />
+      ) : null}
+      {leftSrc ? (
+        <Image
+          ref={leftRef}
+          src={leftSrc}
+          alt=""
+          width={434}
+          height={1024}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
+        />
+      ) : null}
     </>
   );
 }

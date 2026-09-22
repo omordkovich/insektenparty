@@ -21,7 +21,7 @@ export function GuestItem({
   disabled = false,
 }: GuestItemProps) {
   return (
-    <tr className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm sm:table-row sm:rounded-none sm:border-0 sm:border-b sm:border-leaf/10 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none sm:last:border-0">
+    <tr className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-leaf/15 bg-surface/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm sm:table-row sm:rounded-none sm:border-0 sm:border-b sm:border-leaf/10 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none sm:last:border-0">
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <span className="font-bold text-leaf-dark">{guest.name}</span>
       </td>
@@ -82,7 +82,7 @@ export function GuestItem({
           <Button
             variant="outline"
             size="icon"
-            className="bg-white"
+            className="bg-surface"
             aria-label={`${guest.name} bearbeiten`}
             onClick={() => onEdit(guest)}
             disabled={disabled}

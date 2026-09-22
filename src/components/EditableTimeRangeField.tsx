@@ -78,7 +78,7 @@ export function EditableTimeRangeField({
             aria-label="Startzeit"
             defaultValue={currentStart ?? ""}
             disabled={saving}
-            className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+            className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
           <input
             ref={endRef}
@@ -86,7 +86,7 @@ export function EditableTimeRangeField({
             aria-label="Endzeit"
             defaultValue={currentEnd ?? ""}
             disabled={saving}
-            className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+            className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
         </span>
       )}

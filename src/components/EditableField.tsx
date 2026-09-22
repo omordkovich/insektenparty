@@ -108,7 +108,7 @@ export function EditableField({
             placeholder={placeholder}
             disabled={saving}
             rows={2}
-            className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+            className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
         ) : (
           <input
@@ -117,7 +117,7 @@ export function EditableField({
             defaultValue={currentValue}
             placeholder={placeholder}
             disabled={saving}
-            className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+            className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
         )
       }

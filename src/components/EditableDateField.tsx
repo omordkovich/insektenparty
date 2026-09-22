@@ -86,7 +86,7 @@ export function EditableDateField({
           type="date"
           defaultValue={currentValue ?? ""}
           disabled={saving}
-          className={`${className} w-full rounded-lg border border-leaf/25 bg-white px-2 py-1`}
+          className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
         />
       )}
     />

@@ -20,7 +20,7 @@ export function AdditionalGuestsDialog({ guest, onCloseAction }: AdditionalGuest
 
       <ul className="mt-4 space-y-2">
         {guest.additionalGuestNames.map((additionalName, index) => (
-          <li key={index} className="rounded-xl border border-leaf/15 bg-white/80 px-3 py-2">
+          <li key={index} className="rounded-xl border border-leaf/15 bg-surface/80 px-3 py-2">
             {additionalName}
           </li>
         ))}

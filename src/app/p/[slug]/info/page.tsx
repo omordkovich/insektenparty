@@ -22,7 +22,7 @@ export default async function EventInfoPage({ params }: EventInfoPageProps) {
     <>
       <SiteHeader />
       <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="max-w-md text-lg text-zinc-700">
+        <p className="max-w-md text-lg text-muted">
           Dieser Event wurde von{" "}
           <span className="font-bold text-leaf-dark">{ownerName ?? "einem Nutzer"}</span>{" "}
           erstellt.

@@ -20,9 +20,12 @@ export type EventConfig = {
   };
   assets: {
     logo: string;
-    plantsLeft: string;
-    plantsRight: string;
-    accentOne: string;
-    accentTwo: string;
+    // Optional: themes without decorative side/floating graphics (e.g. the
+    // minimal "schwarz" theme) omit these entirely rather than pointing at
+    // an empty image.
+    plantsLeft?: string;
+    plantsRight?: string;
+    accentOne?: string;
+    accentTwo?: string;
   };
 };

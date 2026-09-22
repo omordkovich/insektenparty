@@ -15,26 +15,30 @@ const ACCENT_OFFSET = `calc(50% + ${LOGO_HALF_WIDTH}px + ${ACCENT_GAP}px)`;
 export function Header({ config, logoHref }: HeaderProps) {
   return (
     <header className="relative flex items-center justify-center overflow-hidden pt-6 pb-4">
-      <Image
-        src={config.assets.accentOne}
-        alt=""
-        width={128}
-        height={128}
-        aria-hidden="true"
-        className="floating-accent animate-buzz top-1/2 h-auto w-auto -translate-y-1/2"
-        style={{ right: ACCENT_OFFSET }}
-        priority
-      />
-      <Image
-        src={config.assets.accentTwo}
-        alt=""
-        width={256}
-        height={256}
-        aria-hidden="true"
-        className="floating-accent animate-float top-1/2 h-auto w-auto -translate-y-1/2"
-        style={{ left: ACCENT_OFFSET }}
-        priority
-      />
+      {config.assets.accentOne ? (
+        <Image
+          src={config.assets.accentOne}
+          alt=""
+          width={128}
+          height={128}
+          aria-hidden="true"
+          className="floating-accent animate-buzz top-1/2 h-auto w-auto -translate-y-1/2"
+          style={{ right: ACCENT_OFFSET }}
+          priority
+        />
+      ) : null}
+      {config.assets.accentTwo ? (
+        <Image
+          src={config.assets.accentTwo}
+          alt=""
+          width={256}
+          height={256}
+          aria-hidden="true"
+          className="floating-accent animate-float top-1/2 h-auto w-auto -translate-y-1/2"
+          style={{ left: ACCENT_OFFSET }}
+          priority
+        />
+      ) : null}
 
       <Link
         href={logoHref}

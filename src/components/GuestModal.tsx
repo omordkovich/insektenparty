@@ -246,7 +246,7 @@ export function GuestModal({
             onChange={(event) =>
               setForm((current) => ({ ...current, name: event.target.value }))
             }
-            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+            className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
           />
         </div>
 
@@ -275,7 +275,7 @@ export function GuestModal({
                 ),
               }));
             }}
-            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+            className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
           />
         </div>
 
@@ -299,7 +299,7 @@ export function GuestModal({
                       return { ...current, additionalGuestNames: names };
                     });
                   }}
-                  className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-white px-3 py-2"
+                  className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-surface px-3 py-2"
                 />
                 <Button
                   variant="outline-danger"
@@ -339,7 +339,7 @@ export function GuestModal({
                 arrivalTime: event.target.value,
               }))
             }
-            className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+            className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
           />
         </div>
 
@@ -377,7 +377,7 @@ export function GuestModal({
                   bringingDescription: event.target.value,
                 }))
               }
-              className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+              className="mt-2 w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
             />
           ) : null}
         </div>
@@ -416,7 +416,7 @@ export function GuestModal({
                   message: event.target.value,
                 }))
               }
-              className="mt-2 w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+              className="mt-2 w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
             />
           ) : null}
         </div>
