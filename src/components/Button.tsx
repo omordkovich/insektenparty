@@ -17,8 +17,8 @@ type ButtonProps = {
 // which needs to go the *other* direction in a dark theme (lighter, not
 // darker, for contrast against a black page) - a filter works either way.
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-leaf text-white font-bold hover:brightness-90",
-  secondary: "bg-honey text-on-honey font-bold hover:brightness-90",
+  primary: "bg-button-primary text-button-primary-text font-bold hover:brightness-90",
+  secondary: "bg-button-secondary text-button-secondary-text font-bold hover:brightness-90",
   outline: "border border-leaf/30 font-semibold hover:bg-leaf/10",
   danger: "bg-danger text-white font-bold hover:bg-[var(--danger-dark)]",
   "outline-danger": "border border-danger/30 bg-surface text-danger hover:bg-danger/10",

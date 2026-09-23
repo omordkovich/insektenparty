@@ -21,6 +21,16 @@
      variable (not just leaf-dark) because a theme can darken honey itself
      (see .event-theme-ballons) - the text needs to invert with it. */
   --on-honey: var(--leaf-dark);
+  /* Button fill colors, separate from --leaf/--honey: those double as the
+     accent color for text/borders/icons scattered across the page (which
+     need to read as light on a dark theme), while a button fill wants a
+     more muted tone so it doesn't glare - the two needs conflict on a dark
+     background, so buttons get their own tokens. Default to leaf/honey
+     (with white/on-honey text) so natur/ballons look exactly as before. */
+  --button-primary: var(--leaf);
+  --button-primary-text: #ffffff;
+  --button-secondary: var(--honey);
+  --button-secondary-text: var(--on-honey);
 }
 
 @theme inline {
@@ -36,6 +46,10 @@
   --color-surface: var(--surface-solid);
   --color-danger: var(--danger);
   --color-on-honey: var(--on-honey);
+  --color-button-primary: var(--button-primary);
+  --color-button-primary-text: var(--button-primary-text);
+  --color-button-secondary: var(--button-secondary);
+  --color-button-secondary-text: var(--button-secondary-text);
   /* --font-nunito and --font-fredoka are generated at runtime by next/font
      (see layout.tsx) and applied via a className, not declared in any
      stylesheet the IDE can see - these are not actually unresolved. */
@@ -68,7 +82,7 @@ body {
 }
 
 .event-theme {
-  min-height: 100%;
+  min-height: 100dvh;
   /* Fallback for pages that don't render ParallaxSideGraphics (e.g. the
      info page) - its .parallax-background layer normally supplies the
      real gradient and fully covers this flat color when present. */
@@ -111,7 +125,7 @@ body {
   --shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
   --on-honey: #f8fafc;
 
-  min-height: 100%;
+  min-height: 100dvh;
   background: var(--bg-mid);
   color: var(--ink);
 }
@@ -145,8 +159,14 @@ body {
   --ring: #c7c7cc;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #1c1c1e;
+  /* Muted graphite instead of the light --leaf/--honey silver, which reads
+     as a glaring pale block on a black page - see --button-primary. */
+  --button-primary: #3a3a3c;
+  --button-primary-text: #f5f5f7;
+  --button-secondary: #232325;
+  --button-secondary-text: #c7c7cc;
 
-  min-height: 100%;
+  min-height: 100dvh;
   background: var(--bg-mid);
   color: var(--ink);
 }

@@ -46,9 +46,9 @@ export default async function EventPage({ params }: EventPageProps) {
   };
 
   return (
-    <div className="relative flex min-h-full flex-col" style={{ isolation: "isolate" }}>
+    <div className="relative flex min-h-dvh flex-col" style={{ isolation: "isolate" }}>
       <Header config={config} logoHref={isOwner ? "/" : `/p/${slug}/info`} />
-      <main className="flex-1">
+      <main>
         <Hero config={config} eventId={event.id} isOwner={isOwner} />
         <GuestSection
           apiBasePath={`/api/events/${event.id}/guests`}
