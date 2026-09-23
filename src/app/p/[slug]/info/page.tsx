@@ -29,7 +29,7 @@ export default async function EventInfoPage({ params }: EventInfoPageProps) {
         </p>
         <Link
           href={`/p/${slug}`}
-          className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-leaf px-6 text-base font-bold text-white transition hover:bg-leaf-dark"
+          className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-button-primary px-6 text-base font-bold text-button-primary-text transition hover:brightness-90"
         >
           Zurück zum event
         </Link>

@@ -1,11 +1,12 @@
 import type { EventConfig } from "@/lib/event-config";
 
-export type ThemeKey = "natur" | "ballons" | "schwarz";
+export type ThemeKey = "natur" | "ballons" | "schwarz" | "weiss";
 
 export const THEME_LABELS: Record<ThemeKey, string> = {
   natur: "Natur",
   ballons: "Ballons",
   schwarz: "Schwarz",
+  weiss: "Weiß",
 };
 
 // Maps to the CSS theme classes defined in globals.css.
@@ -13,6 +14,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   natur: "event-theme",
   ballons: "event-theme-ballons",
   schwarz: "event-theme-schwarz",
+  weiss: "event-theme-weiss",
 };
 
 export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
@@ -34,5 +36,9 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
   // decorative side or floating graphics.
   schwarz: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790110957/logo_black.webp",
+  },
+
+  weiss: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790148387/logo_white.webp",
   },
 };
