@@ -173,10 +173,10 @@ body {
 
 .event-theme-schwarz .parallax-background {
   background:
-    radial-gradient(circle at 15% 20%, rgba(199, 199, 204, 0.1), transparent 32%),
-    radial-gradient(circle at 85% 15%, rgba(142, 142, 147, 0.1), transparent 30%),
-    radial-gradient(circle at 50% 90%, rgba(199, 199, 204, 0.06), transparent 40%),
-    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+    radial-gradient(circle at 15% 20%, rgba(199, 199, 204, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(142, 142, 147, 0.1), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(199, 199, 204, 0.06), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
 }
 
 /* Weiß theme: the schwarz theme's monochrome mirror image - light instead
@@ -218,6 +218,237 @@ body {
     radial-gradient(circle at 85% 15%, rgba(28, 28, 30, 0.04), transparent 30%),
     radial-gradient(circle at 50% 90%, rgba(28, 28, 30, 0.03), transparent 40%),
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
+/* Grün theme: deep forest-emerald, colored panels like schwarz. bg-bottom
+   is a notch above pure black (not #000) and the gradient stop is pushed
+   later so the transition isn't compressed near the top. */
+.event-theme-gruen {
+  --bg-top: #0f3a26;
+  --bg-mid: #082013;
+  --bg-bottom: #0a2416;
+  --leaf: #34d399;
+  --leaf-dark: #a7f3d0;
+  --honey: #10b981;
+  --honey-dark: #6ee7b7;
+  --petal: #065f46;
+  --ink: #ecfdf5;
+  --muted: #9cb8ab;
+  --surface: rgba(15, 58, 38, 0.55);
+  --surface-solid: #10291c;
+  --danger: #ff453a;
+  --danger-dark: #c9302c;
+  --ring: #34d399;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --on-honey: #052e1c;
+  --button-primary: #2f7a52;
+  --button-primary-text: #ffffff;
+  --button-secondary: #0d5a41;
+  --button-secondary-text: #d1fae5;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-gruen .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(52, 211, 153, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(16, 185, 129, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(52, 211, 153, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
+}
+
+/* Blau theme: deep midnight blue, colored panels like schwarz. bg-bottom
+   is a notch above pure black and the gradient stop is pushed later. */
+.event-theme-blau {
+  --bg-top: #0d2a5c;
+  --bg-mid: #071638;
+  --bg-bottom: #0a1e42;
+  --leaf: #60a5fa;
+  --leaf-dark: #bfdbfe;
+  --honey: #38bdf8;
+  --honey-dark: #7dd3fc;
+  --petal: #1e40af;
+  --ink: #eff6ff;
+  --muted: #9fb3d1;
+  --surface: rgba(13, 42, 92, 0.55);
+  --surface-solid: #0f2148;
+  --danger: #ff453a;
+  --danger-dark: #c9302c;
+  --ring: #60a5fa;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --on-honey: #041225;
+  --button-primary: #2c5ba8;
+  --button-primary-text: #ffffff;
+  --button-secondary: #14337a;
+  --button-secondary-text: #dbeafe;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-blau .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(96, 165, 250, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(96, 165, 250, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
+}
+
+/* Rot theme: deep, bloody crimson, colored panels like schwarz. bg-bottom
+   is a notch above pure black and the gradient stop is pushed later. */
+.event-theme-rot {
+  --bg-top: #4a0e0e;
+  --bg-mid: #260808;
+  --bg-bottom: #200a0a;
+  --leaf: #f87171;
+  --leaf-dark: #fecaca;
+  --honey: #ef4444;
+  --honey-dark: #fca5a5;
+  --petal: #7f1d1d;
+  --ink: #fef2f2;
+  --muted: #c9a3a3;
+  --surface: rgba(74, 14, 14, 0.55);
+  --surface-solid: #2b0a0a;
+  --danger: #ff453a;
+  --danger-dark: #c9302c;
+  --ring: #f87171;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  --on-honey: #2b0505;
+  --button-primary: #b91c1c;
+  --button-primary-text: #ffffff;
+  --button-secondary: #450a0a;
+  --button-secondary-text: #fecaca;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-rot .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(248, 113, 113, 0.16), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(225, 29, 72, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(127, 29, 29, 0.16), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
+}
+
+/* Gelb theme: stays recognizably yellow across the whole gradient - no
+   near-white top stop - light/daytime shell like weiss/orange/pink.
+   --button-primary leans neon-bright, paired with dark text since a
+   saturated yellow needs dark text for contrast. */
+.event-theme-gelb {
+  --bg-top: #fde047;
+  --bg-mid: #eab308;
+  --bg-bottom: #ca8a04;
+  --leaf: #a16207;
+  --leaf-dark: #422006;
+  --honey: #ca8a04;
+  --honey-dark: #713f12;
+  --petal: #fde047;
+  --ink: #422006;
+  --muted: #78350f;
+  --surface: rgba(254, 252, 232, 0.88);
+  --surface-solid: #fefce8;
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
+  --ring: #a16207;
+  --shadow: 0 18px 40px rgba(202, 138, 4, 0.25);
+  --on-honey: #ffffff;
+  --button-primary: #facc15;
+  --button-primary-text: #422006;
+  --button-secondary: #fde047;
+  --button-secondary-text: #713f12;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-gelb .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(161, 98, 7, 0.14), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(202, 138, 4, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(161, 98, 7, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
+}
+
+/* Orange theme: rich, warm sunset - same dark-but-not-black shell as
+   gruen/blau/rot. */
+.event-theme-orange {
+  --bg-top: #ea580c;
+  --bg-mid: #c2410c;
+  --bg-bottom: #7c2d12;
+  --leaf: #fb923c;
+  --leaf-dark: #fed7aa;
+  --honey: #f97316;
+  --honey-dark: #fdba74;
+  --petal: #9a3412;
+  --ink: #fff7ed;
+  --muted: #d9b8a3;
+  --surface: rgba(154, 52, 18, 0.55);
+  --surface-solid: #9a3412;
+  --danger: #ff453a;
+  --danger-dark: #c9302c;
+  --ring: #fb923c;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  --on-honey: #431407;
+  --button-primary: #f97316;
+  --button-primary-text: #ffffff;
+  --button-secondary: #431407;
+  --button-secondary-text: #fed7aa;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-orange .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(251, 146, 60, 0.16), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(249, 115, 22, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(154, 52, 18, 0.14), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
+}
+
+/* Pink theme: bright, vibrant "Barbie" pink - light/daytime shell like
+   weiss/gelb, colored panels instead of plain white. */
+.event-theme-pink {
+  --bg-top: #fff0f7;
+  --bg-mid: #ffd6ec;
+  --bg-bottom: #ff9ecf;
+  --leaf: #db2777;
+  --leaf-dark: #831843;
+  --honey: #ec4899;
+  --honey-dark: #9d174d;
+  --petal: #f9a8d4;
+  --ink: #500724;
+  --muted: #a8527a;
+  --surface: rgba(255, 230, 245, 0.85);
+  --surface-solid: #fde6f3;
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
+  --ring: #db2777;
+  --shadow: 0 18px 40px rgba(219, 39, 119, 0.18);
+  --on-honey: #ffffff;
+  --button-primary: #d6249f;
+  --button-primary-text: #ffffff;
+  --button-secondary: #fbcfe8;
+  --button-secondary-text: #831843;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-pink .parallax-background {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(219, 39, 119, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(236, 72, 153, 0.1), transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(219, 39, 119, 0.06), transparent 55%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 78%, var(--bg-bottom));
 }
 
 body.modal-open {
