@@ -37,5 +37,11 @@ export default async function EventLayout({ children, params }: EventLayoutProps
 
   const themeClassName = THEME_CLASS_NAMES[event.theme as ThemeKey];
 
-  return <div className={themeClassName}>{children}</div>;
+  // data-theme-root lets portalled dialogs (e.g. the privacy policy) mount
+  // inside the themed wrapper so they pick up the event's CSS variables.
+  return (
+    <div className={themeClassName} data-theme-root>
+      {children}
+    </div>
+  );
 }

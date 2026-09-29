@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MadeWithBadge } from "@/components/MadeWithBadge";
 import { ResetPasswordForm } from "@/components/ResetPasswordForm";
 import { SiteHeader } from "@/components/SiteHeader";
 import { createClient } from "@/lib/supabase/server";
@@ -35,6 +36,7 @@ export default async function ResetPasswordPage() {
             )}
           </div>
         </div>
+        <MadeWithBadge />
       </main>
     </>
   );

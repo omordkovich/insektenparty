@@ -1,4 +1,7 @@
 import { useEffect, useId, useRef } from "react";
+import { saveConsent } from "@/lib/cookie-consent";
+import { Button } from "./Button";
+import { useCookieConsent } from "./useCookieConsent";
 
 const SCRIPT_ID = "google-recaptcha-v2";
 const SCRIPT_SRC =
@@ -71,11 +74,14 @@ export function RecaptchaCheckbox({
   const onTokenChangeRef = useRef(onTokenChange);
   const labelId = useId();
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  // Google's script is only loaded once the visitor consented to it.
+  const { consent } = useCookieConsent();
+  const consentGiven = consent?.recaptcha === true;
 
   onTokenChangeRef.current = onTokenChange;
 
   useEffect(() => {
-    if (!siteKey || !containerRef.current) return;
+    if (!siteKey || !consentGiven || !containerRef.current) return;
 
     let cancelled = false;
 
@@ -105,7 +111,7 @@ export function RecaptchaCheckbox({
     return () => {
       cancelled = true;
     };
-  }, [siteKey]);
+  }, [siteKey, consentGiven]);
 
   useEffect(() => {
     if (resetSignal === 0) return;
@@ -119,6 +125,28 @@ export function RecaptchaCheckbox({
       <p className="text-sm text-danger" role="alert">
         reCAPTCHA ist nicht konfiguriert.
       </p>
+    );
+  }
+
+  if (!consentGiven) {
+    return (
+      <div className="rounded-2xl border border-leaf/20 p-4">
+        <p id={labelId} className="text-sm font-bold">
+          Sicherheitsprüfung
+        </p>
+        <p className="mt-2 text-sm text-muted">
+          Für die Sicherheitsprüfung wird Google reCAPTCHA benötigt. Dabei
+          werden Daten an Google übertragen und Cookies von Google gesetzt.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-3"
+          aria-describedby={labelId}
+          onClick={() => saveConsent(true)}
+        >
+          reCAPTCHA zulassen
+        </Button>
+      </div>
     );
   }
 

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { events } from "@/db/schema";
 
@@ -52,6 +52,23 @@ export async function getEventsByOwner(ownerId: string): Promise<EventListItem[]
     .from(events)
     .where(eq(events.ownerId, ownerId))
     .orderBy(desc(events.createdAt));
+}
+
+export async function countEventsByOwner(ownerId: string): Promise<number> {
+  const [row] = await getDb()
+    .select({ value: count() })
+    .from(events)
+    .where(eq(events.ownerId, ownerId));
+  return row?.value ?? 0;
+}
+
+// Undefined when the event does not exist or belongs to someone else.
+export async function getEventTheme(id: string, ownerId: string): Promise<string | undefined> {
+  const [event] = await getDb()
+    .select({ theme: events.theme })
+    .from(events)
+    .where(and(eq(events.id, id), eq(events.ownerId, ownerId)));
+  return event?.theme;
 }
 
 export async function createEvent(input: {

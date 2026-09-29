@@ -10,6 +10,7 @@ import {
 } from "@/lib/validation";
 import { Button } from "./Button";
 import { FormModal } from "./FormModal";
+import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type GuestModalMode = "create" | "edit";
@@ -424,6 +425,15 @@ export function GuestModal({
         {!isOwner ? (
           <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
         ) : null}
+
+        <p className="text-xs text-muted">
+          Deine Angaben sind auf der Event-Seite für alle sichtbar, die den
+          Einladungslink kennen. Mehr dazu in der{" "}
+          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+            Datenschutzerklärung
+          </LegalLink>
+          .
+        </p>
 
         {fieldError || submitError ? (
           <p className="text-sm text-danger" role="alert">

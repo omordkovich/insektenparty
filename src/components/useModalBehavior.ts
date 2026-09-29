@@ -9,6 +9,11 @@ type UseModalBehaviorOptions = {
   initialFocusRef?: RefObject<HTMLElement | null>;
 };
 
+// Open modals, innermost last. Modals can stack (e.g. the privacy policy
+// opened from the cookie banner): only the topmost one reacts to Escape,
+// and the body stays locked until the last one closes.
+const openModals: symbol[] = [];
+
 // Shared body-scroll-lock + Escape-to-close + initial-focus behavior for
 // every modal shell (Modal, FormModal). Returns a ref for the caller's own
 // close button to use as the initial-focus target when no initialFocusRef
@@ -33,12 +38,15 @@ export function useModalBehavior({
   });
 
   useEffect(() => {
+    const token = Symbol("modal");
+    openModals.push(token);
     const previousOverflow = document.body.style.overflow;
     document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
     (initialFocusRef ?? internalCloseRef).current?.focus();
 
     function onKeyDown(event: KeyboardEvent) {
+      if (openModals[openModals.length - 1] !== token) return;
       if (event.key === "Escape") {
         event.preventDefault();
         if (closeDisabledRef.current) return;
@@ -50,7 +58,8 @@ export function useModalBehavior({
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      document.body.classList.remove("modal-open");
+      openModals.splice(openModals.indexOf(token), 1);
+      if (openModals.length === 0) document.body.classList.remove("modal-open");
       document.body.style.overflow = previousOverflow;
     };
   }, [initialFocusRef]);

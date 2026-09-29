@@ -18,12 +18,18 @@ type EventListItem = {
 
 type EventListProps = {
   initialEvents: EventListItem[];
+  eventLimit: number;
+  unlockedThemes: ThemeKey[];
 };
 
-export function EventList({ initialEvents }: EventListProps) {
+export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventListProps) {
   const [eventList, setEventList] = useState(initialEvents);
   const [editTarget, setEditTarget] = useState<EventListItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EventListItem | null>(null);
+
+  // Recomputed from the live list, so deleting an event frees the slot
+  // immediately. The server re-checks on create.
+  const limitReached = eventList.length >= eventLimit;
 
   return (
     <>
@@ -38,7 +44,7 @@ export function EventList({ initialEvents }: EventListProps) {
               <p className="text-lg text-muted">Du hast noch keine Events erstellt.</p>
               <p className="mt-1 text-xl font-bold text-leaf-dark">Leg direkt los!</p>
               <div className="mt-6 flex justify-center">
-                <CreateEventButton />
+                <CreateEventButton unlockedThemes={unlockedThemes} limitReached={limitReached} />
               </div>
             </div>
           ) : (
@@ -87,7 +93,7 @@ export function EventList({ initialEvents }: EventListProps) {
                 ))}
               </ul>
               <div className="mt-6 flex justify-center">
-                <CreateEventButton />
+                <CreateEventButton unlockedThemes={unlockedThemes} limitReached={limitReached} />
               </div>
             </>
           )}
@@ -98,6 +104,7 @@ export function EventList({ initialEvents }: EventListProps) {
         <EventDialog
           mode="edit"
           event={editTarget}
+          unlockedThemes={unlockedThemes}
           onCloseAction={() => setEditTarget(null)}
           onSavedAction={(updated) =>
             setEventList((current) =>

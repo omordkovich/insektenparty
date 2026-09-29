@@ -3,9 +3,12 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
+import { isThemeSelectable } from "@/lib/features";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 import { EVENT_TEXT_MAX_LENGTH } from "@/lib/validation";
 import { Button } from "./Button";
+import { LockIcon } from "./EditIcons";
+import { LegalLink } from "./LegalLink";
 import { Modal } from "./Modal";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
@@ -13,11 +16,13 @@ const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 type EventDialogProps =
   | {
       mode: "create";
+      unlockedThemes: ThemeKey[];
       onCloseAction: () => void;
     }
   | {
       mode: "edit";
       event: { id: string; title: string; theme: ThemeKey };
+      unlockedThemes: ThemeKey[];
       onCloseAction: () => void;
       onSavedAction: (updated: { title: string; theme: ThemeKey }) => void;
     };
@@ -33,6 +38,8 @@ export function EventDialog(props: EventDialogProps) {
   const [theme, setTheme] = useState<ThemeKey>(mode === "edit" ? props.event.theme : THEME_KEYS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lockHint, setLockHint] = useState<string | null>(null);
+  const originalTheme = mode === "edit" ? props.event.theme : undefined;
 
   async function handleSubmit() {
     if (saving) return;
@@ -127,30 +134,66 @@ export function EventDialog(props: EventDialogProps) {
 
       <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {THEME_KEYS.map((key) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setTheme(key)}
-            disabled={saving}
-            aria-pressed={theme === key}
-            className={`flex flex-col items-center gap-1 rounded-2xl border p-2 text-center transition ${
-              theme === key ? "border-leaf bg-leaf/10" : "border-leaf/20 hover:bg-leaf/5"
-            }`}
-          >
-            <Image
-              src={THEME_ASSETS[key].logo}
-              alt=""
-              width={48}
-              height={48}
-              className="h-12 w-12 object-contain"
-            />
-            <span className="text-[11px] leading-tight text-muted">{THEME_LABELS[key]}</span>
-          </button>
-        ))}
+        {THEME_KEYS.map((key) => {
+          const selectable = isThemeSelectable(props.unlockedThemes, key, originalTheme);
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                if (!selectable) {
+                  setLockHint("Dieses Design kannst du bald freischalten.");
+                  return;
+                }
+                setLockHint(null);
+                setTheme(key);
+              }}
+              disabled={saving}
+              aria-pressed={theme === key}
+              aria-disabled={!selectable || undefined}
+              className={`relative flex flex-col items-center gap-1 rounded-2xl border p-2 text-center transition ${
+                theme === key ? "border-leaf bg-leaf/10" : "border-leaf/20 hover:bg-leaf/5"
+              } ${selectable ? "" : "opacity-50"}`}
+            >
+              {selectable ? null : (
+                <span className="absolute top-1 right-1 rounded-full bg-white p-1 text-leaf-dark shadow-sm">
+                  <LockIcon />
+                </span>
+              )}
+              <Image
+                src={THEME_ASSETS[key].logo}
+                alt=""
+                width={48}
+                height={48}
+                className="h-12 w-12 object-contain"
+              />
+              <span className="text-[11px] leading-tight text-muted">
+                {THEME_LABELS[key]}
+                {selectable ? null : <span className="sr-only"> (gesperrt)</span>}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {error ? (
+      {lockHint ? (
+        <p className="mt-3 text-sm text-muted" role="status">
+          {lockHint}
+        </p>
+      ) : null}
+
+      {mode === "create" ? (
+        <p className="mt-4 text-xs text-muted">
+          Die Event-Seite ist für alle sichtbar, die den Einladungslink kennen –
+          auch die Kontaktangaben, die du dort einträgst. Mehr dazu in der{" "}
+          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+            Datenschutzerklärung
+          </LegalLink>
+          .
+        </p>
+      ) : null}
+
+            {error ? (
         <p className="mt-4 text-sm text-danger" role="alert">
           {error}
         </p>

@@ -66,3 +66,20 @@ export const guests = pgTable("guests", {
 
 export type Guest = typeof guests.$inferSelect;
 export type NewGuest = typeof guests.$inferInsert;
+
+// One row per unlock (append-only ledger). user_id references auth.users
+// (FK + on delete cascade live in the Supabase migration, like events.owner_id
+// which is also not modelled as a Drizzle reference).
+export const userEntitlements = pgTable("user_entitlements", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  userId: uuid("user_id").notNull(),
+  feature: text("feature").notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  source: text("source").notNull().default("manual"),
+  note: text("note"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export type UserEntitlementRecord = typeof userEntitlements.$inferSelect;

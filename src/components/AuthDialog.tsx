@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "./Button";
 import { FormModal } from "./FormModal";
+import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type AuthDialogMode = "login" | "register" | "reset";
@@ -17,9 +19,16 @@ type FormState = {
   email: string;
   password: string;
   passwordConfirm: string;
+  acceptedTerms: boolean;
 };
 
-const emptyForm: FormState = { name: "", email: "", password: "", passwordConfirm: "" };
+const emptyForm: FormState = {
+  name: "",
+  email: "",
+  password: "",
+  passwordConfirm: "",
+  acceptedTerms: false,
+};
 
 type AuthDialogProps = {
   initialMode?: AuthDialogMode;
@@ -109,6 +118,12 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         setFieldError("Die Passwörter stimmen nicht überein.");
         return;
       }
+      if (!form.acceptedTerms) {
+        setFieldError(
+          "Bitte akzeptiere die AGB und bestätige, dass du die Datenschutzerklärung zur Kenntnis genommen hast.",
+        );
+        return;
+      }
       if (!recaptchaToken) {
         setFieldError("Bitte bestätige, dass du kein Roboter bist.");
         return;
@@ -136,7 +151,15 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
       const { data, error } = await supabase.auth.signUp({
         email,
         password: form.password,
-        options: { data: { name: form.name.trim() } },
+        options: {
+          data: {
+            name: form.name.trim(),
+            // Proof of which AGB/privacy policy version was accepted, and when.
+            terms_accepted_at: new Date().toISOString(),
+            terms_version: TERMS_VERSION,
+            privacy_version: PRIVACY_VERSION,
+          },
+        },
       });
       if (error) {
         setSubmitError(error.message);
@@ -297,6 +320,34 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                   className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
                 />
               </div>
+
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  name="acceptedTerms"
+                  type="checkbox"
+                  required
+                  checked={form.acceptedTerms}
+                  disabled={saving}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      acceptedTerms: event.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
+                />
+                <span>
+                  Ich akzeptiere die{" "}
+                  <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
+                    AGB
+                  </LegalLink>{" "}
+                  und habe die{" "}
+                  <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                    Datenschutzerklärung
+                  </LegalLink>{" "}
+                  zur Kenntnis genommen.
+                </span>
+              </label>
 
               <RecaptchaCheckbox
                 onTokenChange={setRecaptchaToken}
