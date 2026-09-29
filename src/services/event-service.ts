@@ -11,11 +11,16 @@ import {
 import {
   createEvent,
   deleteEvent,
+  getEventTheme,
   updateEvent,
   type EventRow,
 } from "@/repositories/event-repository";
+import { canCreateEvent, canUseTheme } from "@/lib/features";
+import { getUserEntitlements } from "@/services/entitlement-service";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
+const EVENT_LIMIT_ERROR = "Du hast dein Event-Kontingent erreicht.";
+const THEME_LOCKED_ERROR = "Dieses Design ist noch nicht freigeschaltet.";
 
 export type EventServiceResult<T> =
   | { ok: true; data: T }
@@ -41,6 +46,14 @@ export async function createEventForOwner(
       status: 400,
       error: "Bitte gib einen Namen für dein Event ein.",
     };
+  }
+
+  const entitlements = await getUserEntitlements(ownerId);
+  if (!canCreateEvent(entitlements)) {
+    return { ok: false, status: 403, error: EVENT_LIMIT_ERROR };
+  }
+  if (!canUseTheme(entitlements, theme as ThemeKey)) {
+    return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
   }
 
   const slug = generateSlug(titleValidation.value);
@@ -127,6 +140,21 @@ export async function updateEventForOwner(
 
   if (!hasAnyUpdate) {
     return { ok: false, status: 400, error: "Kein gültiges Feld angegeben." };
+  }
+
+  // Only a theme that actually changes is checked, so grandfathered events
+  // keep their (now premium) theme - EventDialog always sends {theme, title}.
+  if (themeUpdate !== undefined) {
+    const currentTheme = await getEventTheme(id, ownerId);
+    if (currentTheme === undefined) {
+      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    }
+    if (themeUpdate !== currentTheme) {
+      const entitlements = await getUserEntitlements(ownerId);
+      if (!canUseTheme(entitlements, themeUpdate)) {
+        return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
+      }
+    }
   }
 
   const updated = await updateEvent(id, ownerId, {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
+import { CookieBanner } from "@/components/CookieBanner";
 import React from "react";
 
 const nunito = Nunito({
@@ -25,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${nunito.variable} ${fredoka.variable} h-full`}>
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="min-h-full antialiased">
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { LegalLinks } from "./LegalLinks";
 
 export function MadeWithBadge() {
   return (
@@ -13,6 +14,7 @@ export function MadeWithBadge() {
           className="mx-auto w-32 h-auto"
         />
       </Link>
+      <LegalLinks className="mt-2" />
     </div>
   );
 }

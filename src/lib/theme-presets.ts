@@ -27,6 +27,11 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   natur: "Natur",
 };
 
+// Themes that must be unlocked per user (see user_entitlements, feature key
+// "theme:<key>"). Adding a paid theme later only needs a new entry here -
+// the DB check constraint only enforces the "theme:%" pattern.
+export const PREMIUM_THEMES: readonly ThemeKey[] = ["natur", "ballons"];
+
 // Maps to the CSS theme classes defined in globals.css.
 export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   weiss: "event-theme-weiss",

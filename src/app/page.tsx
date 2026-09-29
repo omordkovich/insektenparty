@@ -1,10 +1,12 @@
 import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
 import { EventList } from "@/components/EventList";
+import { LegalLinks } from "@/components/LegalLinks";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
 import { getEventsByOwner } from "@/repositories/event-repository";
+import { getUserEntitlements } from "@/services/entitlement-service";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -19,6 +21,8 @@ export default async function Home() {
         theme: event.theme as ThemeKey,
       }))
     : [];
+
+  const entitlements = claims ? await getUserEntitlements(claims.sub) : null;
 
   return (
     <>
@@ -40,7 +44,11 @@ export default async function Home() {
         ) : (
           <>
             <div className="mt-8 w-full">
-              <EventList initialEvents={myEvents} />
+              <EventList
+                initialEvents={myEvents}
+                eventLimit={entitlements?.eventLimit ?? 1}
+                unlockedThemes={entitlements?.unlockedThemes ?? []}
+              />
             </div>
             <div className="mt-6">
               <form action="/auth/signout" method="post">
@@ -51,6 +59,8 @@ export default async function Home() {
             </div>
           </>
         )}
+
+        <LegalLinks className="mt-auto pt-12" />
       </main>
     </>
   );

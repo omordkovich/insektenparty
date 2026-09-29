@@ -10,6 +10,9 @@ type ModalProps = {
   closeDisabled?: boolean;
   initialFocusRef?: RefObject<HTMLElement | null>;
   showCloseButton?: boolean;
+  /** "bottom" pins the dialog to the bottom edge on every screen size
+   *  (e.g. the cookie banner); the default centers it from sm upwards. */
+  placement?: "default" | "bottom";
   children: ReactNode;
 };
 
@@ -20,12 +23,15 @@ export function Modal({
   closeDisabled = false,
   initialFocusRef,
   showCloseButton = true,
+  placement = "default",
   children,
 }: ModalProps) {
   const internalCloseRef = useModalBehavior({ onCloseAction, closeDisabled, initialFocusRef });
+  const alignClass = placement === "bottom" ? "items-end" : "items-end sm:items-center";
+  const widthClass = placement === "bottom" ? "max-w-xl" : "max-w-md";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-6">
+    <div className={`fixed inset-0 z-50 flex justify-center p-3 sm:p-6 ${alignClass}`}>
       <button
         type="button"
         className="absolute inset-0 bg-black/55"
@@ -37,7 +43,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="relative z-10 w-full max-w-md rounded-3xl bg-surface p-5 shadow-(--shadow) sm:p-7"
+        className={`relative z-10 w-full ${widthClass} rounded-3xl bg-surface p-5 shadow-(--shadow) sm:p-7`}
       >
         {showCloseButton ? (
           <button

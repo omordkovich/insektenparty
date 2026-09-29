@@ -26,7 +26,13 @@
      need to read as light on a dark theme), while a button fill wants a
      more muted tone so it doesn't glare - the two needs conflict on a dark
      background, so buttons get their own tokens. Default to leaf/honey
-     (with white/on-honey text) so natur/ballons look exactly as before. */
+     (with white/on-honey text) for the natur base theme.
+     Careful: var() inside a custom property is resolved where it is
+     declared - here on :root, with natur's colors - and descendants inherit
+     that resolved value. A theme that overrides --leaf/--honey therefore
+     does NOT recolor these tokens; every theme must set them itself.
+     Event themes use one color for primary and secondary, so every filled
+     button on an event page (page and overlays alike) looks the same. */
   --button-primary: var(--leaf);
   --button-primary-text: #ffffff;
   --button-secondary: var(--honey);
@@ -82,6 +88,11 @@ body {
 }
 
 .event-theme {
+  /* Natur: secondary buttons (e.g. "+ Gast hinzufügen") in the same green
+     as the primary ones instead of the honey default. */
+  --button-secondary: #2f7d4a;
+  --button-secondary-text: #ffffff;
+
   min-height: 100dvh;
   /* Fallback for pages that don't render ParallaxSideGraphics (e.g. the
      info page) - its .parallax-background layer normally supplies the
@@ -124,6 +135,14 @@ body {
   --ring: #3b82f6;
   --shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
   --on-honey: #f8fafc;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  /* Primary and secondary share one color so every filled button on a
+     ballons page - page and overlays alike - looks the same. */
+  --button-primary: #0f172a;
+  --button-primary-text: #f8fafc;
+  --button-secondary: #0f172a;
+  --button-secondary-text: #f8fafc;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -161,8 +180,8 @@ body {
   --on-honey: #1c1c1e;
   /* Muted graphite instead of the light --leaf/--honey silver, which reads
      as a glaring pale block on a black page - see --button-primary. */
-  --button-primary: #3a3a3c;
-  --button-primary-text: #f5f5f7;
+  --button-primary: #232325;
+  --button-primary-text: #c7c7cc;
   --button-secondary: #232325;
   --button-secondary-text: #c7c7cc;
 
@@ -202,7 +221,7 @@ body {
   --ring: #48484a;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
   --on-honey: #ffffff;
-  --button-primary: #d4e2e6;
+  --button-primary: #e5e5ea;
   --button-primary-text: #1c1c1e;
   --button-secondary: #e5e5ea;
   --button-secondary-text: #1c1c1e;
@@ -241,8 +260,8 @@ body {
   --ring: #34d399;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #052e1c;
-  --button-primary: #2f7a52;
-  --button-primary-text: #ffffff;
+  --button-primary: #0d5a41;
+  --button-primary-text: #d1fae5;
   --button-secondary: #0d5a41;
   --button-secondary-text: #d1fae5;
 
@@ -279,8 +298,8 @@ body {
   --ring: #60a5fa;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #041225;
-  --button-primary: #2c5ba8;
-  --button-primary-text: #ffffff;
+  --button-primary: #14337a;
+  --button-primary-text: #dbeafe;
   --button-secondary: #14337a;
   --button-secondary-text: #dbeafe;
 
@@ -317,8 +336,8 @@ body {
   --ring: #f87171;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
   --on-honey: #2b0505;
-  --button-primary: #b91c1c;
-  --button-primary-text: #ffffff;
+  --button-primary: #450a0a;
+  --button-primary-text: #fecaca;
   --button-secondary: #450a0a;
   --button-secondary-text: #fecaca;
 
@@ -337,8 +356,8 @@ body {
 
 /* Gelb theme: stays recognizably yellow across the whole gradient - no
    near-white top stop - light/daytime shell like weiss/orange/pink.
-   --button-primary leans neon-bright, paired with dark text since a
-   saturated yellow needs dark text for contrast. */
+   Buttons are yellow with dark text, since a saturated yellow needs dark
+   text for contrast. */
 .event-theme-gelb {
   --bg-top: #fde047;
   --bg-mid: #eab308;
@@ -357,8 +376,8 @@ body {
   --ring: #a16207;
   --shadow: 0 18px 40px rgba(202, 138, 4, 0.25);
   --on-honey: #ffffff;
-  --button-primary: #facc15;
-  --button-primary-text: #422006;
+  --button-primary: #fde047;
+  --button-primary-text: #713f12;
   --button-secondary: #fde047;
   --button-secondary-text: #713f12;
 
@@ -395,8 +414,8 @@ body {
   --ring: #fb923c;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
   --on-honey: #431407;
-  --button-primary: #f97316;
-  --button-primary-text: #ffffff;
+  --button-primary: #431407;
+  --button-primary-text: #fed7aa;
   --button-secondary: #431407;
   --button-secondary-text: #fed7aa;
 
@@ -433,8 +452,8 @@ body {
   --ring: #db2777;
   --shadow: 0 18px 40px rgba(219, 39, 119, 0.18);
   --on-honey: #ffffff;
-  --button-primary: #d6249f;
-  --button-primary-text: #ffffff;
+  --button-primary: #fbcfe8;
+  --button-primary-text: #831843;
   --button-secondary: #fbcfe8;
   --button-secondary-text: #831843;
 
