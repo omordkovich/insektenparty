@@ -13,19 +13,18 @@ export function ImprintContent() {
 
       <Section title="Kontakt">
         <p>
-          Telefon: {LEGAL_INFO.phone}
-          <br />
           E-Mail: <EmailLink />
         </p>
       </Section>
 
-      {LEGAL_INFO.vatId ? (
-        <Section title="Umsatzsteuer-ID">
-          <p>
-            Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:
-            <br />
-            {LEGAL_INFO.vatId}
-          </p>
+      {LEGAL_INFO.vatId || LEGAL_INFO.businessId ? (
+        <Section title="Steuerliche Angaben">
+          {LEGAL_INFO.vatId ? (
+            <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: {LEGAL_INFO.vatId}</p>
+          ) : null}
+          {LEGAL_INFO.businessId ? (
+            <p>Wirtschafts-Identifikationsnummer gemäß § 139c AO: {LEGAL_INFO.businessId}</p>
+          ) : null}
         </Section>
       ) : null}
 

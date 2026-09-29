@@ -31,8 +31,6 @@ export function WithdrawalContent() {
         <p>
           <PostalAddress />
           <br />
-          Telefon: {LEGAL_INFO.phone}
-          <br />
           E-Mail: {LEGAL_INFO.email}
         </p>
         <p>
