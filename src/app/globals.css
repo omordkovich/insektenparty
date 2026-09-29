@@ -474,13 +474,19 @@ body.modal-open {
   overflow: hidden;
 }
 
-a {
-  color: inherit;
-}
+/* Element defaults live in the base layer: unlayered rules beat every
+   Tailwind utility regardless of specificity, so an unlayered
+   `a { color: inherit }` silently overrode text-* classes on links (e.g.
+   the "Zurück zum event" button on the info page). */
+@layer base {
+  a {
+    color: inherit;
+  }
 
-button,
-input {
-  font: inherit;
+  button,
+  input {
+    font: inherit;
+  }
 }
 
 :focus-visible {
