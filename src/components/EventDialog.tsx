@@ -20,11 +20,12 @@ type EventDialogProps =
       onCloseAction: () => void;
     }
   | {
-      mode: "edit";
-      event: { id: string; title: string; theme: ThemeKey };
+      // Owner's event page: change only the design - the title is edited
+      // inline on the page itself.
+      mode: "theme";
+      event: { id: string; theme: ThemeKey };
       unlockedThemes: ThemeKey[];
       onCloseAction: () => void;
-      onSavedAction: (updated: { title: string; theme: ThemeKey }) => void;
     };
 
 export function EventDialog(props: EventDialogProps) {
@@ -34,24 +35,29 @@ export function EventDialog(props: EventDialogProps) {
   const nameFieldId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  const [name, setName] = useState(mode === "edit" ? props.event.title : "");
-  const [theme, setTheme] = useState<ThemeKey>(mode === "edit" ? props.event.theme : THEME_KEYS[0]);
+  const [name, setName] = useState("");
+  const [theme, setTheme] = useState<ThemeKey>(mode === "theme" ? props.event.theme : THEME_KEYS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lockHint, setLockHint] = useState<string | null>(null);
-  const originalTheme = mode === "edit" ? props.event.theme : undefined;
+  const originalTheme = mode === "theme" ? props.event.theme : undefined;
 
   async function handleSubmit() {
     if (saving) return;
 
     const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError("Bitte gib einen Namen für dein Event ein.");
-      nameInputRef.current?.focus();
-      return;
-    }
-    if (trimmedName.length > EVENT_TEXT_MAX_LENGTH) {
-      setError(`Name darf höchstens ${EVENT_TEXT_MAX_LENGTH} Zeichen lang sein.`);
+    if (mode === "create") {
+      if (!trimmedName) {
+        setError("Bitte gib einen Namen für dein Event ein.");
+        nameInputRef.current?.focus();
+        return;
+      }
+      if (trimmedName.length > EVENT_TEXT_MAX_LENGTH) {
+        setError(`Name darf höchstens ${EVENT_TEXT_MAX_LENGTH} Zeichen lang sein.`);
+        return;
+      }
+    } else if (theme === originalTheme) {
+      onCloseAction();
       return;
     }
 
@@ -85,7 +91,7 @@ export function EventDialog(props: EventDialogProps) {
       const response = await fetch(`/api/events/${props.event.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme, title: trimmedName }),
+        body: JSON.stringify({ theme }),
       });
 
       if (!response.ok) {
@@ -93,19 +99,21 @@ export function EventDialog(props: EventDialogProps) {
           | { error?: string }
           | null;
         setError(
-          payload?.error ?? "Das Event konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          payload?.error ?? "Das Design konnte nicht gespeichert werden. Bitte versuche es erneut.",
         );
         setSaving(false);
         return;
       }
 
-      props.onSavedAction({ title: trimmedName, theme });
+      // The theme lives in the server-rendered layout (wrapper class,
+      // assets), so re-render the page in the new design.
+      router.refresh();
       onCloseAction();
     } catch {
       setError(
         mode === "create"
           ? "Das Event konnte nicht erstellt werden. Bitte versuche es erneut."
-          : "Das Event konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          : "Das Design konnte nicht gespeichert werden. Bitte versuche es erneut.",
       );
       setSaving(false);
     }
@@ -114,26 +122,34 @@ export function EventDialog(props: EventDialogProps) {
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={saving}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        {mode === "create" ? "Event erstellen" : "Event bearbeiten"}
+        {mode === "create" ? "Event erstellen" : "Design ändern"}
       </h2>
 
-      <label htmlFor={nameFieldId} className="mt-5 block text-sm font-semibold text-leaf-dark">
-        Name
-      </label>
-      <input
-        ref={nameInputRef}
-        id={nameFieldId}
-        type="text"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="z. B. Geburtstagsfeier 2026"
-        disabled={saving}
-        maxLength={EVENT_TEXT_MAX_LENGTH}
-        className="mt-1 w-full rounded-xl border border-leaf/25 bg-white px-3 py-2 text-zinc-800"
-      />
+      {mode === "create" ? (
+        <>
+          <label htmlFor={nameFieldId} className="mt-5 block text-sm font-semibold text-leaf-dark">
+            Name
+          </label>
+          <input
+            ref={nameInputRef}
+            id={nameFieldId}
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="z. B. Geburtstagsfeier 2026"
+            disabled={saving}
+            maxLength={EVENT_TEXT_MAX_LENGTH}
+            className="mt-1 w-full rounded-xl border border-leaf/25 bg-white px-3 py-2 text-zinc-800"
+          />
+        </>
+      ) : null}
 
-      <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
-      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {mode === "create" ? (
+        <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
+      ) : null}
+      <div
+        className={`${mode === "create" ? "mt-2" : "mt-5"} grid grid-cols-2 gap-3 sm:grid-cols-4`}
+      >
         {THEME_KEYS.map((key) => {
           const selectable = isThemeSelectable(props.unlockedThemes, key, originalTheme);
           return (

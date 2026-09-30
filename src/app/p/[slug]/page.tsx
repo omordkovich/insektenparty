@@ -9,6 +9,7 @@ import { getEventBySlug } from "@/repositories/event-repository";
 import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { normalizeArrivalTime } from "@/lib/validation";
+import { getUserEntitlements } from "@/services/entitlement-service";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -25,6 +26,9 @@ export default async function EventPage({ params }: EventPageProps) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const isOwner = data?.claims?.sub === event.ownerId;
+  const theme = event.theme as ThemeKey;
+  const unlockedThemes =
+    isOwner && event.ownerId ? (await getUserEntitlements(event.ownerId)).unlockedThemes : [];
 
   const config: EventConfig = {
     kicker: event.kicker,
@@ -42,12 +46,16 @@ export default async function EventPage({ params }: EventPageProps) {
       phone: event.contactPhone,
       email: event.contactEmail,
     },
-    assets: THEME_ASSETS[event.theme as ThemeKey],
+    assets: THEME_ASSETS[theme],
   };
 
   return (
     <div className="relative flex min-h-dvh flex-col" style={{ isolation: "isolate" }}>
-      <Header config={config} logoHref={isOwner ? "/" : `/p/${slug}/info`} />
+      <Header
+        config={config}
+        logoHref={isOwner ? "/" : `/p/${slug}/info`}
+        themeEdit={isOwner ? { eventId: event.id, theme, unlockedThemes } : undefined}
+      />
       <main>
         <Hero config={config} eventId={event.id} isOwner={isOwner} />
         <GuestSection
@@ -56,7 +64,7 @@ export default async function EventPage({ params }: EventPageProps) {
           isOwner={isOwner}
         />
       </main>
-      <Footer config={config} eventId={event.id} isOwner={isOwner} />
+      <Footer config={config} eventId={event.id} slug={slug} isOwner={isOwner} />
 
       <ParallaxSideGraphics
         leftSrc={config.assets.plantsLeft}

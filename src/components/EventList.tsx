@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { buildEventShareUrl } from "@/lib/share";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
 import { CreateEventButton } from "./CreateEventButton";
 import { DeleteEventDialog } from "./DeleteEventDialog";
-import { EventDialog } from "./EventDialog";
+import { ShareButton } from "./ShareButtons";
 
 type EventListItem = {
   id: string;
@@ -24,7 +25,6 @@ type EventListProps = {
 
 export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventListProps) {
   const [eventList, setEventList] = useState(initialEvents);
-  const [editTarget, setEditTarget] = useState<EventListItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EventListItem | null>(null);
 
   // Recomputed from the live list, so deleting an event frees the slot
@@ -71,15 +71,11 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
                       </span>
                     </Link>
                     <div className="flex shrink-0 gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
+                      <ShareButton
+                        url={buildEventShareUrl(event.slug)}
+                        title={event.title || "Unbenanntes Event"}
                         className="bg-white"
-                        aria-label={`${event.title || "Unbenanntes Event"} bearbeiten`}
-                        onClick={() => setEditTarget(event)}
-                      >
-                        <PencilIcon />
-                      </Button>
+                      />
                       <Button
                         variant="outline-danger"
                         size="icon"
@@ -100,20 +96,6 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
         </div>
       </section>
 
-      {editTarget ? (
-        <EventDialog
-          mode="edit"
-          event={editTarget}
-          unlockedThemes={unlockedThemes}
-          onCloseAction={() => setEditTarget(null)}
-          onSavedAction={(updated) =>
-            setEventList((current) =>
-              current.map((e) => (e.id === editTarget.id ? { ...e, ...updated } : e)),
-            )
-          }
-        />
-      ) : null}
-
       {deleteTarget ? (
         <DeleteEventDialog
           event={deleteTarget}
@@ -124,20 +106,6 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
         />
       ) : null}
     </>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path d="M13 6l3 3" stroke="currentColor" strokeWidth="2" />
-    </svg>
   );
 }
 

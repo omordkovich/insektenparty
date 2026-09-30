@@ -1,11 +1,13 @@
 import { EditableField } from "@/components/EditableField";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import type { EventConfig } from "@/lib/event-config";
+import { buildEventShareUrl } from "@/lib/share";
 import type { EventFieldKey } from "@/lib/validation";
 
 type FooterProps = {
   config: EventConfig;
   eventId: string;
+  slug: string;
   isOwner: boolean;
 };
 
@@ -17,7 +19,7 @@ type ContactField = {
   link?: { href: string };
 };
 
-export function Footer({ config, eventId, isOwner }: FooterProps) {
+export function Footer({ config, eventId, slug, isOwner }: FooterProps) {
   const contactFields: ContactField[] = [
     {
       fieldKey: "contactName",
@@ -71,7 +73,7 @@ export function Footer({ config, eventId, isOwner }: FooterProps) {
             </div>
           </>
         ) : null}
-        <MadeWithBadge />
+        <MadeWithBadge share={{ url: buildEventShareUrl(slug), title: config.title }} />
       </div>
     </footer>
   );

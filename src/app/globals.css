@@ -499,6 +499,23 @@ body.modal-open {
   margin-inline: auto;
 }
 
+/* "Made with GASTZILLA" badge: the image (set inline as mask-image) only
+   provides the shape, the fill comes from here - black on neutral pages,
+   the theme's heading color on event pages. */
+.made-with-badge {
+  background-color: #000;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+[data-theme-root] .made-with-badge {
+  background-color: var(--leaf-dark);
+}
+
 .floating-accent {
   position: absolute;
   pointer-events: none;

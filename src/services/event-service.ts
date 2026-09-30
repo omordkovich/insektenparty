@@ -143,7 +143,7 @@ export async function updateEventForOwner(
   }
 
   // Only a theme that actually changes is checked, so grandfathered events
-  // keep their (now premium) theme - EventDialog always sends {theme, title}.
+  // keep their (now premium) theme even if a client re-sends it unchanged.
   if (themeUpdate !== undefined) {
     const currentTheme = await getEventTheme(id, ownerId);
     if (currentTheme === undefined) {

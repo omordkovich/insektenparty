@@ -5,6 +5,11 @@ import { CheckIcon, CloseIcon, PencilIcon } from "./EditIcons";
 
 type SaveResult = { ok: true } | { ok: false; error: string };
 
+// Round pencil button used by every owner edit control on an event page
+// (inline fields, the design picker next to the logo) so they all match.
+export const EDIT_ICON_BUTTON_CLASS =
+  "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-leaf/30 text-leaf-dark transition hover:bg-leaf/10";
+
 type InlineEditShellProps = {
   isOwner: boolean;
   ariaLabel: string;
@@ -64,7 +69,7 @@ export function InlineEditShell({
           type="button"
           onClick={() => setEditing(true)}
           aria-label={ariaLabel}
-          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-leaf/30 text-leaf-dark transition hover:bg-leaf/10"
+          className={EDIT_ICON_BUTTON_CLASS}
         >
           <PencilIcon />
         </button>
