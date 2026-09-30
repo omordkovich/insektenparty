@@ -1,3 +1,4 @@
+import { MIN_REGISTRATION_AGE } from "@/lib/legal-info";
 import {
   EmailLink,
   ExternalLink,
@@ -134,11 +135,13 @@ export function PrivacyPolicyContent() {
           des Passworts senden wir dir E-Mails.
         </p>
         <p>
-          Bei der Registrierung bestätigst du, dass du die AGB akzeptierst und
-          diese Datenschutzerklärung zur Kenntnis genommen hast. Dazu speichern
-          wir in deinem Konto den Zeitpunkt sowie die jeweils gültige Fassung
-          von AGB und Datenschutzerklärung, um den Vertragsschluss nachweisen
-          zu können. Die Bestätigung ist keine Einwilligung in die
+          Bei der Registrierung bestätigst du, dass du die AGB akzeptierst,
+          diese Datenschutzerklärung zur Kenntnis genommen hast und mindestens{" "}
+          {MIN_REGISTRATION_AGE} Jahre alt bist. Dazu speichern wir in deinem
+          Konto den Zeitpunkt, die jeweils gültige Fassung von AGB und
+          Datenschutzerklärung sowie die Altersbestätigung, um den
+          Vertragsschluss nachweisen zu können. Ein Geburtsdatum oder
+          Ausweisdokument erheben wir nicht. Die Bestätigung ist keine Einwilligung in die
           Datenverarbeitung – die Verarbeitung deiner Kontodaten beruht auf
           dem Nutzungsvertrag.
         </p>

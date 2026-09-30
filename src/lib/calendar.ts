@@ -91,6 +91,21 @@ export function formatDateLabel(date: string | null): string {
   return dateLabelFormatter.format(new Date(`${date}T00:00:00Z`));
 }
 
+const createdDateFormatter = new Intl.DateTimeFormat("de-DE", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Europe/Berlin",
+});
+
+// Formats a stored timestamp (e.g. an event's created_at) as a German date,
+// e.g. "4. September 2026". Unlike formatDateLabel this is a real instant,
+// so it is shown in German local time - late-evening UTC timestamps would
+// otherwise land on the previous day.
+export function formatCreatedDate(date: Date): string {
+  return createdDateFormatter.format(date);
+}
+
 // Formats the event's start/end times into the human-readable label shown
 // on the event page, e.g. "09:30 - 12:00 Uhr" or "ab 09:30 Uhr" when no end
 // time is set.

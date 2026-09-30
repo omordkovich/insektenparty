@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
+import { formatCreatedDate } from "@/lib/calendar";
 import { getEventBySlug } from "@/repositories/event-repository";
 import { getUserDisplayName } from "@/repositories/user-repository";
 
@@ -24,7 +25,10 @@ export default async function EventInfoPage({ params }: EventInfoPageProps) {
       <main className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
         <p className="max-w-md text-lg text-muted">
           Dieser Event wurde von{" "}
-          <span className="font-bold text-leaf-dark">{ownerName ?? "einem Nutzer"}</span>{" "}
+          <span className="font-bold text-leaf-dark">{ownerName ?? "einem Nutzer"}</span> am{" "}
+          <span className="whitespace-nowrap font-bold text-leaf-dark">
+            {formatCreatedDate(event.createdAt)}
+          </span>{" "}
           erstellt.
         </p>
         <Link

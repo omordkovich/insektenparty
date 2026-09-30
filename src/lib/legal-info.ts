@@ -17,10 +17,15 @@ export const LEGAL_INFO = {
   // true, wenn du Kleinunternehmer nach § 19 UStG bist (keine Umsatzsteuer
   // auf Rechnungen). Steuert den Preishinweis in den AGB.
   smallBusiness: false,
-}
+};
+
+// Mindestalter für die Registrierung (bestätigt per Checkbox). Käufe durch
+// Minderjährige sind nur mit Zustimmung der Erziehungsberechtigten wirksam
+// (§§ 107, 108 BGB) - siehe AGB § 3.
+export const MIN_REGISTRATION_AGE = 16;
 
 // Stand der AGB bzw. Datenschutzerklärung, wie er bei der Registrierung im
 // Konto gespeichert wird (Nachweis, welcher Fassung zugestimmt wurde).
 // Bei inhaltlichen Änderungen hochsetzen.
-export const TERMS_VERSION = "2026-09-29";
-export const PRIVACY_VERSION = "2026-09-29";
+export const TERMS_VERSION = "2026-09-30";
+export const PRIVACY_VERSION = "2026-09-30";

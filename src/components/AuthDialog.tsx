@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
-import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
+import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "./Button";
 import { FormModal } from "./FormModal";
@@ -20,6 +20,7 @@ type FormState = {
   password: string;
   passwordConfirm: string;
   acceptedTerms: boolean;
+  confirmedAge: boolean;
 };
 
 const emptyForm: FormState = {
@@ -28,6 +29,7 @@ const emptyForm: FormState = {
   password: "",
   passwordConfirm: "",
   acceptedTerms: false,
+  confirmedAge: false,
 };
 
 type AuthDialogProps = {
@@ -124,6 +126,12 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         );
         return;
       }
+      if (!form.confirmedAge) {
+        setFieldError(
+          `Bitte bestätige, dass du mindestens ${MIN_REGISTRATION_AGE} Jahre alt bist.`,
+        );
+        return;
+      }
       if (!recaptchaToken) {
         setFieldError("Bitte bestätige, dass du kein Roboter bist.");
         return;
@@ -154,10 +162,12 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         options: {
           data: {
             name: form.name.trim(),
-            // Proof of which AGB/privacy policy version was accepted, and when.
+            // Proof of which AGB/privacy policy version was accepted, and
+            // that the minimum age was confirmed - and when.
             terms_accepted_at: new Date().toISOString(),
             terms_version: TERMS_VERSION,
             privacy_version: PRIVACY_VERSION,
+            min_age_confirmed: MIN_REGISTRATION_AGE,
           },
         },
       });
@@ -321,7 +331,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                 />
               </div>
 
-              <label className="flex items-start gap-2 text-sm">
+              <label className="flex items-start gap-2 text-left text-sm">
                 <input
                   name="acceptedTerms"
                   type="checkbox"
@@ -347,6 +357,24 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                   </LegalLink>{" "}
                   zur Kenntnis genommen.
                 </span>
+              </label>
+
+              <label className="flex items-start gap-2 text-left text-sm">
+                <input
+                  name="confirmedAge"
+                  type="checkbox"
+                  required
+                  checked={form.confirmedAge}
+                  disabled={saving}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      confirmedAge: event.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
+                />
+                <span>Ich bin mindestens {MIN_REGISTRATION_AGE} Jahre alt.</span>
               </label>
 
               <RecaptchaCheckbox

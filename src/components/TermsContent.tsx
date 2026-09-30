@@ -1,10 +1,15 @@
-import { LEGAL_INFO } from "@/lib/legal-info";
+import { LEGAL_INFO, MIN_REGISTRATION_AGE } from "@/lib/legal-info";
 import { EmailLink, LastUpdated, LegalBody, List, PostalAddress, Section } from "./LegalText";
 
 // Allgemeine Geschäftsbedingungen. Written for one-time purchases of
 // extensions (event slots, premium designs) paid via Stripe - no
 // subscriptions. A subscription model would need additional clauses
 // (term, cancellation, "Kündigungsbutton" § 312k BGB).
+//
+// TODO (Stripe-Checkout): Pflicht-Checkbox vor dem Kauf: „Ich bin volljährig
+// oder meine Erziehungsberechtigten sind mit dem Kauf einverstanden." -
+// gehört zu § 3 (Registrierung ab 16, Käufe Minderjähriger nur mit
+// Zustimmung). Siehe auch das Stripe-TODO in WithdrawalContent.tsx.
 export function TermsContent() {
   return (
     <LegalBody>
@@ -53,8 +58,15 @@ export function TermsContent() {
           unverzüglich, wenn du einen Missbrauch deines Kontos vermutest.
         </p>
         <p>
-          Kostenpflichtige Erweiterungen können nur volljährige Personen
-          erwerben.
+          Die Registrierung ist ab {MIN_REGISTRATION_AGE} Jahren möglich. Mit
+          der Registrierung bestätigst du, dass du mindestens{" "}
+          {MIN_REGISTRATION_AGE} Jahre alt bist.
+        </p>
+        <p>
+          Minderjährige dürfen kostenpflichtige Erweiterungen nur mit
+          Zustimmung ihrer Erziehungsberechtigten erwerben. Widersprechen die
+          Erziehungsberechtigten einem Kauf, erstatten wir den Kaufpreis; die
+          Erweiterung wird dann wieder entfernt.
         </p>
       </Section>
 
