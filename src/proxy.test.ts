@@ -6,7 +6,7 @@ vi.mock("@/lib/supabase/proxy", () => ({
   updateSession: vi.fn(async () => new Response("echte Seite", { status: 200 })),
 }));
 
-const { proxy } = await import("../proxy");
+const { proxy } = await import("./proxy");
 
 function request(url: string) {
   return new NextRequest(url, { headers: { host: new URL(url).host } });
