@@ -19,16 +19,16 @@ describe("proxy – under construction", () => {
 
   it("answers gastzilla.de with the 503 placeholder when switched on", async () => {
     process.env.MAINTENANCE_MODE = "true";
-    const response = await proxy(request("https://gastzilla.de/p/milans7BD"));
+    const response = await proxy(request("https://gastzilla.de/"));
     expect(response.status).toBe(503);
     expect(response.headers.get("retry-after")).toBe("3600");
     expect(await response.text()).toContain("Hier wird gerade gebaut");
   });
 
-  it("still serves the Impressum on gastzilla.de", async () => {
+  it("still serves the Impressum and event pages on gastzilla.de", async () => {
     process.env.MAINTENANCE_MODE = "true";
-    const response = await proxy(request("https://gastzilla.de/impressum"));
-    expect(response.status).toBe(200);
+    expect((await proxy(request("https://gastzilla.de/impressum"))).status).toBe(200);
+    expect(await (await proxy(request("https://gastzilla.de/p/milans7BD"))).text()).toBe("echte Seite");
   });
 
   it("serves the real app on Vercel deployment URLs", async () => {

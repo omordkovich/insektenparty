@@ -3,12 +3,31 @@ import { SITE_URL } from "@/lib/site";
 // "Under construction" mode for the public domain, switched on with the env
 // var MAINTENANCE_MODE=true (on Vercel; needs a redeploy). Only gastzilla.de
 // and www are affected - Vercel deployment URLs and localhost keep showing
-// the real app, so it can still be tested. Impressum and Datenschutz stay
-// reachable (legally required), as do the crawler files.
+// the real app, so it can still be tested. Existing invitations keep
+// working: event pages and everything they use (API, e-mail links, legal
+// pages from their footer, link previews) stay reachable - only the start
+// page and "Über uns" show the placeholder.
 
 const SITE_HOST = new URL(SITE_URL).host;
 const MAINTENANCE_HOSTS = new Set([SITE_HOST, `www.${SITE_HOST}`]);
-const ALWAYS_REACHABLE = new Set(["/impressum", "/datenschutz", "/robots.txt", "/favicon.ico"]);
+const ALWAYS_REACHABLE = new Set([
+  "/impressum",
+  "/datenschutz",
+  "/agb",
+  "/widerruf",
+  "/robots.txt",
+  "/favicon.ico",
+  "/opengraph-image",
+]);
+// Whole sections, matched as "/p" or "/p/..." (not "/party").
+const ALWAYS_REACHABLE_SECTIONS = ["/p", "/api", "/auth"];
+
+function isAlwaysReachable(pathname: string): boolean {
+  return (
+    ALWAYS_REACHABLE.has(pathname) ||
+    ALWAYS_REACHABLE_SECTIONS.some((section) => pathname === section || pathname.startsWith(`${section}/`))
+  );
+}
 
 export function shouldShowMaintenance({
   enabled,
@@ -21,7 +40,7 @@ export function shouldShowMaintenance({
 }): boolean {
   if (enabled !== "true") return false;
   if (!MAINTENANCE_HOSTS.has(host.toLowerCase())) return false;
-  return !ALWAYS_REACHABLE.has(pathname);
+  return !isAlwaysReachable(pathname);
 }
 
 const LOGO_SRC = "https://res.cloudinary.com/d6sufegz/image/upload/v1789641286/banner_l.webp";
