@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { isIdle, shouldPoll } from "@/lib/polling";
 import type { GuestDto } from "@/lib/types";
 import { AdditionalGuestsDialog } from "./AdditionalGuestsDialog";
 import { BringingDetailsDialog } from "./BringingDetailsDialog";
@@ -38,7 +39,12 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
 // simple (plain polling) rather than Supabase Realtime since traffic here is
 // low - a websocket subscription would be instant but isn't worth the setup
 // cost for an event guest list.
-const POLL_INTERVAL_MS = 15_000;
+const POLL_INTERVAL_MS = 30_000;
+// Polling pauses after this long without any interaction, so tabs left open
+// in the background stop sending requests; the next interaction (or the tab
+// becoming visible again) refreshes immediately.
+const IDLE_AFTER_MS = 10 * 60_000;
+const ACTIVITY_EVENTS = ["pointerdown", "pointermove", "keydown", "scroll", "touchstart"] as const;
 
 type GuestSectionProps = {
   apiBasePath: string;
@@ -112,15 +118,48 @@ export function GuestSection({
   // touching the loading/error state, so a visitor who left the tab open
   // sees new entries without a manual refresh. Failures are ignored - the
   // currently-displayed list just stays as-is until the next successful poll.
+  // Only polls while someone is looking (see shouldPoll).
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (document.visibilityState !== "visible") return;
+    let lastActivity = Date.now();
+    let lastFetch = Date.now();
+    const isVisible = () => document.visibilityState === "visible";
+
+    function refresh() {
+      lastFetch = Date.now();
       void fetchGuests(apiBasePath)
         .then((data) => setGuests(data))
         .catch(() => {});
+    }
+
+    const interval = setInterval(() => {
+      if (shouldPoll({ visible: isVisible(), now: Date.now(), lastActivity, idleAfterMs: IDLE_AFTER_MS })) {
+        refresh();
+      }
     }, POLL_INTERVAL_MS);
 
-    return () => clearInterval(interval);
+    // Back after a pause: refresh at once if the list may be stale.
+    function onActivity() {
+      const now = Date.now();
+      const wasIdle = isIdle({ now, lastActivity, idleAfterMs: IDLE_AFTER_MS });
+      lastActivity = now;
+      if (wasIdle && now - lastFetch > POLL_INTERVAL_MS) refresh();
+    }
+    function onVisibilityChange() {
+      if (!isVisible()) return;
+      lastActivity = Date.now();
+      if (Date.now() - lastFetch > POLL_INTERVAL_MS) refresh();
+    }
+
+    for (const type of ACTIVITY_EVENTS) {
+      window.addEventListener(type, onActivity, { passive: true });
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      for (const type of ACTIVITY_EVENTS) window.removeEventListener(type, onActivity);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [apiBasePath]);
 
   function openCreate() {

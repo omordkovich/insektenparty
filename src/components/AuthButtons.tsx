@@ -4,17 +4,21 @@ import { useState } from "react";
 import { AuthDialog, type AuthDialogMode } from "./AuthDialog";
 import { Button } from "./Button";
 
-export function AuthButtons() {
+type AuthButtonsProps = {
+  registerLabel?: string;
+};
+
+export function AuthButtons({ registerLabel = "Registrieren" }: AuthButtonsProps) {
   const [authMode, setAuthMode] = useState<AuthDialogMode | null>(null);
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-center gap-2">
         <Button variant="outline" onClick={() => setAuthMode("login")}>
           Login
         </Button>
         <Button variant="primary" onClick={() => setAuthMode("register")}>
-          Registrieren
+          {registerLabel}
         </Button>
       </div>
 

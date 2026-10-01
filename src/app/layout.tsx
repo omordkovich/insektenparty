@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import { CookieBanner } from "@/components/CookieBanner";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import React from "react";
 
 const nunito = Nunito({
@@ -15,8 +16,11 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "GASTZILLA",
-  description: "GASTZILLA - digitale Einladungen und Gästelisten für dein Event.",
+  // Resolves relative canonical/Open Graph URLs against the main domain.
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
 };
 
 export default function RootLayout({

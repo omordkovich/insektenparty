@@ -1,11 +1,10 @@
+import { SITE_URL } from "@/lib/site";
+
 // Sharing an event page: the public URL plus one link per platform for
 // browsers without the native share sheet (navigator.share).
 
-// Erstmal die Vercel-Domain; später auf https://gastzilla.de umstellen.
-export const SHARE_BASE_URL = "https://mordkovich.vercel.app";
-
 export function buildEventShareUrl(slug: string): string {
-  return `${SHARE_BASE_URL}/p/${encodeURIComponent(slug)}`;
+  return `${SITE_URL}/p/${encodeURIComponent(slug)}`;
 }
 
 export function buildShareText(title: string): string {

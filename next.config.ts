@@ -3,12 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   devIndicators: false,
   images: {
-    // Local decorative graphics get swapped by hand often; Next's image
-    // optimizer caches processed variants on disk and (at least on this
-    // Turbopack build) doesn't reliably notice when the source file changes,
-    // requiring a full dev-server restart to see a replacement. Serving the
-    // files directly avoids that cache layer entirely.
-    unoptimized: true,
+    // All images live on Cloudinary, which resizes/re-encodes them on the
+    // fly - so next/image just asks it for the right size (see the loader)
+    // instead of running Next's own optimizer and on-disk cache.
+    loader: "custom",
+    loaderFile: "./src/lib/cloudinary-loader.ts",
   },
 };
 

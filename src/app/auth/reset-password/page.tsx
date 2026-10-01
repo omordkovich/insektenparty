@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import { ResetPasswordForm } from "@/components/ResetPasswordForm";
 import { SiteHeader } from "@/components/SiteHeader";
 import { createClient } from "@/lib/supabase/server";
+
+// A one-off page reached from an e-mail link - nothing for search engines.
+export const metadata: Metadata = {
+  title: "Neues Passwort festlegen",
+  robots: { index: false, follow: false },
+};
 
 export default async function ResetPasswordPage() {
   const supabase = await createClient();

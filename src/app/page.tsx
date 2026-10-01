@@ -1,12 +1,20 @@
-import { AuthButtons } from "@/components/AuthButtons";
 import { Button } from "@/components/Button";
 import { EventList } from "@/components/EventList";
+import { LandingContent } from "@/components/LandingContent";
 import { LegalLinks } from "@/components/LegalLinks";
+import { pageMetadata } from "@/lib/page-metadata";
+import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
 import { getEventsByOwner } from "@/repositories/event-repository";
 import { getUserEntitlements } from "@/services/entitlement-service";
+
+export const metadata = pageMetadata({
+  title: "GASTZILLA – Digitale Einladungen & Gästelisten für jedes Event",
+  description: SITE_DESCRIPTION,
+  path: "/",
+});
 
 export default async function Home() {
   const supabase = await createClient();
@@ -28,21 +36,13 @@ export default async function Home() {
     <>
       <SiteHeader />
       <main className="flex min-h-full flex-col items-center px-6 py-16 text-center">
-        <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
-          {claims ? `Hi ${name ?? claims.email}` : "Willkommen bei GASTZILLA!"}
-        </h1>
-
         {!claims ? (
-          <>
-            <p className="mt-3 max-w-md text-zinc-600">
-              Melde dich an, um deine Events zu verwalten.
-            </p>
-            <div className="mt-6">
-              <AuthButtons />
-            </div>
-          </>
+          <LandingContent />
         ) : (
           <>
+            <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
+              Hi {name ?? claims.email}
+            </h1>
             <div className="mt-8 w-full">
               <EventList
                 initialEvents={myEvents}

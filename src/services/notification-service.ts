@@ -1,4 +1,5 @@
 import { sendEmail } from "@/lib/email";
+import { buildEventShareUrl } from "@/lib/share";
 import { getEventForNotification } from "@/repositories/event-repository";
 import { getUserContact } from "@/repositories/user-repository";
 
@@ -43,7 +44,7 @@ export async function notifyOwnerOfGuestChange(
     if (!owner?.email) return;
 
     const { subject, text } = buildMessage(kind, guestName, event.title);
-    const link = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/p/${event.slug}`;
+    const link = buildEventShareUrl(event.slug);
 
     await sendEmail({
       to: owner.email,

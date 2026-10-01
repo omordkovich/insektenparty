@@ -2,37 +2,20 @@
 
 import { useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { LEGAL_DOCUMENTS, type LegalDocument } from "@/lib/legal-documents";
 import { ImprintContent } from "./ImprintContent";
 import { LegalDialog } from "./LegalDialog";
 import { PrivacyPolicyContent } from "./PrivacyPolicyContent";
 import { TermsContent } from "./TermsContent";
 import { WithdrawalContent } from "./WithdrawalContent";
 
-export type LegalDocument = "imprint" | "privacy" | "terms" | "withdrawal";
+export type { LegalDocument };
 
-const DOCUMENTS: Record<
-  LegalDocument,
-  { label: string; title: string; anchor: string; Content: ComponentType }
-> = {
-  imprint: { label: "Impressum", title: "Impressum", anchor: "impressum", Content: ImprintContent },
-  privacy: {
-    label: "Datenschutz",
-    title: "Datenschutzerklärung",
-    anchor: "datenschutz",
-    Content: PrivacyPolicyContent,
-  },
-  terms: {
-    label: "AGB",
-    title: "Allgemeine Geschäftsbedingungen",
-    anchor: "agb",
-    Content: TermsContent,
-  },
-  withdrawal: {
-    label: "Widerruf",
-    title: "Widerrufsbelehrung",
-    anchor: "widerruf",
-    Content: WithdrawalContent,
-  },
+const CONTENT: Record<LegalDocument, ComponentType> = {
+  imprint: ImprintContent,
+  privacy: PrivacyPolicyContent,
+  terms: TermsContent,
+  withdrawal: WithdrawalContent,
 };
 
 type LegalLinkProps = {
@@ -41,20 +24,27 @@ type LegalLinkProps = {
   children?: ReactNode;
 };
 
+// Opens a legal text as an overlay - for links inside forms and dialogs
+// (registration, cookie banner, guest sign-up), where navigating to the
+// page would throw away what the visitor typed. The footer links go to the
+// real pages instead (see LegalLinks). The href still points at the page,
+// so opening it in a new tab or without JavaScript works too.
 export function LegalLink({
   document,
   className = "text-sm text-muted underline underline-offset-2 hover:text-leaf-dark",
   children,
 }: LegalLinkProps) {
   const [open, setOpen] = useState(false);
-  const { label, title, anchor, Content } = DOCUMENTS[document];
+  const { label, title, href } = LEGAL_DOCUMENTS[document];
+  const Content = CONTENT[document];
 
   return (
     <>
       <a
-        href={`#${anchor}`}
-        role="button"
+        href={href}
         onClick={(event) => {
+          // Let ctrl/cmd/middle-click open the page in a new tab as usual.
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
           event.preventDefault();
           setOpen(true);
         }}
