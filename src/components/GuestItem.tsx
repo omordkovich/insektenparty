@@ -26,7 +26,10 @@ export function GuestItem({
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <span className="font-bold text-leaf-dark">{guest.name}</span>
       </td>
-      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle text-sm font-semibold text-honey-dark">
+      {/* "+2" must never break between "+" and the number: the global
+          overflow-wrap: anywhere would otherwise let the table squeeze this
+          column to one character. */}
+      <td className="block whitespace-nowrap sm:table-cell sm:px-2 sm:py-3 sm:align-middle text-sm font-semibold text-honey-dark">
         {guest.additionalGuests > 0 ? (
           <button
             type="button"
@@ -39,10 +42,10 @@ export function GuestItem({
           </button>
         ) : null}
       </td>
-      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+      <td className="block [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)}
       </td>
-      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+      <td className="block [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
