@@ -1,16 +1,22 @@
-import { formatDateLabel, formatTimeLabel } from "@/lib/calendar";
+import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
 import { generateSlug } from "@/lib/slug";
-import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+import type { ThemeKey } from "@/lib/theme-presets";
 import {
   isEventFieldKey,
+  normalizeArrivalTime,
   validateEventDate,
   validateEventField,
+  validateEventSchedule,
   validateEventTime,
+  validateNewEventTitle,
+  validateTheme,
   type EventFieldKey,
+  type EventSchedule,
 } from "@/lib/validation";
 import {
   createEvent,
   deleteEvent,
+  getEventSchedule,
   getEventTheme,
   updateEvent,
   type EventRow,
@@ -18,7 +24,6 @@ import {
 import { canCreateEvent, canUseTheme } from "@/lib/features";
 import { getUserEntitlements } from "@/services/entitlement-service";
 
-const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 const EVENT_LIMIT_ERROR = "Du hast dein Event-Kontingent erreicht.";
 const THEME_LOCKED_ERROR = "Dieses Design ist noch nicht freigeschaltet.";
 
@@ -30,29 +35,22 @@ export async function createEventForOwner(
   ownerId: string,
   input: { theme: unknown; title: unknown },
 ): Promise<EventServiceResult<{ slug: string }>> {
-  const { theme, title } = input;
-
-  if (typeof theme !== "string" || !THEME_KEYS.includes(theme as ThemeKey)) {
-    return { ok: false, status: 400, error: "Ungültiges Theme." };
+  const themeValidation = validateTheme(input.theme);
+  if (!themeValidation.ok) {
+    return { ok: false, status: 400, error: themeValidation.error };
   }
+  const theme = themeValidation.value;
 
-  const titleValidation = validateEventField("title", title);
+  const titleValidation = validateNewEventTitle(input.title);
   if (!titleValidation.ok) {
     return { ok: false, status: 400, error: titleValidation.error };
-  }
-  if (!titleValidation.value) {
-    return {
-      ok: false,
-      status: 400,
-      error: "Bitte gib einen Namen für dein Event ein.",
-    };
   }
 
   const entitlements = await getUserEntitlements(ownerId);
   if (!canCreateEvent(entitlements)) {
     return { ok: false, status: 403, error: EVENT_LIMIT_ERROR };
   }
-  if (!canUseTheme(entitlements, theme as ThemeKey)) {
+  if (!canUseTheme(entitlements, theme)) {
     return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
   }
 
@@ -74,24 +72,25 @@ export async function updateEventForOwner(
 ): Promise<EventServiceResult<EventRow>> {
   const updates: Partial<Record<EventFieldKey, string>> = {};
   let themeUpdate: ThemeKey | undefined;
-  let eventDateUpdate: string | null | undefined;
-  let eventStartTimeUpdate: string | null | undefined;
-  let eventEndTimeUpdate: string | null | undefined;
+  // Only the date/time fields present in the request; merged with the
+  // stored ones below so the rules between them can be checked.
+  const scheduleChanges: Partial<EventSchedule> = {};
 
   for (const [key, rawValue] of Object.entries(body)) {
     if (key === "theme") {
-      if (typeof rawValue !== "string" || !THEME_KEYS.includes(rawValue as ThemeKey)) {
-        return { ok: false, status: 400, error: "Ungültiges Theme." };
+      const validation = validateTheme(rawValue);
+      if (!validation.ok) {
+        return { ok: false, status: 400, error: validation.error };
       }
-      themeUpdate = rawValue as ThemeKey;
+      themeUpdate = validation.value;
       continue;
     }
-    if (key === "eventDate") {
+    if (key === "eventDate" || key === "eventEndDate") {
       const validation = validateEventDate(rawValue);
       if (!validation.ok) {
         return { ok: false, status: 400, error: validation.error };
       }
-      eventDateUpdate = validation.value;
+      scheduleChanges[key] = validation.value;
       continue;
     }
     if (key === "eventStartTime" || key === "eventEndTime") {
@@ -99,11 +98,7 @@ export async function updateEventForOwner(
       if (!validation.ok) {
         return { ok: false, status: 400, error: validation.error };
       }
-      if (key === "eventStartTime") {
-        eventStartTimeUpdate = validation.value;
-      } else {
-        eventEndTimeUpdate = validation.value;
-      }
+      scheduleChanges[key] = validation.value;
       continue;
     }
     if (!isEventFieldKey(key)) continue;
@@ -114,29 +109,32 @@ export async function updateEventForOwner(
     updates[key] = validation.value;
   }
 
-  // Start/end time are edited together as one "Uhrzeit" field (see
-  // EditableTimeRangeField) and the derived label below needs both, so a
-  // request touching only one of them is rejected rather than guessed at.
-  if ((eventStartTimeUpdate !== undefined) !== (eventEndTimeUpdate !== undefined)) {
-    return {
-      ok: false,
-      status: 400,
-      error: "Start- und Endzeit müssen gemeinsam angegeben werden.",
-    };
+  // Date and time are checked as a whole ("bis" never before "von", an
+  // earlier end time only on a later end date), so the stored values fill in
+  // whatever this request doesn't change. Both labels are derived from the
+  // resulting schedule.
+  let schedule: EventSchedule | undefined;
+  if (Object.keys(scheduleChanges).length > 0) {
+    const stored = await getEventSchedule(id, ownerId);
+    if (!stored) {
+      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    }
+    const validation = validateEventSchedule({
+      eventDate: stored.eventDate,
+      eventEndDate: stored.eventEndDate,
+      eventStartTime: stored.eventStartTime ? normalizeArrivalTime(stored.eventStartTime) : null,
+      eventEndTime: stored.eventEndTime ? normalizeArrivalTime(stored.eventEndTime) : null,
+      ...scheduleChanges,
+    });
+    if (!validation.ok) {
+      return { ok: false, status: 400, error: validation.error };
+    }
+    schedule = validation.value;
+    updates.dateLabel = formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate);
+    updates.timeLabel = formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime);
   }
 
-  if (eventDateUpdate !== undefined) {
-    updates.dateLabel = formatDateLabel(eventDateUpdate);
-  }
-  if (eventStartTimeUpdate !== undefined) {
-    updates.timeLabel = formatTimeLabel(eventStartTimeUpdate, eventEndTimeUpdate ?? null);
-  }
-
-  const hasAnyUpdate =
-    Object.keys(updates).length > 0 ||
-    themeUpdate !== undefined ||
-    eventDateUpdate !== undefined ||
-    eventStartTimeUpdate !== undefined;
+  const hasAnyUpdate = Object.keys(updates).length > 0 || themeUpdate !== undefined;
 
   if (!hasAnyUpdate) {
     return { ok: false, status: 400, error: "Kein gültiges Feld angegeben." };
@@ -160,9 +158,7 @@ export async function updateEventForOwner(
   const updated = await updateEvent(id, ownerId, {
     ...updates,
     ...(themeUpdate ? { theme: themeUpdate } : {}),
-    ...(eventDateUpdate !== undefined ? { eventDate: eventDateUpdate } : {}),
-    ...(eventStartTimeUpdate !== undefined ? { eventStartTime: eventStartTimeUpdate } : {}),
-    ...(eventEndTimeUpdate !== undefined ? { eventEndTime: eventEndTimeUpdate } : {}),
+    ...(schedule ?? {}),
   });
 
   if (!updated) {

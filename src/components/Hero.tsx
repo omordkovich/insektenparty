@@ -20,6 +20,7 @@ export function Hero({ config, eventId, isOwner }: HeroProps) {
         description: config.greeting,
         location: config.locationLabel,
         date: config.eventDate as string,
+        endDate: config.eventEndDate,
         startTime: config.eventStartTime as string,
         endTime: config.eventEndTime as string,
       }
@@ -74,6 +75,7 @@ export function Hero({ config, eventId, isOwner }: HeroProps) {
               <EditableDateField
                 eventId={eventId}
                 value={config.eventDate}
+                endValue={config.eventEndDate}
                 displayLabel={config.dateLabel}
                 isOwner={isOwner}
                 ariaLabel="Datum bearbeiten"

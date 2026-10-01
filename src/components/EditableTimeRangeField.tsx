@@ -29,6 +29,8 @@ export function EditableTimeRangeField({
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
 
+  // "bis" must be after "von" (unless the event ends on a later day) - checked
+  // by the server with the shared Zod schema, its message is shown inline.
   async function handleSaveAction() {
     const newStart = startRef.current?.value || null;
     const newEnd = endRef.current?.value || null;
@@ -71,23 +73,28 @@ export function EditableTimeRangeField({
       displayContent={currentLabel}
       onSaveAction={handleSaveAction}
       renderEditor={({ saving }) => (
-        <span className="flex gap-2">
-          <input
-            ref={startRef}
-            type="time"
-            aria-label="Startzeit"
-            defaultValue={currentStart ?? ""}
-            disabled={saving}
-            className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
-          />
-          <input
-            ref={endRef}
-            type="time"
-            aria-label="Endzeit"
-            defaultValue={currentEnd ?? ""}
-            disabled={saving}
-            className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
-          />
+        <span className="flex flex-col gap-1 text-left">
+          <label className="flex items-center gap-2 text-xs font-bold">
+            <span className="w-6 shrink-0">von</span>
+            <input
+              ref={startRef}
+              type="time"
+              defaultValue={currentStart ?? ""}
+              disabled={saving}
+              className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-xs font-bold">
+            <span className="w-6 shrink-0">bis</span>
+            <input
+              ref={endRef}
+              type="time"
+              defaultValue={currentEnd ?? ""}
+              disabled={saving}
+              className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
+            />
+          </label>
+          <span className="text-[11px] font-normal text-muted">„bis“ ist optional</span>
         </span>
       )}
     />

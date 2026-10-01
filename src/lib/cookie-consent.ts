@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 // Cookie consent for optional third-party services. Strictly necessary
 // cookies (Supabase login session, this consent entry itself) need no
 // consent; Google reCAPTCHA does. The choice lives in localStorage so it
@@ -18,6 +20,14 @@ export function createConsent(recaptcha: boolean, now: Date = new Date()): Cooki
   return { version: CONSENT_VERSION, recaptcha, decidedAt: now.toISOString() };
 }
 
+const storedConsentSchema = z.object({
+  version: z.literal(CONSENT_VERSION),
+  recaptcha: z.boolean(),
+  decidedAt: z.string(),
+});
+
+// Whatever is in localStorage may be outdated, hand-edited or garbage -
+// anything that isn't a current, well-formed consent counts as "not decided".
 export function parseConsent(raw: string | null): CookieConsent | null {
   if (raw === null) return null;
 
@@ -28,12 +38,8 @@ export function parseConsent(raw: string | null): CookieConsent | null {
     return null;
   }
 
-  if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
-  const { version, recaptcha, decidedAt } = value as Record<string, unknown>;
-  if (version !== CONSENT_VERSION) return null;
-  if (typeof recaptcha !== "boolean" || typeof decidedAt !== "string") return null;
-
-  return { version, recaptcha, decidedAt };
+  const result = storedConsentSchema.safeParse(value);
+  return result.success ? result.data : null;
 }
 
 // --- Browser-only helpers (used via useCookieConsent) ---

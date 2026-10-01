@@ -11,6 +11,8 @@ export type EventConfig = {
    * since those aren't reliably machine-parseable. Null until the owner
    * sets a date via the edit page - the calendar link is skipped until then. */
   eventDate: string | null;
+  /** Last day of a multi-day event, null for a single day. */
+  eventEndDate: string | null;
   eventStartTime: string | null;
   eventEndTime: string | null;
   contact: {

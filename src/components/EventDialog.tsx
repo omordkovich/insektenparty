@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { isThemeSelectable } from "@/lib/features";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
-import { EVENT_TEXT_MAX_LENGTH } from "@/lib/validation";
+import { EVENT_TEXT_MAX_LENGTH, validateNewEventTitle } from "@/lib/validation";
 import { Button } from "./Button";
 import { LockIcon } from "./EditIcons";
 import { LegalLink } from "./LegalLink";
@@ -45,17 +45,15 @@ export function EventDialog(props: EventDialogProps) {
   async function handleSubmit() {
     if (saving) return;
 
-    const trimmedName = name.trim();
+    let trimmedName = "";
     if (mode === "create") {
-      if (!trimmedName) {
-        setError("Bitte gib einen Namen für dein Event ein.");
+      const titleResult = validateNewEventTitle(name);
+      if (!titleResult.ok) {
+        setError(titleResult.error);
         nameInputRef.current?.focus();
         return;
       }
-      if (trimmedName.length > EVENT_TEXT_MAX_LENGTH) {
-        setError(`Name darf höchstens ${EVENT_TEXT_MAX_LENGTH} Zeichen lang sein.`);
-        return;
-      }
+      trimmedName = titleResult.value;
     } else if (theme === originalTheme) {
       onCloseAction();
       return;

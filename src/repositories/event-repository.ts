@@ -71,6 +71,28 @@ export async function getEventTheme(id: string, ownerId: string): Promise<string
   return event?.theme;
 }
 
+// The four date/time columns, for validating a change to some of them
+// against the rest. Undefined when the event does not exist or belongs to
+// someone else.
+export async function getEventSchedule(
+  id: string,
+  ownerId: string,
+): Promise<
+  | { eventDate: string | null; eventEndDate: string | null; eventStartTime: string | null; eventEndTime: string | null }
+  | undefined
+> {
+  const [event] = await getDb()
+    .select({
+      eventDate: events.eventDate,
+      eventEndDate: events.eventEndDate,
+      eventStartTime: events.eventStartTime,
+      eventEndTime: events.eventEndTime,
+    })
+    .from(events)
+    .where(and(eq(events.id, id), eq(events.ownerId, ownerId)));
+  return event;
+}
+
 export async function createEvent(input: {
   ownerId: string;
   slug: string;
@@ -94,6 +116,7 @@ export async function createEvent(input: {
       locationLabel: "",
       defaultArrivalTime: "",
       eventDate: null,
+      eventEndDate: null,
       eventStartTime: null,
       eventEndTime: null,
       contactName: "",

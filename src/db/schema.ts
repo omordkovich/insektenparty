@@ -23,6 +23,8 @@ export const events = pgTable("events", {
   locationLabel: text("location_label").notNull(),
   defaultArrivalTime: text("default_arrival_time").notNull(),
   eventDate: date("event_date"),
+  // Last day of a multi-day event; null for a single-day event.
+  eventEndDate: date("event_end_date"),
   eventStartTime: time("event_start_time"),
   eventEndTime: time("event_end_time"),
   contactName: text("contact_name").notNull(),

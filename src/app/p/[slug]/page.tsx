@@ -39,6 +39,7 @@ export default async function EventPage({ params }: EventPageProps) {
     locationLabel: event.locationLabel,
     defaultArrivalTime: event.defaultArrivalTime,
     eventDate: event.eventDate,
+    eventEndDate: event.eventEndDate,
     eventStartTime: event.eventStartTime ? normalizeArrivalTime(event.eventStartTime) : null,
     eventEndTime: event.eventEndTime ? normalizeArrivalTime(event.eventEndTime) : null,
     contact: {

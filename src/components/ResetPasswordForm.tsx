@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useId, useState, type SubmitEvent } from "react";
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
-import { PASSWORD_MIN_LENGTH } from "./AuthDialog";
 import { Button } from "./Button";
 
 export function ResetPasswordForm() {
   const passwordId = useId();
   const passwordConfirmId = useId();
+  const passwordHintId = useId();
 
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -24,8 +25,9 @@ export function ResetPasswordForm() {
     setFieldError(null);
     setSubmitError(null);
 
-    if (password.length < PASSWORD_MIN_LENGTH) {
-      setFieldError(`Passwort muss mindestens ${PASSWORD_MIN_LENGTH} Zeichen lang sein.`);
+    const passwordError = validateNewPassword(password);
+    if (passwordError) {
+      setFieldError(passwordError);
       return;
     }
     if (password !== passwordConfirm) {
@@ -78,8 +80,12 @@ export function ResetPasswordForm() {
           value={password}
           disabled={saving}
           onChange={(event) => setPassword(event.target.value)}
+          aria-describedby={passwordHintId}
           className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
         />
+        <p id={passwordHintId} className="mt-1 text-xs text-muted">
+          {PASSWORD_HINT}
+        </p>
       </div>
 
       <div>

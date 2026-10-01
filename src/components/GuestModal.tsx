@@ -1,7 +1,6 @@
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import type { GuestDto } from "@/lib/types";
 import {
-  ARRIVAL_TIME_PATTERN,
   BRINGING_DESCRIPTION_MAX_LENGTH,
   MAX_ADDITIONAL_GUESTS,
   MESSAGE_MAX_LENGTH,
@@ -149,16 +148,6 @@ export function GuestModal({
 
     if (!validation.ok) {
       setFieldError(validation.error);
-      return;
-    }
-
-    if (!ARRIVAL_TIME_PATTERN.test(validation.data.arrivalTime)) {
-      setFieldError("Ankunftszeit muss im Format HH:mm angegeben werden.");
-      return;
-    }
-
-    if (validation.data.name.length > NAME_MAX_LENGTH) {
-      setFieldError(`Name darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`);
       return;
     }
 

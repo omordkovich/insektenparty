@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isUuid } from "@/lib/validation";
+import { isUuid, validateRequestBody } from "@/lib/validation";
 import { deleteEventForOwner, updateEventForOwner } from "@/services/event-service";
 
 type RouteContext = {
@@ -33,11 +33,12 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
     }
 
-    if (typeof body !== "object" || body === null || Array.isArray(body)) {
-      return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
+    const bodyValidation = validateRequestBody(body);
+    if (!bodyValidation.ok) {
+      return NextResponse.json({ error: bodyValidation.error }, { status: 400 });
     }
 
-    const result = await updateEventForOwner(eventId, userId, body as Record<string, unknown>);
+    const result = await updateEventForOwner(eventId, userId, bodyValidation.value);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.status });

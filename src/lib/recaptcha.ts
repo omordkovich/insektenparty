@@ -1,17 +1,15 @@
+import { z } from "zod";
+
 type RecaptchaVerifyResponse = {
   success?: boolean;
   "error-codes"?: string[];
 };
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const recaptchaBodySchema = z.object({ recaptchaToken: z.string().trim().min(1) });
 
 export function getRecaptchaToken(body: unknown): string | null {
-  if (!isPlainObject(body)) return null;
-  if (typeof body.recaptchaToken !== "string") return null;
-  const token = body.recaptchaToken.trim();
-  return token.length > 0 ? token : null;
+  const result = recaptchaBodySchema.safeParse(body);
+  return result.success ? result.data.recaptchaToken : null;
 }
 
 export async function verifyRecaptchaToken(

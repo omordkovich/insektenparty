@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
+import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
@@ -11,8 +13,6 @@ import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type AuthDialogMode = "login" | "register" | "reset";
 
-const NAME_MAX_LENGTH = 100;
-export const PASSWORD_MIN_LENGTH = 6;
 
 type FormState = {
   name: string;
@@ -44,6 +44,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
   const emailId = useId();
   const passwordId = useId();
   const passwordConfirmId = useId();
+  const passwordHintId = useId();
   const emailInputRef = useRef<HTMLInputElement>(null);
 
   const [mode, setMode] = useState<AuthDialogMode>(initialMode);
@@ -71,11 +72,24 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     setFieldError(null);
     setSubmitError(null);
 
-    const email = form.email.trim();
-    if (!email) {
-      setFieldError("E-Mail ist erforderlich.");
+    // Checked in the order of the form fields, so the message always refers
+    // to the topmost field that needs fixing.
+    let name = "";
+    if (mode === "register") {
+      const nameResult = validatePersonName(form.name);
+      if (!nameResult.ok) {
+        setFieldError(nameResult.error);
+        return;
+      }
+      name = nameResult.value;
+    }
+
+    const emailResult = validateEmail(form.email);
+    if (!emailResult.ok) {
+      setFieldError(emailResult.error);
       return;
     }
+    const email = emailResult.value;
 
     if (mode === "reset") {
       setSaving(true);
@@ -99,23 +113,20 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
       return;
     }
 
-    if (form.password.length < PASSWORD_MIN_LENGTH) {
-      setFieldError(
-        `Passwort muss mindestens ${PASSWORD_MIN_LENGTH} Zeichen lang sein.`,
-      );
+    // New passwords must meet the rules; login only needs one entered, so
+    // accounts with older, shorter passwords can still sign in.
+    const passwordError =
+      mode === "register"
+        ? validateNewPassword(form.password)
+        : form.password
+          ? null
+          : "Bitte gib dein Passwort ein.";
+    if (passwordError) {
+      setFieldError(passwordError);
       return;
     }
 
     if (mode === "register") {
-      const name = form.name.trim();
-      if (!name) {
-        setFieldError("Name ist erforderlich.");
-        return;
-      }
-      if (name.length > NAME_MAX_LENGTH) {
-        setFieldError(`Name darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`);
-        return;
-      }
       if (form.password !== form.passwordConfirm) {
         setFieldError("Die Passwörter stimmen nicht überein.");
         return;
@@ -161,7 +172,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         password: form.password,
         options: {
           data: {
-            name: form.name.trim(),
+            name,
             // Proof of which AGB/privacy policy version was accepted, and
             // that the minimum age was confirmed - and when.
             terms_accepted_at: new Date().toISOString(),
@@ -290,7 +301,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                 name="password"
                 type="password"
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
-                minLength={PASSWORD_MIN_LENGTH}
+                minLength={mode === "register" ? PASSWORD_MIN_LENGTH : undefined}
                 value={form.password}
                 disabled={saving}
                 onChange={(event) =>
@@ -299,8 +310,14 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                     password: event.target.value,
                   }))
                 }
+                aria-describedby={mode === "register" ? passwordHintId : undefined}
                 className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
               />
+              {mode === "register" ? (
+                <p id={passwordHintId} className="mt-1 text-xs text-muted">
+                  {PASSWORD_HINT}
+                </p>
+              ) : null}
             </div>
           ) : null}
 

@@ -14,16 +14,20 @@ function escapeIcsText(value: string): string {
     .replace(/\n/g, "\\n");
 }
 
-export function buildCalendarLink(params: {
+type CalendarEventParams = {
   title: string;
   description: string;
   location: string;
   date: string;
+  /** Last day of a multi-day event; null/omitted for a single day. */
+  endDate?: string | null;
   startTime: string;
   endTime: string;
-}): string {
+};
+
+export function buildCalendarLink(params: CalendarEventParams): string {
   const dtStart = toIcsDateTime(params.date, params.startTime);
-  const dtEnd = toIcsDateTime(params.date, params.endTime);
+  const dtEnd = toIcsDateTime(params.endDate ?? params.date, params.endTime);
   const stamp = dtStart;
 
   const ics = [
@@ -51,15 +55,8 @@ export function buildCalendarLink(params: {
 // through Google Calendar's prefill page instead - it opens the "add event"
 // screen with no file involved. Only real downside: iOS/Apple Calendar users
 // land on this web page rather than their native app.
-export function buildGoogleCalendarLink(params: {
-  title: string;
-  description: string;
-  location: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-}): string {
-  const dates = `${toIcsDateTime(params.date, params.startTime)}/${toIcsDateTime(params.date, params.endTime)}`;
+export function buildGoogleCalendarLink(params: CalendarEventParams): string {
+  const dates = `${toIcsDateTime(params.date, params.startTime)}/${toIcsDateTime(params.endDate ?? params.date, params.endTime)}`;
   const qs = new URLSearchParams({
     action: "TEMPLATE",
     text: params.title,
@@ -89,6 +86,36 @@ const dateLabelFormatter = new Intl.DateTimeFormat("de-DE", {
 export function formatDateLabel(date: string | null): string {
   if (!date) return "";
   return dateLabelFormatter.format(new Date(`${date}T00:00:00Z`));
+}
+
+const shortDateFormatter = new Intl.DateTimeFormat("de-DE", {
+  weekday: "short",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+function dateParts(date: string) {
+  const parts = shortDateFormatter.formatToParts(new Date(`${date}T00:00:00Z`));
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
+  return { weekday: get("weekday"), day: get("day"), month: get("month"), year: get("year") };
+}
+
+// Label for the event's date: a single day as before ("Freitag, 4. September
+// 2026"); a range compactly, naming month/year only where they differ:
+// "Fr. 4. – So. 6. September 2026", "Fr. 30. Oktober – So. 1. November 2026".
+export function formatDateRangeLabel(start: string | null, end: string | null): string {
+  if (!start) return "";
+  if (!end || end === start) return formatDateLabel(start);
+
+  const a = dateParts(start);
+  const b = dateParts(end);
+  const endText = `${b.weekday} ${b.day}. ${b.month} ${b.year}`;
+
+  if (a.year !== b.year) return `${a.weekday} ${a.day}. ${a.month} ${a.year} – ${endText}`;
+  if (a.month !== b.month) return `${a.weekday} ${a.day}. ${a.month} – ${endText}`;
+  return `${a.weekday} ${a.day}. – ${endText}`;
 }
 
 const createdDateFormatter = new Intl.DateTimeFormat("de-DE", {
