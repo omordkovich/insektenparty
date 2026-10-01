@@ -15,6 +15,11 @@ export type GuestServiceResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };
 
+// Postgres TIME comes back as HH:mm:ss; null stays null.
+function optionalTime(value: string | null): string | null {
+  return value ? normalizeArrivalTime(String(value)) : null;
+}
+
 function toGuestDto(row: GuestRow): GuestDto {
   return {
     id: row.id,
@@ -22,6 +27,9 @@ function toGuestDto(row: GuestRow): GuestDto {
     additionalGuests: row.additionalGuests,
     additionalGuestNames: row.additionalGuestNames,
     arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
+    arrivalEndTime: optionalTime(row.arrivalEndTime),
+    departureTime: optionalTime(row.departureTime),
+    departureEndTime: optionalTime(row.departureEndTime),
     bringingSomething: row.bringingSomething,
     bringingDescription: row.bringingDescription,
     hasMessage: row.hasMessage,

@@ -29,6 +29,9 @@ type FormState = {
   additionalGuests: string;
   additionalGuestNames: string[];
   arrivalTime: string;
+  arrivalEndTime: string;
+  departureTime: string;
+  departureEndTime: string;
   bringingSomething: boolean;
   bringingDescription: string;
   hasMessage: boolean;
@@ -46,6 +49,9 @@ function getInitialForm(
       additionalGuests: String(guest.additionalGuests),
       additionalGuestNames: guest.additionalGuestNames,
       arrivalTime: guest.arrivalTime,
+      arrivalEndTime: guest.arrivalEndTime ?? "",
+      departureTime: guest.departureTime ?? "",
+      departureEndTime: guest.departureEndTime ?? "",
       bringingSomething: guest.bringingSomething,
       bringingDescription: guest.bringingDescription ?? "",
       hasMessage: guest.hasMessage,
@@ -58,6 +64,9 @@ function getInitialForm(
     additionalGuests: "0",
     additionalGuestNames: [],
     arrivalTime: defaultArrivalTime,
+    arrivalEndTime: "",
+    departureTime: "",
+    departureEndTime: "",
     bringingSomething: false,
     bringingDescription: "",
     hasMessage: false,
@@ -140,6 +149,9 @@ export function GuestModal({
         : parsedAdditional,
       additionalGuestNames: form.additionalGuestNames,
       arrivalTime: form.arrivalTime,
+      arrivalEndTime: form.arrivalEndTime,
+      departureTime: form.departureTime,
+      departureEndTime: form.departureEndTime,
       bringingSomething: form.bringingSomething,
       bringingDescription: form.bringingDescription,
       hasMessage: form.hasMessage,
@@ -313,25 +325,84 @@ export function GuestModal({
           </div>
         ) : null}
 
-        <div>
-          <label htmlFor={arrivalId} className="mb-1 block text-sm font-bold">
-            Ankunftszeit
-          </label>
-          <input
-            id={arrivalId}
-            name="arrivalTime"
-            type="time"
-            value={form.arrivalTime}
-            disabled={saving}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                arrivalTime: event.target.value,
-              }))
-            }
-            className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
-          />
-        </div>
+        <fieldset>
+          <legend className="mb-1 block text-sm font-bold">Ankunftszeit</legend>
+          <div className="flex gap-2">
+            <label className="flex flex-1 items-center gap-2 text-sm">
+              <span className="shrink-0">von</span>
+              <input
+                id={arrivalId}
+                name="arrivalTime"
+                type="time"
+                value={form.arrivalTime}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    arrivalTime: event.target.value,
+                  }))
+                }
+                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+              />
+            </label>
+            <label className="flex flex-1 items-center gap-2 text-sm">
+              <span className="shrink-0">bis</span>
+              <input
+                name="arrivalEndTime"
+                type="time"
+                value={form.arrivalEndTime}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    arrivalEndTime: event.target.value,
+                  }))
+                }
+                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+              />
+            </label>
+          </div>
+          <p className="mt-1 text-xs text-muted">„bis“ ist optional.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend className="mb-1 block text-sm font-bold">Ich bleibe bis:</legend>
+          <div className="flex gap-2">
+            <label className="flex flex-1 items-center gap-2 text-sm">
+              <span className="shrink-0">von</span>
+              <input
+                name="departureTime"
+                type="time"
+                value={form.departureTime}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    departureTime: event.target.value,
+                  }))
+                }
+                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+              />
+            </label>
+            <label className="flex flex-1 items-center gap-2 text-sm">
+              <span className="shrink-0">bis</span>
+              <input
+                name="departureEndTime"
+                type="time"
+                value={form.departureEndTime}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    departureEndTime: event.target.value,
+                  }))
+                }
+                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+              />
+            </label>
+          </div>
+          <p className="mt-1 text-xs text-muted">Optional – falls du schon weißt, wann du gehst.</p>
+        </fieldset>
 
         <div>
           <label className="flex items-center gap-2 text-sm font-bold">

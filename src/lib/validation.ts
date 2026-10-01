@@ -98,6 +98,11 @@ export type GuestInput = {
   additionalGuests: number;
   additionalGuestNames: string[];
   arrivalTime: string;
+  /** Optional end of the arrival window ("von – bis"); null = only "von". */
+  arrivalEndTime: string | null;
+  /** Optional "Ich bleibe bis" window; both null when not given. */
+  departureTime: string | null;
+  departureEndTime: string | null;
   bringingSomething: boolean;
   bringingDescription: string | null;
   hasMessage: boolean;
@@ -129,6 +134,20 @@ const arrivalTimeSchema = z
   .min(1, "Ankunftszeit ist erforderlich.")
   .regex(ARRIVAL_TIME_PATTERN, "Ankunftszeit muss im Format HH:mm angegeben werden.");
 
+// Optional time: missing or empty means "not given". In a "von – bis"
+// window an earlier "bis" means it runs past midnight (22:00 – 01:00), so
+// only equality is rejected (see guestInputSchema).
+function optionalTimeSchema(formatError: string) {
+  return z.preprocess(
+    (value) => (value === undefined || (typeof value === "string" && value.trim() === "") ? null : value),
+    z.string({ error: formatError }).trim().regex(ARRIVAL_TIME_PATTERN, formatError).nullable(),
+  );
+}
+
+const arrivalEndTimeSchema = optionalTimeSchema("Das Ende der Ankunftszeit muss im Format HH:mm angegeben werden.");
+const DEPARTURE_FORMAT_ERROR = "„Ich bleibe bis“ muss im Format HH:mm angegeben werden.";
+const departureTimeSchema = optionalTimeSchema(DEPARTURE_FORMAT_ERROR);
+
 const bringingDescriptionSchema = z
   .string({ error: "Bitte gib an, was du mitbringst." })
   .trim()
@@ -149,6 +168,9 @@ const guestBaseSchema = z.object(
       error: "Namen der zusätzlichen Personen sind ungültig.",
     }),
     arrivalTime: arrivalTimeSchema,
+    arrivalEndTime: arrivalEndTimeSchema,
+    departureTime: departureTimeSchema,
+    departureEndTime: departureTimeSchema,
     // Only an explicit true counts; the matching text is checked below.
     bringingSomething: z.unknown().transform((value) => value === true),
     bringingDescription: z.unknown(),
@@ -164,6 +186,20 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
       code: "custom",
       message: "Anzahl der Namen muss der Anzahl zusätzlicher Personen entsprechen.",
     });
+    return z.NEVER;
+  }
+
+  if (guest.arrivalEndTime === guest.arrivalTime) {
+    ctx.addIssue({ code: "custom", message: "Das Ende der Ankunftszeit darf nicht gleich dem Beginn sein." });
+    return z.NEVER;
+  }
+
+  if (guest.departureEndTime && !guest.departureTime) {
+    ctx.addIssue({ code: "custom", message: "Bitte gib bei „Ich bleibe bis“ zuerst die „von“-Zeit an." });
+    return z.NEVER;
+  }
+  if (guest.departureEndTime && guest.departureEndTime === guest.departureTime) {
+    ctx.addIssue({ code: "custom", message: "Bei „Ich bleibe bis“ dürfen „von“ und „bis“ nicht gleich sein." });
     return z.NEVER;
   }
 
@@ -192,6 +228,9 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
     additionalGuests: guest.additionalGuests,
     additionalGuestNames: guest.additionalGuestNames,
     arrivalTime: guest.arrivalTime,
+    arrivalEndTime: guest.arrivalEndTime,
+    departureTime: guest.departureTime,
+    departureEndTime: guest.departureEndTime,
     bringingSomething: guest.bringingSomething,
     bringingDescription,
     hasMessage: guest.hasMessage,
@@ -265,6 +304,12 @@ export const newEventTitleSchema = z
 
 export function validateNewEventTitle(value: unknown): FieldResult<string> {
   return toFieldResult(newEventTitleSchema.safeParse(value));
+}
+
+// Guest list display of a "von – bis" window (arrival, departure):
+// "zw. 09:30 und 10:30" with an end, "09:30" without.
+export function formatTimeWindow(start: string, end: string | null): string {
+  return end ? `zw. ${start} und ${end}` : start;
 }
 
 export function normalizeArrivalTime(value: string): string {

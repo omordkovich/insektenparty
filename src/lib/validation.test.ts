@@ -4,6 +4,7 @@ import {
   validateEventDate,
   validateEventField,
   validateEventSchedule,
+  formatTimeWindow,
   validateEventTime,
   validateGuestInput,
   validateNewEventTitle,
@@ -37,6 +38,9 @@ describe("validateGuestInput", () => {
         additionalGuests: 2,
         additionalGuestNames: ["Ben", "Cleo"],
         arrivalTime: "09:30",
+        arrivalEndTime: null,
+        departureTime: null,
+        departureEndTime: null,
         bringingSomething: true,
         bringingDescription: "Kuchen",
         hasMessage: false,
@@ -96,6 +100,43 @@ describe("validateGuestInput", () => {
     expect(guestError({ arrivalTime: undefined })).toBe("Ankunftszeit ist erforderlich.");
     expect(guestError({ arrivalTime: " " })).toBe("Ankunftszeit ist erforderlich.");
     expect(guestError({ arrivalTime: "25:00" })).toBe("Ankunftszeit muss im Format HH:mm angegeben werden.");
+  });
+
+  it("accepts an optional end of the arrival window", () => {
+    const withEnd = validateGuestInput({ ...validGuest, arrivalEndTime: "10:30" });
+    expect(withEnd.ok && withEnd.data.arrivalEndTime).toBe("10:30");
+    const empty = validateGuestInput({ ...validGuest, arrivalEndTime: "" });
+    expect(empty.ok && empty.data.arrivalEndTime).toBeNull();
+  });
+
+  it("allows the arrival window to end after midnight but not at its start", () => {
+    const overnight = validateGuestInput({ ...validGuest, arrivalTime: "22:00", arrivalEndTime: "01:00" });
+    expect(overnight.ok && overnight.data.arrivalEndTime).toBe("01:00");
+    expect(guestError({ arrivalEndTime: "09:30" })).toBe(
+      "Das Ende der Ankunftszeit darf nicht gleich dem Beginn sein.",
+    );
+    expect(guestError({ arrivalEndTime: "9:30 Uhr" })).toBe(
+      "Das Ende der Ankunftszeit muss im Format HH:mm angegeben werden.",
+    );
+  });
+
+  it("treats \"Ich bleibe bis\" as optional", () => {
+    const empty = validateGuestInput({ ...validGuest, departureTime: "", departureEndTime: "" });
+    expect(empty.ok && [empty.data.departureTime, empty.data.departureEndTime]).toEqual([null, null]);
+    const single = validateGuestInput({ ...validGuest, departureTime: "18:00" });
+    expect(single.ok && [single.data.departureTime, single.data.departureEndTime]).toEqual(["18:00", null]);
+    const range = validateGuestInput({ ...validGuest, departureTime: "23:00", departureEndTime: "00:30" });
+    expect(range.ok && [range.data.departureTime, range.data.departureEndTime]).toEqual(["23:00", "00:30"]);
+  });
+
+  it("checks the \"Ich bleibe bis\" window", () => {
+    expect(guestError({ departureTime: "", departureEndTime: "19:00" })).toBe(
+      "Bitte gib bei „Ich bleibe bis“ zuerst die „von“-Zeit an.",
+    );
+    expect(guestError({ departureTime: "18:00", departureEndTime: "18:00" })).toBe(
+      "Bei „Ich bleibe bis“ dürfen „von“ und „bis“ nicht gleich sein.",
+    );
+    expect(guestError({ departureTime: "6 Uhr" })).toBe("„Ich bleibe bis“ muss im Format HH:mm angegeben werden.");
   });
 
   it("requires a description only when bringing something", () => {
@@ -270,5 +311,13 @@ describe("validateRequestBody", () => {
     expect(validateRequestBody([])).toEqual({ ok: false, error: "Ungültige Anfragedaten." });
     expect(validateRequestBody(null)).toEqual({ ok: false, error: "Ungültige Anfragedaten." });
     expect(validateRequestBody("x")).toEqual({ ok: false, error: "Ungültige Anfragedaten." });
+  });
+});
+
+describe("formatTimeWindow", () => {
+  it("shows \"zw. HH:MM und HH:MM\" with an end time, otherwise only the start", () => {
+    expect(formatTimeWindow("09:30", "10:30")).toBe("zw. 09:30 und 10:30");
+    expect(formatTimeWindow("22:00", "01:00")).toBe("zw. 22:00 und 01:00");
+    expect(formatTimeWindow("09:30", null)).toBe("09:30");
   });
 });

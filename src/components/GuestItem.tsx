@@ -1,4 +1,5 @@
 import type { GuestDto } from "@/lib/types";
+import { formatTimeWindow } from "@/lib/validation";
 import { Button } from "./Button";
 
 type GuestItemProps = {
@@ -39,7 +40,10 @@ export function GuestItem({
         ) : null}
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
-        {guest.arrivalTime}
+        {formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)}
+      </td>
+      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+        {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         {guest.bringingSomething ? (

@@ -4,6 +4,9 @@ export type GuestDto = {
   additionalGuests: number;
   additionalGuestNames: string[];
   arrivalTime: string;
+  arrivalEndTime: string | null;
+  departureTime: string | null;
+  departureEndTime: string | null;
   bringingSomething: boolean;
   bringingDescription: string | null;
   hasMessage: boolean;

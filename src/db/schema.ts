@@ -53,6 +53,11 @@ export const guests = pgTable("guests", {
     .notNull()
     .default([]),
   arrivalTime: time("arrival_time").notNull(),
+  // Optional end of the arrival window; may be earlier (past midnight).
+  arrivalEndTime: time("arrival_end_time"),
+  // Optional "Ich bleibe bis" window (both null when not given).
+  departureTime: time("departure_time"),
+  departureEndTime: time("departure_end_time"),
   bringingSomething: boolean("bringing_something").notNull().default(false),
   bringingDescription: varchar("bringing_description", { length: 1000 }),
   hasMessage: boolean("has_message").notNull().default(false),

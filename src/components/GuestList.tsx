@@ -68,6 +68,7 @@ export function GuestList({
                     <th className="px-2 py-2 font-bold">Name:</th>
                     <th className="px-2 py-2" aria-hidden="true" />
                     <th className="px-2 py-2 font-bold">Ankunftszeit</th>
+                    <th className="px-2 py-2 font-bold">Bleibt bis</th>
                     <th className="px-2 py-2 font-bold">Ich bringe was mit</th>
                     <th className="px-2 py-2 font-bold">Nachricht</th>
                     <th className="px-2 py-2" aria-hidden="true" />
