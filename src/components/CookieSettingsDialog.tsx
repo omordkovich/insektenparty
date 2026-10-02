@@ -32,7 +32,12 @@ export function CookieSettingsDialog({ onCloseAction }: CookieSettingsDialogProp
   }
 
   return (
-    <Modal titleId={titleId} descriptionId={descriptionId} onCloseAction={onCloseAction}>
+    <Modal
+      titleId={titleId}
+      descriptionId={descriptionId}
+      onCloseAction={onCloseAction}
+      placement="sheet"
+    >
       <h2 id={titleId} className="pr-10 font-display text-2xl text-leaf-dark">
         Cookie-Einstellungen
       </h2>

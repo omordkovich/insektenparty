@@ -22,7 +22,16 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const supabase = await createClient();
-    await supabase.auth.verifyOtp({ type, token_hash });
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+
+    // Expired, already used or unknown (e.g. the unconfirmed account was
+    // cleaned up in the meantime): land on the start page with a notice
+    // instead of silently pretending it worked.
+    if (error) {
+      redirectTo.pathname = "/";
+      redirectTo.search = `?link_expired=${type === "recovery" ? "recovery" : "signup"}`;
+      return NextResponse.redirect(redirectTo);
+    }
   }
 
   return NextResponse.redirect(redirectTo);

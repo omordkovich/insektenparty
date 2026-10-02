@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
-import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
+import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
 import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
+import { PasswordHint } from "./PasswordHint";
+import { PasswordInput } from "./PasswordInput";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
 
 export type AuthDialogMode = "login" | "register" | "reset";
@@ -56,6 +58,9 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
   const [saving, setSaving] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaReset, setRecaptchaReset] = useState(0);
+
+  // The rule hint goes away as soon as the new password satisfies every rule.
+  const showPasswordHint = mode === "register" && validateNewPassword(form.password) !== null;
 
   function switchMode(nextMode: AuthDialogMode) {
     setMode(nextMode);
@@ -296,10 +301,9 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
               <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
                 Passwort
               </label>
-              <input
+              <PasswordInput
                 id={passwordId}
                 name="password"
-                type="password"
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
                 minLength={mode === "register" ? PASSWORD_MIN_LENGTH : undefined}
                 value={form.password}
@@ -310,13 +314,10 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                     password: event.target.value,
                   }))
                 }
-                aria-describedby={mode === "register" ? passwordHintId : undefined}
-                className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+                aria-describedby={showPasswordHint ? passwordHintId : undefined}
               />
-              {mode === "register" ? (
-                <p id={passwordHintId} className="mt-1 text-xs text-muted">
-                  {PASSWORD_HINT}
-                </p>
+              {showPasswordHint ? (
+                <PasswordHint id={passwordHintId} />
               ) : null}
             </div>
           ) : null}
@@ -330,10 +331,9 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                 >
                   Passwort wiederholen
                 </label>
-                <input
+                <PasswordInput
                   id={passwordConfirmId}
                   name="passwordConfirm"
-                  type="password"
                   autoComplete="new-password"
                   minLength={PASSWORD_MIN_LENGTH}
                   value={form.passwordConfirm}
@@ -344,7 +344,6 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                       passwordConfirm: event.target.value,
                     }))
                   }
-                  className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
                 />
               </div>
 

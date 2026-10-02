@@ -1,6 +1,8 @@
-import { useEffect, useId, useRef } from "react";
-import { saveConsent } from "@/lib/cookie-consent";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "./Button";
+import { CookieSettingsDialog } from "./CookieSettingsDialog";
+import { themePortalTarget } from "./themePortalTarget";
 import { useCookieConsent } from "./useCookieConsent";
 
 const SCRIPT_ID = "google-recaptcha-v2";
@@ -77,8 +79,14 @@ export function RecaptchaCheckbox({
   // Google's script is only loaded once the visitor consented to it.
   const { consent } = useCookieConsent();
   const consentGiven = consent?.recaptcha === true;
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  onTokenChangeRef.current = onTokenChange;
+  // Keeps the latest callback for the widget's async handlers without making
+  // the effect below re-run (and re-render the widget) whenever the parent
+  // re-renders. Declared first, so it also runs first after each render.
+  useEffect(() => {
+    onTokenChangeRef.current = onTokenChange;
+  });
 
   useEffect(() => {
     if (!siteKey || !consentGiven || !containerRef.current) return;
@@ -142,10 +150,20 @@ export function RecaptchaCheckbox({
           variant="outline"
           className="mt-3"
           aria-describedby={labelId}
-          onClick={() => saveConsent(true)}
+          onClick={() => setSettingsOpen(true)}
         >
           reCAPTCHA zulassen
         </Button>
+        {/* The visitor confirms the choice themselves in the cookie settings
+            instead of a one-click opt-in. Portalled out of the surrounding
+            form (and onto the event theme, like the legal texts); the form's
+            input is kept because only this dialog is opened on top of it. */}
+        {settingsOpen
+          ? createPortal(
+              <CookieSettingsDialog onCloseAction={() => setSettingsOpen(false)} />,
+              themePortalTarget(),
+            )
+          : null}
       </div>
     );
   }

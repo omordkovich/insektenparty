@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useId, useState, type SubmitEvent } from "react";
-import { PASSWORD_HINT, PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
+import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
+import { PasswordHint } from "./PasswordHint";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "./Button";
 
@@ -83,9 +84,7 @@ export function ResetPasswordForm() {
           aria-describedby={passwordHintId}
           className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
         />
-        <p id={passwordHintId} className="mt-1 text-xs text-muted">
-          {PASSWORD_HINT}
-        </p>
+        <PasswordHint id={passwordHintId} />
       </div>
 
       <div>

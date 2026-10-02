@@ -9,6 +9,7 @@ type GuestItemProps = {
   onShowBringing: (guest: GuestDto) => void;
   onShowAdditionalGuests: (guest: GuestDto) => void;
   onShowMessage: (guest: GuestDto) => void;
+  onShowTime: (guest: GuestDto) => void;
   disabled?: boolean;
 };
 
@@ -19,6 +20,7 @@ export function GuestItem({
   onShowBringing,
   onShowAdditionalGuests,
   onShowMessage,
+  onShowTime,
   disabled = false,
 }: GuestItemProps) {
   return (
@@ -29,23 +31,38 @@ export function GuestItem({
       {/* "+2" must never break between "+" and the number: the global
           overflow-wrap: anywhere would otherwise let the table squeeze this
           column to one character. */}
-      <td className="block whitespace-nowrap sm:table-cell sm:px-2 sm:py-3 sm:align-middle text-sm font-semibold text-honey-dark">
+      <td className="block whitespace-nowrap sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         {guest.additionalGuests > 0 ? (
           <button
             type="button"
             onClick={() => onShowAdditionalGuests(guest)}
             disabled={disabled}
             aria-label={`Zusätzliche Personen von ${guest.name} anzeigen`}
-            className="underline decoration-honey-dark/40 underline-offset-4 transition hover:text-leaf-dark disabled:opacity-50"
+            title="Zusätzliche Personen"
+            className="flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-current px-0.5 text-xs leading-none font-bold text-leaf transition hover:text-leaf-dark disabled:opacity-50"
           >
             +{guest.additionalGuests}
           </button>
         ) : null}
       </td>
-      <td className="block [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+      {/* Without the table header (below sm) the two time columns are
+          ambiguous, so they collapse into one clock icon that opens a dialog. */}
+      <td className="block sm:hidden">
+        <button
+          type="button"
+          onClick={() => onShowTime(guest)}
+          disabled={disabled}
+          aria-label={`Ankunfts- und Abreisezeit von ${guest.name} anzeigen`}
+          title="Ankunfts- und Abreisezeit"
+          className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+        >
+          <ClockIcon />
+        </button>
+      </td>
+      <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)}
       </td>
-      <td className="block [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+      <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
         {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
       </td>
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
@@ -56,7 +73,7 @@ export function GuestItem({
             disabled={disabled}
             aria-label={`${guest.name} bringt etwas mit - anzeigen`}
             title="Bringt etwas mit"
-            className="text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+            className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
           >
             <GiftIcon />
           </button>
@@ -74,7 +91,7 @@ export function GuestItem({
             disabled={disabled}
             aria-label={`Nachricht von ${guest.name} anzeigen`}
             title="Hat eine Nachricht hinterlassen"
-            className="text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+            className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
           >
             <MessageIcon />
           </button>
@@ -125,9 +142,24 @@ function PencilIcon() {
   );
 }
 
+function ClockIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M12 7.5V12l3 2"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function GiftIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
       <rect x="4" y="9" width="16" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" />
       <path d="M4 13h16" stroke="currentColor" strokeWidth="2" />
       <path d="M12 9v11" stroke="currentColor" strokeWidth="2" />
@@ -149,7 +181,7 @@ function GiftIcon() {
 
 function MessageIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
       <path
         d="M4 5h16v11H8l-4 4V5Z"
         stroke="currentColor"

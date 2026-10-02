@@ -10,9 +10,11 @@ type ModalProps = {
   closeDisabled?: boolean;
   initialFocusRef?: RefObject<HTMLElement | null>;
   showCloseButton?: boolean;
-  /** "bottom" pins the dialog to the bottom edge on every screen size
-   *  (e.g. the cookie banner); the default centers it from sm upwards. */
-  placement?: "default" | "bottom";
+  /** The default centers the dialog vertically. "bottom" pins it to the
+   *  bottom edge on every screen size (the cookie banner); "sheet" pins it
+   *  to the bottom on small screens and centers it from sm upwards (the
+   *  cookie settings). */
+  placement?: "default" | "bottom" | "sheet";
   children: ReactNode;
 };
 
@@ -27,7 +29,12 @@ export function Modal({
   children,
 }: ModalProps) {
   const internalCloseRef = useModalBehavior({ onCloseAction, closeDisabled, initialFocusRef });
-  const alignClass = placement === "bottom" ? "items-end" : "items-end sm:items-center";
+  const alignClass =
+    placement === "bottom"
+      ? "items-end"
+      : placement === "sheet"
+        ? "items-end sm:items-center"
+        : "items-center";
   const widthClass = placement === "bottom" ? "max-w-xl" : "max-w-md";
 
   return (

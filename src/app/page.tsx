@@ -2,6 +2,7 @@ import { Button } from "@/components/Button";
 import { EventList } from "@/components/EventList";
 import { LandingContent } from "@/components/LandingContent";
 import { LegalLinks } from "@/components/LegalLinks";
+import { LinkExpiredDialog, type LinkExpiredKind } from "@/components/LinkExpiredDialog";
 import { pageMetadata } from "@/lib/page-metadata";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -16,7 +17,15 @@ export const metadata = pageMetadata({
   path: "/",
 });
 
-export default async function Home() {
+type HomeProps = {
+  searchParams: Promise<{ link_expired?: string | string[] }>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { link_expired } = await searchParams;
+  const linkExpired: LinkExpiredKind | null =
+    link_expired === "recovery" ? "recovery" : link_expired === "signup" ? "signup" : null;
+
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
@@ -62,6 +71,8 @@ export default async function Home() {
 
         <LegalLinks className="mt-auto pt-12" />
       </main>
+
+      {linkExpired ? <LinkExpiredDialog kind={linkExpired} /> : null}
     </>
   );
 }
