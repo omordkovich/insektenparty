@@ -1,4 +1,6 @@
+import { AuthErrorDialog } from "@/components/AuthErrorDialog";
 import { Button } from "@/components/Button";
+import { ConsentDialog } from "@/components/ConsentDialog";
 import { EventList } from "@/components/EventList";
 import { LandingContent } from "@/components/LandingContent";
 import { LegalLinks } from "@/components/LegalLinks";
@@ -6,6 +8,7 @@ import { LinkExpiredDialog, type LinkExpiredKind } from "@/components/LinkExpire
 import { pageMetadata } from "@/lib/page-metadata";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
+import { hasAcceptedTerms } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
 import { getEventsByOwner } from "@/repositories/event-repository";
@@ -18,11 +21,11 @@ export const metadata = pageMetadata({
 });
 
 type HomeProps = {
-  searchParams: Promise<{ link_expired?: string | string[] }>;
+  searchParams: Promise<{ link_expired?: string | string[]; auth_error?: string | string[] }>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { link_expired } = await searchParams;
+  const { link_expired, auth_error: authError } = await searchParams;
   const linkExpired: LinkExpiredKind | null =
     link_expired === "recovery" ? "recovery" : link_expired === "signup" ? "signup" : null;
 
@@ -73,6 +76,8 @@ export default async function Home({ searchParams }: HomeProps) {
       </main>
 
       {linkExpired ? <LinkExpiredDialog kind={linkExpired} /> : null}
+      {authError === "1" ? <AuthErrorDialog /> : null}
+      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog /> : null}
     </>
   );
 }

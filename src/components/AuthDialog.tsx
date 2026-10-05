@@ -2,13 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
-import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal-info";
 import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
+import { consentMetadata } from "@/lib/terms-consent";
 import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
+import {
+  CONSENT_AGE_ERROR,
+  CONSENT_TERMS_ERROR,
+  ConsentCheckboxes,
+} from "./ConsentCheckboxes";
 import { FormModal } from "./FormModal";
-import { LegalLink } from "./LegalLink";
+import { GoogleIcon } from "./GoogleIcon";
 import { PasswordHint } from "./PasswordHint";
 import { PasswordInput } from "./PasswordInput";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
@@ -68,6 +73,45 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     setSubmitError(null);
     setConfirmationSent(false);
     setResetSent(false);
+  }
+
+  async function handleGoogle() {
+    if (saving) return;
+
+    setFieldError(null);
+    setSubmitError(null);
+
+    // Registering needs the same consent as the email form. (Logging in does
+    // not: an account that never consented is asked on the start page.)
+    if (mode === "register") {
+      if (!form.acceptedTerms) {
+        setFieldError(CONSENT_TERMS_ERROR);
+        return;
+      }
+      if (!form.confirmedAge) {
+        setFieldError(CONSENT_AGE_ERROR);
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      const callback = new URL("/auth/callback", window.location.origin);
+      if (mode === "register") callback.searchParams.set("consent", "1");
+
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: callback.toString() },
+      });
+      if (error) {
+        setSubmitError(error.message);
+        setSaving(false);
+      }
+      // On success the browser navigates to Google; keep the dialog locked.
+    } catch {
+      setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setSaving(false);
+    }
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -137,15 +181,11 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         return;
       }
       if (!form.acceptedTerms) {
-        setFieldError(
-          "Bitte akzeptiere die AGB und bestätige, dass du die Datenschutzerklärung zur Kenntnis genommen hast.",
-        );
+        setFieldError(CONSENT_TERMS_ERROR);
         return;
       }
       if (!form.confirmedAge) {
-        setFieldError(
-          `Bitte bestätige, dass du mindestens ${MIN_REGISTRATION_AGE} Jahre alt bist.`,
-        );
+        setFieldError(CONSENT_AGE_ERROR);
         return;
       }
       if (!recaptchaToken) {
@@ -178,12 +218,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         options: {
           data: {
             name,
-            // Proof of which AGB/privacy policy version was accepted, and
-            // that the minimum age was confirmed - and when.
-            terms_accepted_at: new Date().toISOString(),
-            terms_version: TERMS_VERSION,
-            privacy_version: PRIVACY_VERSION,
-            min_age_confirmed: MIN_REGISTRATION_AGE,
+            ...consentMetadata(),
           },
         },
       });
@@ -347,57 +382,42 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
                 />
               </div>
 
-              <label className="flex items-start gap-2 text-left text-sm">
-                <input
-                  name="acceptedTerms"
-                  type="checkbox"
-                  required
-                  checked={form.acceptedTerms}
-                  disabled={saving}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      acceptedTerms: event.target.checked,
-                    }))
-                  }
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
-                />
-                <span>
-                  Ich akzeptiere die{" "}
-                  <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
-                    AGB
-                  </LegalLink>{" "}
-                  und habe die{" "}
-                  <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-                    Datenschutzerklärung
-                  </LegalLink>{" "}
-                  zur Kenntnis genommen.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-2 text-left text-sm">
-                <input
-                  name="confirmedAge"
-                  type="checkbox"
-                  required
-                  checked={form.confirmedAge}
-                  disabled={saving}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      confirmedAge: event.target.checked,
-                    }))
-                  }
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
-                />
-                <span>Ich bin mindestens {MIN_REGISTRATION_AGE} Jahre alt.</span>
-              </label>
+              <ConsentCheckboxes
+                acceptedTerms={form.acceptedTerms}
+                confirmedAge={form.confirmedAge}
+                disabled={saving}
+                onAcceptedTermsChange={(checked) =>
+                  setForm((current) => ({ ...current, acceptedTerms: checked }))
+                }
+                onConfirmedAgeChange={(checked) =>
+                  setForm((current) => ({ ...current, confirmedAge: checked }))
+                }
+              />
 
               <RecaptchaCheckbox
                 onTokenChange={setRecaptchaToken}
                 resetSignal={recaptchaReset}
               />
             </>
+          ) : null}
+
+          {mode !== "reset" ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-sm text-foreground/60">
+                <span className="h-px flex-1 bg-leaf/20" />
+                oder
+                <span className="h-px flex-1 bg-leaf/20" />
+              </div>
+              <Button
+                variant="outline"
+                className="w-full gap-3"
+                onClick={handleGoogle}
+                disabled={saving}
+              >
+                <GoogleIcon />
+                Mit Google fortfahren
+              </Button>
+            </div>
           ) : null}
 
           {fieldError || submitError ? (

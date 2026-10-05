@@ -135,6 +135,18 @@ export function PrivacyPolicyContent() {
           des Passworts senden wir dir E-Mails.
         </p>
         <p>
+          Alternativ kannst du dich mit deinem Google-Konto registrieren und
+          anmelden („Mit Google fortfahren“). Dann leitet dich unser
+          Auth-Dienstleister Supabase zu Google weiter (Google Ireland Limited,
+          Gordon House, Barrow Street, Dublin 4, Irland). Google übermittelt uns
+          nach deiner Bestätigung deinen Namen und deine E-Mail-Adresse; ein
+          Passwort wird dann nicht bei uns gespeichert. Welche Daten Google
+          dabei selbst verarbeitet, regelt Googles Datenschutzerklärung:{" "}
+          <ExternalLink href="https://policies.google.com/privacy" />. Die
+          Rechtsgrundlage für unsere Verarbeitung ist Art. 6 Abs. 1 lit. b
+          DSGVO.
+        </p>
+        <p>
           Bei der Registrierung bestätigst du, dass du die AGB akzeptierst,
           diese Datenschutzerklärung zur Kenntnis genommen hast und mindestens{" "}
           {MIN_REGISTRATION_AGE} Jahre alt bist. Dazu speichern wir in deinem

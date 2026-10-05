@@ -1,5 +1,6 @@
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { isSafeRelativePath } from "@/lib/redirect";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
@@ -9,9 +10,6 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next");
 
   const redirectTo = request.nextUrl.clone();
-  // `next` only trusted when it's a same-site relative path (starts with a
-  // single "/") - otherwise it could be used for an open redirect.
-  const isSafeRelativePath = (value: string) => value.startsWith("/") && !value.startsWith("//");
   redirectTo.pathname =
     next && isSafeRelativePath(next)
       ? next
