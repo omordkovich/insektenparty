@@ -77,7 +77,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {linkExpired ? <LinkExpiredDialog kind={linkExpired} /> : null}
       {authError === "1" ? <AuthErrorDialog /> : null}
-      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog askForName={!name} /> : null}
+      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog /> : null}
     </>
   );
 }

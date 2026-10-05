@@ -2,19 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getAccountName, getSignInMethods } from "./account";
 
 describe("getAccountName", () => {
-  it("returns the display name the user chose", () => {
-    expect(getAccountName({ display_name: "Maxi" })).toBe("Maxi");
+  it("is the name from the user metadata", () => {
+    expect(getAccountName({ name: "Maxi" })).toBe("Maxi");
   });
 
-  it("ignores the name Google delivers", () => {
-    expect(getAccountName({ name: "Max Google", full_name: "Max Google" })).toBeNull();
-    expect(getAccountName({ name: "Max Google", display_name: "Maxi" })).toBe("Maxi");
-  });
-
-  it("returns null when there is no usable display name", () => {
+  it("returns null when there is no usable name", () => {
     expect(getAccountName({})).toBeNull();
-    expect(getAccountName({ display_name: "  " })).toBeNull();
-    expect(getAccountName({ display_name: 42 })).toBeNull();
+    expect(getAccountName({ name: "  " })).toBeNull();
+    expect(getAccountName({ name: 42 })).toBeNull();
     expect(getAccountName(undefined)).toBeNull();
   });
 });

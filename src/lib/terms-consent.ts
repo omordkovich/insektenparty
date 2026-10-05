@@ -17,3 +17,13 @@ export function hasAcceptedTerms(userMetadata: unknown): boolean {
   const acceptedAt = (userMetadata as Record<string, unknown>).terms_accepted_at;
   return typeof acceptedAt === "string" && acceptedAt !== "";
 }
+
+// The register tab tells /auth/callback that the AGB/age checkboxes were
+// ticked by setting this cookie right before the redirect to Google. It is a
+// cookie and not a `?consent=1` on the redirect URL because Supabase only
+// accepts redirect URLs that match its allow-list exactly: a query string made
+// it fall back to the Site URL, and the callback never ran. The cookie is only
+// sent to the callback path and holds no personal data.
+export const GOOGLE_CONSENT_COOKIE = "gz_google_consent";
+export const GOOGLE_CONSENT_COOKIE_PATH = "/auth/callback";
+export const GOOGLE_CONSENT_COOKIE_MAX_AGE_SECONDS = 600;

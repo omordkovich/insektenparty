@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useState, type SubmitEvent } from "react";
-import { DISPLAY_NAME_KEY } from "@/lib/account";
 import { createClient } from "@/lib/supabase/client";
 import { NAME_MAX_LENGTH, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
@@ -35,7 +34,7 @@ export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: A
     try {
       const supabase = createClient();
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { [DISPLAY_NAME_KEY]: result.value },
+        data: { name: result.value },
       });
       if (updateError) {
         setError(updateError.message);

@@ -2,16 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
-import { DISPLAY_NAME_KEY } from "@/lib/account";
 import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
-import {
-  serializeSignupIntent,
-  SIGNUP_INTENT_COOKIE,
-  SIGNUP_INTENT_MAX_AGE_SECONDS,
-  SIGNUP_INTENT_PATH,
-} from "@/lib/signup-intent";
 import { createClient } from "@/lib/supabase/client";
-import { consentMetadata } from "@/lib/terms-consent";
+import {
+  consentMetadata,
+  GOOGLE_CONSENT_COOKIE,
+  GOOGLE_CONSENT_COOKIE_MAX_AGE_SECONDS,
+  GOOGLE_CONSENT_COOKIE_PATH,
+} from "@/lib/terms-consent";
 import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
 import {
@@ -86,12 +84,6 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     setResetSent(false);
   }
 
-  function failName(message: string) {
-    setFieldError(message);
-    setNameInvalid(true);
-    nameInputRef.current?.focus();
-  }
-
   async function handleGoogle() {
     if (saving) return;
 
@@ -99,16 +91,10 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     setNameInvalid(false);
     setSubmitError(null);
 
-    // Registering needs the same name and consent as the email form. (Logging
-    // in does not: an account that is still missing them is asked on the
-    // start page.)
-    let displayName: string | null = null;
+    // Registering needs the same consent as the email form. The name comes
+    // from the Google account. (Logging in needs no checkboxes: an account
+    // that never consented is asked on the start page.)
     if (mode === "register") {
-      const nameResult = validatePersonName(form.name);
-      if (!nameResult.ok) {
-        failName(nameResult.error);
-        return;
-      }
       if (!form.acceptedTerms) {
         setFieldError(CONSENT_TERMS_ERROR);
         return;
@@ -117,24 +103,22 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         setFieldError(CONSENT_AGE_ERROR);
         return;
       }
-      displayName = nameResult.value;
     }
 
-    // Handed to /auth/callback through a short-lived cookie (not the URL).
     // Always written or cleared, so an abandoned register attempt can't leak
     // into a later login.
+    const registering = mode === "register";
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
-    document.cookie = `${SIGNUP_INTENT_COOKIE}=${
-      displayName ? serializeSignupIntent(displayName) : ""
-    }; Path=${SIGNUP_INTENT_PATH}; Max-Age=${
-      displayName ? SIGNUP_INTENT_MAX_AGE_SECONDS : 0
+    document.cookie = `${GOOGLE_CONSENT_COOKIE}=${registering ? "1" : ""}; Path=${GOOGLE_CONSENT_COOKIE_PATH}; Max-Age=${
+      registering ? GOOGLE_CONSENT_COOKIE_MAX_AGE_SECONDS : 0
     }; SameSite=Lax${secure}`;
 
     setSaving(true);
     try {
       const { error } = await createClient().auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}${SIGNUP_INTENT_PATH}` },
+        // Exactly the URL on Supabase's redirect allow-list: no query string.
+        options: { redirectTo: `${window.location.origin}${GOOGLE_CONSENT_COOKIE_PATH}` },
       });
       if (error) {
         setSubmitError(error.message);
@@ -161,7 +145,9 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     if (mode === "register") {
       const nameResult = validatePersonName(form.name);
       if (!nameResult.ok) {
-        failName(nameResult.error);
+        setFieldError(nameResult.error);
+        setNameInvalid(true);
+        nameInputRef.current?.focus();
         return;
       }
       name = nameResult.value;
@@ -251,7 +237,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         password: form.password,
         options: {
           data: {
-            [DISPLAY_NAME_KEY]: name,
+            name,
             ...consentMetadata(),
           },
         },

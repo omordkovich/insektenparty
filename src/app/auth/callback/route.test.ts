@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { serializeSignupIntent, SIGNUP_INTENT_COOKIE } from "@/lib/signup-intent";
+import { GOOGLE_CONSENT_COOKIE } from "@/lib/terms-consent";
 
 const exchangeCodeForSession = vi.fn();
 const updateUser = vi.fn();
@@ -12,11 +12,12 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { GET } from "./route";
 
-function call(query: string, intentName?: string) {
-  const headers: Record<string, string> = {};
-  if (intentName !== undefined) {
-    headers.cookie = `${SIGNUP_INTENT_COOKIE}=${serializeSignupIntent(intentName)}`;
-  }
+// `consented` mimics the register tab, which sets the consent cookie before
+// redirecting to Google.
+function call(query: string, consented = false) {
+  const headers: Record<string, string> = consented
+    ? { cookie: `${GOOGLE_CONSENT_COOKIE}=1` }
+    : {};
   return GET(new NextRequest(`http://localhost:3000/auth/callback?${query}`, { headers }));
 }
 
@@ -25,7 +26,7 @@ function locationOf(response: Response) {
   return url.pathname + url.search;
 }
 
-// A first Google login: Google delivers `name`, we have no consent or display name.
+// A first Google login: Google delivers `name`, there is no consent yet.
 const newGoogleUser = { user: { user_metadata: { name: "Max Google", full_name: "Max Google" } } };
 
 describe("GET /auth/callback", () => {
@@ -52,14 +53,13 @@ describe("GET /auth/callback", () => {
     expect(updateUser).not.toHaveBeenCalled();
   });
 
-  it("stores consent and the chosen display name for a register-tab sign-in", async () => {
+  it("stores the consent for a register-tab sign-in", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    await call("code=abc", "Maxi");
+    await call("code=abc", true);
 
     expect(updateUser).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        display_name: "Maxi",
         terms_accepted_at: expect.any(String),
         terms_version: expect.any(String),
         privacy_version: expect.any(String),
@@ -70,51 +70,31 @@ describe("GET /auth/callback", () => {
     expect(refreshSession).toHaveBeenCalled();
   });
 
-  it("never uses the name from Google as the display name", async () => {
+  it("does not touch the name", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    await call("code=abc", "Maxi");
+    await call("code=abc", true);
 
     const { data } = updateUser.mock.calls[0][0];
-    expect(data.display_name).toBe("Maxi");
     expect(data).not.toHaveProperty("name");
+    expect(data).not.toHaveProperty("display_name");
   });
 
-  it("keeps the existing consent record and display name of a returning account", async () => {
+  it("keeps the original consent record of an account that already accepted", async () => {
     exchangeCodeForSession.mockResolvedValue({
-      data: {
-        user: {
-          user_metadata: {
-            terms_accepted_at: "2026-09-30T10:00:00.000Z",
-            display_name: "Original",
-          },
-        },
-      },
+      data: { user: { user_metadata: { terms_accepted_at: "2026-09-30T10:00:00.000Z" } } },
       error: null,
     });
 
-    await call("code=abc", "Anderer Name");
+    await call("code=abc", true);
 
     expect(updateUser).not.toHaveBeenCalled();
   });
 
-  it("only fills in what is missing", async () => {
-    exchangeCodeForSession.mockResolvedValue({
-      data: { user: { user_metadata: { display_name: "Original" } } },
-      error: null,
-    });
-
-    await call("code=abc", "Anderer Name");
-
-    const { data } = updateUser.mock.calls[0][0];
-    expect(data).toHaveProperty("terms_accepted_at");
-    expect(data).not.toHaveProperty("display_name");
-  });
-
-  it("ignores an invalid intent cookie", async () => {
+  it("ignores a consent query parameter (only the cookie counts)", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    await call("code=abc", "   ");
+    await call("code=abc&consent=1");
 
     expect(updateUser).not.toHaveBeenCalled();
   });
@@ -122,9 +102,9 @@ describe("GET /auth/callback", () => {
   it("clears the one-time cookie", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    const response = await call("code=abc", "Maxi");
+    const response = await call("code=abc", true);
 
-    expect(response.headers.get("set-cookie")).toContain(`${SIGNUP_INTENT_COOKIE}=;`);
+    expect(response.headers.get("set-cookie")).toContain(`${GOOGLE_CONSENT_COOKIE}=;`);
   });
 
   it("follows a safe `next` path", async () => {

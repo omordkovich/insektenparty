@@ -3,9 +3,9 @@ import { getDb } from "@/db";
 
 type AuthUserRow = { name: string | null; email: string | null };
 
-// Only the display name chosen by the user (`display_name`) - never the `name`
-// Google delivers. Same rule as getAccountName in lib/account.ts.
-const nameColumn = sql`nullif(trim(raw_user_meta_data ->> 'display_name'), '') as name`;
+// The display name is the metadata's `name` (same as getAccountName in
+// lib/account.ts); blank counts as missing.
+const nameColumn = sql`nullif(trim(raw_user_meta_data ->> 'name'), '') as name`;
 
 // auth.users is Supabase-managed (outside src/db/schema.ts), so this reads
 // it directly through the same DB connection rather than via Drizzle's

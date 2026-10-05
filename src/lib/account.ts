@@ -1,13 +1,11 @@
-// The display name is the one name we show (start page, notification mails,
-// event info page). It lives under its own key because Google overwrites the
-// user metadata's `name` on every login. We never read `name`.
+// The display name is the user metadata's `name`: what the user entered at
+// signup, or - for Google accounts - the name of the Google account (Google
+// refreshes it on every login, so it is changed there, not in this app).
 // Keep the SQL in user-repository.ts in sync.
-export const DISPLAY_NAME_KEY = "display_name";
-
 export function getAccountName(userMetadata: unknown): string | null {
   if (typeof userMetadata !== "object" || userMetadata === null) return null;
 
-  const value = (userMetadata as Record<string, unknown>)[DISPLAY_NAME_KEY];
+  const value = (userMetadata as Record<string, unknown>).name;
   return typeof value === "string" && value.trim() !== "" ? value : null;
 }
 

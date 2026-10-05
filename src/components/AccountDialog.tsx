@@ -46,7 +46,11 @@ export function AccountDialog({ email, name, methods, onCloseAction }: AccountDi
       {view === "overview" ? (
         <div className="mt-4 space-y-4">
           <div className="overflow-hidden rounded-2xl border border-leaf/20 bg-white">
-            <Row label="Anzeigename" value={name ?? "–"} onClick={() => show("name")} />
+            <Row
+              label="Anzeigename"
+              value={name ?? "–"}
+              onClick={methods.hasGoogle ? undefined : () => show("name")}
+            />
             <Row label="E-Mail" value={email} />
             <Row label="Anmeldung" value={methods.hasGoogle ? "Google" : "E-Mail"} />
             <Row
@@ -55,6 +59,14 @@ export function AccountDialog({ email, name, methods, onCloseAction }: AccountDi
               onClick={() => show("password")}
             />
           </div>
+
+          {methods.hasGoogle ? (
+            <p className="text-sm text-foreground/60">
+              Dein Anzeigename wird von deinem Google-Konto übernommen. Wenn du ihn ändern
+              möchtest, ändere den Namen in deinem Google-Konto; er wird beim nächsten Login
+              übernommen.
+            </p>
+          ) : null}
 
           {notice ? (
             <p className="text-sm text-leaf-dark" role="status">
