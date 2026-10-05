@@ -69,12 +69,13 @@ const additionalGuestNameSchema = nameSchema({
   tooLong: `Namen der zusätzlichen Personen dürfen höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
 });
 
-// Registration form: same rules as a guest name, "required" wording.
+// Display name (registration form, "Mein Konto", ConsentDialog): same length
+// rules as a guest name.
 export const personNameSchema = nameSchema({
-  required: "Name ist erforderlich.",
-  empty: "Name ist erforderlich.",
-  tooShort: `Name muss mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
-  tooLong: `Name darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
+  required: "Bitte gib einen Anzeigenamen ein.",
+  empty: "Bitte gib einen Anzeigenamen ein.",
+  tooShort: `Der Anzeigename muss mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
+  tooLong: `Der Anzeigename darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
 });
 
 export function validatePersonName(value: unknown): FieldResult<string> {

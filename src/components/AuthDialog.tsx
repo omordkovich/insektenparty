@@ -2,7 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import { DISPLAY_NAME_KEY } from "@/lib/account";
 import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
+import {
+  serializeSignupIntent,
+  SIGNUP_INTENT_COOKIE,
+  SIGNUP_INTENT_MAX_AGE_SECONDS,
+  SIGNUP_INTENT_PATH,
+} from "@/lib/signup-intent";
 import { createClient } from "@/lib/supabase/client";
 import { consentMetadata } from "@/lib/terms-consent";
 import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/validation";
@@ -53,10 +60,13 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
   const passwordConfirmId = useId();
   const passwordHintId = useId();
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const [mode, setMode] = useState<AuthDialogMode>(initialMode);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  // The display name field is the one the error message is about.
+  const [nameInvalid, setNameInvalid] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -70,20 +80,35 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
   function switchMode(nextMode: AuthDialogMode) {
     setMode(nextMode);
     setFieldError(null);
+    setNameInvalid(false);
     setSubmitError(null);
     setConfirmationSent(false);
     setResetSent(false);
+  }
+
+  function failName(message: string) {
+    setFieldError(message);
+    setNameInvalid(true);
+    nameInputRef.current?.focus();
   }
 
   async function handleGoogle() {
     if (saving) return;
 
     setFieldError(null);
+    setNameInvalid(false);
     setSubmitError(null);
 
-    // Registering needs the same consent as the email form. (Logging in does
-    // not: an account that never consented is asked on the start page.)
+    // Registering needs the same name and consent as the email form. (Logging
+    // in does not: an account that is still missing them is asked on the
+    // start page.)
+    let displayName: string | null = null;
     if (mode === "register") {
+      const nameResult = validatePersonName(form.name);
+      if (!nameResult.ok) {
+        failName(nameResult.error);
+        return;
+      }
       if (!form.acceptedTerms) {
         setFieldError(CONSENT_TERMS_ERROR);
         return;
@@ -92,16 +117,24 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         setFieldError(CONSENT_AGE_ERROR);
         return;
       }
+      displayName = nameResult.value;
     }
+
+    // Handed to /auth/callback through a short-lived cookie (not the URL).
+    // Always written or cleared, so an abandoned register attempt can't leak
+    // into a later login.
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `${SIGNUP_INTENT_COOKIE}=${
+      displayName ? serializeSignupIntent(displayName) : ""
+    }; Path=${SIGNUP_INTENT_PATH}; Max-Age=${
+      displayName ? SIGNUP_INTENT_MAX_AGE_SECONDS : 0
+    }; SameSite=Lax${secure}`;
 
     setSaving(true);
     try {
-      const callback = new URL("/auth/callback", window.location.origin);
-      if (mode === "register") callback.searchParams.set("consent", "1");
-
       const { error } = await createClient().auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: callback.toString() },
+        options: { redirectTo: `${window.location.origin}${SIGNUP_INTENT_PATH}` },
       });
       if (error) {
         setSubmitError(error.message);
@@ -119,6 +152,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     if (saving) return;
 
     setFieldError(null);
+    setNameInvalid(false);
     setSubmitError(null);
 
     // Checked in the order of the form fields, so the message always refers
@@ -127,7 +161,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
     if (mode === "register") {
       const nameResult = validatePersonName(form.name);
       if (!nameResult.ok) {
-        setFieldError(nameResult.error);
+        failName(nameResult.error);
         return;
       }
       name = nameResult.value;
@@ -217,7 +251,7 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
         password: form.password,
         options: {
           data: {
-            name,
+            [DISPLAY_NAME_KEY]: name,
             ...consentMetadata(),
           },
         },
@@ -292,21 +326,26 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
           {mode === "register" ? (
             <div>
               <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-                Name
+                Anzeigename
               </label>
               <input
+                ref={nameInputRef}
                 id={nameId}
                 name="name"
                 type="text"
-                autoComplete="name"
+                autoComplete="nickname"
                 maxLength={NAME_MAX_LENGTH}
-                placeholder="Dein Name"
+                placeholder="Dein Anzeigename"
                 value={form.name}
                 disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, name: event.target.value }))
-                }
-                className="w-full rounded-xl border border-leaf/25 bg-white px-3 py-3"
+                aria-invalid={nameInvalid}
+                onChange={(event) => {
+                  setNameInvalid(false);
+                  setForm((current) => ({ ...current, name: event.target.value }));
+                }}
+                className={`w-full rounded-xl border bg-white px-3 py-3 ${
+                  nameInvalid ? "border-danger" : "border-leaf/25"
+                }`}
               />
             </div>
           ) : null}

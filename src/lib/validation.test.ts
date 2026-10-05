@@ -203,11 +203,15 @@ describe("validateEmail", () => {
 describe("validatePersonName", () => {
   it("requires 2 to 100 characters", () => {
     expect(validatePersonName(" Al ")).toEqual({ ok: true, value: "Al" });
-    expect(validatePersonName(" ")).toEqual({ ok: false, error: "Name ist erforderlich." });
-    expect(validatePersonName("A")).toEqual({ ok: false, error: "Name muss mindestens 2 Zeichen lang sein." });
+    expect(validatePersonName(" ")).toEqual({ ok: false, error: "Bitte gib einen Anzeigenamen ein." });
+    expect(validatePersonName(undefined)).toEqual({ ok: false, error: "Bitte gib einen Anzeigenamen ein." });
+    expect(validatePersonName("A")).toEqual({
+      ok: false,
+      error: "Der Anzeigename muss mindestens 2 Zeichen lang sein.",
+    });
     expect(validatePersonName("x".repeat(101))).toEqual({
       ok: false,
-      error: "Name darf höchstens 100 Zeichen lang sein.",
+      error: "Der Anzeigename darf höchstens 100 Zeichen lang sein.",
     });
   });
 });

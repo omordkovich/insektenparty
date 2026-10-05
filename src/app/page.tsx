@@ -1,5 +1,5 @@
+import { AccountButton } from "@/components/AccountButton";
 import { AuthErrorDialog } from "@/components/AuthErrorDialog";
-import { Button } from "@/components/Button";
 import { ConsentDialog } from "@/components/ConsentDialog";
 import { EventList } from "@/components/EventList";
 import { LandingContent } from "@/components/LandingContent";
@@ -8,6 +8,7 @@ import { LinkExpiredDialog, type LinkExpiredKind } from "@/components/LinkExpire
 import { pageMetadata } from "@/lib/page-metadata";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
+import { getAccountName, getSignInMethods } from "@/lib/account";
 import { hasAcceptedTerms } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -32,8 +33,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
-  const name =
-    typeof claims?.user_metadata?.name === "string" ? claims.user_metadata.name : null;
+  const name = getAccountName(claims?.user_metadata);
 
   const myEvents = claims
     ? (await getEventsByOwner(claims.sub)).map((event) => ({
@@ -63,11 +63,11 @@ export default async function Home({ searchParams }: HomeProps) {
               />
             </div>
             <div className="mt-6">
-              <form action="/auth/signout" method="post">
-                <Button variant="outline" type="submit">
-                  Logout
-                </Button>
-              </form>
+              <AccountButton
+                email={claims.email ?? ""}
+                name={name}
+                methods={getSignInMethods(claims.app_metadata)}
+              />
             </div>
           </>
         )}
@@ -77,7 +77,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {linkExpired ? <LinkExpiredDialog kind={linkExpired} /> : null}
       {authError === "1" ? <AuthErrorDialog /> : null}
-      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog /> : null}
+      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog askForName={!name} /> : null}
     </>
   );
 }

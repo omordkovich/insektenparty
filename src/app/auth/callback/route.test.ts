@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { serializeSignupIntent, SIGNUP_INTENT_COOKIE } from "@/lib/signup-intent";
 
 const exchangeCodeForSession = vi.fn();
 const updateUser = vi.fn();
@@ -11,8 +12,12 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { GET } from "./route";
 
-function call(query: string) {
-  return GET(new NextRequest(`http://localhost:3000/auth/callback?${query}`));
+function call(query: string, intentName?: string) {
+  const headers: Record<string, string> = {};
+  if (intentName !== undefined) {
+    headers.cookie = `${SIGNUP_INTENT_COOKIE}=${serializeSignupIntent(intentName)}`;
+  }
+  return GET(new NextRequest(`http://localhost:3000/auth/callback?${query}`, { headers }));
 }
 
 function locationOf(response: Response) {
@@ -20,7 +25,8 @@ function locationOf(response: Response) {
   return url.pathname + url.search;
 }
 
-const newGoogleUser = { user: { user_metadata: { name: "Max", full_name: "Max" } } };
+// A first Google login: Google delivers `name`, we have no consent or display name.
+const newGoogleUser = { user: { user_metadata: { name: "Max Google", full_name: "Max Google" } } };
 
 describe("GET /auth/callback", () => {
   beforeEach(() => {
@@ -38,7 +44,7 @@ describe("GET /auth/callback", () => {
     expect(exchangeCodeForSession).toHaveBeenCalledWith("abc");
   });
 
-  it("does not store consent when the user did not tick the boxes (the ConsentDialog asks later)", async () => {
+  it("stores nothing for a login-tab sign-in (the ConsentDialog asks later)", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
     await call("code=abc");
@@ -46,13 +52,14 @@ describe("GET /auth/callback", () => {
     expect(updateUser).not.toHaveBeenCalled();
   });
 
-  it("stores consent for a new account that ticked the boxes while registering", async () => {
+  it("stores consent and the chosen display name for a register-tab sign-in", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    await call("code=abc&consent=1");
+    await call("code=abc", "Maxi");
 
     expect(updateUser).toHaveBeenCalledWith({
       data: expect.objectContaining({
+        display_name: "Maxi",
         terms_accepted_at: expect.any(String),
         terms_version: expect.any(String),
         privacy_version: expect.any(String),
@@ -63,15 +70,61 @@ describe("GET /auth/callback", () => {
     expect(refreshSession).toHaveBeenCalled();
   });
 
-  it("keeps the original consent record of an account that already accepted", async () => {
+  it("never uses the name from Google as the display name", async () => {
+    exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
+
+    await call("code=abc", "Maxi");
+
+    const { data } = updateUser.mock.calls[0][0];
+    expect(data.display_name).toBe("Maxi");
+    expect(data).not.toHaveProperty("name");
+  });
+
+  it("keeps the existing consent record and display name of a returning account", async () => {
     exchangeCodeForSession.mockResolvedValue({
-      data: { user: { user_metadata: { terms_accepted_at: "2026-09-30T10:00:00.000Z" } } },
+      data: {
+        user: {
+          user_metadata: {
+            terms_accepted_at: "2026-09-30T10:00:00.000Z",
+            display_name: "Original",
+          },
+        },
+      },
       error: null,
     });
 
-    await call("code=abc&consent=1");
+    await call("code=abc", "Anderer Name");
 
     expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("only fills in what is missing", async () => {
+    exchangeCodeForSession.mockResolvedValue({
+      data: { user: { user_metadata: { display_name: "Original" } } },
+      error: null,
+    });
+
+    await call("code=abc", "Anderer Name");
+
+    const { data } = updateUser.mock.calls[0][0];
+    expect(data).toHaveProperty("terms_accepted_at");
+    expect(data).not.toHaveProperty("display_name");
+  });
+
+  it("ignores an invalid intent cookie", async () => {
+    exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
+
+    await call("code=abc", "   ");
+
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("clears the one-time cookie", async () => {
+    exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
+
+    const response = await call("code=abc", "Maxi");
+
+    expect(response.headers.get("set-cookie")).toContain(`${SIGNUP_INTENT_COOKIE}=;`);
   });
 
   it("follows a safe `next` path", async () => {

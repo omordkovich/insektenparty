@@ -128,7 +128,7 @@ export function PrivacyPolicyContent() {
       <Section title="6. Benutzerkonto">
         <p>
           Um Events anzulegen, benötigst du ein Benutzerkonto. Dabei verarbeiten
-          wir deinen Namen, deine E-Mail-Adresse und dein Passwort (nur als
+          wir deinen frei gewählten Anzeigenamen, deine E-Mail-Adresse und dein Passwort (nur als
           verschlüsselter Hash gespeichert) sowie technische Anmeldedaten wie
           Zeitpunkt und IP-Adresse von Login-Vorgängen zur Absicherung deines
           Kontos. Zur Bestätigung der Registrierung und für das Zurücksetzen
@@ -138,9 +138,13 @@ export function PrivacyPolicyContent() {
           Alternativ kannst du dich mit deinem Google-Konto registrieren und
           anmelden („Mit Google fortfahren“). Dann leitet dich unser
           Auth-Dienstleister Supabase zu Google weiter (Google Ireland Limited,
-          Gordon House, Barrow Street, Dublin 4, Irland). Google übermittelt uns
-          nach deiner Bestätigung deinen Namen und deine E-Mail-Adresse; ein
-          Passwort wird dann nicht bei uns gespeichert. Welche Daten Google
+          Gordon House, Barrow Street, Dublin 4, Irland). Google übermittelt
+          nach deiner Bestätigung Angaben zu deinem Google-Konto (u. a. Name,
+          E-Mail-Adresse und Profilbild) an unseren Auth-Dienstleister
+          Supabase. Wir verwenden davon nur deine E-Mail-Adresse und die
+          Kennung deines Google-Kontos für die Anmeldung; als Anzeigenamen
+          verwenden wir ausschließlich den Namen, den du bei der Registrierung
+          selbst angibst. Ein Passwort wird dann nicht bei uns gespeichert. Welche Daten Google
           dabei selbst verarbeitet, regelt Googles Datenschutzerklärung:{" "}
           <ExternalLink href="https://policies.google.com/privacy" />. Die
           Rechtsgrundlage für unsere Verarbeitung ist Art. 6 Abs. 1 lit. b
@@ -342,9 +346,10 @@ export function PrivacyPolicyContent() {
           </li>
         </List>
         <p>
-          Die Löschung deines Kontos kannst du jederzeit formlos per E-Mail an{" "}
-          <EmailLink />{" "}
-          beantragen.
+          Dein Konto kannst du jederzeit selbst unter „Mein Konto“ → „Konto
+          löschen“ endgültig löschen; dabei werden auch deine Events und
+          Gästelisten gelöscht. Alternativ kannst du die Löschung formlos per
+          E-Mail an <EmailLink /> beantragen.
         </p>
       </Section>
 
