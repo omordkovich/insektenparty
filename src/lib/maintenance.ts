@@ -6,7 +6,8 @@ import { SITE_URL } from "@/lib/site";
 // the real app, so it can still be tested. Existing invitations keep
 // working: event pages and everything they use (API, e-mail links, legal
 // pages from their footer, link previews) stay reachable - only the start
-// page and "Über uns" show the placeholder.
+// page, "Über uns" and the occasion pages (/einladung...) show the
+// placeholder.
 
 const SITE_HOST = new URL(SITE_URL).host;
 const MAINTENANCE_HOSTS = new Set([SITE_HOST, `www.${SITE_HOST}`]);
@@ -16,6 +17,8 @@ const ALWAYS_REACHABLE = new Set([
   "/agb",
   "/widerruf",
   "/robots.txt",
+  "/sitemap.xml",
+  "/llms.txt",
   "/favicon.ico",
   "/opengraph-image",
 ]);

@@ -64,12 +64,15 @@ export function renderOgCard({ imageSrc, imageWidth, imageHeight, kicker, title,
   );
 }
 
-export function renderSiteOgImage() {
+export function renderSiteOgImage({
+  title = "Online-Einladung & Gästeliste kostenlos erstellen",
+  subtitle = "Schluss mit Zusagen-Chaos im Gruppenchat.",
+}: { title?: string; subtitle?: string } = {}) {
   return renderOgCard({
     imageSrc: SITE_LOGO,
     imageWidth: 420,
     imageHeight: 149,
-    title: "Digitale Einladungen & Gästelisten für jedes Event",
-    subtitle: "Schluss mit Zusagen-Chaos im Gruppenchat.",
+    title,
+    subtitle,
   });
 }

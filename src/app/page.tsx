@@ -16,7 +16,7 @@ import { getEventsByOwner } from "@/repositories/event-repository";
 import { getUserEntitlements } from "@/services/entitlement-service";
 
 export const metadata = pageMetadata({
-  title: "GASTZILLA – Digitale Einladungen & Gästelisten für jedes Event",
+  title: "Online-Einladung & Gästeliste kostenlos erstellen – GASTZILLA",
   description: SITE_DESCRIPTION,
   path: "/",
 });

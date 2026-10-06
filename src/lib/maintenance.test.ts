@@ -41,7 +41,7 @@ describe("shouldShowMaintenance", () => {
   });
 
   it("keeps the legal pages and crawler files reachable", () => {
-    for (const pathname of ["/impressum", "/datenschutz", "/agb", "/widerruf", "/robots.txt", "/favicon.ico"]) {
+    for (const pathname of ["/impressum", "/datenschutz", "/agb", "/widerruf", "/robots.txt", "/sitemap.xml", "/llms.txt", "/favicon.ico"]) {
       expect(shouldShowMaintenance({ ...on, pathname })).toBe(false);
     }
   });

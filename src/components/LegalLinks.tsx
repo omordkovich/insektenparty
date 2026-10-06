@@ -12,7 +12,10 @@ const linkClass = "text-sm text-muted underline underline-offset-2 hover:text-le
 // document, so it stays an overlay.
 export function LegalLinks({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap justify-center gap-x-4 gap-y-1 ${className}`}>
+    <nav
+      aria-label="Rechtliches und Informationen"
+      className={`flex flex-wrap justify-center gap-x-4 gap-y-1 ${className}`}
+    >
       <Link href="/about" className={linkClass}>
         Über uns
       </Link>
@@ -22,6 +25,6 @@ export function LegalLinks({ className = "" }: { className?: string }) {
           {LEGAL_DOCUMENTS[doc].label}
         </Link>
       ))}
-    </div>
+    </nav>
   );
 }

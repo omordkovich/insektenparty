@@ -6,9 +6,11 @@ import { Button } from "./Button";
 
 type AuthButtonsProps = {
   registerLabel?: string;
+  // Passed on to AuthDialog: page to open after a successful login.
+  afterLoginHref?: string;
 };
 
-export function AuthButtons({ registerLabel = "Registrieren" }: AuthButtonsProps) {
+export function AuthButtons({ registerLabel = "Registrieren", afterLoginHref }: AuthButtonsProps) {
   const [authMode, setAuthMode] = useState<AuthDialogMode | null>(null);
 
   return (
@@ -23,7 +25,11 @@ export function AuthButtons({ registerLabel = "Registrieren" }: AuthButtonsProps
       </div>
 
       {authMode ? (
-        <AuthDialog initialMode={authMode} onCloseAction={() => setAuthMode(null)} />
+        <AuthDialog
+          initialMode={authMode}
+          onCloseAction={() => setAuthMode(null)}
+          afterLoginHref={afterLoginHref}
+        />
       ) : null}
     </>
   );

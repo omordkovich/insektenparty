@@ -47,9 +47,17 @@ const emptyForm: FormState = {
 type AuthDialogProps = {
   initialMode?: AuthDialogMode;
   onCloseAction: () => void;
+  // Where to go after a successful password login. Without it the current
+  // page is just refreshed - enough on the start page, which then shows the
+  // event list, but static pages (e.g. /einladung) would look unchanged.
+  afterLoginHref?: string;
 };
 
-export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogProps) {
+export function AuthDialog({
+  initialMode = "login",
+  onCloseAction,
+  afterLoginHref,
+}: AuthDialogProps) {
   const router = useRouter();
   const titleId = useId();
   const nameId = useId();
@@ -227,7 +235,8 @@ export function AuthDialog({ initialMode = "login", onCloseAction }: AuthDialogP
           setSubmitError(error.message);
           return;
         }
-        router.refresh();
+        if (afterLoginHref) router.push(afterLoginHref);
+        else router.refresh();
         onCloseAction();
         return;
       }

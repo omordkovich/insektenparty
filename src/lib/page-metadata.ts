@@ -10,10 +10,15 @@ export function pageMetadata({
   title,
   description,
   path,
+  image = "/opengraph-image",
+  imageAlt = SITE_NAME,
 }: {
   title: string;
   description: string;
   path: string;
+  // Link preview image; pages with their own opengraph-image pass its path.
+  image?: string;
+  imageAlt?: string;
 }): Metadata {
   return {
     title,
@@ -26,8 +31,8 @@ export function pageMetadata({
       title,
       description,
       url: path,
-      images: [{ url: "/opengraph-image", ...OG_SIZE, alt: SITE_NAME }],
+      images: [{ url: image, ...OG_SIZE, alt: imageAlt }],
     },
-    twitter: { card: "summary_large_image", title, description, images: ["/opengraph-image"] },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
