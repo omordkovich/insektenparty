@@ -13,7 +13,7 @@ Stand: 2026-10-06
 - [x] Footer-Links als `<nav>` (Landmark für Screenreader und Crawler)
 - [x] `/sitemap.xml` und `/llms.txt` bleiben auch im Wartungsmodus erreichbar
 - [x] H1, Seitentitel und Vorschaubild: „Online-Einladung & Gästeliste kostenlos erstellen“
-- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 19 Anlässe: Kindergeburtstag, Spielverabredung, Geburtstag, Hochzeit, Firmenfeier, Grillparty & Gartenfest, Karneval, Oktoberfest, Halloweenparty, Advent & Weihnachtsmarkt, Weihnachtsfest, Silvester, Mottoparty, Gruppenreise & Vereinsfahrt, Kultur, Ausgehen, Sport zusammen, Tabletop & Brettspiele, Gaming & LAN-Party; jede Seite mit Einladungstext-Vorlage zum Kopieren – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
+- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 26 Anlässe: Kindergeburtstag, Spielverabredung, Einschulung & Schulstart, Kita- & Schulfeste, Abifeier & Abiball, Geburtstag, Hochzeit, Junggesellenabschied, Babyparty & Gender Reveal, Taufe & Kommunion, Firmenfeier, Grillparty & Gartenfest, Karneval, Oktoberfest, Halloweenparty, Advent & Weihnachtsmarkt, Familienfest & Feiertage, Silvester, Mottoparty, Gruppenreise & Vereinsfahrt, Kultur, Proben & Auftritte, Ausgehen, Sport zusammen, Tabletop & Brettspiele, Gaming & LAN-Party; jede Seite mit Einladungstext-Vorlage zum Kopieren und eigenen, anlass-spezifischen FAQ und Vorteilen (keine Doppelungen) – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
 
 ## Du selbst (Dashboards & Konten)
 
@@ -34,7 +34,6 @@ Stand: 2026-10-06
 - [ ] Social-Media-Profile (Instagram, LinkedIn, …) → als `sameAs` ins Organization-Schema, sobald es welche gibt
 - [ ] Screenshot einer Beispiel-Einladung → als `screenshot` ins Schema und auf die Startseite
 - [ ] Seite `/preise`, sobald das Bezahlmodell steht (Stripe ist pausiert)
-- [ ] FAQ pro Anlass-Seite stärker anlass-spezifisch machen (allgemeine Fragen wie „Brauchen Gäste ein Konto?“ wiederholen sich auf allen Seiten)
 - [ ] Nach 2–3 Monaten Search Console: ranken zwei Anlass-Seiten auf dieselben Begriffe → zusammenlegen + Weiterleitung
 - [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“
 

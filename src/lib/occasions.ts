@@ -70,7 +70,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Kommt ein Elternteil oder das Geschwisterkind mit? Begleitpersonen werden direkt bei der Zusage mit Namen eingetragen und mitgezählt.",
       },
       {
-        title: "Mitbringsel abstimmen",
+        title: "Kuchen, Muffins & Co. abstimmen",
         text: "Wer Kuchen, Muffins oder Saft mitbringt, schreibt es dazu. Alle sehen es – und es gibt keine fünf Nudelsalate.",
       },
       {
@@ -89,24 +89,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen die Eltern ein Konto oder eine App?",
+        question: "Wie viele Kinder sollte ich einladen?",
         answer:
-          "Nein. Die Eltern öffnen einfach den Einladungslink im Browser und tragen ihr Kind ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Eine beliebte Faustregel: so viele Kinder, wie das Geburtstagskind alt wird. Mit GASTZILLA siehst du jederzeit, wie viele zugesagt haben – Geschwister und Begleitpersonen werden mitgezählt.",
       },
       {
-        question: "Wer kann die Gästeliste sehen?",
+        question: "Wie früh sollte ich zum Kindergeburtstag einladen?",
+        answer:
+          "Üblich sind zwei bis drei Wochen vorher. So können die Eltern den Termin und ein Geschenk planen.",
+      },
+      {
+        question: "Sehen andere Eltern, wer zum Kindergeburtstag kommt?",
         answer:
           "Alle, die den Einladungslink haben – also die eingeladenen Familien. Suchmaschinen finden deine Event-Seite nicht. Teile den Link deshalb nur mit den Eltern, die du einladen möchtest.",
-      },
-      {
-        question: "Was kostet die Einladung zum Kindergeburtstag?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
-      },
-      {
-        question: "Können die Eltern den Termin in ihren Kalender übernehmen?",
-        answer:
-          "Ja – sofern du Datum und Uhrzeit angibst: Ein Klick aufs Datum bietet den Termin für den eigenen Kalender oder Google Kalender an.",
       },
     ],
     updated: "2026-10-06",
@@ -154,19 +149,199 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen die Eltern ein Konto oder eine App?",
+        question: "Wie lange sollte eine Spielverabredung dauern?",
         answer:
-          "Nein. Die Eltern öffnen den Link im Browser und tragen ihr Kind ein. Nur du brauchst ein kostenloses Konto.",
+          "Für kleinere Kinder reichen oft zwei bis drei Stunden. Mit GASTZILLA tragen die Eltern Bring- und Abholzeit selbst ein – so ist für alle klar, wann Schluss ist.",
       },
       {
-        question: "Wer kann die Liste sehen?",
+        question: "Wie erfahre ich von Allergien?",
+        answer:
+          "Eltern können bei der Zusage eine Nachricht hinterlassen, etwa zu Allergien oder wer das Kind abholt. Die Nachricht steht direkt beim Eintrag in der Liste.",
+      },
+      {
+        question: "Wer sieht, welche Kinder kommen?",
         answer:
           "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den Eltern der eingeladenen Kinder.",
       },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "school-start",
+    slug: "einschulung",
+    name: "Einschulung & Schulstart",
+    title: "Einladung zur Einschulung online erstellen",
+    metaTitle: "Einladung zur Einschulung online erstellen – GASTZILLA",
+    description:
+      "Einschulungsfeier oder Treffen zum neuen Schuljahr: Familie und Freunde sagen per Link ohne Konto zu und tragen ein, was sie mitbringen. Kostenlos & werbefrei.",
+    teaser: "Einschulungsfeier oder Treffen zum Schuljahresstart – wer kommt zur Feier nach der Schule?",
+    intro: [
+      "Der erste Schultag ist ein großer Tag – für das Schulkind und die ganze Familie. Nach der Einschulungsfeier in der Schule geht es oft weiter mit Kaffee und Kuchen zu Hause oder im Restaurant. Wer kommt mit, wer kommt erst zur Feier danach, und wer bringt einen Kuchen mit?",
+      "Auch zum neuen Schuljahr treffen sich Klassen, Eltern oder Freundeskreise gern – zum Kennenlernen oder Grillen. Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zur Einschulung",
+    benefits: [
       {
-        question: "Was kostet das?",
+        title: "Schulfeier und Familienfeier im Blick",
+        text: "Gäste geben an, wann sie kommen – ob schon zur Feier in der Schule oder erst zu Kaffee und Kuchen danach.",
+      },
+      {
+        title: "Kuchen und Geschenke abstimmen",
+        text: "Wer einen Kuchen oder ein Geschenk für die Schultüte mitbringt, trägt es ein. Alle sehen es, und nichts kommt doppelt.",
+      },
+      {
+        title: "Großeltern und Paten dabei",
+        text: "Begleitpersonen werden mit Namen eingetragen und mitgezählt. So weißt du, wie viele Plätze du zu Hause oder im Restaurant brauchst.",
+      },
+      {
+        title: "Kennenlernen zum Schuljahresstart",
+        text: "Für das Treffen der neuen Klasse teilst du den Link einfach im Klassenchat – alle Familien tragen sich selbst ein.",
+      },
+    ],
+    invitationText: [
+      "Liebe Familie, liebe Freunde,",
+      "[Name] kommt in die Schule – das wollen wir feiern! 🎒",
+      "Wann: [Datum], ab [Uhrzeit] (nach der Einschulungsfeier)",
+      "Wo: [Ort]",
+      "Bitte sagt bis [Datum] hier zu und schreibt dazu, ob ihr einen Kuchen mitbringt: [Link]",
+      "Wir freuen uns auf euch!",
+      "[Eure Namen]",
+    ],
+    faq: [
+      {
+        question: "Wann sollte ich zur Einschulungsfeier einladen?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Etwa drei bis vier Wochen vorher. Den genauen Termin der Einschulung erfahrt ihr von der Schule – meist liegt er kurz nach den Sommerferien.",
+      },
+      {
+        question: "Kann ich auch ein Treffen zum neuen Schuljahr für die ganze Klasse planen?",
+        answer:
+          "Ja. Teile den Link im Klassenchat – Eltern tragen ihre Familie ein, und alle sehen, wer kommt.",
+      },
+      {
+        question: "Wer sieht die Zusagen zur Einschulungsfeier?",
+        answer:
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den eingeladenen Familien.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "school-events",
+    slug: "kita-schulfeste",
+    name: "Kita- & Schulfeste",
+    title: "Kita- und Schulfeste organisieren – Anmeldung per Link",
+    metaTitle: "Kita- & Schulfeste organisieren – GASTZILLA",
+    description:
+      "Abschiedsfeier, Sommerfest, Laternenfest oder Tag der offenen Tür: Familien melden sich per Link ohne Konto an und tragen ein, was sie mitbringen.",
+    teaser: "Abschiedsfeier, Sommerfest, Laternenfest oder Tag der offenen Tür – Anmeldungen und Kuchenbuffet über einen Link.",
+    intro: [
+      "Ob Abschiedsfeier der Vorschulkinder, Abschlussfeier der vierten Klasse, Sommerfest, Laternenfest, Elternabend oder Tag der offenen Tür: Wer in Kita oder Schule ein Fest organisiert, sammelt Anmeldungen, Helfer und Kuchenspenden – meist über Zettel an der Pinnwand und viele Nachrichten.",
+      "Mit GASTZILLA erstellt ihr – ob Kita-Team, Lehrkräfte oder Elternbeirat – in wenigen Minuten eine Seite für euer Fest und teilt den Link. Familien tragen sich selbst ein, ganz ohne Konto oder App.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zu Kita- und Schulfesten",
+    benefits: [
+      {
+        title: "Kuchenbuffet ohne Zettelwirtschaft",
+        text: "Familien tragen ein, was sie zum Buffet beisteuern – Kuchen, Salat oder Getränke. Alle sehen es, und das Buffet ist gut gemischt.",
+      },
+      {
+        title: "Wissen, wie viele kommen",
+        text: "Geschwister, Eltern und Großeltern werden mit eingetragen und mitgezählt. So plant ihr Bänke, Essen und Getränke passend.",
+      },
+      {
+        title: "Ein Link für alle Familien",
+        text: "Teilt den Link per WhatsApp, Signal, Telegram oder E-Mail – oder schreibt ihn in den Elternbrief.",
+      },
+      {
+        title: "Zeitfenster im Blick",
+        text: "Familien geben an, wann sie kommen – praktisch für den Tag der offenen Tür, damit ihr wisst, wie viele Besucher wann da sind.",
+      },
+    ],
+    invitationText: [
+      "Liebe Eltern,",
+      "wir laden euch herzlich zu [unserem Sommerfest / unserer Abschiedsfeier / unserem Laternenfest / unserem Tag der offenen Tür] ein! 🏫",
+      "Wann: [Datum], [Uhrzeit von] bis [Uhrzeit bis]",
+      "Wo: [Kita / Schule, Adresse]",
+      "Bitte meldet euch bis [Datum] hier an und tragt ein, ob ihr etwas zum Buffet mitbringt: [Link]",
+      "Wir freuen uns auf euch!",
+      "[Kita-Team / Elternbeirat]",
+    ],
+    faq: [
+      {
+        question: "Wer kann die Anmeldungen sehen?",
+        answer:
+          "Alle, die den Link haben – also alle Familien, an die ihr ihn schickt. Suchmaschinen finden die Seite nicht. Familien können sich auch nur mit Vornamen oder als „Familie M.“ eintragen.",
+      },
+      {
+        question: "Eignet sich das für einen Tag der offenen Tür?",
+        answer:
+          "Ja. Interessierte Familien melden sich an und geben an, wann sie kommen möchten. So wisst ihr, wie viele Besucher zu welcher Zeit da sind. Bedenkt: Alle mit dem Link sehen die Anmeldungen.",
+      },
+      {
+        question: "Braucht die Kita oder Schule ein eigenes Konto?",
+        answer:
+          "Es reicht ein kostenloses Konto für die Person, die das Fest organisiert. Familien brauchen kein Konto und keine App.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "graduation",
+    slug: "abifeier",
+    name: "Abifeier & Abiball",
+    title: "Abifeier, Abiball oder Abigag – gemeinsam planen per Link",
+    metaTitle: "Abifeier, Abiball & Abigag planen – GASTZILLA",
+    description:
+      "Abiball, Abifeier, Abigag oder Abschlussfeier: Mitschüler, Familien und Lehrkräfte sagen per Link ohne Konto zu und tragen ihre Gäste mit ein. Kostenlos.",
+    teaser: "Abiball, Abigag oder Abschlussfeier – wer kommt, mit wie vielen Gästen, und wer hilft mit?",
+    intro: [
+      "Das Abitur ist geschafft – jetzt wird gefeiert! Ob Abiball mit Familien und Lehrkräften, Abigag am letzten Schultag, Abschlussfeier nach der zehnten Klasse oder private Abifeier mit Freunden: Wer organisiert, muss wissen, wer kommt, wie viele Gäste jeder mitbringt und wer beim Aufbau hilft.",
+      "Mit GASTZILLA erstellt ihr in wenigen Minuten eine Seite für eure Feier und teilt den Link im Jahrgangschat. Alle tragen sich selbst ein – ohne Konto oder App.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zur Abifeier",
+    benefits: [
+      {
+        title: "Gäste pro Person im Blick",
+        text: "Jeder trägt ein, wen er mitbringt – Eltern, Geschwister oder Partner. So wisst ihr, wie viele Plätze ihr beim Abiball braucht.",
+      },
+      {
+        title: "Helfer für Abigag und Aufbau",
+        text: "Wer Deko, Musik, Getränke oder den Aufbau übernimmt, trägt es ein. Alle sehen es, und nichts bleibt liegen.",
+      },
+      {
+        title: "Zeitplan für den großen Tag",
+        text: "Gäste geben an, wann sie kommen – ob schon zur Zeugnisübergabe oder erst zum Ball am Abend.",
+      },
+      {
+        title: "Ein Link für den ganzen Jahrgang",
+        text: "Teilt den Link per WhatsApp, Signal, Telegram oder E-Mail – an Mitschüler, Familien und Lehrkräfte.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "wir haben es geschafft – Zeit für [den Abiball / die Abifeier / den Abigag]! 🎓",
+      "Wann: [Datum], ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Bitte tragt euch bis [Datum] hier ein und schreibt dazu, wie viele Gäste ihr mitbringt und wobei ihr helft: [Link]",
+      "Wir freuen uns auf euch!",
+      "[Euer Abikomitee / Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Kann ich über GASTZILLA Karten für den Abiball verkaufen?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Zusagen. Ticketverkauf und Bezahlung organisiert ihr wie gewohnt – aber mit der richtigen Gästezahl.",
+      },
+      {
+        question: "Wie früh sollte man den Abiball planen?",
+        answer:
+          "Location und Termin werden oft ein Jahr oder länger im Voraus gebucht. Die Zusagen der Gäste sammelt ihr dann meist zwei bis drei Monate vor dem Ball.",
+      },
+      {
+        question: "Wer sieht, wer zum Abiball kommt?",
+        answer:
+          "Alle, die den Link haben – also euer Jahrgang und alle, an die ihr ihn weiterschickt. Suchmaschinen finden die Seite nicht.",
       },
     ],
     updated: "2026-10-07",
@@ -191,7 +366,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Statt Nachrichten zu zählen, siehst du auf einen Blick, wer kommt. Bei jeder neuen Zusage bekommst du eine E-Mail.",
       },
       {
-        title: "Mit Begleitung",
+        title: "Partner und Freunde mitbringen",
         text: "Gäste tragen Partner, Freunde oder Kinder direkt mit Namen ein. So weißt du, für wie viele Leute du Essen und Getränke einplanen musst.",
       },
       {
@@ -199,7 +374,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Zu jeder Zusage kann eine Nachricht gehören – für Glückwünsche oder den Hinweis, dass jemand später kommt.",
       },
       {
-        title: "Mitbringsel abstimmen",
+        title: "Buffet gemeinsam füllen",
         text: "Wer einen Kuchen, Salat oder Getränke mitbringt, schreibt es dazu. Alle sehen es, und nichts kommt doppelt.",
       },
     ],
@@ -214,24 +389,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Wie früh sollte ich zum Geburtstag einladen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Für eine kleine Feier reichen meist zwei bis drei Wochen. Für einen runden Geburtstag mit vielen Gästen sind vier bis sechs Wochen üblich.",
       },
       {
-        question: "Wer kann die Gästeliste sehen?",
+        question: "Kann ich eine Überraschungsparty planen?",
         answer:
-          "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschungsparty, schick den Link also nicht an das Geburtstagskind.",
+          "Ja – schick den Link nur an die Gäste, nicht an das Geburtstagskind. Alle mit dem Link sehen die Gästeliste, Suchmaschinen finden die Seite nicht.",
       },
       {
-        question: "Was kostet die Geburtstagseinladung?",
+        question: "Wie bekomme ich die Zusagen bis zu einem Stichtag?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
-      },
-      {
-        question: "Können Gäste den Termin in ihren Kalender übernehmen?",
-        answer:
-          "Ja – sofern du Datum und Uhrzeit angibst: Ein Klick aufs Datum bietet den Termin für den eigenen Kalender oder Google Kalender an.",
+          "Nenne den Stichtag im Einladungstext, zum Beispiel „Bitte sagt bis zum 1. Mai zu“. Bei jeder neuen Zusage bekommst du eine E-Mail, und in der Liste siehst du, wer schon dabei ist.",
       },
     ],
     updated: "2026-10-06",
@@ -279,19 +449,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen unsere Gäste ein Konto oder eine App?",
+        question: "Wie früh sollte man zur Hochzeit einladen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein – auch Oma und Opa kommen damit zurecht. Nur du brauchst ein kostenloses Konto.",
+          "Üblich ist ein „Save the Date“ sechs bis zwölf Monate vorher und die eigentliche Einladung drei bis vier Monate vor der Hochzeit. Mit GASTZILLA legst du die Seite früh an und ergänzt Details später – bereits verschickte Links funktionieren weiter.",
       },
       {
-        question: "Wer kann die Gästeliste sehen?",
+        question: "Können Gäste ihre Begleitung angeben?",
+        answer:
+          "Ja. Partner, Kinder oder weitere Begleitpersonen werden bei der Zusage mit Namen eingetragen und mitgezählt – praktisch für Sitzplan und Tischkarten.",
+      },
+      {
+        question: "Wer sieht unsere Gästeliste?",
         answer:
           "Alle, die den Einladungslink haben. Suchmaschinen finden eure Event-Seite nicht. Teile den Link deshalb nur mit den Gästen, die du einladen möchtest.",
-      },
-      {
-        question: "Was kostet die Hochzeitseinladung?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
       {
         question: "Können Gäste den Termin in ihren Kalender übernehmen?",
@@ -300,6 +470,178 @@ export const OCCASIONS: Occasion[] = [
       },
     ],
     updated: "2026-10-06",
+  },
+  {
+    id: "bachelor-party",
+    slug: "junggesellenabschied",
+    name: "Junggesellenabschied",
+    title: "Junggesellenabschied planen – Einladung per Link",
+    metaTitle: "Junggesellenabschied planen – Einladung per Link – GASTZILLA",
+    description:
+      "Junggesellen- oder Junggesellinnenabschied planen: Freunde sagen per Link ohne Konto zu – für den JGA-Abend oder das ganze Wochenende. Kostenlos & werbefrei.",
+    teaser: "JGA-Abend oder -Wochenende – wer ist dabei, wer kümmert sich um Shirts, Spiele und Bollerwagen?",
+    intro: [
+      "Ob Junggesellen- oder Junggesellinnenabschied, ob ein Abend in der Stadt oder ein ganzes Wochenende in Hamburg, Prag oder am See: Für einen gelungenen JGA müssen Trauzeugen und Freunde viel abstimmen. Wer ist dabei, wer kommt erst später dazu, und wer besorgt Shirts, Spiele oder den Bollerwagen?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Seite für den JGA und teilst den Link in der Runde. Alle tragen sich selbst ein – ohne Konto oder App – und du hast den Überblick.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum Junggesellenabschied",
+    benefits: [
+      {
+        title: "Wie groß wird die Runde?",
+        text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat. So weißt du früh, für wie viele Leute du Unterkunft, Tisch oder Programm buchen musst.",
+      },
+      {
+        title: "Aufgaben verteilen",
+        text: "Shirts, Spiele, Deko oder Getränke – jeder trägt ein, was er übernimmt. Alle sehen es, und nichts bleibt liegen.",
+      },
+      {
+        title: "Für den Abend oder das ganze Wochenende",
+        text: "Für ein JGA-Wochenende gibst du einen Zeitraum an. Gäste schreiben dazu, wann sie kommen und auf Wunsch, bis wann sie bleiben.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "[Name] heiratet – Zeit für den Junggesellenabschied! 🥂",
+      "Wann: [Datum / Zeitraum] ab [Uhrzeit]",
+      "Wo / Treffpunkt: [Ort]",
+      "Tragt euch bitte bis [Datum] hier ein und schreibt dazu, was ihr übernehmt: [Link]",
+      "Psst – nichts verraten!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Kann die Braut oder der Bräutigam die Planung sehen?",
+        answer:
+          "Nur mit dem Link: Alle, die ihn haben, sehen die Liste. Schick ihn deshalb nur an die Runde, die mitfeiert – Suchmaschinen finden die Seite nicht.",
+      },
+      {
+        question: "Wann sollte man den JGA planen?",
+        answer:
+          "Meist findet der Junggesellenabschied einige Wochen vor der Hochzeit statt. Für ein ganzes Wochenende lohnt es sich, zwei bis drei Monate vorher einzuladen, damit Unterkunft und Programm gebucht werden können.",
+      },
+      {
+        question: "Kann ich über GASTZILLA Kosten aufteilen?",
+        answer:
+          "Nein. GASTZILLA sammelt die Zusagen und wer was übernimmt. Die Kosten teilt ihr wie gewohnt untereinander – du weißt dann aber genau, durch wie viele.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "baby-shower",
+    slug: "babyparty",
+    name: "Babyparty & Gender Reveal",
+    title: "Babyparty oder Gender Reveal Party – Einladung online erstellen",
+    metaTitle: "Babyparty & Gender Reveal planen – GASTZILLA",
+    description:
+      "Babyparty, Baby Shower oder Gender Reveal: Gäste sagen per Link ohne Konto zu, stimmen Geschenke ab und geben ihren Tipp ab. Kostenlos & werbefrei.",
+    teaser: "Baby Shower oder Gender Reveal – Zusagen, Geschenke abstimmen und Tipps sammeln über einen Link.",
+    intro: [
+      "Ob Babyparty für die werdenden Eltern oder Gender Reveal Party, bei der endlich verraten wird, ob es ein Junge oder ein Mädchen wird: Wer einlädt, will wissen, wer kommt – und dass nicht fünf Gäste denselben Strampler schenken.",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite und teilst den Link. Freunde und Familie tragen sich selbst ein – ganz ohne Konto oder App.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zur Babyparty",
+    benefits: [
+      {
+        title: "Geschenke ohne Doppelungen",
+        text: "Wer etwas mitbringt – ob Geschenk, Kuchen oder Deko –, trägt es ein. Alle sehen es, und nichts wird doppelt geschenkt.",
+      },
+      {
+        title: "Junge oder Mädchen? Tipps sammeln",
+        text: "Bei der Gender Reveal Party geben Gäste ihren Tipp einfach als Nachricht zu ihrer Zusage ab – aufgelöst wird bei der Feier.",
+      },
+      {
+        title: "Partner und Kinder mitzählen",
+        text: "Partner und Kinder werden direkt mit Namen eingetragen und mitgezählt. So weißt du, wie viele Gäste kommen.",
+      },
+    ],
+    invitationText: [
+      "Hallo ihr Lieben,",
+      "[wir bekommen ein Baby / Name bekommt ein Baby] – das wollen wir mit euch feiern! 🍼",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Sagt bitte hier zu und schreibt dazu, was ihr mitbringt – zur Gender Reveal Party gern auch euren Tipp: Junge oder Mädchen? [Link]",
+      "Wir freuen uns auf euch!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Wann findet eine Babyparty statt?",
+        answer:
+          "Meist einige Wochen vor dem Geburtstermin, oft im letzten Drittel der Schwangerschaft. Eine Gender Reveal Party wird häufig gefeiert, sobald das Geschlecht bekannt ist.",
+      },
+      {
+        question: "Wie sammle ich die Tipps für die Gender Reveal Party?",
+        answer:
+          "Gäste schreiben ihren Tipp – Junge oder Mädchen – einfach als Nachricht zu ihrer Zusage. Die Nachrichten stehen direkt bei den Einträgen in der Liste.",
+      },
+      {
+        question: "Können die werdenden Eltern die Planung sehen?",
+        answer:
+          "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschung für die werdenden Eltern, schick ihnen den Link also nicht.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "christening",
+    slug: "taufe-kommunion",
+    name: "Taufe & Kommunion",
+    title: "Taufe, Kommunion oder Konfirmation – Einladung online erstellen",
+    metaTitle: "Taufe, Kommunion & Konfirmation planen – GASTZILLA",
+    description:
+      "Taufe, Kommunion, Konfirmation, Firmung oder Jugendweihe: Familie und Paten sagen per Link ohne Konto zu und tragen Begleitung mit ein. Kostenlos & werbefrei.",
+    teaser: "Taufe, Kommunion, Konfirmation oder Jugendweihe – wer kommt zum Gottesdienst, wer zur Feier?",
+    intro: [
+      "Ob Taufe, Erstkommunion, Konfirmation, Firmung, Jugendweihe oder Bar und Bat Mizwa: Zu diesen Festen kommt die ganze Familie zusammen – oft mit Paten, Großeltern und Freunden von weit her. Wer kommt schon zum Gottesdienst, wer erst zur Feier danach, und für wie viele Personen muss der Tisch im Restaurant reserviert werden?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite und teilst den Link. Alle tragen sich selbst ein – ganz ohne Konto oder App – und du hast die Zusagen in einer Liste.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zu Taufe und Kommunion",
+    benefits: [
+      {
+        title: "Gottesdienst und Feier im Blick",
+        text: "Gäste geben an, wann sie kommen – ob schon zum Gottesdienst oder erst zur Feier danach. So weißt du, wer wann da ist.",
+      },
+      {
+        title: "Richtig reservieren",
+        text: "Partner und Kinder werden mit Namen eingetragen und mitgezählt. So weißt du, für wie viele Personen du im Restaurant oder beim Caterer planen musst.",
+      },
+      {
+        title: "Geschenke und Kuchen abstimmen",
+        text: "Wer ein Geschenk oder einen Kuchen mitbringt, trägt es ein. Alle sehen es, und nichts wird doppelt geschenkt.",
+      },
+      {
+        title: "Einfach für alle Generationen",
+        text: "Ein Link per WhatsApp, Signal, Telegram oder E-Mail genügt – auch Großeltern und Paten brauchen keine App und kein Konto.",
+      },
+    ],
+    invitationText: [
+      "Liebe Familie, liebe Freunde,",
+      "wir feiern [die Taufe / die Erstkommunion / die Konfirmation] von [Name] und laden euch herzlich ein! 🕊️",
+      "Gottesdienst: [Datum], [Uhrzeit], [Kirche]",
+      "Feier danach: ab [Uhrzeit], [Ort]",
+      "Bitte sagt bis [Datum] hier zu und tragt ein, wer mitkommt: [Link]",
+      "Wir freuen uns auf euch!",
+      "[Eure Namen]",
+    ],
+    faq: [
+      {
+        question: "Wie früh lädt man zur Taufe oder Kommunion ein?",
+        answer:
+          "Üblich sind etwa vier bis sechs Wochen vorher, damit Paten und Verwandte von weiter weg planen können.",
+      },
+      {
+        question: "Können Gäste angeben, ob sie zum Gottesdienst kommen?",
+        answer:
+          "Ja. Gäste geben ihre Ankunftszeit an – so siehst du, wer schon zum Gottesdienst kommt und wer erst zur Feier danach.",
+      },
+      {
+        question: "Passt GASTZILLA auch für Jugendweihe oder Bar Mizwa?",
+        answer:
+          "Ja. GASTZILLA ist für jedes Fest gedacht. Titel, Begrüßungstext und Design wählst du selbst.",
+      },
+    ],
+    updated: "2026-10-07",
   },
   {
     id: "company-party",
@@ -325,7 +667,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Begleitpersonen werden mitgezählt, Ankunftszeiten stehen direkt dabei. So weißt du, für wie viele Leute du Essen und Getränke planen musst.",
       },
       {
-        title: "Wer bringt was mit?",
+        title: "Buffet und Teamfrühstück abstimmen",
         text: "Beim Teamfrühstück oder Sommerfest mit Buffet tragen alle ein, was sie mitbringen. Doppelte Salate und fehlende Getränke fallen sofort auf.",
       },
       {
@@ -344,24 +686,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Wie früh sollte man zur Weihnachtsfeier einladen?",
+        answer:
+          "Für Weihnachtsfeiern sind sechs bis acht Wochen üblich, weil Termine im Dezember schnell belegt sind. Für Sommerfest oder Teamevent reichen meist drei bis vier Wochen.",
+      },
+      {
         question: "Müssen sich die Kollegen registrieren?",
         answer:
           "Nein. Sie öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Organisator brauchst ein kostenloses Konto.",
       },
       {
-        question: "Wer kann die Gästeliste sehen?",
+        question: "Ist GASTZILLA für Firmen geeignet?",
         answer:
-          "Alle, die den Einladungslink haben. Suchmaschinen finden die Event-Seite nicht. Teile den Link deshalb nur mit den Personen, die eingeladen sind.",
-      },
-      {
-        question: "Was kostet die Einladung zur Firmenfeier?",
-        answer:
-          "Ein Event mit allen Grundfunktionen ist kostenlos und werbefrei. Weitere Events und Premium-Designs kannst du bald dazukaufen.",
-      },
-      {
-        question: "Bekomme ich Bescheid, wenn sich jemand einträgt?",
-        answer:
-          "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
+          "GASTZILLA ist werbefrei, setzt keine Tracking-Cookies ein und speichert die Daten auf Servern in der EU. Teilnehmende tragen nur ihren Namen ein – ein Konto brauchen sie nicht.",
       },
     ],
     updated: "2026-10-06",
@@ -409,19 +746,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Wie verhindere ich, dass alle dasselbe mitbringen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Jeder Gast schreibt bei der Zusage dazu, was er mitbringt. Weil alle die Liste sehen, ergänzt sich das Buffet von selbst.",
+      },
+      {
+        question: "Was mache ich, wenn es regnet?",
+        answer:
+          "Ändere Ort oder Uhrzeit einfach auf deiner Event-Seite – wer den Link öffnet, sieht sofort die aktuellen Angaben. Schick am besten kurz einen Hinweis in die Gruppe.",
       },
       {
         question: "Können Gäste ihren Eintrag später ändern?",
         answer:
           "Ja. Wenn sich etwas ändert – andere Uhrzeit, ein Gast mehr oder ein anderes Mitbringsel –, passen sie ihren Eintrag einfach an. Du bekommst dazu eine E-Mail.",
-      },
-      {
-        question: "Was kostet die Einladung zur Grillparty?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-06",
@@ -442,7 +779,7 @@ export const OCCASIONS: Occasion[] = [
     benefitsTitle: "Darum passt GASTZILLA zum Karneval",
     benefits: [
       {
-        title: "Kostüm-Verrat per Nachricht",
+        title: "Wer kommt als was?",
         text: "Gäste können zu ihrer Zusage eine Nachricht schreiben – zum Beispiel, als was sie kommen. So stimmt ihr euch ab, und es gibt keine fünf Piraten.",
       },
       {
@@ -468,9 +805,9 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Kann ich ein ganzes Karnevalswochenende planen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Ja. Gib als Datum einen Zeitraum an, zum Beispiel von Weiberfastnacht bis Rosenmontag. Gäste tragen ein, wann sie dazukommen.",
       },
       {
         question: "Kann ich über GASTZILLA Karten für die Sitzung kaufen?",
@@ -481,11 +818,6 @@ export const OCCASIONS: Occasion[] = [
         question: "Gibt es ein Karnevals-Design?",
         answer:
           "Ein eigenes Karnevals-Design gibt es nicht, aber mit bunten Farbdesigns wie „Rot“, „Gelb“ oder „Blau“ bekommt deine Einladung schnell die passende Stimmung.",
-      },
-      {
-        question: "Was kostet das?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-07",
@@ -529,6 +861,11 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Wie früh muss ich einen Tisch im Festzelt reservieren?",
+        answer:
+          "Für die großen Festzelte – etwa auf der Wiesn in München – werden Reservierungen oft schon Monate vorher vergeben. Sammle die Zusagen also früh, dann weißt du rechtzeitig, für wie viele Plätze du anfragen musst.",
+      },
+      {
         question: "Kann ich über GASTZILLA einen Tisch im Festzelt reservieren?",
         answer:
           "Nein. GASTZILLA sammelt nur die Zusagen. Die Reservierung erledigst du wie gewohnt beim Festwirt – aber mit der richtigen Personenzahl.",
@@ -537,11 +874,6 @@ export const OCCASIONS: Occasion[] = [
         question: "Gibt es ein Oktoberfest-Design?",
         answer:
           "Ein eigenes Oktoberfest-Design gibt es nicht, aber mit den Farbdesigns „Blau“ oder „Weiß“ bekommt deine Einladung schnell den passenden Look.",
-      },
-      {
-        question: "Was kostet das?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-07",
@@ -566,7 +898,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Wähle ein dunkles Design wie „Schwarz“ oder ein kräftiges „Orange“ – und gib deiner Einladung den richtigen Grusel-Look.",
       },
       {
-        title: "Kostüm-Verrat per Nachricht",
+        title: "Kostüme abstimmen",
         text: "Gäste können zu ihrer Zusage eine Nachricht schreiben – zum Beispiel, als was sie kommen. So gibt es keine drei Draculas.",
       },
       {
@@ -589,19 +921,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Wie früh sollte ich zur Halloweenparty einladen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Etwa zwei bis drei Wochen vorher – Ende Oktober sind viele Wochenenden schnell verplant, und alle brauchen Zeit für ihr Kostüm.",
+      },
+      {
+        question: "Kann ich auch eine Halloweenparty für Kinder planen?",
+        answer:
+          "Ja. Eltern tragen ihr Kind ein und geben an, wann sie es bringen und wieder abholen – praktisch, wenn die Kinder danach noch um die Häuser ziehen.",
       },
       {
         question: "Gibt es ein Halloween-Design?",
         answer:
           "Ein eigenes Halloween-Design gibt es nicht, aber mit den Farbdesigns „Schwarz“ oder „Orange“ bekommt deine Einladung schnell eine passende Stimmung.",
-      },
-      {
-        question: "Was kostet die Einladung zur Halloweenparty?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-06",
@@ -649,82 +981,82 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Kann ich auch einen Besuch auf dem Weihnachtsmarkt planen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Ja. Nenne Treffpunkt und Uhrzeit, zum Beispiel am Eingang oder an der Glühweinbude. Wer später nachkommt, schreibt es einfach bei der Zusage dazu.",
       },
       {
-        question: "Bekomme ich Bescheid, wenn sich jemand einträgt?",
+        question: "Eignet sich das für eine Adventsfeier im Verein oder in der Nachbarschaft?",
         answer:
-          "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
+          "Ja. Ein Link genügt für alle – Nachbarn, Vereinsmitglieder oder Freunde tragen sich selbst ein, ohne Konto oder App.",
       },
       {
-        question: "Was kostet das?",
+        question: "Wie früh sollte ich zur Adventsfeier einladen?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Etwa drei bis vier Wochen vorher – in der Adventszeit sind die Wochenenden schnell voll.",
       },
     ],
     updated: "2026-10-07",
   },
   {
-    id: "christmas",
-    slug: "weihnachtsfest",
-    name: "Weihnachtsfest",
-    title: "Einladung zum Weihnachtsfest online erstellen",
-    metaTitle: "Einladung zum Weihnachtsfest online erstellen – GASTZILLA",
+    id: "family-celebration",
+    slug: "familienfest",
+    name: "Familienfest & Feiertage",
+    title: "Familienfest oder Feiertag – Einladung online erstellen",
+    metaTitle: "Familienfest & Feiertage gemeinsam planen – GASTZILLA",
     description:
-      "Weihnachten mit Familie und Freunden planen: Gäste sagen per Link ohne Konto zu und tragen ein, was sie zum Festessen mitbringen. Kostenlos & werbefrei.",
-    teaser: "Familie und Freunde sagen per Link zu – und stimmen ab, wer was zum Festessen beiträgt.",
+      "Weihnachten, Ostern, Iftar, Zuckerfest, Chanukka oder Thanksgiving: Familie und Freunde sagen per Link ohne Konto zu und tragen ein, was sie mitbringen.",
+    teaser: "Weihnachten, Ostern, Iftar, Chanukka, Thanksgiving & Co. – wer kommt und wer bringt welches Gericht mit?",
     intro: [
-      "Weihnachten mit der ganzen Familie heißt: viele Absprachen. Wer kommt an welchem Tag, wer bringt den Nachtisch mit, und kommt die Cousine diesmal mit Freund? Bis alles geklärt ist, sind Familienchat und Telefon heiß gelaufen.",
-      "Mit GASTZILLA erstellst du eine Einladungsseite für euer Weihnachtsfest – ob Heiligabend, Weihnachtsessen oder Treffen zwischen den Jahren – und teilst den Link. Alle tragen sich selbst ein, ganz ohne Konto oder App.",
+      "Ob Weihnachten oder Ostern, Iftar im Ramadan oder das Zuckerfest, Chanukka oder Pessach, Diwali, Nouruz oder Thanksgiving: Wenn die ganze Familie zusammenkommt, gibt es viel abzustimmen. Wer kommt an welchem Tag, wer bringt welches Gericht mit, und wie viele Plätze braucht ihr am Tisch? Bis alles geklärt ist, sind Familienchat und Telefon heiß gelaufen.",
+      "Mit GASTZILLA erstellst du eine Einladungsseite für euer Familienfest und teilst den Link. Alle tragen sich selbst ein – ganz ohne Konto oder App, ob Großeltern, Cousinen oder Freunde der Familie.",
     ],
-    benefitsTitle: "Darum passt GASTZILLA zum Weihnachtsfest",
+    benefitsTitle: "Darum passt GASTZILLA zum Familienfest",
     benefits: [
       {
-        title: "Wer bringt was zum Festessen?",
-        text: "Jeder trägt ein, was er beisteuert – Rotkohl, Nachtisch oder Wein. Alle sehen es, und am Ende fehlt nichts und nichts ist doppelt.",
+        title: "Wer bringt welches Gericht mit?",
+        text: "Jeder trägt ein, was er beisteuert – Vorspeise, Hauptgang, Nachtisch oder Getränke. Alle sehen es, und am Ende fehlt nichts und nichts ist doppelt.",
       },
       {
-        title: "Auch über mehrere Tage",
-        text: "Feiert ihr vom 24. bis zum 26.? Gib einfach einen Zeitraum an. Gäste schreiben dazu, wann sie kommen und auf Wunsch, bis wann sie bleiben.",
+        title: "Pünktlich zum Essen – oder über mehrere Tage",
+        text: "Gäste geben an, wann sie kommen und auf Wunsch, bis wann sie bleiben – etwa pünktlich zum Fastenbrechen. Feiert ihr über mehrere Tage, gibst du einfach einen Zeitraum an.",
       },
       {
         title: "Die ganze Familie im Blick",
         text: "Partner und Kinder werden mit Namen eingetragen und mitgezählt. So weißt du, wie viele Plätze am Tisch du brauchst.",
       },
       {
-        title: "Einfach für alle Generationen",
-        text: "Ein Link per WhatsApp, Signal, Telegram oder E-Mail genügt. Niemand muss eine App installieren oder ein Konto anlegen.",
+        title: "Wünsche und Hinweise",
+        text: "Gäste können eine Nachricht hinterlassen – zum Beispiel zu Allergien, vegetarischem Essen oder Speisevorschriften.",
       },
     ],
     invitationText: [
-      "Liebe Familie,",
-      "auch dieses Jahr wollen wir Weihnachten zusammen feiern! 🎄",
-      "Wann: [Datum / Zeitraum]",
+      "Liebe Familie, liebe Freunde,",
+      "wir feiern [Weihnachten / Ostern / Iftar / das Zuckerfest / Chanukka / Thanksgiving] zusammen! 🍽️",
+      "Wann: [Datum / Zeitraum] ab [Uhrzeit]",
       "Wo: [Ort]",
-      "Damit wir das Festessen gut planen können, tragt euch bitte hier ein und schreibt dazu, wer was mitbringt: [Link]",
+      "Damit wir gut planen können, tragt euch bitte hier ein und schreibt dazu, wer was mitbringt: [Link]",
       "Wir freuen uns auf euch!",
       "[Dein Name]",
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Passt GASTZILLA auch für religiöse Feste?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Ja. GASTZILLA ist für jedes Fest gedacht – ob Weihnachten, Ostern, Ramadan, Chanukka, Diwali oder Thanksgiving. Titel, Begrüßungstext und Design wählst du selbst.",
       },
       {
-        question: "Können Gäste ihren Eintrag später ändern?",
+        question: "Wie stimmen wir ab, wer welches Gericht mitbringt?",
         answer:
-          "Ja. Wenn sich etwas ändert – eine andere Uhrzeit, ein Gast mehr oder ein anderes Gericht –, passen sie ihren Eintrag einfach an. Du bekommst dazu eine E-Mail.",
+          "Jeder trägt bei der Zusage ein, was er beisteuert. Alle sehen die Liste – so ergänzt sich das Festessen, und nichts kommt doppelt.",
       },
       {
-        question: "Was kostet die Einladung zum Weihnachtsfest?",
+        question: "Können Gäste auf Speisevorschriften hinweisen?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Ja. Allergien, vegetarisches Essen oder Speisevorschriften schreiben Gäste einfach als Nachricht zu ihrer Zusage.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-07",
   },
   {
     id: "new-years-eve",
@@ -765,19 +1097,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Wie früh sollte ich zu Silvester einladen?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Am besten drei bis vier Wochen vorher, denn viele planen Silvester früh. Kurzfristig geht es aber auch – die Seite steht in wenigen Minuten.",
       },
       {
-        question: "Bekomme ich Bescheid, wenn sich jemand einträgt?",
+        question: "Können Gäste angeben, ob sie übernachten?",
         answer:
-          "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
+          "Gäste geben an, bis wann sie bleiben, und können eine Nachricht hinterlassen – etwa, ob sie einen Schlafplatz brauchen.",
       },
       {
-        question: "Was kostet die Einladung zur Silvesterparty?",
+        question: "Wie stimmen wir Raclette oder Buffet ab?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Jeder trägt bei der Zusage ein, was er mitbringt – Käse, Brot, Salat oder Sekt. Alle sehen es, und nichts fehlt.",
       },
     ],
     updated: "2026-10-06",
@@ -821,19 +1153,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        question: "Wie finde ich ein gutes Motto?",
         answer:
-          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Beliebt sind zum Beispiel 80er, 90er, Bad Taste, Hawaii, Casino oder Hollywood. Wichtig ist ein Motto, zu dem jeder leicht ein Outfit findet.",
+      },
+      {
+        question: "Wie früh sollte ich zur Mottoparty einladen?",
+        answer:
+          "Etwa drei bis vier Wochen vorher, damit alle Zeit haben, ein passendes Kostüm zu besorgen.",
       },
       {
         question: "Gibt es Designs passend zu meinem Motto?",
         answer:
           "Eigene Motto-Designs gibt es nicht, aber du kannst aus mehreren Farbdesigns wählen und Titel und Begrüßungstext frei auf dein Motto zuschneiden.",
-      },
-      {
-        question: "Was kostet die Einladung zur Mottoparty?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-06",
@@ -918,12 +1250,12 @@ export const OCCASIONS: Occasion[] = [
         text: "Jeder trägt sich ein und nennt Begleitpersonen mit Namen. Die Liste zeigt dir jederzeit, für wie viele Leute du Karten oder eine Gruppenführung besorgen musst.",
       },
       {
-        title: "Treffpunkt und Uhrzeit für alle",
-        text: "Ort, Datum und Uhrzeit stehen auf der Seite, dazu deine Kontaktdaten. Gäste geben an, wann sie zum Treffpunkt kommen.",
+        title: "Treffpunkt vor der Vorstellung",
+        text: "Ort, Datum und Uhrzeit stehen auf der Seite, dazu deine Kontaktdaten. Gäste geben an, wann sie zum Treffpunkt kommen – mit etwas Puffer vor Beginn.",
       },
       {
-        title: "Absprachen ohne Gruppenchat",
-        text: "Gäste können eine Nachricht hinterlassen – etwa, ob sie schon eine Karte haben oder nach der Vorstellung noch mitkommen.",
+        title: "Wer hat schon eine Karte?",
+        text: "Gäste schreiben dazu, ob sie schon eine Karte haben, eine Ermäßigung nutzen oder nach der Vorstellung noch mitkommen.",
       },
     ],
     invitationText: [
@@ -937,19 +1269,74 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Lohnt sich eine Gruppenkarte?",
+        answer:
+          "Viele Theater, Museen und Kinos bieten Gruppenpreise ab einer bestimmten Personenzahl. Mit der Zusagenliste weißt du rechtzeitig, ob ihr die Gruppengröße erreicht.",
+      },
+      {
+        question: "Kann ich auch eine Führung für die Gruppe planen?",
+        answer:
+          "Ja. Sammle die Zusagen mit GASTZILLA und buche die Führung anschließend mit der passenden Teilnehmerzahl beim Museum oder Theater.",
+      },
+      {
         question: "Kann ich über GASTZILLA Tickets kaufen?",
         answer:
           "Nein. GASTZILLA ist kein Ticketshop – du sammelst nur die Zusagen. Die Karten besorgst du wie gewohnt beim Kino, Theater oder Veranstalter.",
       },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "rehearsal",
+    slug: "probe",
+    name: "Proben & Auftritte",
+    title: "Bandprobe, Chorprobe oder Auftritt – Zusagen per Link sammeln",
+    metaTitle: "Bandprobe, Chorprobe & Auftritt planen – GASTZILLA",
+    description:
+      "Bandprobe, Orchester- oder Chorprobe, Probenwochenende oder Auftritt: Musiker sagen per Link ohne Konto zu – und du siehst, wer dabei ist. Kostenlos.",
+    teaser: "Band-, Orchester- oder Chorprobe, Probenwochenende oder Auftritt – wer ist dabei, wer bringt was mit?",
+    intro: [
+      "Ob Bandprobe im Proberaum, Orchester- oder Chorprobe, Probenwochenende oder Auftritt beim Stadtfest: Damit sich der Termin lohnt, müssen die richtigen Leute da sein. Fehlt der Bass, die zweite Geige oder der halbe Sopran? Im Gruppenchat erfährt man das oft erst kurz vorher.",
+      "Mit GASTZILLA legst du in wenigen Minuten eine Seite für den Termin an und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und jeder sieht, wer kommt.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zu Proben und Auftritten",
+    benefits: [
       {
-        question: "Brauchen die anderen ein Konto oder eine App?",
-        answer:
-          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du brauchst ein kostenloses Konto.",
+        title: "Sind alle Stimmen besetzt?",
+        text: "Musiker schreiben zu ihrer Zusage, welches Instrument oder welche Stimme sie übernehmen. So siehst du vorher, ob die Besetzung steht.",
       },
       {
-        question: "Was kostet das?",
+        title: "Equipment und Noten abstimmen",
+        text: "Verstärker, Notenständer, Kabel, Noten oder Getränke – jeder trägt ein, was er mitbringt. Dann fehlt beim Aufbau nichts.",
+      },
+      {
+        title: "Probenwochenende planen",
+        text: "Für ein Probenwochenende gibst du einen Zeitraum an. Alle schreiben dazu, wann sie anreisen und auf Wunsch, bis wann sie bleiben.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "nächste [Bandprobe / Orchesterprobe / Chorprobe] am [Datum] um [Uhrzeit]! 🎵",
+      "Wo: [Proberaum / Ort]",
+      "Tragt euch bitte hier ein und schreibt dazu, mit welchem Instrument oder welcher Stimme ihr dabei seid: [Link]",
+      "Bis dann!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Kann ich regelmäßige Proben anlegen?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Jeder Termin ist bei GASTZILLA ein eigenes Event. Ein Event mit allen Grundfunktionen ist kostenlos, weitere Events kannst du bald dazukaufen. Für ein Probenwochenende reicht ein Event mit Zeitraum.",
+      },
+      {
+        question: "Wie sehe ich, wer welches Instrument spielt?",
+        answer:
+          "Bitte die Musiker, bei der Zusage Instrument oder Stimme als Nachricht anzugeben. Die Nachricht steht in der Liste direkt beim jeweiligen Eintrag.",
+      },
+      {
+        question: "Eignet sich das auch für einen Auftritt mit Helfern?",
+        answer:
+          "Ja. Für Konzert oder Vereinsfest tragen sich Musiker und Helfer ein und schreiben dazu, wann sie kommen und was sie mitbringen.",
       },
     ],
     updated: "2026-10-07",
@@ -978,8 +1365,8 @@ export const OCCASIONS: Occasion[] = [
         text: "Gäste geben an, wann sie kommen und auf Wunsch, bis wann sie bleiben – praktisch, wenn manche erst zum Club dazustoßen.",
       },
       {
-        title: "Absprachen ohne Gruppenchat",
-        text: "Gäste können eine Nachricht hinterlassen – etwa, ob sie vegetarisch essen oder erst nach dem Essen dazukommen.",
+        title: "Essenswünsche vorab",
+        text: "Gäste können eine Nachricht hinterlassen – etwa, ob sie vegetarisch essen, eine Allergie haben oder erst nach dem Essen dazukommen.",
       },
     ],
     invitationText: [
@@ -993,19 +1380,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Wie groß sollte eine Escape-Room-Gruppe sein?",
+        answer:
+          "Die meisten Escape Rooms sind für etwa zwei bis sechs Personen ausgelegt – die genaue Gruppengröße nennt der Anbieter. Mit der Zusagenliste siehst du, ob ihr ein oder zwei Teams braucht.",
+      },
+      {
+        question: "Wie früh sollte ich für eine größere Gruppe reservieren?",
+        answer:
+          "Für Restaurants und Bars am Wochenende lohnt sich eine Reservierung meist ein bis zwei Wochen vorher – sammle die Zusagen also rechtzeitig.",
+      },
+      {
         question: "Kann ich über GASTZILLA einen Tisch reservieren oder einen Escape Room buchen?",
         answer:
           "Nein. GASTZILLA sammelt nur die Zusagen. Reservierung und Buchung erledigst du wie gewohnt beim Restaurant, der Bar, dem Bowlingcenter oder dem Escape-Room-Anbieter – aber mit der richtigen Personenzahl.",
-      },
-      {
-        question: "Brauchen die anderen ein Konto oder eine App?",
-        answer:
-          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du brauchst ein kostenloses Konto.",
-      },
-      {
-        question: "Was kostet das?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
     updated: "2026-10-07",
@@ -1030,7 +1417,7 @@ export const OCCASIONS: Occasion[] = [
         text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat. So siehst du schnell, ob es für zwei Teams, die Laufgruppe oder eine Seilschaft reicht.",
       },
       {
-        title: "Wer bringt was mit?",
+        title: "Ausrüstung abstimmen",
         text: "Bälle, Schläger, Leibchen, Seil oder Getränke – jeder trägt ein, was er mitbringt. Dann steht am Ende niemand ohne Ausrüstung da.",
       },
       {
@@ -1052,9 +1439,9 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        question: "Wie viele Leute brauchen wir für ein Spiel?",
         answer:
-          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Organisator brauchst ein kostenloses Konto.",
+          "Für Fußball auf dem Kleinfeld reichen oft fünf gegen fünf, für Basketball drei gegen drei. Mit der Zusagenliste seht ihr vorher, ob es reicht – oder ob noch jemand fehlt.",
       },
       {
         question: "Können sich Mitspieler wieder austragen?",
@@ -1108,19 +1495,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        question: "Wie viele Leute passen zu einem Spieleabend?",
         answer:
-          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Viele Brettspiele sind für drei bis sechs Personen gedacht. Kommen mehr, spielt ihr an zwei Tischen – mit der Zusagenliste siehst du rechtzeitig, wie viele es werden.",
       },
       {
-        question: "Können sich Mitspieler wieder austragen?",
+        question: "Wie stimmen wir ab, was gespielt wird?",
         answer:
-          "Ja. Wer doch nicht kann, ändert oder löscht seinen Eintrag einfach. Du bekommst dazu eine E-Mail.",
+          "Gäste können bei der Zusage eine Nachricht hinterlassen – etwa, worauf sie Lust haben. So siehst du vorher, welche Spiele gefragt sind.",
       },
       {
-        question: "Was kostet das?",
+        question: "Eignet sich das auch für eine Pen-&-Paper-Kampagne?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Ja. Die Spielrunde trägt sich ein, und per Nachricht klärt ihr Charakterbögen, Snacks oder wer später dazukommt.",
       },
     ],
     updated: "2026-10-07",
@@ -1164,19 +1551,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        question: "Kann ich eine LAN-Party über mehrere Tage planen?",
         answer:
-          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+          "Ja. Gib einen Zeitraum an. Gäste schreiben dazu, wann sie kommen, bis wann sie bleiben und welche Hardware sie mitbringen.",
       },
       {
-        question: "Bekomme ich Bescheid, wenn sich jemand einträgt?",
+        question: "Wie verhindere ich, dass Controller oder Kabel fehlen?",
         answer:
-          "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
+          "Jeder trägt bei der Zusage ein, was er mitbringt – Konsole, Controller, Rechner, Monitor oder Netzwerkkabel. Alle sehen die Liste, und Lücken fallen sofort auf.",
       },
       {
-        question: "Was kostet das?",
+        question: "Eignet sich das auch für ein Mario-Kart-Turnier?",
         answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Ja. Alle tragen sich ein, und du siehst vorher, wie viele mitspielen – so planst du Runden und Controller passend.",
       },
     ],
     updated: "2026-10-07",
