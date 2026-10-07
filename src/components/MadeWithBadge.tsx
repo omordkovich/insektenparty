@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { LegalLinks } from "./LegalLinks";
 import { ShareButtons } from "./ShareButtons";
 
@@ -8,9 +9,11 @@ type MadeWithBadgeProps = {
   /** Event pages pass their share URL/title to get share + copy buttons
    *  next to the badge. */
   share?: { url: string; title: string };
+  /** Extra icon button placed right of the share/copy buttons. */
+  extraAction?: ReactNode;
 };
 
-export function MadeWithBadge({ share }: MadeWithBadgeProps) {
+export function MadeWithBadge({ share, extraAction }: MadeWithBadgeProps) {
   return (
     <div className="mt-6 text-center">
       <div className="flex items-center justify-center gap-3">
@@ -24,7 +27,11 @@ export function MadeWithBadge({ share }: MadeWithBadgeProps) {
             style={{ maskImage: `url(${BADGE_SRC})`, WebkitMaskImage: `url(${BADGE_SRC})` }}
           />
         </Link>
-        {share ? <ShareButtons url={share.url} title={share.title} className="bg-surface" /> : null}
+        {share ? (
+          <ShareButtons url={share.url} title={share.title} className="bg-surface">
+            {extraAction}
+          </ShareButtons>
+        ) : null}
       </div>
       <LegalLinks className="mt-2" />
     </div>

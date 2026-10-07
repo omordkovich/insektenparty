@@ -24,6 +24,9 @@ export type Occasion = {
   // Own field because German needs zum/zur/zu depending on the occasion.
   benefitsTitle: string;
   benefits: { title: string; text: string }[];
+  // Ready-to-copy invitation text, one entry per line; placeholders in
+  // [brackets], always including [Link] for the invitation link.
+  invitationText: string[];
   faq: FaqItem[];
   // Last real text change (sitemap lastModified), YYYY-MM-DD.
   updated: string;
@@ -75,6 +78,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder neuen Zusage bekommst du eine Benachrichtigung per E-Mail.",
       },
     ],
+    invitationText: [
+      "Hallo liebe Eltern,",
+      "[Name des Kindes] wird [Alter] und möchte das mit [eurem Kind] feiern! 🎈",
+      "Wann: [Datum], [Uhrzeit von] bis [Uhrzeit bis]",
+      "Wo: [Ort]",
+      "Bitte tragt euer Kind bis [Datum] über diesen Link ein – dort könnt ihr auch Bring- und Abholzeit und Mitbringsel angeben: [Link]",
+      "Wir freuen uns!",
+      "[Dein Name]",
+    ],
     faq: [
       {
         question: "Brauchen die Eltern ein Konto oder eine App?",
@@ -98,6 +110,66 @@ export const OCCASIONS: Occasion[] = [
       },
     ],
     updated: "2026-10-06",
+  },
+  {
+    id: "kids-playdate",
+    slug: "spielverabredung",
+    name: "Spielverabredung",
+    title: "Spielverabredung für Kinder per Link organisieren",
+    metaTitle: "Spielverabredung für Kinder organisieren – GASTZILLA",
+    description:
+      "Spielenachmittag für mehrere Kinder planen: Eltern sagen per Link ohne Konto zu und geben an, wann sie ihr Kind bringen und abholen. Kostenlos & werbefrei.",
+    teaser: "Mehrere Kinder, ein Nachmittag – Eltern tragen Bring- und Abholzeit selbst ein.",
+    intro: [
+      "Wenn sich mehrere Kinder zum Spielen treffen – nach der Kita, auf dem Spielplatz oder bei euch zu Hause –, laufen die Absprachen meist über viele einzelne Eltern-Chats: Wer kommt, wann wird gebracht, wer holt wann ab, und darf das kleine Geschwisterkind mit?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Seite für die Spielverabredung und schickst den Link an die Eltern. Sie tragen ihr Kind selbst ein – ganz ohne Konto oder App – und alle wissen, wer dabei ist.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zur Spielverabredung",
+    benefits: [
+      {
+        title: "Bringen und Abholen geklärt",
+        text: "Eltern geben an, wann sie ihr Kind bringen, und können eintragen, bis wann es bleibt. So weißt du jederzeit, welche Kinder gerade da sind.",
+      },
+      {
+        title: "Geschwister mit eintragen",
+        text: "Kommt der kleine Bruder oder ein Elternteil mit? Begleitpersonen werden direkt bei der Zusage mit Namen eingetragen und mitgezählt.",
+      },
+      {
+        title: "Wichtiges direkt dabei",
+        text: "Eltern können eine Nachricht hinterlassen – zum Beispiel zu Allergien oder wer das Kind heute abholt.",
+      },
+      {
+        title: "Snacks abstimmen",
+        text: "Wer Obst, Muffins oder Getränke mitbringt, schreibt es dazu. Alle sehen es, und nichts kommt doppelt.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "die Kinder wollen sich mal wieder zum Spielen treffen! 🧸",
+      "Wann: [Datum], ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Tragt euer Kind bitte hier ein und schreibt dazu, wann ihr es bringt und abholt: [Link]",
+      "Liebe Grüße",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Brauchen die Eltern ein Konto oder eine App?",
+        answer:
+          "Nein. Die Eltern öffnen den Link im Browser und tragen ihr Kind ein. Nur du brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Wer kann die Liste sehen?",
+        answer:
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den Eltern der eingeladenen Kinder.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
   },
   {
     id: "birthday",
@@ -130,6 +202,15 @@ export const OCCASIONS: Occasion[] = [
         title: "Mitbringsel abstimmen",
         text: "Wer einen Kuchen, Salat oder Getränke mitbringt, schreibt es dazu. Alle sehen es, und nichts kommt doppelt.",
       },
+    ],
+    invitationText: [
+      "Hallo ihr Lieben,",
+      "ich werde [Alter] – und das möchte ich mit euch feiern! 🥳",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Sagt mir bitte bis [Datum] über diesen Link Bescheid, ob ihr kommt und wen ihr mitbringt: [Link]",
+      "Ich freue mich auf euch!",
+      "[Dein Name]",
     ],
     faq: [
       {
@@ -187,6 +268,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Verschicke die Einladung per WhatsApp, Signal, Telegram oder E-Mail – an die Familie genauso wie an Freunde und Kollegen.",
       },
     ],
+    invitationText: [
+      "Liebe Familie, liebe Freunde,",
+      "wir trauen uns! 💍",
+      "Am [Datum] möchten wir unsere Hochzeit mit euch feiern.",
+      "Ort: [Ort], Beginn: [Uhrzeit]",
+      "Bitte gebt uns bis [Datum] über diesen Link Bescheid, ob ihr dabei seid und wer euch begleitet: [Link]",
+      "Wir freuen uns sehr auf euch!",
+      "[Eure Namen]",
+    ],
     faq: [
       {
         question: "Brauchen unsere Gäste ein Konto oder eine App?",
@@ -242,6 +332,15 @@ export const OCCASIONS: Occasion[] = [
         title: "Datensparsam",
         text: "GASTZILLA ist werbefrei, setzt keine Tracking-Cookies ein und speichert die Daten auf Servern in der EU.",
       },
+    ],
+    invitationText: [
+      "Liebe Kolleginnen und Kollegen,",
+      "wir laden euch herzlich zu unserer [Weihnachtsfeier / Sommerfest / Teamevent] ein! 🎉",
+      "Wann: [Datum], ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Bitte tragt euch bis [Datum] über diesen Link ein, damit wir gut planen können: [Link]",
+      "Wir freuen uns auf einen schönen Abend mit euch!",
+      "[Dein Name / Team]",
     ],
     faq: [
       {
@@ -299,6 +398,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail – an Nachbarn, Freunde und Familie gleichzeitig.",
       },
     ],
+    invitationText: [
+      "Hallo zusammen,",
+      "der Grill wird angeworfen! 🔥",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Für [Grillgut und Getränke] ist gesorgt – wer mag, bringt einen Salat oder Nachtisch mit. Tragt euch bitte hier ein und schreibt dazu, was ihr mitbringt: [Link]",
+      "Bis bald!",
+      "[Dein Name]",
+    ],
     faq: [
       {
         question: "Brauchen meine Gäste ein Konto oder eine App?",
@@ -317,6 +425,126 @@ export const OCCASIONS: Occasion[] = [
       },
     ],
     updated: "2026-10-06",
+  },
+  {
+    id: "carnival-party",
+    slug: "karneval",
+    name: "Karneval",
+    title: "Karnevalsparty oder Karnevalssitzung – Einladung online erstellen",
+    metaTitle: "Karnevalsparty & Karnevalssitzung planen – GASTZILLA",
+    description:
+      "Karnevalsparty, Sitzung, Weiberfastnacht oder Elfter im Elften: Gäste sagen per Link ohne Konto zu, verraten ihr Kostüm und tragen ein, was sie mitbringen.",
+    teaser: "Party, Sitzung, Elfter im Elften oder Rosenmontag – Zusagen, Kostüme und Mitbringsel über einen Link.",
+    intro: [
+      "Alaaf und Helau! Ob Sessionsauftakt am Elften im Elften, gemeinsamer Besuch der Karnevalssitzung, Weiberfastnacht oder Rosenmontag: Wenn die Jecken loslegen, will alles gut vorbereitet sein. Wer kommt mit, wie viele Sitzungskarten braucht ihr, wer trifft sich schon vor dem Zug, und wer bringt Kölsch oder Alt, Berliner oder Frikadellen mit? Im Gruppenchat geht das zwischen Kostümfotos schnell unter.",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite für deine Karnevalsparty oder euren Sitzungsbesuch und teilst den Link. Deine Gäste tragen sich selbst ein – ohne Konto oder App – und du siehst alle Zusagen in einer Liste.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum Karneval",
+    benefits: [
+      {
+        title: "Kostüm-Verrat per Nachricht",
+        text: "Gäste können zu ihrer Zusage eine Nachricht schreiben – zum Beispiel, als was sie kommen. So stimmt ihr euch ab, und es gibt keine fünf Piraten.",
+      },
+      {
+        title: "Gemeinsam zur Karnevalssitzung",
+        text: "Alle tragen sich mit Begleitung ein – so weißt du rechtzeitig, wie viele Karten du für die Sitzung besorgen musst.",
+      },
+      {
+        title: "Treffen vor und nach dem Zug",
+        text: "Gäste geben an, wann sie kommen und auf Wunsch, bis wann sie bleiben. Feiert ihr von Weiberfastnacht bis Rosenmontag, gibst du einfach einen Zeitraum an.",
+      },
+      {
+        title: "Mitbringsel für die Feier",
+        text: "Wer Berliner, Frikadellen oder Getränke mitbringt, trägt es ein. Alle sehen es, und das Buffet passt.",
+      },
+    ],
+    invitationText: [
+      "Alaaf und Helau, ihr Jecken! 🎉",
+      "Wir [feiern Weiberfastnacht / gehen zusammen zur Karnevalssitzung / feiern den Elften im Elften]!",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Kostüm ist Pflicht! Sagt hier zu, verratet, als was ihr kommt, und tragt ein, was ihr mitbringt: [Link]",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Brauchen meine Gäste ein Konto oder eine App?",
+        answer:
+          "Nein. Deine Gäste öffnen den Einladungslink im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Kann ich über GASTZILLA Karten für die Sitzung kaufen?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Zusagen. Die Karten besorgst du wie gewohnt beim Karnevalsverein – aber mit der richtigen Anzahl.",
+      },
+      {
+        question: "Gibt es ein Karnevals-Design?",
+        answer:
+          "Ein eigenes Karnevals-Design gibt es nicht, aber mit bunten Farbdesigns wie „Rot“, „Gelb“ oder „Blau“ bekommt deine Einladung schnell die passende Stimmung.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "oktoberfest",
+    slug: "oktoberfest",
+    name: "Oktoberfest",
+    title: "Oktoberfest-Party oder Wiesn-Besuch – Einladung online erstellen",
+    metaTitle: "Oktoberfest-Party & Wiesn-Besuch planen – GASTZILLA",
+    description:
+      "Oktoberfest-Party zu Hause oder gemeinsam auf die Wiesn: Gäste sagen per Link ohne Konto zu – und du weißt, für wie viele du im Festzelt reservieren musst.",
+    teaser: "Oktoberfest-Party zu Hause oder gemeinsam auf die Wiesn – Zusagen, Brezn und Treffpunkt über einen Link.",
+    intro: [
+      "O’zapft is! Ob Oktoberfest-Party im Garten oder Partykeller, gemeinsam auf die Wiesn in München, auf den Cannstatter Wasen oder zum Oktoberfest in deiner Stadt: Damit der Tisch im Festzelt reicht und genug Brezn da sind, musst du wissen, wer mitkommt.",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite für deine Oktoberfest-Party oder euren Wiesn-Besuch und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und du hast die Zusagen in einer Liste.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum Oktoberfest",
+    benefits: [
+      {
+        title: "Richtig reservieren im Festzelt",
+        text: "Jeder trägt sich ein und nennt Begleitpersonen mit Namen. So weißt du, für wie viele Leute du einen Tisch im Zelt reservieren musst.",
+      },
+      {
+        title: "Brezn, Obatzda und Weißwürste",
+        text: "Bei der Party zu Hause trägt jeder ein, was er mitbringt. Alle sehen es – und am Ende fehlt weder Senf noch Brezn.",
+      },
+      {
+        title: "Treffpunkt vor dem Zelt",
+        text: "Ort und Uhrzeit stehen auf der Seite. Wer später nachkommt oder früher geht, gibt das einfach bei der Zusage an.",
+      },
+    ],
+    invitationText: [
+      "Servus beinand! 🥨",
+      "O’zapft is – wir [feiern Oktoberfest bei mir / gehen zusammen auf die Wiesn]!",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo / Treffpunkt: [Ort]",
+      "Tragt euch bitte bis [Datum] hier ein, damit ich [den Tisch reservieren / genug Brezn besorgen] kann – und schreibt dazu, was ihr mitbringt: [Link]",
+      "Dirndl und Lederhosn gern gesehen!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Kann ich über GASTZILLA einen Tisch im Festzelt reservieren?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Zusagen. Die Reservierung erledigst du wie gewohnt beim Festwirt – aber mit der richtigen Personenzahl.",
+      },
+      {
+        question: "Gibt es ein Oktoberfest-Design?",
+        answer:
+          "Ein eigenes Oktoberfest-Design gibt es nicht, aber mit den Farbdesigns „Blau“ oder „Weiß“ bekommt deine Einladung schnell den passenden Look.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
   },
   {
     id: "halloween-party",
@@ -350,6 +578,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder neuen Zusage bekommst du eine E-Mail.",
       },
     ],
+    invitationText: [
+      "Hallo ihr Gruselgestalten! 🎃",
+      "Ich lade euch zu meiner Halloweenparty ein.",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Verkleidung erwünscht! Sagt hier zu, verratet, als was ihr kommt, und tragt ein, welche Snacks ihr mitbringt: [Link]",
+      "Schaurige Grüße",
+      "[Dein Name]",
+    ],
     faq: [
       {
         question: "Brauchen meine Gäste ein Konto oder eine App?",
@@ -370,32 +607,45 @@ export const OCCASIONS: Occasion[] = [
     updated: "2026-10-06",
   },
   {
-    id: "mulled-wine-evening",
-    slug: "gluehweinabend",
-    name: "Glühweinabend",
-    title: "Einladung zum Glühweinabend online erstellen",
-    metaTitle: "Einladung zum Glühweinabend online erstellen – GASTZILLA",
+    id: "advent-party",
+    slug: "advent-weihnachtsmarkt",
+    name: "Advent & Weihnachtsmarkt",
+    title: "Adventsfeier, Glühweinabend oder Weihnachtsmarkt – per Link einladen",
+    metaTitle: "Adventsfeier & Weihnachtsmarkt gemeinsam planen – GASTZILLA",
     description:
-      "Glühweinabend oder Adventstreffen per Link planen: Gäste sagen ohne Konto zu, geben an, wann sie kommen, und was sie mitbringen. Kostenlos & werbefrei.",
-    teaser: "Adventsabend mit Freunden – wer kommt wann und wer bringt Tassen mit?",
+      "Adventsfeier, Glühweinabend oder gemeinsam auf den Weihnachtsmarkt: Gäste sagen per Link ohne Konto zu und geben an, wann sie kommen. Kostenlos & werbefrei.",
+    teaser: "Adventskaffee, Glühwein am Feuer oder Weihnachtsmarkt – wer kommt wann und wer bringt was mit?",
     intro: [
-      "Ein Glühweinabend ist schnell geplant – auf dem Balkon, im Garten oder in der Feuerschale vor dem Haus. Schwieriger ist der Überblick: Wer kommt nach der Arbeit vorbei, wer bleibt länger, und wer bringt Plätzchen mit?",
-      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite für deinen Glühweinabend oder dein Adventstreffen und teilst den Link. Deine Gäste tragen sich selbst ein – ohne Konto oder App.",
+      "Ob Adventskaffee mit den Nachbarn, Plätzchenbacken mit Freunden, Glühweinabend an der Feuerschale oder ein gemeinsamer Bummel über den Weihnachtsmarkt: In der Adventszeit ist viel los. Wer kommt nach der Arbeit dazu, wo trefft ihr euch, und wer bringt Plätzchen oder Tassen mit?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Einladungsseite für deine Adventsfeier, deinen Glühweinabend oder euren Weihnachtsmarktbesuch und teilst den Link. Deine Gäste tragen sich selbst ein – ohne Konto oder App.",
     ],
-    benefitsTitle: "Darum passt GASTZILLA zum Glühweinabend",
+    benefitsTitle: "Darum passt GASTZILLA zur Adventszeit",
     benefits: [
       {
         title: "Wer kommt wann?",
-        text: "Gäste geben an, wann sie vorbeikommen und auf Wunsch, bis wann sie bleiben. So weißt du, wann der Topf auf dem Herd stehen muss.",
+        text: "Gäste geben an, wann sie vorbeikommen und auf Wunsch, bis wann sie bleiben. So weißt du, wann der Glühwein warm sein muss.",
       },
       {
         title: "Plätzchen, Tassen, Kinderpunsch",
         text: "Jeder trägt ein, was er mitbringt. Alle sehen es – und am Ende fehlen weder Tassen noch der Punsch für die Kinder.",
       },
       {
-        title: "Spontan einladen",
-        text: "Die Einladungsseite steht in wenigen Minuten. Teile den Link per WhatsApp, Signal, Telegram oder E-Mail – auch kurzfristig.",
+        title: "Gemeinsam auf den Weihnachtsmarkt",
+        text: "Nenne Treffpunkt und Uhrzeit – etwa am Eingang oder an der Glühweinbude. Wer später nachkommt, schreibt es einfach bei der Zusage dazu.",
       },
+      {
+        title: "Für Nachbarn, Verein oder Freunde",
+        text: "Ein Link per WhatsApp, Signal, Telegram oder E-Mail genügt – für die Hausgemeinschaft genauso wie für den Verein oder den Freundeskreis.",
+      },
+    ],
+    invitationText: [
+      "Hallo ihr Lieben,",
+      "zur Einstimmung auf die Adventszeit lade ich euch zu [Glühwein / Plätzchen / Adventskaffee / einem Bummel über den Weihnachtsmarkt] ein. ✨",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo / Treffpunkt: [Ort]",
+      "Kommt vorbei, wann es euch passt – tragt euch einfach hier ein und schreibt dazu, wann ihr kommt und was ihr mitbringt: [Link]",
+      "Liebe Grüße",
+      "[Dein Name]",
     ],
     faq: [
       {
@@ -409,12 +659,12 @@ export const OCCASIONS: Occasion[] = [
           "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
       },
       {
-        question: "Was kostet die Einladung zum Glühweinabend?",
+        question: "Was kostet das?",
         answer:
           "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-07",
   },
   {
     id: "christmas",
@@ -447,6 +697,15 @@ export const OCCASIONS: Occasion[] = [
         title: "Einfach für alle Generationen",
         text: "Ein Link per WhatsApp, Signal, Telegram oder E-Mail genügt. Niemand muss eine App installieren oder ein Konto anlegen.",
       },
+    ],
+    invitationText: [
+      "Liebe Familie,",
+      "auch dieses Jahr wollen wir Weihnachten zusammen feiern! 🎄",
+      "Wann: [Datum / Zeitraum]",
+      "Wo: [Ort]",
+      "Damit wir das Festessen gut planen können, tragt euch bitte hier ein und schreibt dazu, wer was mitbringt: [Link]",
+      "Wir freuen uns auf euch!",
+      "[Dein Name]",
     ],
     faq: [
       {
@@ -495,6 +754,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Die Einladungsseite steht in wenigen Minuten. Teile den Link per WhatsApp, Signal, Telegram oder E-Mail – auch wenige Tage vor Silvester.",
       },
     ],
+    invitationText: [
+      "Hallo zusammen,",
+      "lasst uns das neue Jahr gemeinsam begrüßen! 🥂",
+      "Wann: 31.12. ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Es gibt [Raclette / Fondue / Buffet] – sagt hier zu und tragt ein, was ihr mitbringt und wie lange ihr bleibt: [Link]",
+      "Bis Silvester!",
+      "[Dein Name]",
+    ],
     faq: [
       {
         question: "Brauchen meine Gäste ein Konto oder eine App?",
@@ -542,6 +810,15 @@ export const OCCASIONS: Occasion[] = [
         text: "Wer etwas mitbringt, trägt es ein. Alle sehen es, und das Buffet passt am Ende zum Motto.",
       },
     ],
+    invitationText: [
+      "Hallo zusammen,",
+      "Motto des Abends: [Motto]! 🕺",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Kommt passend verkleidet – sagt hier zu, verratet euer Outfit und tragt ein, was ihr mitbringt: [Link]",
+      "Ich freue mich auf euch!",
+      "[Dein Name]",
+    ],
     faq: [
       {
         question: "Brauchen meine Gäste ein Konto oder eine App?",
@@ -562,34 +839,52 @@ export const OCCASIONS: Occasion[] = [
     updated: "2026-10-06",
   },
   {
-    id: "group-trip",
-    slug: "gruppenausflug",
-    name: "Gruppenausflug",
-    title: "Gruppenausflug organisieren – Anmeldung per Link",
-    metaTitle: "Gruppenausflug organisieren – Anmeldung per Link – GASTZILLA",
+    id: "group-travel",
+    slug: "gruppenreise",
+    name: "Gruppenreise & Vereinsfahrt",
+    title: "Gruppenreise oder Vereinsfahrt organisieren – Anmeldung per Link",
+    metaTitle: "Gruppenreise & Vereinsfahrt organisieren – GASTZILLA",
     description:
-      "Gruppenausflug, Vereinsfahrt oder Wanderung planen: Teilnehmer melden sich per Link ohne Konto an, Begleitpersonen werden mitgezählt. Kostenlos & werbefrei.",
-    teaser: "Teilnehmer melden sich per Link an – mit Begleitung, auch für mehrtägige Touren.",
+      "Mit dem Bus nach Paris oder Amsterdam, Wochenendtour oder Vereinsfahrt: Teilnehmer melden sich per Link ohne Konto an – mit Begleitung. Kostenlos & werbefrei.",
+    teaser: "Busfahrt nach Paris, Wochenendtour oder Vereinsfahrt – Anmeldungen mit Begleitung in einer Liste.",
     intro: [
-      "Beim Gruppenausflug hängt alles an der Teilnehmerzahl: Wie viele Tickets, wie viele Plätze im Restaurant, wie viele Autos? Wer die Anmeldungen per Chat einsammelt, zählt am Ende doch wieder alles von Hand.",
-      "Mit GASTZILLA erstellst du eine Seite für deinen Ausflug – ob Wanderung, Vereinsfahrt, Klassentreffen oder Wochenendtour – und teilst den Link. Alle melden sich selbst an, ganz ohne Konto oder App.",
+      "Ob Busfahrt zum Städtetrip nach Paris oder Amsterdam, Wochenendtour mit Freunden oder die jährliche Vereinsfahrt: Bei einer Gruppenreise hängt alles an der Teilnehmerzahl. Wie groß muss der Bus sein, wie viele Zimmer braucht ihr, und wer kommt mit Partner? Wer die Anmeldungen per Chat und Telefon einsammelt, zählt am Ende doch wieder von Hand.",
+      "Mit GASTZILLA erstellst du eine Seite für eure Reise – mit Reisezeitraum, Abfahrtsort und Kontakt – und teilst den Link. Alle melden sich selbst an, ganz ohne Konto oder App, und du hast jederzeit die aktuelle Teilnehmerliste.",
     ],
-    benefitsTitle: "Darum passt GASTZILLA zum Gruppenausflug",
+    benefitsTitle: "Darum passt GASTZILLA zur Gruppenreise",
     benefits: [
       {
-        title: "Teilnehmer zählen sich selbst",
-        text: "Jeder trägt sich ein und nennt Begleitpersonen mit Namen. Die Gästeliste zeigt dir jederzeit, mit wie vielen Leuten du planen kannst.",
+        title: "Teilnehmerzahl für Bus und Hotel",
+        text: "Jeder meldet sich an und trägt Begleitpersonen mit Namen ein. So weißt du, wie viele Plätze im Bus und wie viele Zimmer ihr braucht.",
       },
       {
-        title: "Auch für mehrere Tage",
-        text: "Gib einen Zeitraum von bis an – für Wochenendtouren oder Vereinsfahrten. Treffpunkt und Kontakt stehen direkt auf der Seite.",
+        title: "Reisezeitraum und Abfahrtsort",
+        text: "Gib einen Zeitraum von bis an und nenne den Abfahrtsort. Deine Kontaktdaten stehen direkt auf der Seite, falls jemand Fragen hat.",
       },
       {
-        title: "Fragen direkt bei der Anmeldung",
-        text: "Teilnehmer können eine Nachricht hinterlassen, etwa zu Mitfahrgelegenheit oder Verpflegung. So hast du alles an einem Ort.",
+        title: "Wünsche direkt bei der Anmeldung",
+        text: "Teilnehmer können eine Nachricht hinterlassen – etwa einen Zimmerwunsch oder dass sie unterwegs zusteigen.",
+      },
+      {
+        title: "Ein Link für den ganzen Verein",
+        text: "Teile die Anmeldung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder neuen Anmeldung bekommst du eine E-Mail.",
       },
     ],
+    invitationText: [
+      "Hallo zusammen,",
+      "wir fahren gemeinsam nach [Reiseziel]! 🚌",
+      "Wann: [Datum von] bis [Datum bis]",
+      "Abfahrt: [Uhrzeit], [Abfahrtsort]",
+      "Bitte meldet euch bis [Datum] über diesen Link an und tragt Begleitpersonen mit Namen ein – Zimmerwünsche gern als Nachricht: [Link]",
+      "Bei Fragen erreicht ihr mich unter [Telefon].",
+      "[Dein Name]",
+    ],
     faq: [
+      {
+        question: "Kann ich über GASTZILLA die Reise buchen oder bezahlen lassen?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Anmeldungen. Bus, Hotel und Bezahlung organisierst du wie gewohnt selbst – aber mit der richtigen Teilnehmerzahl.",
+      },
       {
         question: "Müssen sich die Teilnehmer registrieren?",
         answer:
@@ -598,61 +893,293 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer kann die Teilnehmerliste sehen?",
         answer:
-          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit der Gruppe, die du einladen möchtest.",
-      },
-      {
-        question: "Was kostet die Planung des Ausflugs?",
-        answer:
-          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit der Gruppe, die mitfahren soll.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-07",
   },
   {
-    id: "casual-meetup",
-    slug: "verabredung",
-    name: "Verabredungen",
-    title: "Verabredungen und Treffen einfach per Link planen",
-    metaTitle: "Verabredungen und Treffen per Link planen – GASTZILLA",
+    id: "culture-outing",
+    slug: "kultur",
+    name: "Kultur",
+    title: "Kino, Theater, Oper oder Museum – gemeinsamen Besuch per Link planen",
+    metaTitle: "Kino, Theater, Oper & Museum gemeinsam planen – GASTZILLA",
     description:
-      "Spieleabend, Kinoabend oder Stammtisch: Lade per Link ein, Freunde sagen ohne Konto zu – und du siehst sofort, wer dabei ist. Kostenlos & werbefrei.",
-    teaser: "Spieleabend, Kino oder Stammtisch – sehen, wer dabei ist, ohne Chat-Chaos.",
+      "Kino, Theater, Oper, Museum, Konzert oder Stadion: Lade per Link ein, alle sagen ohne Konto zu – und du weißt, wie viele Karten du brauchst. Kostenlos.",
+    teaser: "Kino, Theater, Oper, Museum oder Konzert – sehen, wer mitkommt und wie viele Karten nötig sind.",
     intro: [
-      "Nicht jedes Treffen ist eine große Party. Aber auch beim Spieleabend, Kinobesuch oder Stammtisch kommt die Frage: Wer ist eigentlich dabei? Im Gruppenchat gehen die Antworten zwischen Memes und Sprachnachrichten schnell unter.",
-      "Mit GASTZILLA legst du in wenigen Minuten eine Seite für dein Treffen an und teilst den Link. Deine Freunde tragen sich selbst ein – ohne Konto oder App – und alle sehen auf einen Blick, wer kommt.",
+      "Gemeinsam ins Kino, ins Theater oder in die Oper, durchs Museum, zum Konzert oder zum Heimspiel ins Stadion – die Idee ist schnell geboren. Danach beginnt das Nachfragen: Wer kommt mit, wer bringt jemanden mit, und wie viele Karten müsst ihr besorgen?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Seite für euren Besuch und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und du siehst sofort, mit wie vielen Leuten du rechnen kannst.",
     ],
-    benefitsTitle: "Darum passt GASTZILLA zu Verabredungen",
+    benefitsTitle: "Darum passt GASTZILLA zum gemeinsamen Kulturbesuch",
     benefits: [
       {
-        title: "Schnell erstellt",
-        text: "Titel, Datum, Ort – fertig. Die Seite steht in wenigen Minuten und lässt sich jederzeit anpassen.",
+        title: "Wissen, wie viele Karten nötig sind",
+        text: "Jeder trägt sich ein und nennt Begleitpersonen mit Namen. Die Liste zeigt dir jederzeit, für wie viele Leute du Karten oder eine Gruppenführung besorgen musst.",
       },
       {
-        title: "Alle sehen, wer kommt",
-        text: "Die Liste ist für alle mit dem Link sichtbar. Niemand muss im Chat nachfragen, ob genug Leute für die Doppelkopfrunde zusammenkommen.",
+        title: "Treffpunkt und Uhrzeit für alle",
+        text: "Ort, Datum und Uhrzeit stehen auf der Seite, dazu deine Kontaktdaten. Gäste geben an, wann sie zum Treffpunkt kommen.",
       },
       {
-        title: "Kurze Absprachen inklusive",
-        text: "Wer etwas mitbringt oder später kommt, schreibt es direkt dazu – statt einer weiteren Nachricht in den Gruppenchat.",
+        title: "Absprachen ohne Gruppenchat",
+        text: "Gäste können eine Nachricht hinterlassen – etwa, ob sie schon eine Karte haben oder nach der Vorstellung noch mitkommen.",
       },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "wer kommt mit [ins Kino / ins Theater / in die Oper / ins Museum]? 🎭",
+      "Wann: [Datum], [Uhrzeit]",
+      "Treffpunkt: [Ort]",
+      "Tragt euch bitte bis [Datum] hier ein, damit ich die richtige Anzahl an Karten besorgen kann: [Link]",
+      "Liebe Grüße",
+      "[Dein Name]",
     ],
     faq: [
       {
-        question: "Brauchen meine Freunde ein Konto oder eine App?",
+        question: "Kann ich über GASTZILLA Tickets kaufen?",
+        answer:
+          "Nein. GASTZILLA ist kein Ticketshop – du sammelst nur die Zusagen. Die Karten besorgst du wie gewohnt beim Kino, Theater oder Veranstalter.",
+      },
+      {
+        question: "Brauchen die anderen ein Konto oder eine App?",
         answer:
           "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du brauchst ein kostenloses Konto.",
       },
       {
-        question: "Kann ich mehrere Treffen anlegen?",
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "going-out",
+    slug: "ausgehen",
+    name: "Ausgehen",
+    title: "Restaurant, Bar, Club oder Escape Room – gemeinsam ausgehen per Link planen",
+    metaTitle: "Restaurant, Bar, Club & Escape Room planen – GASTZILLA",
+    description:
+      "Restaurant, Bar, Club, Bowling oder Escape Room: Lade per Link ein, alle sagen ohne Konto zu – und du weißt, für wie viele du reservieren oder buchen musst.",
+    teaser: "Restaurant, Cocktailbar, Stammkneipe, Club, Bowling oder Escape Room – sehen, wer dabei ist.",
+    intro: [
+      "Zusammen essen gehen, ein Abend in der Cocktailbar, die Runde in der Stammkneipe, danach in den Club – oder eine Partie Bowling, Billard oder Darts, ein Escape Room mit Freunden: Ausgehen ist schnell vorgeschlagen. Aber wer kommt wirklich mit, und für wie viele Leute musst du einen Tisch, eine Bahn oder einen Raum buchen?",
+      "Mit GASTZILLA erstellst du in wenigen Minuten eine Seite für euren Abend und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und du siehst sofort, mit wie vielen Leuten du rechnen kannst.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum gemeinsamen Ausgehen",
+    benefits: [
+      {
+        title: "Richtig reservieren und buchen",
+        text: "Jeder trägt sich ein und nennt Begleitpersonen mit Namen. So weißt du, für wie viele Leute du im Restaurant, auf der Bowlingbahn oder im Escape Room buchen musst – gerade dort zählt die genaue Teamgröße.",
+      },
+      {
+        title: "Später dazukommen, früher gehen",
+        text: "Gäste geben an, wann sie kommen und auf Wunsch, bis wann sie bleiben – praktisch, wenn manche erst zum Club dazustoßen.",
+      },
+      {
+        title: "Absprachen ohne Gruppenchat",
+        text: "Gäste können eine Nachricht hinterlassen – etwa, ob sie vegetarisch essen oder erst nach dem Essen dazukommen.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "wer hat Lust auf [Restaurant / Cocktailbar / Stammkneipe / Club / Bowling / Escape Room]? 🍸",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Tragt euch bitte bis [Datum] hier ein, damit ich für die richtige Anzahl reservieren kann: [Link]",
+      "Bis dann!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Kann ich über GASTZILLA einen Tisch reservieren oder einen Escape Room buchen?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Zusagen. Reservierung und Buchung erledigst du wie gewohnt beim Restaurant, der Bar, dem Bowlingcenter oder dem Escape-Room-Anbieter – aber mit der richtigen Personenzahl.",
+      },
+      {
+        question: "Brauchen die anderen ein Konto oder eine App?",
+        answer:
+          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "sports-together",
+    slug: "sport",
+    name: "Sport zusammen",
+    title: "Gemeinsam Sport machen – Laufen, Klettern, Fußball & Co. per Link organisieren",
+    metaTitle: "Gemeinsam Sport machen – Laufen, Klettern & Co. – GASTZILLA",
+    description:
+      "Lauftreff, Klettern, Fußball, Hockey oder Snowboardtour: Lade per Link ein, alle sagen ohne Konto zu – und du siehst sofort, ob genug zusammenkommen.",
+    teaser: "Lauftreff, Klettern, Fußball, Hockey oder ab in die Berge – sehen, ob genug Leute zusammenkommen.",
+    intro: [
+      "Ob Marathon-Training in der Gruppe, Klettern und Bouldern in der Halle, eine Runde Fußball im Park, Basketball, Handball oder Hockeytraining – oder gemeinsam mit Snowboard und Ski in die Berge: Damit es losgehen kann, müssen genug Leute dabei sein. Im Gruppenchat ist das oft bis zuletzt unklar.",
+      "Mit GASTZILLA legst du in wenigen Minuten eine Seite für euren Termin an und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und jeder sieht auf einen Blick, wer dabei ist.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum gemeinsamen Sport",
+    benefits: [
+      {
+        title: "Kommen genug Leute zusammen?",
+        text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat. So siehst du schnell, ob es für zwei Teams, die Laufgruppe oder eine Seilschaft reicht.",
+      },
+      {
+        title: "Wer bringt was mit?",
+        text: "Bälle, Schläger, Leibchen, Seil oder Getränke – jeder trägt ein, was er mitbringt. Dann steht am Ende niemand ohne Ausrüstung da.",
+      },
+      {
+        title: "Treffpunkt und Startzeit",
+        text: "Ort und Uhrzeit stehen auf der Seite. Wer später dazukommt oder früher gehen muss, gibt das einfach bei der Zusage an.",
+      },
+      {
+        title: "Ab in die Berge",
+        text: "Für das Snowboard- oder Skiwochenende gibst du einen Zeitraum an. Fahrgemeinschaften und Leihausrüstung klärt ihr per Nachricht direkt bei der Zusage.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "wer ist dabei? [Lauftreff / Klettern / Fußball / Hockey / Snowboard-Wochenende] am [Datum] um [Uhrzeit]! ⚽",
+      "Treffpunkt: [Ort]",
+      "Tragt euch hier ein, damit wir wissen, ob genug Leute zusammenkommen – und schreibt dazu, wer [Ball / Ausrüstung / Auto] mitbringt: [Link]",
+      "Sportliche Grüße",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        answer:
+          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Organisator brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Können sich Mitspieler wieder austragen?",
+        answer:
+          "Ja. Wer doch nicht kann, ändert oder löscht seinen Eintrag einfach. Du bekommst dazu eine E-Mail.",
+      },
+      {
+        question: "Kann ich mehrere Termine anlegen?",
         answer:
           "Ein Event mit allen Grundfunktionen ist kostenlos. Weitere Events kannst du bald dazukaufen.",
       },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "tabletop-night",
+    slug: "tabletop",
+    name: "Tabletop & Brettspiele",
+    title: "Tabletop- und Brettspielabend per Link organisieren",
+    metaTitle: "Tabletop- und Brettspielabend organisieren – GASTZILLA",
+    description:
+      "Brettspielabend, Pen & Paper oder Tabletop-Runde: Mitspieler sagen per Link ohne Konto zu und tragen ein, welche Spiele sie mitbringen. Kostenlos & werbefrei.",
+    teaser: "Brettspiele, Pen & Paper oder Tabletop – wer spielt mit und wer bringt welches Spiel mit?",
+    intro: [
+      "Ein guter Spieleabend steht und fällt mit der Runde: Für manche Spiele braucht es genau vier Leute, für die Pen-&-Paper-Kampagne die ganze Gruppe. Und dann ist da noch die Frage, wer welches Spiel, welche Armee oder welche Snacks mitbringt.",
+      "Mit GASTZILLA legst du in wenigen Minuten eine Seite für euren Brettspiel-, Pen-&-Paper- oder Tabletop-Abend an und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und jeder sieht, wer dabei ist.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum Tabletop- und Brettspielabend",
+    benefits: [
       {
-        question: "Gibt es Werbung?",
-        answer: "Nein. GASTZILLA ist werbefrei und setzt keine Tracking-Cookies ein.",
+        title: "Wie viele sitzen am Tisch?",
+        text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat. So weißt du rechtzeitig, ob es für das große Strategiespiel reicht oder ob ihr zwei Tische braucht.",
+      },
+      {
+        title: "Wer bringt welches Spiel mit?",
+        text: "Spiele, Erweiterungen, Miniaturen oder Snacks – jeder trägt ein, was er mitbringt. Alle sehen es, und niemand schleppt dasselbe Spiel an.",
+      },
+      {
+        title: "Wünsche und Absprachen",
+        text: "Gäste können eine Nachricht hinterlassen – etwa, worauf sie Lust haben oder ob ihr Charakterbogen noch beim Spielleiter liegt.",
       },
     ],
-    updated: "2026-10-06",
+    invitationText: [
+      "Hallo zusammen,",
+      "es ist mal wieder Zeit für einen Spieleabend! 🎲",
+      "Wann: [Datum] ab [Uhrzeit]",
+      "Wo: [Ort]",
+      "Tragt euch hier ein und schreibt dazu, welche Spiele ihr mitbringt oder worauf ihr Lust habt: [Link]",
+      "Bis zum nächsten Wurf!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        answer:
+          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Können sich Mitspieler wieder austragen?",
+        answer:
+          "Ja. Wer doch nicht kann, ändert oder löscht seinen Eintrag einfach. Du bekommst dazu eine E-Mail.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
+  },
+  {
+    id: "gaming-night",
+    slug: "gaming",
+    name: "Gaming & LAN-Party",
+    title: "Gamingabend oder LAN-Party per Link organisieren",
+    metaTitle: "Gamingabend oder LAN-Party organisieren – GASTZILLA",
+    description:
+      "Konsolenabend oder LAN-Party: Mitspieler sagen per Link ohne Konto zu und tragen ein, wer Konsole, Controller oder Snacks mitbringt. Kostenlos & werbefrei.",
+    teaser: "Konsolenabend oder LAN-Party – wer zockt mit und wer bringt Controller und Kabel?",
+    intro: [
+      "Ob Couch-Koop, Mario-Kart-Turnier oder LAN-Party übers Wochenende: Bevor es losgeht, muss geklärt sein, wer kommt, wer seinen Rechner mitbringt und ob genug Controller da sind. Im Gruppenchat gehen solche Absprachen schnell unter.",
+      "Mit GASTZILLA legst du in wenigen Minuten eine Seite für deinen Gamingabend oder deine LAN-Party an und teilst den Link. Alle tragen sich selbst ein – ohne Konto oder App – und du hast den Überblick.",
+    ],
+    benefitsTitle: "Darum passt GASTZILLA zum Gamingabend",
+    benefits: [
+      {
+        title: "Hardware abstimmen",
+        text: "Konsole, Controller, Monitor, Netzwerkkabel oder Snacks – jeder trägt ein, was er mitbringt. So fehlt am Ende weder der vierte Controller noch das Verlängerungskabel.",
+      },
+      {
+        title: "Auch übers Wochenende",
+        text: "Für die LAN-Party gibst du einfach einen Zeitraum an. Gäste schreiben dazu, wann sie kommen und auf Wunsch, bis wann sie bleiben.",
+      },
+      {
+        title: "Wer ist dabei?",
+        text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat – so wisst ihr, für welches Spiel genug Leute da sind.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "[Gamingabend / LAN-Party] bei mir! 🎮",
+      "Wann: [Datum] ab [Uhrzeit] (bis [Datum / Uhrzeit])",
+      "Wo: [Ort]",
+      "Tragt euch hier ein und schreibt dazu, wer Konsole, Controller, Rechner oder Kabel mitbringt: [Link]",
+      "GG!",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Brauchen die Mitspieler ein Konto oder eine App?",
+        answer:
+          "Nein. Sie öffnen den Link im Browser und tragen sich ein. Nur du als Gastgeber brauchst ein kostenloses Konto.",
+      },
+      {
+        question: "Bekomme ich Bescheid, wenn sich jemand einträgt?",
+        answer:
+          "Ja. Bei jeder neuen Zusage und bei Änderungen an der Gästeliste bekommst du eine E-Mail.",
+      },
+      {
+        question: "Was kostet das?",
+        answer:
+          "Nichts. Ein Event mit allen Grundfunktionen ist bei GASTZILLA kostenlos und werbefrei.",
+      },
+    ],
+    updated: "2026-10-07",
   },
 ];
 

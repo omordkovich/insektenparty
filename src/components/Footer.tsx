@@ -1,4 +1,5 @@
 import { EditableField } from "@/components/EditableField";
+import { InvitationTextButton } from "@/components/InvitationTextButton";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import type { EventConfig } from "@/lib/event-config";
 import { buildEventShareUrl } from "@/lib/share";
@@ -73,7 +74,25 @@ export function Footer({ config, eventId, slug, isOwner }: FooterProps) {
             </div>
           </>
         ) : null}
-        <MadeWithBadge share={{ url: buildEventShareUrl(slug), title: config.title }} />
+        <MadeWithBadge
+          share={{ url: buildEventShareUrl(slug), title: config.title }}
+          extraAction={
+            isOwner ? (
+              <InvitationTextButton
+                eventId={eventId}
+                className="bg-surface"
+                facts={{
+                  title: config.title,
+                  dateLabel: config.dateLabel,
+                  timeLabel: config.timeLabel,
+                  location: config.locationLabel,
+                  contactName: config.contact.name,
+                  url: buildEventShareUrl(slug),
+                }}
+              />
+            ) : null
+          }
+        />
       </div>
     </footer>
   );

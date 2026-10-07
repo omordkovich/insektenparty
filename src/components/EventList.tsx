@@ -56,7 +56,7 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
                     className="flex items-center gap-3 rounded-2xl border border-leaf/15 bg-white/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm transition-all duration-500 ease-in-out hover:scale-[1.03] hover:border-leaf/30 hover:bg-white hover:shadow-lg hover:brightness-105 active:scale-[0.97] active:brightness-90 active:duration-150"
                   >
                     <Link
-                      href={`/p/${event.slug}`}
+                      href={`/event/${event.slug}`}
                       className="flex min-w-0 flex-1 items-center gap-3"
                     >
                       <Image

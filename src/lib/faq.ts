@@ -19,6 +19,11 @@ export const FAQ: FaqItem[] = [
       "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht.",
   },
   {
+    question: "Muss ich den Einladungstext selbst schreiben?",
+    answer:
+      "Nein. Auf deiner Event-Seite setzt GASTZILLA automatisch einen Einladungstext mit Titel, Datum, Ort und Link zusammen. Anrede und Gruß passt du nach Wunsch an und kopierst den Text mit einem Klick.",
+  },
+  {
     question: "Gibt es Werbung?",
     answer: "Nein. GASTZILLA ist werbefrei und setzt keine Tracking-Cookies ein.",
   },

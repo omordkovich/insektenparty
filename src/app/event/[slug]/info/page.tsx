@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatCreatedDate } from "@/lib/calendar";
-import { getEventBySlug } from "@/repositories/event-repository";
+import { getEventByAddress } from "@/repositories/event-repository";
 import { getUserDisplayName } from "@/repositories/user-repository";
 
 type EventInfoPageProps = {
@@ -11,10 +11,13 @@ type EventInfoPageProps = {
 
 export default async function EventInfoPage({ params }: EventInfoPageProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const event = await getEventByAddress(slug);
 
   if (!event) {
     notFound();
+  }
+  if (event.slug !== slug) {
+    permanentRedirect(`/event/${event.slug}/info`);
   }
 
   const ownerName = event.ownerId ? await getUserDisplayName(event.ownerId) : null;
@@ -32,7 +35,7 @@ export default async function EventInfoPage({ params }: EventInfoPageProps) {
           erstellt.
         </p>
         <Link
-          href={`/p/${slug}`}
+          href={`/event/${slug}`}
           className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-button-primary px-6 text-base font-bold text-button-primary-text transition hover:brightness-90"
         >
           Zurück zum event

@@ -1,6 +1,6 @@
 import { cloudinaryPng, OG_SIZE, renderOgCard, renderSiteOgImage } from "@/lib/og-image";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
-import { getEventBySlug } from "@/repositories/event-repository";
+import { getEventByAddress } from "@/repositories/event-repository";
 
 // Link preview for a shared invitation: the event's theme logo, title and
 // date - nothing a link holder couldn't see on the page anyway.
@@ -14,7 +14,7 @@ export default async function EventOpengraphImage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const event = await getEventByAddress(slug);
   if (!event) return renderSiteOgImage();
 
   const assets = THEME_ASSETS[event.theme as ThemeKey];

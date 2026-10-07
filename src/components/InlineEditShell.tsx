@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useId, useState, type ReactNode } from "react";
 import { CheckIcon, CloseIcon, PencilIcon } from "./EditIcons";
 
 type SaveResult = { ok: true } | { ok: false; error: string };
@@ -17,8 +18,13 @@ type InlineEditShellProps = {
   isEmpty: boolean;
   placeholder: string;
   displayContent: ReactNode;
-  renderEditor: (state: { saving: boolean }) => ReactNode;
+  /** Editor markup; `hintId` is set when there is an editHint - put it on
+   *  the input as aria-describedby so screen readers read the hint. */
+  renderEditor: (state: { saving: boolean; hintId?: string }) => ReactNode;
   onSaveAction: () => Promise<SaveResult>;
+  /** Short note shown under the field while editing (e.g. what a change
+   *  affects beyond the field itself). */
+  editHint?: string;
 };
 
 // Shared "pencil to edit, checkmark/X to save/cancel" shell used by every
@@ -35,10 +41,13 @@ export function InlineEditShell({
   displayContent,
   renderEditor,
   onSaveAction,
+  editHint,
 }: InlineEditShellProps) {
+  const hintId = useId();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function handleSave() {
     setSaving(true);
@@ -53,6 +62,9 @@ export function InlineEditShell({
 
     setSaving(false);
     setEditing(false);
+    // Re-render the server parts of the page so everything built from the
+    // saved field (e.g. the owner's invitation text) shows the new value.
+    router.refresh();
   }
 
   if (!isOwner) {
@@ -79,7 +91,16 @@ export function InlineEditShell({
 
   return (
     <span className="block">
-      {renderEditor({ saving })}
+      {renderEditor({ saving, hintId: editHint ? hintId : undefined })}
+      {editHint ? (
+        // Reset type styles: the field may sit inside a large heading.
+        <span
+          id={hintId}
+          className="mt-1 block font-sans text-sm font-normal leading-snug tracking-normal normal-case text-muted"
+        >
+          {editHint}
+        </span>
+      ) : null}
       <span className="mt-1 inline-flex gap-2">
         <button
           type="button"

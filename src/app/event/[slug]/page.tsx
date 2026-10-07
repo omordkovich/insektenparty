@@ -1,11 +1,11 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import type { EventConfig } from "@/lib/event-config";
-import { getEventBySlug } from "@/repositories/event-repository";
+import { getEventByAddress } from "@/repositories/event-repository";
 import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { normalizeArrivalTime } from "@/lib/validation";
@@ -17,10 +17,14 @@ type EventPageProps = {
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const event = await getEventByAddress(slug);
 
   if (!event) {
     notFound();
+  }
+  // Opened with an old address (event renamed since): go to the current one.
+  if (event.slug !== slug) {
+    permanentRedirect(`/event/${event.slug}`);
   }
 
   const supabase = await createClient();
@@ -54,7 +58,7 @@ export default async function EventPage({ params }: EventPageProps) {
     <div className="relative flex min-h-dvh flex-col" style={{ isolation: "isolate" }}>
       <Header
         config={config}
-        logoHref={isOwner ? "/" : `/p/${slug}/info`}
+        logoHref={isOwner ? "/" : `/event/${slug}/info`}
         themeEdit={isOwner ? { eventId: event.id, theme, unlockedThemes } : undefined}
       />
       <main>

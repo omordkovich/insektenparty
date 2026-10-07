@@ -14,6 +14,12 @@ export const events = pgTable("events", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   ownerId: uuid("owner_id"),
   slug: text("slug").notNull().unique(),
+  // Permanent part of the address (see src/lib/slug.ts). Nullable until
+  // migration step 2 (supabase/migrations/2026-10-07-2-*) has run.
+  slugKey: text("slug_key").unique(),
+  // First-name part of the address, fixed at creation ("" = none). Null
+  // for events created before it existed.
+  slugName: text("slug_name"),
   theme: text("theme").notNull(),
   kicker: text("kicker").notNull(),
   title: text("title").notNull(),

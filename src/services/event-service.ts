@@ -1,5 +1,5 @@
 import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
-import { generateSlug } from "@/lib/slug";
+import { buildSlug, generateSlug, slugKeyOf, slugNamePart } from "@/lib/slug";
 import type { ThemeKey } from "@/lib/theme-presets";
 import {
   isEventFieldKey,
@@ -16,16 +16,30 @@ import {
 import {
   createEvent,
   deleteEvent,
+  getEventAddress,
   getEventSchedule,
   getEventTheme,
   updateEvent,
   type EventRow,
 } from "@/repositories/event-repository";
+import { getUserDisplayName } from "@/repositories/user-repository";
 import { canCreateEvent, canUseTheme } from "@/lib/features";
 import { getUserEntitlements } from "@/services/entitlement-service";
 
 const EVENT_LIMIT_ERROR = "Du hast dein Event-Kontingent erreicht.";
 const THEME_LOCKED_ERROR = "Dieses Design ist noch nicht freigeschaltet.";
+
+// A taken address only happens on a (very unlikely) suffix collision, so a
+// few fresh suffixes are plenty; more failures mean something else is wrong.
+const SLUG_ATTEMPTS = 5;
+
+// Postgres "unique_violation" - drizzle wraps the driver error in `cause`.
+function isUniqueViolation(error: unknown): boolean {
+  const codeOf = (value: unknown) =>
+    typeof value === "object" && value !== null && "code" in value ? value.code : undefined;
+  const cause = typeof error === "object" && error !== null && "cause" in error ? error.cause : undefined;
+  return codeOf(error) === "23505" || codeOf(cause) === "23505";
+}
 
 export type EventServiceResult<T> =
   | { ok: true; data: T }
@@ -54,15 +68,23 @@ export async function createEventForOwner(
     return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
   }
 
-  const slug = generateSlug(titleValidation.value);
-  const created = await createEvent({
-    ownerId,
-    slug,
-    theme,
-    title: titleValidation.value,
-  });
-
-  return { ok: true, data: { slug: created.slug } };
+  const ownerName = await getUserDisplayName(ownerId);
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const { slug, key, namePart } = generateSlug({ title: titleValidation.value, ownerName });
+      const created = await createEvent({
+        ownerId,
+        slug,
+        slugKey: key,
+        slugName: namePart,
+        theme,
+        title: titleValidation.value,
+      });
+      return { ok: true, data: { slug: created.slug } };
+    } catch (error) {
+      if (!isUniqueViolation(error) || attempt >= SLUG_ATTEMPTS) throw error;
+    }
+  }
 }
 
 export async function updateEventForOwner(
@@ -155,8 +177,28 @@ export async function updateEventForOwner(
     }
   }
 
+  // A new title moves the address along - same key, so old links still find
+  // the event and get redirected (see getEventByAddress), and the same name
+  // part as at creation, so renaming the account never changes links.
+  let addressUpdate: { slug: string; slugKey: string; slugName: string } | undefined;
+  if (updates.title !== undefined) {
+    const current = await getEventAddress(id, ownerId);
+    if (!current) {
+      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    }
+    const key = current.slugKey ?? slugKeyOf(current.slug);
+    // Events from before slug_name existed get the current name once.
+    const namePart = current.slugName ?? slugNamePart(await getUserDisplayName(ownerId));
+    addressUpdate = {
+      slug: buildSlug({ namePart, title: updates.title, key }),
+      slugKey: key,
+      slugName: namePart,
+    };
+  }
+
   const updated = await updateEvent(id, ownerId, {
     ...updates,
+    ...(addressUpdate ?? {}),
     ...(themeUpdate ? { theme: themeUpdate } : {}),
     ...(schedule ?? {}),
   });

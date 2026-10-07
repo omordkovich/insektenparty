@@ -50,6 +50,12 @@ describe("OCCASIONS", () => {
         expect(occasion.metaTitle.endsWith("– GASTZILLA")).toBe(true);
       });
 
+      it("has an invitation template with placeholders and the invitation link", () => {
+        expect(occasion.invitationText.length).toBeGreaterThanOrEqual(4);
+        for (const line of occasion.invitationText) expect(line.trim()).not.toBe("");
+        expect(occasion.invitationText.join("\n")).toContain("[Link]");
+      });
+
       it("has 3-4 benefits and 3-4 FAQ entries", () => {
         expect(occasion.benefits.length).toBeGreaterThanOrEqual(3);
         expect(occasion.benefits.length).toBeLessThanOrEqual(4);

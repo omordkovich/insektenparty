@@ -3,11 +3,11 @@ import { buildEventShareUrl, buildShareLinks, buildShareText } from "@/lib/share
 
 describe("buildEventShareUrl", () => {
   it("appends the event path to the share base URL", () => {
-    expect(buildEventShareUrl("milans7BD")).toBe("https://gastzilla.de/p/milans7BD");
+    expect(buildEventShareUrl("milans7BD")).toBe("https://gastzilla.de/event/milans7BD");
   });
 
   it("encodes unusual characters in the slug", () => {
-    expect(buildEventShareUrl("a b")).toBe("https://gastzilla.de/p/a%20b");
+    expect(buildEventShareUrl("a b")).toBe("https://gastzilla.de/event/a%20b");
   });
 });
 
@@ -20,7 +20,7 @@ describe("buildShareText", () => {
 });
 
 describe("buildShareLinks", () => {
-  const url = "https://gastzilla.de/p/milans7BD";
+  const url = "https://gastzilla.de/event/milans7BD";
   const links = buildShareLinks({ url, title: "Milans Party & mehr" });
   const byId = Object.fromEntries(links.map((link) => [link.id, link]));
   const enc = encodeURIComponent;

@@ -21,6 +21,7 @@ export const FEATURES = [
   "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
   "Designs für verschiedene Anlässe",
+  "Fertiger Einladungstext mit Datum, Ort und Link – anpassbar und mit einem Klick kopierbar",
   "Termin in den eigenen Kalender übernehmen",
   "Werbefrei, ohne Tracking-Cookies, Server in der EU",
 ];

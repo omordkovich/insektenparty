@@ -18,6 +18,6 @@ describe("sitemap", () => {
   });
 
   it("never lists event pages", () => {
-    expect(entries.some((entry) => entry.url.includes("/p/"))).toBe(false);
+    expect(entries.some((entry) => entry.url.includes("/event/"))).toBe(false);
   });
 });

@@ -1,11 +1,31 @@
 import { and, count, desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { events } from "@/db/schema";
+import { slugKeyOf } from "@/lib/slug";
 
 export type EventRow = typeof events.$inferSelect;
 
-export async function getEventBySlug(slug: string): Promise<EventRow | undefined> {
-  const [event] = await getDb().select().from(events).where(eq(events.slug, slug));
+// Finds an event by the address it was opened with: the current address
+// first, otherwise by its key (the last part) - so links from before a
+// rename still work. Callers redirect when event.slug differs.
+export async function getEventByAddress(address: string): Promise<EventRow | undefined> {
+  const [exact] = await getDb().select().from(events).where(eq(events.slug, address));
+  if (exact) return exact;
+  const [byKey] = await getDb()
+    .select()
+    .from(events)
+    .where(eq(events.slugKey, slugKeyOf(address)));
+  return byKey;
+}
+
+export async function getEventAddress(
+  id: string,
+  ownerId: string,
+): Promise<{ slug: string; slugKey: string | null; slugName: string | null } | undefined> {
+  const [event] = await getDb()
+    .select({ slug: events.slug, slugKey: events.slugKey, slugName: events.slugName })
+    .from(events)
+    .where(and(eq(events.id, id), eq(events.ownerId, ownerId)));
   return event;
 }
 
@@ -96,6 +116,8 @@ export async function getEventSchedule(
 export async function createEvent(input: {
   ownerId: string;
   slug: string;
+  slugKey: string;
+  slugName: string;
   theme: string;
   title: string;
 }): Promise<{ slug: string }> {
@@ -107,6 +129,8 @@ export async function createEvent(input: {
     .values({
       ownerId: input.ownerId,
       slug: input.slug,
+      slugKey: input.slugKey,
+      slugName: input.slugName,
       theme: input.theme,
       kicker: "",
       title: input.title,

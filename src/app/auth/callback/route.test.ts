@@ -110,7 +110,7 @@ describe("GET /auth/callback", () => {
   it("follows a safe `next` path", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: newGoogleUser, error: null });
 
-    expect(locationOf(await call("code=abc&next=/p/xyz"))).toBe("/p/xyz");
+    expect(locationOf(await call("code=abc&next=/event/xyz"))).toBe("/event/xyz");
   });
 
   it("ignores an unsafe `next` path", async () => {
@@ -122,7 +122,7 @@ describe("GET /auth/callback", () => {
   it("flags a failed code exchange instead of silently landing on the start page", async () => {
     exchangeCodeForSession.mockResolvedValue({ data: { user: null }, error: { code: "bad" } });
 
-    expect(locationOf(await call("code=abc&next=/p/xyz"))).toBe("/?auth_error=1");
+    expect(locationOf(await call("code=abc&next=/event/xyz"))).toBe("/?auth_error=1");
   });
 
   it("flags a missing code (e.g. the user cancelled at Google)", async () => {

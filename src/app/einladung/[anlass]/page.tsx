@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { cardClass } from "@/components/card";
 import { FaqSection } from "@/components/FaqSection";
 import { HowItWorks } from "@/components/HowItWorks";
+import { InvitationTemplate } from "@/components/InvitationTemplate";
 import { JsonLd } from "@/components/JsonLd";
 import { LegalLinks } from "@/components/LegalLinks";
 import { OccasionChips } from "@/components/OccasionChips";
@@ -86,6 +87,8 @@ export default async function OccasionPage({ params }: OccasionPageProps) {
               ))}
             </ul>
           </section>
+
+          <InvitationTemplate name={occasion.name} lines={occasion.invitationText} />
 
           <HowItWorks />
 

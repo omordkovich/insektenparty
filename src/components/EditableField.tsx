@@ -22,6 +22,8 @@ type EditableFieldProps = {
   /** Wraps a non-empty value in the calendar "add to calendar" link instead
    * of a plain <a> - mutually exclusive with `link`. */
   calendarLinks?: { icsHref: string; googleHref: string };
+  /** Note shown under the field while editing (see InlineEditShell). */
+  editHint?: string;
 };
 
 export function EditableField({
@@ -35,6 +37,7 @@ export function EditableField({
   ariaLabel,
   link,
   calendarLinks,
+  editHint,
 }: EditableFieldProps) {
   function renderDisplayValue(text: string) {
     if (calendarLinks) {
@@ -100,13 +103,15 @@ export function EditableField({
       placeholder={placeholder}
       displayContent={currentValue ? renderDisplayValue(currentValue) : null}
       onSaveAction={handleSaveAction}
-      renderEditor={({ saving }) =>
+      editHint={editHint}
+      renderEditor={({ saving, hintId }) =>
         as === "textarea" ? (
           <textarea
             ref={textareaRef}
             defaultValue={currentValue}
             placeholder={placeholder}
             disabled={saving}
+            aria-describedby={hintId}
             rows={2}
             className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
@@ -117,6 +122,7 @@ export function EditableField({
             defaultValue={currentValue}
             placeholder={placeholder}
             disabled={saving}
+            aria-describedby={hintId}
             className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
         )

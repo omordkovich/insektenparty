@@ -52,6 +52,7 @@ export function Hero({ config, eventId, isOwner }: HeroProps) {
             placeholder="Titel deines Events"
             isOwner={isOwner}
             ariaLabel="Titel bearbeiten"
+            editHint="Mit dem Titel ändert sich auch der Einladungslink. Bereits verschickte Links funktionieren weiter."
             className="font-display text-[clamp(1.5rem,9vw,3rem)] leading-none text-leaf-dark sm:text-6xl md:text-7xl"
           />
         </h1>

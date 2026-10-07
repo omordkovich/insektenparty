@@ -51,7 +51,7 @@ describe("GET /auth/confirm", () => {
   it("ignores `next` when verification failed", async () => {
     verifyOtp.mockResolvedValue({ error: { code: "otp_expired" } });
 
-    expect(locationOf(await call("token_hash=abc&type=signup&next=/p/xyz"))).toBe(
+    expect(locationOf(await call("token_hash=abc&type=signup&next=/event/xyz"))).toBe(
       "/?link_expired=signup",
     );
   });

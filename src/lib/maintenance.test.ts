@@ -12,9 +12,10 @@ describe("shouldShowMaintenance", () => {
 
   it("keeps event pages and everything they need reachable", () => {
     for (const pathname of [
+      "/event/milans7BD",
+      "/event/milans7BD/info",
+      "/event/milans7BD/opengraph-image",
       "/p/milans7BD",
-      "/p/milans7BD/info",
-      "/p/milans7BD/opengraph-image",
       "/api/events/996439e3-1828-47b4-baf8-8c29bb5bb6b3/guests",
       "/auth/confirm",
       "/auth/reset-password",

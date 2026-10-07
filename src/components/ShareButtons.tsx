@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { buildShareText, copyToClipboard } from "@/lib/share";
 import { Button } from "./Button";
 import { CheckIcon } from "./EditIcons";
@@ -15,12 +15,14 @@ type ShareProps = {
   className?: string;
 };
 
-// Share + copy, side by side (event page footer).
-export function ShareButtons(props: ShareProps) {
+// Share + copy, side by side (event page footer); children are extra icon
+// buttons appended to the same row (e.g. the owner's invitation text).
+export function ShareButtons({ children, ...props }: ShareProps & { children?: ReactNode }) {
   return (
     <div className="flex gap-2">
       <ShareButton {...props} />
       <CopyLinkButton {...props} />
+      {children}
     </div>
   );
 }

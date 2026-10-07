@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 // browsers without the native share sheet (navigator.share).
 
 export function buildEventShareUrl(slug: string): string {
-  return `${SITE_URL}/p/${encodeURIComponent(slug)}`;
+  return `${SITE_URL}/event/${encodeURIComponent(slug)}`;
 }
 
 export function buildShareText(title: string): string {

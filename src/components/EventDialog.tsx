@@ -82,7 +82,7 @@ export function EventDialog(props: EventDialogProps) {
         }
 
         const { slug } = (await response.json()) as { slug: string };
-        router.push(`/p/${slug}`);
+        router.push(`/event/${slug}`);
         return;
       }
 

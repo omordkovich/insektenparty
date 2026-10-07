@@ -28,7 +28,7 @@ describe("proxy – under construction", () => {
   it("still serves the Impressum and event pages on gastzilla.de", async () => {
     process.env.MAINTENANCE_MODE = "true";
     expect((await proxy(request("https://gastzilla.de/impressum"))).status).toBe(200);
-    expect(await (await proxy(request("https://gastzilla.de/p/milans7BD"))).text()).toBe("echte Seite");
+    expect(await (await proxy(request("https://gastzilla.de/event/milans7BD"))).text()).toBe("echte Seite");
   });
 
   it("serves the real app on Vercel deployment URLs", async () => {

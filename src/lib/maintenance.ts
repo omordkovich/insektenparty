@@ -22,8 +22,9 @@ const ALWAYS_REACHABLE = new Set([
   "/favicon.ico",
   "/opengraph-image",
 ]);
-// Whole sections, matched as "/p" or "/p/..." (not "/party").
-const ALWAYS_REACHABLE_SECTIONS = ["/p", "/api", "/auth"];
+// Whole sections, matched as "/event" or "/event/..." (not "/events").
+// "/p" is the old event prefix - kept so its redirect still works.
+const ALWAYS_REACHABLE_SECTIONS = ["/event", "/p", "/api", "/auth"];
 
 function isAlwaysReachable(pathname: string): boolean {
   return (

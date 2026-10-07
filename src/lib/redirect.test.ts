@@ -4,7 +4,7 @@ import { isSafeRelativePath } from "./redirect";
 describe("isSafeRelativePath", () => {
   it("accepts same-site paths", () => {
     expect(isSafeRelativePath("/")).toBe(true);
-    expect(isSafeRelativePath("/p/xyz")).toBe(true);
+    expect(isSafeRelativePath("/event/xyz")).toBe(true);
   });
 
   it("rejects anything that could leave the site", () => {

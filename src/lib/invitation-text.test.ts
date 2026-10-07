@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+import {
+  buildInvitationText,
+  DEFAULT_WORDING,
+  type InvitationFacts,
+  parseStoredWording,
+} from "@/lib/invitation-text";
+
+const facts: InvitationFacts = {
+  title: "Sommerfest bei Familie Müller",
+  dateLabel: "Samstag, 12. Juli 2026",
+  timeLabel: "15:00 - 20:00 Uhr",
+  location: "Gartenstraße 5, Köln",
+  contactName: "Anna Müller",
+  url: "https://gastzilla.de/event/abc123",
+};
+
+describe("buildInvitationText", () => {
+  it("composes the default wording around the event facts", () => {
+    expect(buildInvitationText(facts, DEFAULT_WORDING)).toBe(
+      [
+        "Hallo zusammen,",
+        "ich lade euch herzlich ein:",
+        "Sommerfest bei Familie Müller",
+        "Wann: Samstag, 12. Juli 2026, 15:00 - 20:00 Uhr",
+        "Wo: Gartenstraße 5, Köln",
+        "Bitte sagt über diesen Link zu und tragt euch ein:",
+        "https://gastzilla.de/event/abc123",
+        "Ich freue mich auf euch!",
+        "Anna Müller",
+      ].join("\n"),
+    );
+  });
+
+  it("leaves out event facts that are not filled in", () => {
+    const text = buildInvitationText(
+      { ...facts, title: " ", timeLabel: "", location: "", contactName: "" },
+      DEFAULT_WORDING,
+    );
+    expect(text).toBe(
+      [
+        "Hallo zusammen,",
+        "ich lade euch herzlich ein:",
+        "Wann: Samstag, 12. Juli 2026",
+        "Bitte sagt über diesen Link zu und tragt euch ein:",
+        "https://gastzilla.de/event/abc123",
+        "Ich freue mich auf euch!",
+      ].join("\n"),
+    );
+  });
+
+  it("shows only the time when there is no date", () => {
+    const text = buildInvitationText({ ...facts, dateLabel: "" }, DEFAULT_WORDING);
+    expect(text).toContain("Wann: 15:00 - 20:00 Uhr");
+  });
+
+  it("uses the owner's wording and drops emptied lines", () => {
+    const text = buildInvitationText(facts, {
+      greeting: "  Liebe Nachbarn,  ",
+      intro: "",
+      callToAction: "Hier eintragen:",
+      closing: "Bis bald!\nEure Annas",
+    });
+    expect(text.split("\n")).toEqual([
+      "Liebe Nachbarn,",
+      "Sommerfest bei Familie Müller",
+      "Wann: Samstag, 12. Juli 2026, 15:00 - 20:00 Uhr",
+      "Wo: Gartenstraße 5, Köln",
+      "Hier eintragen:",
+      "https://gastzilla.de/event/abc123",
+      "Bis bald!",
+      "Eure Annas",
+      "Anna Müller",
+    ]);
+  });
+
+  it("always contains the invitation link", () => {
+    const empty = { greeting: "", intro: "", callToAction: "", closing: "" };
+    expect(buildInvitationText(facts, empty)).toContain(facts.url);
+  });
+});
+
+describe("parseStoredWording", () => {
+  it("falls back to the defaults for missing or broken data", () => {
+    expect(parseStoredWording(null)).toEqual(DEFAULT_WORDING);
+    expect(parseStoredWording("not json")).toEqual(DEFAULT_WORDING);
+    expect(parseStoredWording("[1,2]")).toEqual(DEFAULT_WORDING);
+  });
+
+  it("keeps stored strings and fills the rest from the defaults", () => {
+    expect(parseStoredWording(JSON.stringify({ greeting: "Moin,", intro: 42 }))).toEqual({
+      ...DEFAULT_WORDING,
+      greeting: "Moin,",
+    });
+  });
+});

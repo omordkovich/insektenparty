@@ -13,10 +13,12 @@ Stand: 2026-10-06
 - [x] Footer-Links als `<nav>` (Landmark für Screenreader und Crawler)
 - [x] `/sitemap.xml` und `/llms.txt` bleiben auch im Wartungsmodus erreichbar
 - [x] H1, Seitentitel und Vorschaubild: „Online-Einladung & Gästeliste kostenlos erstellen“
-- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 12 Anlässe: Kindergeburtstag, Geburtstag, Hochzeit, Firmenfeier, Grillparty & Gartenfest, Halloweenparty, Glühweinabend, Weihnachtsfest, Silvester, Mottoparty, Gruppenausflug, Verabredungen – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
+- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 19 Anlässe: Kindergeburtstag, Spielverabredung, Geburtstag, Hochzeit, Firmenfeier, Grillparty & Gartenfest, Karneval, Oktoberfest, Halloweenparty, Advent & Weihnachtsmarkt, Weihnachtsfest, Silvester, Mottoparty, Gruppenreise & Vereinsfahrt, Kultur, Ausgehen, Sport zusammen, Tabletop & Brettspiele, Gaming & LAN-Party; jede Seite mit Einladungstext-Vorlage zum Kopieren – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
 
 ## Du selbst (Dashboards & Konten)
 
+- [x] **Datenbank-Migration Event-Adressen, Schritt 1** – eingespielt am 2026-10-07
+- [ ] **Schritt 2 nach dem Deploy** – `supabase/migrations/2026-10-07-2-event-slug-key-not-null.sql` ausführen
 - [ ] **Wartungsmodus beenden**, sobald es geht (`MAINTENANCE_MODE` in Vercel entfernen + Redeploy). Solange die Startseite 503 liefert, wird sie nicht indexiert.
 - [ ] **Vercel → Domains → www.gastzilla.de**: Weiterleitung von 307 (temporär) auf **308 (permanent)** umstellen
 - [ ] **Google Search Console**: Domain-Property `gastzilla.de` anlegen (DNS-TXT-Eintrag), Sitemap `https://gastzilla.de/sitemap.xml` einreichen
@@ -32,6 +34,8 @@ Stand: 2026-10-06
 - [ ] Social-Media-Profile (Instagram, LinkedIn, …) → als `sameAs` ins Organization-Schema, sobald es welche gibt
 - [ ] Screenshot einer Beispiel-Einladung → als `screenshot` ins Schema und auf die Startseite
 - [ ] Seite `/preise`, sobald das Bezahlmodell steht (Stripe ist pausiert)
+- [ ] FAQ pro Anlass-Seite stärker anlass-spezifisch machen (allgemeine Fragen wie „Brauchen Gäste ein Konto?“ wiederholen sich auf allen Seiten)
+- [ ] Nach 2–3 Monaten Search Console: ranken zwei Anlass-Seiten auf dieselben Begriffe → zusammenlegen + Weiterleitung
 - [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“
 
 ## Außerhalb der Seite (für KI-Empfehlungen am wichtigsten)

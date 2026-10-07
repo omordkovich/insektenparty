@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 // Where overlays that live outside an event page's component tree (cookie
 // banner, legal texts) should be portalled to. On an event page that is the
-// themed wrapper from app/p/[slug]/layout.tsx, so the overlay picks up the
+// themed wrapper from app/event/[slug]/layout.tsx, so the overlay picks up the
 // event's CSS variables; everywhere else it is <body> (neutral theme).
 // Browser-only: call it during render of client-only content or in handlers.
 export function themePortalTarget(): HTMLElement {

@@ -24,7 +24,7 @@ const BENEFITS: { title: string; text: string; icon: ReactNode }[] = [
   },
   {
     title: "Teilen, wo deine Gäste sind",
-    text: "WhatsApp, Signal, Telegram, E-Mail – oder einfach den Link kopieren.",
+    text: "WhatsApp, Signal, Telegram, E-Mail – mit fertigem Einladungstext zum Kopieren.",
     icon: <ShareIcon />,
   },
 ];

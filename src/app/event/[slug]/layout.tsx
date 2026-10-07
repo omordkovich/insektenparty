@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buildEventShareUrl } from "@/lib/share";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
-import { getEventBySlug } from "@/repositories/event-repository";
+import { getEventByAddress } from "@/repositories/event-repository";
 import React from "react";
 
 type EventLayoutProps = {
@@ -12,7 +12,7 @@ type EventLayoutProps = {
 
 // Event pages (and their /info sub-page) contain guest lists - names, often
 // of children - plus addresses and phone numbers. They must never show up
-// in search results. Note: robots.txt must NOT disallow /p/, otherwise
+// in search results. Note: robots.txt must NOT disallow /event/, otherwise
 // crawlers can't fetch the page and never see this noindex.
 const NO_INDEX: Metadata["robots"] = {
   index: false,
@@ -26,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const event = await getEventByAddress(slug);
 
   if (!event) {
     return { title: "Event nicht gefunden", robots: NO_INDEX };
@@ -49,7 +49,7 @@ export async function generateMetadata({
       locale: "de_DE",
       title: `Einladung: ${event.title}`,
       description,
-      url: buildEventShareUrl(slug),
+      url: buildEventShareUrl(event.slug),
     },
     twitter: { card: "summary_large_image", title: `Einladung: ${event.title}`, description },
   };
@@ -57,7 +57,7 @@ export async function generateMetadata({
 
 export default async function EventLayout({ children, params }: EventLayoutProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const event = await getEventByAddress(slug);
 
   if (!event) {
     notFound();
