@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const result = await createEventForOwner(userId, {
       theme: (body as { theme?: unknown })?.theme,
       title: (body as { title?: unknown })?.title,
+      accessPassword: (body as { accessPassword?: unknown })?.accessPassword,
     });
 
     if (!result.ok) {

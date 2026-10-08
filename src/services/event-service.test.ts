@@ -204,3 +204,43 @@ describe("updateEventForOwner – renaming", () => {
     expect(getEventAddress).not.toHaveBeenCalled();
   });
 });
+
+describe("event password", () => {
+  beforeEach(() => {
+    vi.mocked(createEvent).mockReset();
+    vi.mocked(createEvent).mockImplementation(async (input) => ({ slug: input.slug }));
+    vi.mocked(updateEvent).mockClear();
+    vi.mocked(getUserEntitlements).mockResolvedValue({
+      unlockedThemes: ["weiss"],
+      eventLimit: 1,
+      eventCount: 0,
+    });
+  });
+
+  it("stores the trimmed password when creating", async () => {
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", accessPassword: " Sommer " });
+    expect(vi.mocked(createEvent).mock.calls[0][0].accessPassword).toBe("Sommer");
+  });
+
+  it("creates an open event without a password", async () => {
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" });
+    expect(vi.mocked(createEvent).mock.calls[0][0].accessPassword).toBeNull();
+  });
+
+  it("rejects a too short password when creating", async () => {
+    expect(
+      await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", accessPassword: "abc" }),
+    ).toEqual({ ok: false, status: 400, error: "Das Passwort muss mindestens 4 Zeichen lang sein." });
+    expect(createEvent).not.toHaveBeenCalled();
+  });
+
+  it("sets and removes the password on update", async () => {
+    expect(await update({ accessPassword: "Winter" })).toMatchObject({ ok: true, data: { accessPassword: "Winter" } });
+    expect(await update({ accessPassword: null })).toMatchObject({ ok: true, data: { accessPassword: null } });
+    expect(await update({ accessPassword: "ab" })).toEqual({
+      ok: false,
+      status: 400,
+      error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+    });
+  });
+});

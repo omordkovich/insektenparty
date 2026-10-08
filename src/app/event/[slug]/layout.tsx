@@ -35,9 +35,12 @@ export async function generateMetadata({
   // Not for search engines (see NO_INDEX), but this is what WhatsApp & co.
   // show when an invitation link is shared - only what any link holder
   // sees anyway (title, date), never the guest list or contact details.
-  const description = event.dateLabel
-    ? `Du bist eingeladen – ${event.dateLabel}. Jetzt zusagen und Gästeliste ansehen.`
-    : "Du bist eingeladen! Jetzt zusagen und Gästeliste ansehen.";
+  // Password-protected: the preview names the event but nothing else.
+  const description = event.accessPassword
+    ? "Passwortgeschützte Einladung – öffne den Link und gib das Passwort ein."
+    : event.dateLabel
+      ? `Du bist eingeladen – ${event.dateLabel}. Jetzt zusagen und Gästeliste ansehen.`
+      : "Du bist eingeladen! Jetzt zusagen und Gästeliste ansehen.";
 
   return {
     title: `${event.title} - Einladung`,

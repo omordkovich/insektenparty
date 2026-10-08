@@ -1,4 +1,5 @@
 import { notFound, permanentRedirect } from "next/navigation";
+import { EventLockedPage } from "@/components/EventLockedPage";
 import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
@@ -6,10 +7,10 @@ import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import type { EventConfig } from "@/lib/event-config";
 import { getEventByAddress } from "@/repositories/event-repository";
-import { createClient } from "@/lib/supabase/server";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { normalizeArrivalTime } from "@/lib/validation";
 import { getUserEntitlements } from "@/services/entitlement-service";
+import { getViewerAccess } from "@/services/event-access-service";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -27,9 +28,13 @@ export default async function EventPage({ params }: EventPageProps) {
     permanentRedirect(`/event/${event.slug}`);
   }
 
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const isOwner = data?.claims?.sub === event.ownerId;
+  const { isOwner, hasAccess } = await getViewerAccess(event);
+  // Password-protected and neither the owner nor unlocked: only the title.
+  if (!hasAccess) {
+    return <EventLockedPage eventId={event.id} title={event.title} />;
+  }
+  // The password only ever goes to the signed-in owner.
+  const ownerAccessPassword = isOwner ? event.accessPassword : null;
   const theme = event.theme as ThemeKey;
   const unlockedThemes =
     isOwner && event.ownerId ? (await getUserEntitlements(event.ownerId)).unlockedThemes : [];
@@ -59,7 +64,11 @@ export default async function EventPage({ params }: EventPageProps) {
       <Header
         config={config}
         logoHref={isOwner ? "/" : `/event/${slug}/info`}
-        themeEdit={isOwner ? { eventId: event.id, theme, unlockedThemes } : undefined}
+        themeEdit={
+          isOwner
+            ? { eventId: event.id, theme, unlockedThemes, accessPassword: ownerAccessPassword }
+            : undefined
+        }
       />
       <main>
         <Hero config={config} eventId={event.id} isOwner={isOwner} />
@@ -69,7 +78,13 @@ export default async function EventPage({ params }: EventPageProps) {
           isOwner={isOwner}
         />
       </main>
-      <Footer config={config} eventId={event.id} slug={slug} isOwner={isOwner} />
+      <Footer
+        config={config}
+        eventId={event.id}
+        slug={slug}
+        isOwner={isOwner}
+        accessPassword={ownerAccessPassword}
+      />
 
       <ParallaxSideGraphics
         leftSrc={config.assets.plantsLeft}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
+import { denyLockedEvent } from "@/services/event-access-service";
 import { deleteGuestForEvent, updateGuestForEvent } from "@/services/guest-service";
 
 type RouteContext = {
@@ -13,6 +14,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
+
+    const denied = await denyLockedEvent(eventId);
+    if (denied) return denied;
 
     let body: unknown;
     try {
@@ -49,6 +53,9 @@ export async function DELETE(request: Request, context: RouteContext) {
     if (!isUuid(eventId) || !isUuid(guestId)) {
       return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
     }
+
+    const denied = await denyLockedEvent(eventId);
+    if (denied) return denied;
 
     let body: unknown = null;
     try {

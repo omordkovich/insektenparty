@@ -102,6 +102,12 @@ export function PrivacyPolicyContent() {
             nach Ablauf der Sitzung gelöscht.
           </li>
           <li>
+            <strong>Freischalt-Cookie (passwortgeschützte Events):</strong> merkt
+            sich für bis zu 180 Tage, dass du das Passwort eines Events richtig
+            eingegeben hast, damit du es nicht bei jedem Besuch erneut eingeben
+            musst. Es enthält kein Passwort, nur eine Prüfsumme.
+          </li>
+          <li>
             <strong>Cookie-Auswahl (Local Storage):</strong> speichert deine
             Entscheidung im Cookie-Banner, damit wir nicht bei jedem Besuch
             erneut fragen müssen. Der Eintrag bleibt, bis du ihn in deinem
@@ -209,7 +215,9 @@ export function PrivacyPolicyContent() {
         </List>
         <p>
           <strong>Wichtig:</strong> Die Gästeliste ist auf der Event-Seite für
-          alle sichtbar, die den Einladungslink kennen. Bitte gib keine
+          alle sichtbar, die den Einladungslink kennen – bei einem
+          passwortgeschützten Event für alle, die zusätzlich das Passwort
+          kennen. Bitte gib keine
           sensiblen Informationen an (z. B. Gesundheitsdaten wie Allergien in
           der Nachricht) und beschränke dich bei Kindern möglichst auf den
           Vornamen. Wenn du Begleitpersonen einträgst, stelle bitte sicher,
@@ -224,6 +232,23 @@ export function PrivacyPolicyContent() {
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Teilnahme an der
           Gästeliste). Du kannst deinen Eintrag jederzeit selbst ändern oder
           löschen.
+        </p>
+        <SubHeading>Passwort-Anfrage</SubHeading>
+        <p>
+          Ist ein Event passwortgeschützt, kannst du das Passwort beim
+          Veranstalter anfragen. Dafür verarbeiten wir deinen Namen, je nach
+          Wahl deine E-Mail-Adresse oder deine Telefonnummer samt gewünschtem
+          Weg (z. B. SMS oder WhatsApp) sowie eine optionale Nachricht.
+        </p>
+        <p>
+          Diese Angaben schicken wir einmalig per E-Mail an den Veranstalter
+          und speichern sie nicht in unserer Datenbank. Bei einer Anfrage per
+          E-Mail kann der Veranstalter direkt auf deine Adresse antworten.
+        </p>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Teilnahme an der
+          Veranstaltung) bzw. lit. f DSGVO (berechtigtes Interesse an der
+          Kontaktaufnahme).
         </p>
       </Section>
 

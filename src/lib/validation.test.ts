@@ -11,6 +11,9 @@ import {
   validatePersonName,
   validateRequestBody,
   validateTheme,
+  validateAccessPassword,
+  validateEventPasswordPair,
+  validatePasswordRequest,
 } from "@/lib/validation";
 
 const validGuest = {
@@ -375,5 +378,100 @@ describe("formatTimeWindow", () => {
     expect(formatTimeWindow("09:30", "10:30")).toBe("zw. 09:30 und 10:30");
     expect(formatTimeWindow("22:00", "01:00")).toBe("zw. 22:00 und 01:00");
     expect(formatTimeWindow("09:30", null)).toBe("09:30");
+  });
+});
+
+describe("event password", () => {
+  it("accepts 4 to 100 characters after trimming, null switches it off", () => {
+    expect(validateAccessPassword(" abcd ")).toEqual({ ok: true, value: "abcd" });
+    expect(validateAccessPassword(null)).toEqual({ ok: true, value: null });
+    expect(validateAccessPassword("abc")).toEqual({
+      ok: false,
+      error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+    });
+    expect(validateAccessPassword("  ab  ")).toEqual({
+      ok: false,
+      error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+    });
+    expect(validateAccessPassword("x".repeat(101))).toEqual({
+      ok: false,
+      error: "Das Passwort darf höchstens 100 Zeichen lang sein.",
+    });
+    expect(validateAccessPassword(1234).ok).toBe(false);
+  });
+
+  it("checks that both dialog fields match", () => {
+    expect(validateEventPasswordPair("Sommer", " Sommer ")).toEqual({ ok: true, value: "Sommer" });
+    expect(validateEventPasswordPair("Sommer", "Winter")).toEqual({
+      ok: false,
+      error: "Die Passwörter stimmen nicht überein.",
+    });
+    expect(validateEventPasswordPair("abc", "abc")).toEqual({
+      ok: false,
+      error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+    });
+  });
+});
+
+describe("validatePasswordRequest", () => {
+  const byEmail = { name: " Max ", contactKind: "email", email: " max@example.de ", message: "" };
+  const byPhone = { name: "Max", contactKind: "phone", phone: "+49 (152) 123-456", channel: "whatsapp" };
+
+  function requestError(body: Record<string, unknown>) {
+    const result = validatePasswordRequest(body);
+    return result.ok ? null : result.error;
+  }
+
+  it("accepts an e-mail request", () => {
+    expect(validatePasswordRequest(byEmail)).toEqual({
+      ok: true,
+      value: { name: "Max", contact: { kind: "email", email: "max@example.de" }, message: null },
+    });
+  });
+
+  it("accepts a phone request with channel and optional message", () => {
+    expect(validatePasswordRequest({ ...byPhone, message: " Hallo! " })).toEqual({
+      ok: true,
+      value: {
+        name: "Max",
+        contact: { kind: "phone", phone: "+49 (152) 123-456", channel: "whatsapp", channelOther: null },
+        message: "Hallo!",
+      },
+    });
+  });
+
+  it("requires a free text for the channel \"Sonstiges\"", () => {
+    expect(requestError({ ...byPhone, channel: "other", channelOther: " " })).toBe(
+      "Bitte gib an, wie du das Passwort bekommen möchtest.",
+    );
+    const result = validatePasswordRequest({ ...byPhone, channel: "other", channelOther: " Signal " });
+    expect(result.ok && result.value.contact).toEqual({
+      kind: "phone",
+      phone: "+49 (152) 123-456",
+      channel: "other",
+      channelOther: "Signal",
+    });
+  });
+
+  it("requires a contact choice and its fields", () => {
+    expect(requestError({ name: "Max" })).toBe("Bitte wähle, wie du das Passwort bekommen möchtest.");
+    expect(requestError({ ...byEmail, email: "" })).toBe("E-Mail ist erforderlich.");
+    expect(requestError({ ...byPhone, channel: undefined })).toBe(
+      "Bitte wähle, wie du das Passwort per Telefon bekommen möchtest.",
+    );
+  });
+
+  it("checks the phone number loosely", () => {
+    expect(requestError({ ...byPhone, phone: "12345" })).toBe("Bitte gib eine gültige Telefonnummer ein.");
+    expect(requestError({ ...byPhone, phone: "0152 abc" })).toBe("Bitte gib eine gültige Telefonnummer ein.");
+    expect(requestError({ ...byPhone, phone: "1".repeat(21) })).toBe("Bitte gib eine gültige Telefonnummer ein.");
+    expect(requestError({ ...byPhone, phone: "0152/123456" })).toBeNull();
+  });
+
+  it("checks name and message length", () => {
+    expect(requestError({ ...byEmail, name: "M" })).toBe("Name muss mindestens 2 Zeichen lang sein.");
+    expect(requestError({ ...byEmail, message: "x".repeat(501) })).toBe(
+      "Die Nachricht darf höchstens 500 Zeichen lang sein.",
+    );
   });
 });

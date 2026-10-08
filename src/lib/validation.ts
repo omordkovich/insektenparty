@@ -293,6 +293,139 @@ export function validateGuestInput(body: unknown): ValidationResult {
   return result.success ? { ok: true, data: result.data } : { ok: false, error: firstError(result.error) };
 }
 
+// --- Event password ("Passwortgeschützt") ------------------------------------------
+
+export const EVENT_PASSWORD_MIN_LENGTH = 4;
+export const EVENT_PASSWORD_MAX_LENGTH = 100;
+
+// Deliberately soft: a shared password the owner sends around with the
+// invitation link, not an account password (see lib/password.ts).
+const eventPasswordSchema = z
+  .string({ error: "Bitte gib ein Passwort ein." })
+  .trim()
+  .min(EVENT_PASSWORD_MIN_LENGTH, `Das Passwort muss mindestens ${EVENT_PASSWORD_MIN_LENGTH} Zeichen lang sein.`)
+  .max(EVENT_PASSWORD_MAX_LENGTH, `Das Passwort darf höchstens ${EVENT_PASSWORD_MAX_LENGTH} Zeichen lang sein.`);
+
+// Saving an event: null switches the protection off.
+export function validateAccessPassword(value: unknown): FieldResult<string | null> {
+  return toFieldResult(eventPasswordSchema.nullable().safeParse(value));
+}
+
+// The dialog's "Passwort" + "Passwort wiederholen".
+export function validateEventPasswordPair(password: string, repeat: string): FieldResult<string> {
+  const result = toFieldResult(eventPasswordSchema.safeParse(password));
+  if (!result.ok) return result;
+  if (result.value !== repeat.trim()) {
+    return { ok: false, error: "Die Passwörter stimmen nicht überein." };
+  }
+  return result;
+}
+
+// --- Password request (locked event page) --------------------------------------------
+
+export const PASSWORD_REQUEST_MESSAGE_MAX_LENGTH = 500;
+export const PASSWORD_REQUEST_OTHER_MAX_LENGTH = 100;
+export const PHONE_CHANNELS = ["sms", "whatsapp", "telegram", "other"] as const;
+export type PhoneChannel = (typeof PHONE_CHANNELS)[number];
+export const PHONE_CHANNEL_LABELS: Record<PhoneChannel, string> = {
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+  telegram: "Telegram",
+  other: "Sonstiges",
+};
+
+export type PasswordRequestContact =
+  | { kind: "email"; email: string }
+  | { kind: "phone"; phone: string; channel: PhoneChannel; channelOther: string | null };
+
+export type PasswordRequestInput = {
+  name: string;
+  contact: PasswordRequestContact;
+  message: string | null;
+};
+
+const INVALID_PHONE = "Bitte gib eine gültige Telefonnummer ein.";
+
+// Loose on purpose: digits plus the usual separators, 6-20 digits.
+const phoneSchema = z
+  .string({ error: INVALID_PHONE })
+  .trim()
+  .regex(/^\+?[\d\s\-/()]+$/, INVALID_PHONE)
+  .refine((value) => {
+    const digits = value.replace(/\D/g, "").length;
+    return digits >= 6 && digits <= 20;
+  }, INVALID_PHONE);
+
+const channelOtherSchema = z
+  .string({ error: "Bitte gib an, wie du das Passwort bekommen möchtest." })
+  .trim()
+  .min(1, "Bitte gib an, wie du das Passwort bekommen möchtest.")
+  .max(PASSWORD_REQUEST_OTHER_MAX_LENGTH, `Die Angabe darf höchstens ${PASSWORD_REQUEST_OTHER_MAX_LENGTH} Zeichen lang sein.`);
+
+const requestMessageSchema = z.preprocess(
+  (value) => (value === undefined || value === null || (typeof value === "string" && value.trim() === "") ? null : value),
+  z
+    .string({ error: "Die Nachricht ist ungültig." })
+    .trim()
+    .max(PASSWORD_REQUEST_MESSAGE_MAX_LENGTH, `Die Nachricht darf höchstens ${PASSWORD_REQUEST_MESSAGE_MAX_LENGTH} Zeichen lang sein.`)
+    .nullable(),
+);
+
+function isPhoneChannel(value: unknown): value is PhoneChannel {
+  return (PHONE_CHANNELS as readonly unknown[]).includes(value);
+}
+
+// The form sends flat fields; only the chosen contact way is checked.
+export const passwordRequestSchema = z
+  .object(
+    {
+      name: guestNameSchema,
+      // Only the fields of the chosen contact way are sent.
+      contactKind: z.unknown().optional(),
+      email: z.unknown().optional(),
+      phone: z.unknown().optional(),
+      channel: z.unknown().optional(),
+      channelOther: z.unknown().optional(),
+      message: requestMessageSchema,
+    },
+    { error: "Ungültige Anfragedaten." },
+  )
+  .transform((request, ctx): PasswordRequestInput => {
+    const fail = (message: string) => {
+      ctx.addIssue({ code: "custom", message });
+      return z.NEVER;
+    };
+
+    let contact: PasswordRequestContact;
+    if (request.contactKind === "email") {
+      const email = emailSchema.safeParse(request.email);
+      if (!email.success) return fail(firstError(email.error));
+      contact = { kind: "email", email: email.data };
+    } else if (request.contactKind === "phone") {
+      const phone = phoneSchema.safeParse(request.phone);
+      if (!phone.success) return fail(firstError(phone.error));
+      const channel = request.channel;
+      if (!isPhoneChannel(channel)) {
+        return fail("Bitte wähle, wie du das Passwort per Telefon bekommen möchtest.");
+      }
+      let channelOther: string | null = null;
+      if (channel === "other") {
+        const other = channelOtherSchema.safeParse(request.channelOther);
+        if (!other.success) return fail(firstError(other.error));
+        channelOther = other.data;
+      }
+      contact = { kind: "phone", phone: phone.data, channel, channelOther };
+    } else {
+      return fail("Bitte wähle, wie du das Passwort bekommen möchtest.");
+    }
+
+    return { name: request.name, contact, message: request.message };
+  });
+
+export function validatePasswordRequest(body: unknown): FieldResult<PasswordRequestInput> {
+  return toFieldResult(passwordRequestSchema.safeParse(body));
+}
+
 // --- Event page fields ---------------------------------------------------------
 
 export const EVENT_TEXT_MAX_LENGTH = 200;

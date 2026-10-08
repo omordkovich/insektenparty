@@ -10,11 +10,18 @@ type ThemeEditButtonProps = {
   eventId: string;
   theme: ThemeKey;
   unlockedThemes: ThemeKey[];
+  accessPassword: string | null;
   className?: string;
 };
 
-// Owner-only pencil next to the event logo: opens the design picker.
-export function ThemeEditButton({ eventId, theme, unlockedThemes, className = "" }: ThemeEditButtonProps) {
+// Owner-only pencil next to the event logo: opens design and password settings.
+export function ThemeEditButton({
+  eventId,
+  theme,
+  unlockedThemes,
+  accessPassword,
+  className = "",
+}: ThemeEditButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,16 +29,16 @@ export function ThemeEditButton({ eventId, theme, unlockedThemes, className = ""
       <button
         type="button"
         className={`${EDIT_ICON_BUTTON_CLASS} ${className}`}
-        aria-label="Design ändern"
-        title="Design ändern"
+        aria-label="Event-Einstellungen"
+        title="Event-Einstellungen"
         onClick={() => setOpen(true)}
       >
         <PencilIcon />
       </button>
       {open ? (
         <EventDialog
-          mode="theme"
-          event={{ id: eventId, theme }}
+          mode="settings"
+          event={{ id: eventId, theme, accessPassword }}
           unlockedThemes={unlockedThemes}
           onCloseAction={() => setOpen(false)}
         />

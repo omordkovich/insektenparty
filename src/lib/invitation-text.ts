@@ -10,6 +10,8 @@ export type InvitationFacts = {
   location: string;
   contactName: string;
   url: string;
+  /** Password-protected event: shown right after the link; null = open. */
+  password: string | null;
 };
 
 export type InvitationWording = {
@@ -52,6 +54,7 @@ export function invitationLines(facts: InvitationFacts): InvitationLine[] {
     ...(facts.location.trim() ? fixed(`Wo: ${facts.location.trim()}`) : []),
     { kind: "editable", key: "callToAction" },
     { kind: "fixed", text: facts.url },
+    ...(facts.password ? fixed(`Passwort für die Event-Seite: ${facts.password}`) : []),
     { kind: "editable", key: "closing" },
     ...fixed(facts.contactName),
   ];

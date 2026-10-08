@@ -36,6 +36,10 @@ export const events = pgTable("events", {
   contactName: text("contact_name").notNull(),
   contactPhone: text("contact_phone").notNull(),
   contactEmail: text("contact_email").notNull(),
+  // Event password for guests ("Passwortgeschützt"); null = not protected.
+  // Plain text on purpose: the owner needs it in the invitation text. Only
+  // ever sent to the signed-in owner (see services/event-access-service.ts).
+  accessPassword: text("access_password"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

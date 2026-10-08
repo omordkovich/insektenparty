@@ -13,6 +13,7 @@ const facts: InvitationFacts = {
   location: "Gartenstraße 5, Köln",
   contactName: "Anna Müller",
   url: "https://gastzilla.de/event/abc123",
+  password: null,
 };
 
 describe("buildInvitationText", () => {
@@ -92,5 +93,17 @@ describe("parseStoredWording", () => {
       ...DEFAULT_WORDING,
       greeting: "Moin,",
     });
+  });
+});
+
+describe("invitation text for a password-protected event", () => {
+  it("adds the password right after the link", () => {
+    const lines = buildInvitationText({ ...facts, password: "Sommer" }, DEFAULT_WORDING).split("\n");
+    const linkIndex = lines.indexOf("https://gastzilla.de/event/abc123");
+    expect(lines[linkIndex + 1]).toBe("Passwort für die Event-Seite: Sommer");
+  });
+
+  it("has no password line for an open event", () => {
+    expect(buildInvitationText(facts, DEFAULT_WORDING)).not.toContain("Passwort");
   });
 });

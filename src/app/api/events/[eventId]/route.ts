@@ -8,9 +8,10 @@ type RouteContext = {
 };
 
 // Partial update: the body may contain any subset of the known event fields
-// plus an optional "theme" (in practice either one field from the inline
-// EditableField save, or {theme} from EventDialog's theme mode). Unknown
-// keys are ignored (see event-service.ts).
+// plus an optional "theme" and "accessPassword" (string, or null to remove
+// the password protection) - in practice either one field from the inline
+// EditableField save, or {theme, accessPassword} from EventDialog's settings
+// mode. Unknown keys are ignored (see event-service.ts).
 export async function PATCH(request: Request, context: RouteContext) {
   try {
     const { eventId } = await context.params;

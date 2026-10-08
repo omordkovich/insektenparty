@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { isThemeSelectable } from "@/lib/features";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
-import { EVENT_TEXT_MAX_LENGTH, validateNewEventTitle } from "@/lib/validation";
+import {
+  EVENT_TEXT_MAX_LENGTH,
+  validateEventPasswordPair,
+  validateNewEventTitle,
+} from "@/lib/validation";
 import { Button } from "./Button";
 import { LockIcon } from "./EditIcons";
+import { EventPasswordFields } from "./EventPasswordFields";
 import { LegalLink } from "./LegalLink";
 import { Modal } from "./Modal";
 
@@ -20,10 +25,10 @@ type EventDialogProps =
       onCloseAction: () => void;
     }
   | {
-      // Owner's event page: change only the design - the title is edited
-      // inline on the page itself.
-      mode: "theme";
-      event: { id: string; theme: ThemeKey };
+      // Owner's event page: design and password protection - the title is
+      // edited inline on the page itself.
+      mode: "settings";
+      event: { id: string; theme: ThemeKey; accessPassword: string | null };
       unlockedThemes: ThemeKey[];
       onCloseAction: () => void;
     };
@@ -36,11 +41,15 @@ export function EventDialog(props: EventDialogProps) {
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
-  const [theme, setTheme] = useState<ThemeKey>(mode === "theme" ? props.event.theme : THEME_KEYS[0]);
+  const [theme, setTheme] = useState<ThemeKey>(mode === "settings" ? props.event.theme : THEME_KEYS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lockHint, setLockHint] = useState<string | null>(null);
-  const originalTheme = mode === "theme" ? props.event.theme : undefined;
+  const originalTheme = mode === "settings" ? props.event.theme : undefined;
+  const originalPassword = mode === "settings" ? props.event.accessPassword : null;
+  const [isProtected, setIsProtected] = useState(originalPassword !== null);
+  const [password, setPassword] = useState(originalPassword ?? "");
+  const [passwordRepeat, setPasswordRepeat] = useState(originalPassword ?? "");
 
   async function handleSubmit() {
     if (saving) return;
@@ -54,9 +63,27 @@ export function EventDialog(props: EventDialogProps) {
         return;
       }
       trimmedName = titleResult.value;
-    } else if (theme === originalTheme) {
-      onCloseAction();
-      return;
+    }
+
+    let accessPassword: string | null = null;
+    if (isProtected) {
+      const passwordResult = validateEventPasswordPair(password, passwordRepeat);
+      if (!passwordResult.ok) {
+        setError(passwordResult.error);
+        return;
+      }
+      accessPassword = passwordResult.value;
+    }
+
+    // Settings: only send what changed; nothing changed = just close.
+    const changes: { theme?: ThemeKey; accessPassword?: string | null } = {};
+    if (mode === "settings") {
+      if (theme !== originalTheme) changes.theme = theme;
+      if (accessPassword !== originalPassword) changes.accessPassword = accessPassword;
+      if (Object.keys(changes).length === 0) {
+        onCloseAction();
+        return;
+      }
     }
 
     setSaving(true);
@@ -67,7 +94,7 @@ export function EventDialog(props: EventDialogProps) {
         const response = await fetch("/api/events", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ theme, title: trimmedName }),
+          body: JSON.stringify({ theme, title: trimmedName, accessPassword }),
         });
 
         if (!response.ok) {
@@ -89,7 +116,7 @@ export function EventDialog(props: EventDialogProps) {
       const response = await fetch(`/api/events/${props.event.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme }),
+        body: JSON.stringify(changes),
       });
 
       if (!response.ok) {
@@ -97,21 +124,21 @@ export function EventDialog(props: EventDialogProps) {
           | { error?: string }
           | null;
         setError(
-          payload?.error ?? "Das Design konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          payload?.error ?? "Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
         );
         setSaving(false);
         return;
       }
 
-      // The theme lives in the server-rendered layout (wrapper class,
-      // assets), so re-render the page in the new design.
+      // Theme and password both shape the server-rendered page (wrapper
+      // class, assets, badge, invitation text), so re-render it.
       router.refresh();
       onCloseAction();
     } catch {
       setError(
         mode === "create"
           ? "Das Event konnte nicht erstellt werden. Bitte versuche es erneut."
-          : "Das Design konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          : "Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
       );
       setSaving(false);
     }
@@ -120,7 +147,7 @@ export function EventDialog(props: EventDialogProps) {
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={saving}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        {mode === "create" ? "Event erstellen" : "Design ändern"}
+        {mode === "create" ? "Event erstellen" : "Event-Einstellungen"}
       </h2>
 
       {mode === "create" ? (
@@ -142,12 +169,8 @@ export function EventDialog(props: EventDialogProps) {
         </>
       ) : null}
 
-      {mode === "create" ? (
-        <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
-      ) : null}
-      <div
-        className={`${mode === "create" ? "mt-2" : "mt-5"} grid grid-cols-2 gap-3 sm:grid-cols-4`}
-      >
+      <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
+      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {THEME_KEYS.map((key) => {
           const selectable = isThemeSelectable(props.unlockedThemes, key, originalTheme);
           return (
@@ -196,6 +219,19 @@ export function EventDialog(props: EventDialogProps) {
         </p>
       ) : null}
 
+      <EventPasswordFields
+        isProtected={isProtected}
+        onProtectedChange={(value) => {
+          setIsProtected(value);
+          setError(null);
+        }}
+        password={password}
+        onPasswordChange={setPassword}
+        passwordRepeat={passwordRepeat}
+        onPasswordRepeatChange={setPasswordRepeat}
+        disabled={saving}
+      />
+
       {mode === "create" ? (
         <p className="mt-4 text-xs text-muted">
           Die Event-Seite ist für alle sichtbar, die den Einladungslink kennen –
@@ -207,7 +243,7 @@ export function EventDialog(props: EventDialogProps) {
         </p>
       ) : null}
 
-            {error ? (
+      {error ? (
         <p className="mt-4 text-sm text-danger" role="alert">
           {error}
         </p>

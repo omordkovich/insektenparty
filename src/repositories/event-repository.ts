@@ -59,6 +59,30 @@ export async function getEventForNotification(
   return event;
 }
 
+export type EventAccessRow = {
+  id: string;
+  ownerId: string | null;
+  accessPassword: string | null;
+  title: string;
+  slug: string;
+};
+
+// What the password protection needs: who owns the event, its password
+// (null = open) and what a locked visitor may see (title) or be sent (slug).
+export async function getEventAccessInfo(id: string): Promise<EventAccessRow | undefined> {
+  const [event] = await getDb()
+    .select({
+      id: events.id,
+      ownerId: events.ownerId,
+      accessPassword: events.accessPassword,
+      title: events.title,
+      slug: events.slug,
+    })
+    .from(events)
+    .where(eq(events.id, id));
+  return event;
+}
+
 export type EventListItem = {
   id: string;
   slug: string;
@@ -120,6 +144,7 @@ export async function createEvent(input: {
   slugName: string;
   theme: string;
   title: string;
+  accessPassword: string | null;
 }): Promise<{ slug: string }> {
   // Every other field starts empty - the owner fills them in via the
   // inline-editable fields on the event page (placeholders guide them
@@ -146,6 +171,7 @@ export async function createEvent(input: {
       contactName: "",
       contactPhone: "",
       contactEmail: "",
+      accessPassword: input.accessPassword,
     })
     .returning({ slug: events.slug });
   return created;

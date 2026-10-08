@@ -4,6 +4,7 @@ import type { ThemeKey } from "@/lib/theme-presets";
 import {
   isEventFieldKey,
   normalizeArrivalTime,
+  validateAccessPassword,
   validateEventDate,
   validateEventField,
   validateEventSchedule,
@@ -47,7 +48,7 @@ export type EventServiceResult<T> =
 
 export async function createEventForOwner(
   ownerId: string,
-  input: { theme: unknown; title: unknown },
+  input: { theme: unknown; title: unknown; accessPassword?: unknown },
 ): Promise<EventServiceResult<{ slug: string }>> {
   const themeValidation = validateTheme(input.theme);
   if (!themeValidation.ok) {
@@ -58,6 +59,11 @@ export async function createEventForOwner(
   const titleValidation = validateNewEventTitle(input.title);
   if (!titleValidation.ok) {
     return { ok: false, status: 400, error: titleValidation.error };
+  }
+
+  const passwordValidation = validateAccessPassword(input.accessPassword ?? null);
+  if (!passwordValidation.ok) {
+    return { ok: false, status: 400, error: passwordValidation.error };
   }
 
   const entitlements = await getUserEntitlements(ownerId);
@@ -79,6 +85,7 @@ export async function createEventForOwner(
         slugName: namePart,
         theme,
         title: titleValidation.value,
+        accessPassword: passwordValidation.value,
       });
       return { ok: true, data: { slug: created.slug } };
     } catch (error) {
@@ -94,11 +101,21 @@ export async function updateEventForOwner(
 ): Promise<EventServiceResult<EventRow>> {
   const updates: Partial<Record<EventFieldKey, string>> = {};
   let themeUpdate: ThemeKey | undefined;
+  // undefined = not part of this request; null = protection switched off.
+  let passwordUpdate: string | null | undefined;
   // Only the date/time fields present in the request; merged with the
   // stored ones below so the rules between them can be checked.
   const scheduleChanges: Partial<EventSchedule> = {};
 
   for (const [key, rawValue] of Object.entries(body)) {
+    if (key === "accessPassword") {
+      const validation = validateAccessPassword(rawValue);
+      if (!validation.ok) {
+        return { ok: false, status: 400, error: validation.error };
+      }
+      passwordUpdate = validation.value;
+      continue;
+    }
     if (key === "theme") {
       const validation = validateTheme(rawValue);
       if (!validation.ok) {
@@ -156,7 +173,8 @@ export async function updateEventForOwner(
     updates.timeLabel = formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime);
   }
 
-  const hasAnyUpdate = Object.keys(updates).length > 0 || themeUpdate !== undefined;
+  const hasAnyUpdate =
+    Object.keys(updates).length > 0 || themeUpdate !== undefined || passwordUpdate !== undefined;
 
   if (!hasAnyUpdate) {
     return { ok: false, status: 400, error: "Kein gültiges Feld angegeben." };
@@ -201,6 +219,7 @@ export async function updateEventForOwner(
     ...(addressUpdate ?? {}),
     ...(themeUpdate ? { theme: themeUpdate } : {}),
     ...(schedule ?? {}),
+    ...(passwordUpdate !== undefined ? { accessPassword: passwordUpdate } : {}),
   });
 
   if (!updated) {

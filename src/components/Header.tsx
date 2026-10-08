@@ -7,8 +7,13 @@ import { ThemeEditButton } from "./ThemeEditButton";
 type HeaderProps = {
   config: EventConfig;
   logoHref: string;
-  /** Owner only: shows the "change design" pencil at the logo's corner. */
-  themeEdit?: { eventId: string; theme: ThemeKey; unlockedThemes: ThemeKey[] };
+  /** Owner only: shows the settings pencil (design, password) at the logo's corner. */
+  themeEdit?: {
+    eventId: string;
+    theme: ThemeKey;
+    unlockedThemes: ThemeKey[];
+    accessPassword: string | null;
+  };
 };
 
 // Logo is fixed at w-64 (256px), so half its width is a constant here.
@@ -68,6 +73,7 @@ export function Header({ config, logoHref, themeEdit }: HeaderProps) {
             eventId={themeEdit.eventId}
             theme={themeEdit.theme}
             unlockedThemes={themeEdit.unlockedThemes}
+            accessPassword={themeEdit.accessPassword}
             className="absolute bottom-2 left-full ml-3"
           />
         ) : null}

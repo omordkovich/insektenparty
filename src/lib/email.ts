@@ -21,6 +21,7 @@ export async function sendEmail(options: {
   to: string;
   subject: string;
   text: string;
+  replyTo?: string;
 }): Promise<void> {
   const client = getTransporter();
   if (!client) {
@@ -35,5 +36,6 @@ export async function sendEmail(options: {
     to: options.to,
     subject: options.subject,
     text: options.text,
+    replyTo: options.replyTo,
   });
 }

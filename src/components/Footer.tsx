@@ -1,5 +1,6 @@
 import { EditableField } from "@/components/EditableField";
 import { InvitationTextButton } from "@/components/InvitationTextButton";
+import { LockIcon } from "@/components/EditIcons";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import type { EventConfig } from "@/lib/event-config";
 import { buildEventShareUrl } from "@/lib/share";
@@ -10,6 +11,8 @@ type FooterProps = {
   eventId: string;
   slug: string;
   isOwner: boolean;
+  /** Owner only (null for everyone else): goes into the invitation text. */
+  accessPassword: string | null;
 };
 
 type ContactField = {
@@ -20,7 +23,7 @@ type ContactField = {
   link?: { href: string };
 };
 
-export function Footer({ config, eventId, slug, isOwner }: FooterProps) {
+export function Footer({ config, eventId, slug, isOwner, accessPassword }: FooterProps) {
   const contactFields: ContactField[] = [
     {
       fieldKey: "contactName",
@@ -74,6 +77,12 @@ export function Footer({ config, eventId, slug, isOwner }: FooterProps) {
             </div>
           </>
         ) : null}
+        {isOwner && accessPassword ? (
+          <p className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-leaf/10 px-3 py-1 text-xs font-bold text-leaf-dark">
+            <LockIcon />
+            Passwortgeschützt
+          </p>
+        ) : null}
         <MadeWithBadge
           share={{ url: buildEventShareUrl(slug), title: config.title }}
           extraAction={
@@ -88,6 +97,7 @@ export function Footer({ config, eventId, slug, isOwner }: FooterProps) {
                   location: config.locationLabel,
                   contactName: config.contact.name,
                   url: buildEventShareUrl(slug),
+                  password: accessPassword,
                 }}
               />
             ) : null
