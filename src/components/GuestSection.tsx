@@ -8,6 +8,7 @@ import { BringingDetailsDialog } from "./BringingDetailsDialog";
 import { DeleteGuestDialog } from "./DeleteGuestDialog";
 import { GuestList } from "./GuestList";
 import { GuestModal, type GuestModalMode } from "./GuestModal";
+import { DeclinedDetailsDialog } from "./DeclinedDetailsDialog";
 import { MessageDetailsDialog } from "./MessageDetailsDialog";
 import { TimeDetailsDialog } from "./TimeDetailsDialog";
 
@@ -68,6 +69,7 @@ export function GuestSection({
     useState<GuestDto | null>(null);
   const [messageGuest, setMessageGuest] = useState<GuestDto | null>(null);
   const [timeGuest, setTimeGuest] = useState<GuestDto | null>(null);
+  const [declinedGuest, setDeclinedGuest] = useState<GuestDto | null>(null);
 
   // Used for user-triggered refreshes (after save/delete), where showing the
   // loading spinner and any error banner is the desired feedback.
@@ -197,6 +199,7 @@ export function GuestSection({
         onShowAdditionalGuests={setAdditionalGuestsGuest}
         onShowMessage={setMessageGuest}
         onShowTime={setTimeGuest}
+        onShowDeclined={setDeclinedGuest}
       />
 
       {modal.isOpen ? (
@@ -256,6 +259,14 @@ export function GuestSection({
           key={timeGuest.id}
           guest={timeGuest}
           onCloseAction={() => setTimeGuest(null)}
+        />
+      ) : null}
+
+      {declinedGuest ? (
+        <DeclinedDetailsDialog
+          key={declinedGuest.id}
+          guest={declinedGuest}
+          onCloseAction={() => setDeclinedGuest(null)}
         />
       ) : null}
     </>

@@ -196,6 +196,13 @@ export function PrivacyPolicyContent() {
           jeden, an den der Link weitergegeben wird. Bitte gib nur Daten an, die
           du auf diese Weise teilen möchtest.
         </p>
+        <p>
+          Optional kannst du dein Event mit einem Passwort schützen. Dann sehen
+          Besucher ohne Passwort nur den Titel des Events; Inhalte, Kontaktangaben
+          und Gästeliste werden erst nach Eingabe des Passworts angezeigt. Das
+          Passwort speichern wir, damit wir es dir in deinem Einladungstext
+          anzeigen können; Gästen zeigen wir es nicht an.
+        </p>
         <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.</p>
       </Section>
 

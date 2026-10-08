@@ -10,6 +10,7 @@ type GuestItemProps = {
   onShowAdditionalGuests: (guest: GuestDto) => void;
   onShowMessage: (guest: GuestDto) => void;
   onShowTime: (guest: GuestDto) => void;
+  onShowDeclined: (guest: GuestDto) => void;
   disabled?: boolean;
 };
 
@@ -21,6 +22,7 @@ export function GuestItem({
   onShowAdditionalGuests,
   onShowMessage,
   onShowTime,
+  onShowDeclined,
   disabled = false,
 }: GuestItemProps) {
   return (
@@ -47,21 +49,32 @@ export function GuestItem({
       </td>
       {guest.declined ? (
         <>
-          {/* Instead of the clock and gift icons (mobile) and the time and
-              "Ich bringe was mit" columns (desktop): greyed-out "Abgesagt". */}
+          {/* Instead of the clock, gift and message icons (mobile) and the
+              time, "Ich bringe was mit" and message columns (desktop): a
+              greyed-out "Abgesagt" that opens the guest's message, if any. */}
           <td className="block sm:hidden">
-            <span className="block text-muted" role="img" aria-label="Abgesagt" title="Abgesagt">
+            <button
+              type="button"
+              onClick={() => onShowDeclined(guest)}
+              disabled={disabled}
+              aria-label={`${guest.name} hat abgesagt - anzeigen`}
+              title="Abgesagt"
+              className="block text-muted transition hover:text-ink disabled:opacity-50"
+            >
               <DeclinedIcon />
-            </span>
+            </button>
           </td>
-          <td
-            colSpan={3}
-            className="hidden sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-bold text-muted"
-          >
-            <span className="flex items-center gap-2">
+          <td colSpan={4} className="hidden sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
+            <button
+              type="button"
+              onClick={() => onShowDeclined(guest)}
+              disabled={disabled}
+              aria-label={`${guest.name} hat abgesagt - anzeigen`}
+              className="mx-auto flex items-center gap-2 font-bold text-muted transition hover:text-ink disabled:opacity-50"
+            >
               <DeclinedIcon />
               Abgesagt
-            </span>
+            </button>
           </td>
         </>
       ) : (
@@ -104,26 +117,26 @@ export function GuestItem({
               </span>
             )}
           </td>
+          <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
+            {guest.hasMessage ? (
+              <button
+                type="button"
+                onClick={() => onShowMessage(guest)}
+                disabled={disabled}
+                aria-label={`Nachricht von ${guest.name} anzeigen`}
+                title="Hat eine Nachricht hinterlassen"
+                className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+              >
+                <MessageIcon />
+              </button>
+            ) : (
+              <span className="text-muted/40" aria-label="Keine Nachricht" title="Keine Nachricht">
+                <MessageIcon />
+              </span>
+            )}
+          </td>
         </>
       )}
-      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
-        {guest.hasMessage ? (
-          <button
-            type="button"
-            onClick={() => onShowMessage(guest)}
-            disabled={disabled}
-            aria-label={`Nachricht von ${guest.name} anzeigen`}
-            title="Hat eine Nachricht hinterlassen"
-            className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
-          >
-            <MessageIcon />
-          </button>
-        ) : (
-          <span className="text-muted/40" aria-label="Keine Nachricht" title="Keine Nachricht">
-            <MessageIcon />
-          </span>
-        )}
-      </td>
       <td className="block w-full sm:w-auto sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <div className="flex justify-end gap-2">
           <Button

@@ -1,3 +1,4 @@
+import { CopyPasswordButton } from "@/components/CopyPasswordButton";
 import { EditableField } from "@/components/EditableField";
 import { InvitationTextButton } from "@/components/InvitationTextButton";
 import { LockIcon } from "@/components/EditIcons";
@@ -87,19 +88,24 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
           share={{ url: buildEventShareUrl(slug), title: config.title }}
           extraAction={
             isOwner ? (
-              <InvitationTextButton
-                eventId={eventId}
-                className="bg-surface"
-                facts={{
-                  title: config.title,
-                  dateLabel: config.dateLabel,
-                  timeLabel: config.timeLabel,
-                  location: config.locationLabel,
-                  contactName: config.contact.name,
-                  url: buildEventShareUrl(slug),
-                  password: accessPassword,
-                }}
-              />
+              <>
+                {accessPassword ? (
+                  <CopyPasswordButton password={accessPassword} className="bg-surface" />
+                ) : null}
+                <InvitationTextButton
+                  eventId={eventId}
+                  className="bg-surface"
+                  facts={{
+                    title: config.title,
+                    dateLabel: config.dateLabel,
+                    timeLabel: config.timeLabel,
+                    location: config.locationLabel,
+                    contactName: config.contact.name,
+                    url: buildEventShareUrl(slug),
+                    password: accessPassword,
+                  }}
+                />
+              </>
             ) : null
           }
         />

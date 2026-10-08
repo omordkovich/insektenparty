@@ -234,8 +234,9 @@ export function EventDialog(props: EventDialogProps) {
 
       {mode === "create" ? (
         <p className="mt-4 text-xs text-muted">
-          Die Event-Seite ist für alle sichtbar, die den Einladungslink kennen –
-          auch die Kontaktangaben, die du dort einträgst. Mehr dazu in der{" "}
+          Die Event-Seite ist für alle sichtbar, die den Einladungslink kennen
+          (mit Passwortschutz: zusätzlich das Passwort) – auch die
+          Kontaktangaben, die du dort einträgst. Mehr dazu in der{" "}
           <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
             Datenschutzerklärung
           </LegalLink>

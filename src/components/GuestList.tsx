@@ -13,6 +13,7 @@ type GuestListProps = {
   onShowAdditionalGuests: (guest: GuestDto) => void;
   onShowMessage: (guest: GuestDto) => void;
   onShowTime: (guest: GuestDto) => void;
+  onShowDeclined: (guest: GuestDto) => void;
   actionsDisabled?: boolean;
 };
 
@@ -27,6 +28,7 @@ export function GuestList({
   onShowAdditionalGuests,
   onShowMessage,
   onShowTime,
+  onShowDeclined,
   actionsDisabled = false,
 }: GuestListProps) {
   return (
@@ -87,6 +89,7 @@ export function GuestList({
                       onShowAdditionalGuests={onShowAdditionalGuests}
                       onShowMessage={onShowMessage}
                       onShowTime={onShowTime}
+                      onShowDeclined={onShowDeclined}
                       disabled={actionsDisabled}
                     />
                   ))}

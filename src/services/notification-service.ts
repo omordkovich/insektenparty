@@ -13,22 +13,22 @@ function buildMessage(
   switch (kind) {
     case "created":
       return {
-        subject: "Neuer Gast auf der Kinderparty",
+        subject: `Neuer Gast bei deinem Event „${eventTitle}“`,
         text: `„${guestName}“ hat sich bei Event „${eventTitle}“ als Gast eingetragen.`,
       };
     case "updated":
       return {
-        subject: "Änderung an der Gästeliste",
-        text: `„${guestName}“ hat seinen Eintrag bei Event „${eventTitle}“ geändert.`,
+        subject: `Änderung an der Gästeliste von „${eventTitle}“`,
+        text: `„${guestName}“ hat den Eintrag bei Event „${eventTitle}“ geändert.`,
       };
     case "declined":
       return {
-        subject: "Absage auf der Kinderparty",
+        subject: `Absage bei deinem Event „${eventTitle}“`,
         text: `„${guestName}“ hat bei Event „${eventTitle}“ abgesagt.`,
       };
     case "deleted":
       return {
-        subject: "Gast aus der Gästeliste entfernt",
+        subject: `Gast aus der Gästeliste von „${eventTitle}“ entfernt`,
         text: `„${guestName}“ wurde aus der Gästeliste bei Event „${eventTitle}“ entfernt.`,
       };
   }

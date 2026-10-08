@@ -106,7 +106,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Sehen andere Eltern, wer zum Kindergeburtstag kommt?",
         answer:
-          "Ja – alle, die den Einladungslink haben, also die eingeladenen Familien. Suchmaschinen finden deine Event-Seite nicht. Teile den Link deshalb nur mit den Eltern, die du einladen möchtest.",
+          "Ja – alle, die den Einladungslink haben, also die eingeladenen Familien. Suchmaschinen finden deine Event-Seite nicht. Teile den Link deshalb nur mit den Eltern, die du einladen möchtest – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
     ],
     updated: "2026-10-06",
@@ -171,7 +171,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer sieht, welche Kinder kommen?",
         answer:
-          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den Eltern der eingeladenen Kinder.",
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den Eltern der eingeladenen Kinder. Mit einem Passwort sieht die Liste außerdem nur, wer das Passwort kennt.",
       },
     ],
     updated: "2026-10-07",
@@ -236,7 +236,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer sieht die Zusagen zur Einschulungsfeier?",
         answer:
-          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den eingeladenen Familien.",
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit den eingeladenen Familien – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
     ],
     updated: "2026-10-07",
@@ -296,7 +296,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer kann die Anmeldungen sehen?",
         answer:
-          "Alle, die den Link haben – also alle Familien, an die ihr ihn schickt. Suchmaschinen finden die Seite nicht. Familien können sich auch nur mit Vornamen oder als „Familie M.“ eintragen.",
+          "Alle, die den Link haben – also alle Familien, an die ihr ihn schickt. Suchmaschinen finden die Seite nicht. Mit einem Passwort stellt ihr außerdem sicher, dass nur eingeladene Familien die Liste öffnen. Familien können sich auch nur mit Vornamen oder als „Familie M.“ eintragen.",
       },
       {
         question: "Braucht die Kita oder Schule ein eigenes Konto?",
@@ -366,7 +366,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer sieht, wer zum Abiball kommt?",
         answer:
-          "Alle, die den Link haben – also euer Jahrgang und alle, an die ihr ihn weiterschickt. Suchmaschinen finden die Seite nicht.",
+          "Alle, die den Link haben – also euer Jahrgang und alle, an die ihr ihn weiterschickt. Suchmaschinen finden die Seite nicht. Wollt ihr die Liste enger halten, schützt sie mit einem Passwort.",
       },
     ],
     updated: "2026-10-07",
@@ -426,7 +426,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Kann ich eine Überraschungsparty planen?",
         answer:
-          "Ja – schick den Link nur an die Gäste, nicht an das Geburtstagskind. Alle mit dem Link sehen die Gästeliste, Suchmaschinen finden die Seite nicht.",
+          "Ja – schick den Link nur an die Gäste, nicht an das Geburtstagskind. Alle mit dem Link sehen die Gästeliste, Suchmaschinen finden die Seite nicht. Schütze die Seite zusätzlich mit einem Passwort – dann bleibt die Überraschung auch dann geheim, wenn der Link doch beim Geburtstagskind landet.",
       },
       {
         question: "Wie bekomme ich die Zusagen bis zu einem Stichtag?",
@@ -496,7 +496,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer sieht unsere Gästeliste?",
         answer:
-          "Alle, die den Einladungslink haben. Suchmaschinen finden eure Event-Seite nicht. Teile den Link deshalb nur mit den Gästen, die du einladen möchtest.",
+          "Alle, die den Einladungslink haben. Suchmaschinen finden eure Event-Seite nicht. Teile den Link deshalb nur mit den Gästen, die du einladen möchtest – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
     ],
     updated: "2026-10-06",
@@ -552,7 +552,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Kann die Braut oder der Bräutigam die Planung sehen?",
         answer:
-          "Nur mit dem Link: Alle, die ihn haben, sehen die Liste. Schick ihn deshalb nur an die Runde, die mitfeiert – Suchmaschinen finden die Seite nicht.",
+          "Nur mit dem Link: Alle, die ihn haben, sehen die Liste. Schick ihn deshalb nur an die Runde, die mitfeiert – Suchmaschinen finden die Seite nicht. Mit einem Passwort bleibt die Planung auch dann geheim, wenn der Link weitergeleitet wird.",
       },
       {
         question: "Kann ich über GASTZILLA Kosten aufteilen?",
@@ -618,7 +618,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Können die werdenden Eltern die Planung sehen?",
         answer:
-          "Alle, die den Einladungslink haben, sehen die Liste. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschung für die werdenden Eltern, schick ihnen den Link also nicht.",
+          "Alle, die den Einladungslink haben, sehen die Liste. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschung für die werdenden Eltern, schick ihnen den Link also nicht – und schütze die Seite am besten zusätzlich mit einem Passwort.",
       },
     ],
     updated: "2026-10-07",
@@ -1285,7 +1285,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer kann die Teilnehmerliste sehen?",
         answer:
-          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit der Gruppe, die mitfahren soll.",
+          "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit der Gruppe, die mitfahren soll – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
     ],
     updated: "2026-10-07",

@@ -21,7 +21,12 @@ export const FAQ: FaqItem[] = [
   {
     question: "Wer sieht die Gästeliste?",
     answer:
-      "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht.",
+      "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht. Mit einem Passwort sieht sie außerdem nur, wer das Passwort kennt.",
+  },
+  {
+    question: "Kann ich mein Event mit einem Passwort schützen?",
+    answer:
+      "Ja. Hake beim Erstellen oder später in den Event-Einstellungen „Passwortgeschützt“ an und lege ein Passwort fest. Ohne Passwort sehen Besucher nur den Titel – keine Gästeliste, kein Datum, keinen Ort. Im Einladungstext steht das Passwort automatisch, und wer es nicht hat, kann es über die Event-Seite bei dir anfragen.",
   },
   {
     question: "Muss ich den Einladungstext selbst schreiben?",

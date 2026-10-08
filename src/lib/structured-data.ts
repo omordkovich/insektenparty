@@ -19,6 +19,7 @@ export const FEATURES = [
   "Gäste sagen über einen Link zu oder ab – ohne Konto und ohne App",
   "Begleitpersonen, Kinder, Mitbringsel und Nachrichten direkt bei der Zusage",
   "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail bei jeder Zu- und Absage",
+  "Optionaler Passwortschutz für Event-Seite und Gästeliste – Gäste können das Passwort beim Gastgeber anfragen",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
   "Designs für verschiedene Anlässe",
   "Fertiger Einladungstext mit Datum, Ort und Link – anpassbar und mit einem Klick kopierbar",

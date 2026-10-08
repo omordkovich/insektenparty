@@ -16,7 +16,8 @@ type MadeWithBadgeProps = {
 export function MadeWithBadge({ share, extraAction }: MadeWithBadgeProps) {
   return (
     <div className="mt-6 text-center">
-      <div className="flex items-center justify-center gap-3">
+      {/* Wraps on narrow phones: the owner gets up to four icon buttons. */}
+      <div className="flex flex-wrap items-center justify-center gap-3">
         <Link href="/" className="inline-block">
           {/* The badge (black on transparent) is used as a mask so it can be
               filled with the event theme's color - see .made-with-badge. */}

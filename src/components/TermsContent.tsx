@@ -138,9 +138,10 @@ export function TermsContent() {
         </List>
         <p>
           Event-Seiten und Gästelisten sind für alle Personen sichtbar, die den
-          Einladungslink kennen. Als Veranstalter entscheidest du, an wen du den
-          Link weitergibst, und stellst sicher, dass du die von dir
-          eingegebenen Daten Dritter verwenden darfst.
+          Einladungslink kennen – bei passwortgeschützten Events für alle, die
+          zusätzlich das Passwort kennen. Als Veranstalter entscheidest du, an
+          wen du Link und Passwort weitergibst, und stellst sicher, dass du die
+          von dir eingegebenen Daten Dritter verwenden darfst.
         </p>
         <p>
           Wir dürfen Inhalte, die gegen diese Regeln verstoßen, entfernen und
@@ -221,7 +222,7 @@ export function TermsContent() {
         </p>
       </Section>
 
-      <LastUpdated date="September 2026" />
+      <LastUpdated date="Oktober 2026" />
     </LegalBody>
   );
 }

@@ -514,7 +514,8 @@ export function GuestModal({
 
         <p className="text-xs text-muted">
           Deine Angaben sind auf der Event-Seite für alle sichtbar, die den
-          Einladungslink kennen. Mehr dazu in der{" "}
+          Einladungslink kennen (bei passwortgeschützten Events: zusätzlich das
+          Passwort). Mehr dazu in der{" "}
           <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
             Datenschutzerklärung
           </LegalLink>
