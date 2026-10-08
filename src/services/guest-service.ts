@@ -26,7 +26,7 @@ function toGuestDto(row: GuestRow): GuestDto {
     name: row.name,
     additionalGuests: row.additionalGuests,
     additionalGuestNames: row.additionalGuestNames,
-    arrivalTime: normalizeArrivalTime(String(row.arrivalTime)),
+    arrivalTime: optionalTime(row.arrivalTime),
     arrivalEndTime: optionalTime(row.arrivalEndTime),
     departureTime: optionalTime(row.departureTime),
     departureEndTime: optionalTime(row.departureEndTime),
@@ -34,6 +34,7 @@ function toGuestDto(row: GuestRow): GuestDto {
     bringingDescription: row.bringingDescription,
     hasMessage: row.hasMessage,
     message: row.message,
+    declined: row.declined,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -72,7 +73,7 @@ export async function createGuestForEvent(
   const created = await createGuest(eventId, validation.data);
 
   if (!isOwnerRequest) {
-    await notifyOwnerOfGuestChange(eventId, "created", created.name);
+    await notifyOwnerOfGuestChange(eventId, created.declined ? "declined" : "created", created.name);
   }
 
   return { ok: true, data: toGuestDto(created) };
@@ -104,7 +105,7 @@ export async function updateGuestForEvent(
   }
 
   if (!isOwnerRequest) {
-    await notifyOwnerOfGuestChange(eventId, "updated", updated.name);
+    await notifyOwnerOfGuestChange(eventId, updated.declined ? "declined" : "updated", updated.name);
   }
 
   return { ok: true, data: toGuestDto(updated) };

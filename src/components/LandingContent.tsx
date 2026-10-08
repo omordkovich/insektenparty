@@ -19,7 +19,7 @@ const BENEFITS: { title: string; text: string; icon: ReactNode }[] = [
   },
   {
     title: "Gäste brauchen kein Konto",
-    text: "Zusagen, Begleitpersonen, Mitbringsel und Nachrichten direkt über den Link.",
+    text: "Zu- und Absagen, Begleitpersonen, Mitbringsel und Nachrichten direkt über den Link.",
     icon: <GuestIcon />,
   },
   {
@@ -44,7 +44,7 @@ export function LandingContent() {
         </p>
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
           Erstelle in wenigen Minuten eine Einladungsseite für Geburtstag, Hochzeit,
-          Grillabend oder Firmenfeier. Teile den Link – deine Gäste tragen sich selbst ein.
+          Grillabend oder Firmenfeier. Teile den Link – deine Gäste sagen selbst zu oder ab.
         </p>
         <div className="mt-6 flex justify-center">
           <AuthButtons registerLabel="Kostenlos starten" />

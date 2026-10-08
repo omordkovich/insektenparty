@@ -3,7 +3,7 @@ import { buildEventShareUrl } from "@/lib/share";
 import { getEventForNotification } from "@/repositories/event-repository";
 import { getUserContact } from "@/repositories/user-repository";
 
-export type GuestChangeKind = "created" | "updated" | "deleted";
+export type GuestChangeKind = "created" | "updated" | "declined" | "deleted";
 
 function buildMessage(
   kind: GuestChangeKind,
@@ -20,6 +20,11 @@ function buildMessage(
       return {
         subject: "Änderung an der Gästeliste",
         text: `„${guestName}“ hat seinen Eintrag bei Event „${eventTitle}“ geändert.`,
+      };
+    case "declined":
+      return {
+        subject: "Absage auf der Kinderparty",
+        text: `„${guestName}“ hat bei Event „${eventTitle}“ abgesagt.`,
       };
     case "deleted":
       return {

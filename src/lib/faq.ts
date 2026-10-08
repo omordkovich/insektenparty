@@ -14,6 +14,11 @@ export const FAQ: FaqItem[] = [
     answer: "Nein, sie öffnen einfach den Einladungslink und tragen sich ein.",
   },
   {
+    question: "Können Gäste auch absagen?",
+    answer:
+      "Ja. Wer nicht kommen kann, hakt beim Eintragen „Ich sage ab“ an – auf Wunsch mit einer Nachricht. In der Gästeliste steht der Gast dann als „Abgesagt“, und du bekommst eine E-Mail. So weißt du nicht nur, wer kommt, sondern auch, wer sicher nicht kommt.",
+  },
+  {
     question: "Wer sieht die Gästeliste?",
     answer:
       "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht.",

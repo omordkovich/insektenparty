@@ -45,6 +45,7 @@ describe("validateGuestInput", () => {
         bringingDescription: "Kuchen",
         hasMessage: false,
         message: null,
+        declined: false,
       },
     });
   });
@@ -155,6 +156,57 @@ describe("validateGuestInput", () => {
     );
     const result = validateGuestInput({ ...validGuest, hasMessage: true, message: " Hallo " });
     expect(result.ok && result.data.message).toBe("Hallo");
+  });
+
+  it("clears everything about coming for a declined guest", () => {
+    expect(
+      validateGuestInput({
+        ...validGuest,
+        declined: true,
+        departureTime: "18:00",
+        hasMessage: true,
+        message: " Viel Spaß! ",
+      }),
+    ).toEqual({
+      ok: true,
+      data: {
+        name: "Anna",
+        additionalGuests: 0,
+        additionalGuestNames: [],
+        arrivalTime: null,
+        arrivalEndTime: null,
+        departureTime: null,
+        departureEndTime: null,
+        bringingSomething: false,
+        bringingDescription: null,
+        hasMessage: true,
+        message: "Viel Spaß!",
+        declined: true,
+      },
+    });
+  });
+
+  it("ignores invalid greyed-out fields of a declined guest", () => {
+    const result = validateGuestInput({
+      ...validGuest,
+      declined: true,
+      additionalGuests: "",
+      arrivalTime: "",
+      departureEndTime: "kaputt",
+      bringingDescription: "",
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it("still checks name and message of a declined guest", () => {
+    expect(guestError({ declined: true, name: "A" })).toBe("Name muss mindestens 2 Zeichen lang sein.");
+    expect(guestError({ declined: true, hasMessage: true, message: "" })).toBe("Bitte gib eine Nachricht ein.");
+    expect(guestError({ declined: true, arrivalTime: "" })).toBeNull();
+  });
+
+  it("only counts an explicit true as declined", () => {
+    const result = validateGuestInput({ ...validGuest, declined: "true" });
+    expect(result.ok && result.data.declined).toBe(false);
   });
 });
 

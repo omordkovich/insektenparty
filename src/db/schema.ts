@@ -58,7 +58,8 @@ export const guests = pgTable("guests", {
     .array()
     .notNull()
     .default([]),
-  arrivalTime: time("arrival_time").notNull(),
+  // Null only for a declined guest.
+  arrivalTime: time("arrival_time"),
   // Optional end of the arrival window; may be earlier (past midnight).
   arrivalEndTime: time("arrival_end_time"),
   // Optional "Ich bleibe bis" window (both null when not given).
@@ -68,6 +69,8 @@ export const guests = pgTable("guests", {
   bringingDescription: varchar("bringing_description", { length: 1000 }),
   hasMessage: boolean("has_message").notNull().default(false),
   message: varchar("message", { length: 1000 }),
+  // "Ich sage ab": times, extra people and "Ich bringe was mit" stay empty.
+  declined: boolean("declined").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

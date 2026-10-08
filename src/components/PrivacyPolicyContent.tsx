@@ -200,9 +200,11 @@ export function PrivacyPolicyContent() {
         </p>
         <List>
           <li>Name</li>
-          <li>Anzahl und Namen weiterer Gäste bzw. Begleitpersonen</li>
-          <li>voraussichtliche Ankunftszeit</li>
-          <li>optional: was du mitbringst</li>
+          <li>ob du zusagst oder absagst</li>
+          <li>bei einer Zusage: Anzahl und Namen weiterer Gäste bzw. Begleitpersonen</li>
+          <li>bei einer Zusage: voraussichtliche Ankunftszeit</li>
+          <li>optional bei einer Zusage: bis wann du bleibst</li>
+          <li>optional bei einer Zusage: was du mitbringst</li>
           <li>optional: eine Nachricht an den Veranstalter</li>
         </List>
         <p>
@@ -215,7 +217,7 @@ export function PrivacyPolicyContent() {
         </p>
         <p>
           Der Veranstalter wird per E-Mail benachrichtigt, wenn sich jemand
-          einträgt, einen Eintrag ändert oder entfernt; die Benachrichtigung
+          einträgt, absagt, einen Eintrag ändert oder entfernt; die Benachrichtigung
           enthält den Namen des Gastes.
         </p>
         <p>
@@ -403,7 +405,7 @@ export function PrivacyPolicyContent() {
           Fassung.
         </p>
       </Section>
-      <LastUpdated date="September 2026" />
+      <LastUpdated date="Oktober 2026" />
     </LegalBody>
   );
 }

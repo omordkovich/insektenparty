@@ -98,7 +98,8 @@ export type GuestInput = {
   name: string;
   additionalGuests: number;
   additionalGuestNames: string[];
-  arrivalTime: string;
+  /** Null only for a declined guest. */
+  arrivalTime: string | null;
   /** Optional end of the arrival window ("von – bis"); null = only "von". */
   arrivalEndTime: string | null;
   /** Optional "Ich bleibe bis" window; both null when not given. */
@@ -108,6 +109,8 @@ export type GuestInput = {
   bringingDescription: string | null;
   hasMessage: boolean;
   message: string | null;
+  /** "Ich sage ab": everything about coming is then empty (see declinedGuestSchema). */
+  declined: boolean;
 };
 
 export type ValidationResult = { ok: true; data: GuestInput } | { ok: false; error: string };
@@ -181,6 +184,22 @@ const guestBaseSchema = z.object(
   { error: "Ungültige Anfragedaten." },
 );
 
+// Text that is only required when its checkbox is ticked; null otherwise.
+function optionalText(
+  enabled: boolean,
+  value: unknown,
+  schema: z.ZodType<string>,
+  ctx: z.RefinementCtx,
+): string | null | typeof z.NEVER {
+  if (!enabled) return null;
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    ctx.addIssue({ code: "custom", message: firstError(result.error) });
+    return z.NEVER;
+  }
+  return result.data;
+}
+
 export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInput => {
   if (guest.additionalGuestNames.length !== guest.additionalGuests) {
     ctx.addIssue({
@@ -204,25 +223,16 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
     return z.NEVER;
   }
 
-  let bringingDescription: string | null = null;
-  if (guest.bringingSomething) {
-    const result = bringingDescriptionSchema.safeParse(guest.bringingDescription);
-    if (!result.success) {
-      ctx.addIssue({ code: "custom", message: firstError(result.error) });
-      return z.NEVER;
-    }
-    bringingDescription = result.data;
-  }
+  const bringingDescription = optionalText(
+    guest.bringingSomething,
+    guest.bringingDescription,
+    bringingDescriptionSchema,
+    ctx,
+  );
+  if (bringingDescription === z.NEVER) return z.NEVER;
 
-  let message: string | null = null;
-  if (guest.hasMessage) {
-    const result = messageSchema.safeParse(guest.message);
-    if (!result.success) {
-      ctx.addIssue({ code: "custom", message: firstError(result.error) });
-      return z.NEVER;
-    }
-    message = result.data;
-  }
+  const message = optionalText(guest.hasMessage, guest.message, messageSchema, ctx);
+  if (message === z.NEVER) return z.NEVER;
 
   return {
     name: guest.name,
@@ -236,11 +246,50 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
     bringingDescription,
     hasMessage: guest.hasMessage,
     message,
+    declined: false,
   };
 });
 
+// "Ich sage ab": the form greys out times, extra people and "Ich bringe was
+// mit", so whatever they still hold is ignored (never blocks the save) and
+// stored empty. Only the name and an optional message count.
+export const declinedGuestSchema = z
+  .object(
+    {
+      name: guestNameSchema,
+      hasMessage: z.unknown().transform((value) => value === true),
+      message: z.unknown(),
+    },
+    { error: "Ungültige Anfragedaten." },
+  )
+  .transform((guest, ctx): GuestInput => {
+    const message = optionalText(guest.hasMessage, guest.message, messageSchema, ctx);
+    if (message === z.NEVER) return z.NEVER;
+
+    return {
+      name: guest.name,
+      additionalGuests: 0,
+      additionalGuestNames: [],
+      arrivalTime: null,
+      arrivalEndTime: null,
+      departureTime: null,
+      departureEndTime: null,
+      bringingSomething: false,
+      bringingDescription: null,
+      hasMessage: guest.hasMessage,
+      message,
+      declined: true,
+    };
+  });
+
+// Like the checkboxes, only an explicit true counts.
+function isDeclined(body: unknown): boolean {
+  return typeof body === "object" && body !== null && (body as { declined?: unknown }).declined === true;
+}
+
 export function validateGuestInput(body: unknown): ValidationResult {
-  const result = guestInputSchema.safeParse(body);
+  const schema = isDeclined(body) ? declinedGuestSchema : guestInputSchema;
+  const result = schema.safeParse(body);
   return result.success ? { ok: true, data: result.data } : { ok: false, error: firstError(result.error) };
 }
 

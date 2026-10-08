@@ -36,6 +36,7 @@ type FormState = {
   bringingDescription: string;
   hasMessage: boolean;
   message: string;
+  declined: boolean;
 };
 
 function getInitialForm(
@@ -48,7 +49,8 @@ function getInitialForm(
       name: guest.name,
       additionalGuests: String(guest.additionalGuests),
       additionalGuestNames: guest.additionalGuestNames,
-      arrivalTime: guest.arrivalTime,
+      // A declined guest has no arrival time; un-declining starts from the default.
+      arrivalTime: guest.arrivalTime ?? defaultArrivalTime,
       arrivalEndTime: guest.arrivalEndTime ?? "",
       departureTime: guest.departureTime ?? "",
       departureEndTime: guest.departureEndTime ?? "",
@@ -56,6 +58,7 @@ function getInitialForm(
       bringingDescription: guest.bringingDescription ?? "",
       hasMessage: guest.hasMessage,
       message: guest.message ?? "",
+      declined: guest.declined,
     };
   }
 
@@ -71,6 +74,7 @@ function getInitialForm(
     bringingDescription: "",
     hasMessage: false,
     message: "",
+    declined: false,
   };
 }
 
@@ -119,6 +123,7 @@ export function GuestModal({
   const bringingDescriptionId = useId();
   const messageCheckboxId = useId();
   const messageId = useId();
+  const declinedId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const initialForm = getInitialForm(mode, guest, defaultArrivalTime);
 
@@ -156,6 +161,7 @@ export function GuestModal({
       bringingDescription: form.bringingDescription,
       hasMessage: form.hasMessage,
       message: form.message,
+      declined: form.declined,
     });
 
     if (!validation.ok) {
@@ -252,117 +258,136 @@ export function GuestModal({
           />
         </div>
 
-        <div>
-          <label htmlFor={additionalId} className="mb-1 block text-sm font-bold">
-            Zusätzliche Personen
-          </label>
+        <label className="flex items-center gap-2 text-sm font-bold">
           <input
-            id={additionalId}
-            name="additionalGuests"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={MAX_ADDITIONAL_GUESTS}
-            step={1}
-            value={form.additionalGuests}
+            id={declinedId}
+            name="declined"
+            type="checkbox"
+            checked={form.declined}
             disabled={saving}
-            onChange={(event) => {
-              const rawValue = event.target.value;
-              setForm((current) => ({
-                ...current,
-                additionalGuests: rawValue,
-                additionalGuestNames: resizeAdditionalGuestNames(
-                  rawValue,
-                  current.additionalGuestNames,
-                ),
-              }));
-            }}
-            className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+            onChange={(event) =>
+              setForm((current) => ({ ...current, declined: event.target.checked }))
+            }
+            className="h-5 w-5 rounded border-leaf/40"
           />
-        </div>
+          Ich sage ab
+        </label>
 
-        {form.additionalGuestNames.length > 0 ? (
-          <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
-            <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
-            {form.additionalGuestNames.map((additionalName, index) => (
-              <div key={index} className="flex items-center gap-2">
+        {/* A declined guest doesn't come: times, extra people and "Ich bringe
+            was mit" are greyed out (their values are kept for un-declining,
+            but not saved - see declinedGuestSchema). */}
+        <fieldset disabled={form.declined} className="space-y-4 transition-opacity disabled:opacity-40">
+          <div>
+            <label htmlFor={additionalId} className="mb-1 block text-sm font-bold">
+              Zusätzliche Personen
+            </label>
+            <input
+              id={additionalId}
+              name="additionalGuests"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={MAX_ADDITIONAL_GUESTS}
+              step={1}
+              value={form.additionalGuests}
+              disabled={saving}
+              onChange={(event) => {
+                const rawValue = event.target.value;
+                setForm((current) => ({
+                  ...current,
+                  additionalGuests: rawValue,
+                  additionalGuestNames: resizeAdditionalGuestNames(
+                    rawValue,
+                    current.additionalGuestNames,
+                  ),
+                }));
+              }}
+              className="w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+            />
+          </div>
+
+          {form.additionalGuestNames.length > 0 ? (
+            <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
+              <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
+              {form.additionalGuestNames.map((additionalName, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    maxLength={NAME_MAX_LENGTH}
+                    aria-label={`Name Gast ${index + 1}`}
+                    placeholder={`Gast_${index + 1}`}
+                    value={additionalName}
+                    disabled={saving}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setForm((current) => {
+                        const names = current.additionalGuestNames.slice();
+                        names[index] = value;
+                        return { ...current, additionalGuestNames: names };
+                      });
+                    }}
+                    className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-surface px-3 py-2"
+                  />
+                  <Button
+                    variant="outline-danger"
+                    size="icon"
+                    aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
+                    onClick={() =>
+                      setForm((current) => ({
+                        ...current,
+                        ...removeAdditionalGuestName(
+                          index,
+                          current.additionalGuestNames,
+                        ),
+                      }))
+                    }
+                    disabled={saving}
+                  >
+                    <TrashIcon />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <fieldset>
+            <legend className="mb-1 block text-sm font-bold">Ankunftszeit</legend>
+            <div className="flex gap-2">
+              <label className="flex flex-1 items-center gap-2 text-sm">
+                <span className="shrink-0">von</span>
                 <input
-                  type="text"
-                  maxLength={NAME_MAX_LENGTH}
-                  aria-label={`Name Gast ${index + 1}`}
-                  placeholder={`Gast_${index + 1}`}
-                  value={additionalName}
+                  id={arrivalId}
+                  name="arrivalTime"
+                  type="time"
+                  value={form.arrivalTime}
                   disabled={saving}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setForm((current) => {
-                      const names = current.additionalGuestNames.slice();
-                      names[index] = value;
-                      return { ...current, additionalGuestNames: names };
-                    });
-                  }}
-                  className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-surface px-3 py-2"
-                />
-                <Button
-                  variant="outline-danger"
-                  size="icon"
-                  aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
-                  onClick={() =>
+                  onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      ...removeAdditionalGuestName(
-                        index,
-                        current.additionalGuestNames,
-                      ),
+                      arrivalTime: event.target.value,
                     }))
                   }
+                  className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+                />
+              </label>
+              <label className="flex flex-1 items-center gap-2 text-sm">
+                <span className="shrink-0">bis</span>
+                <input
+                  name="arrivalEndTime"
+                  type="time"
+                  value={form.arrivalEndTime}
                   disabled={saving}
-                >
-                  <TrashIcon />
-                </Button>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        <fieldset>
-          <legend className="mb-1 block text-sm font-bold">Ankunftszeit</legend>
-          <div className="flex gap-2">
-            <label className="flex flex-1 items-center gap-2 text-sm">
-              <span className="shrink-0">von</span>
-              <input
-                id={arrivalId}
-                name="arrivalTime"
-                type="time"
-                value={form.arrivalTime}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    arrivalTime: event.target.value,
-                  }))
-                }
-                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
-              />
-            </label>
-            <label className="flex flex-1 items-center gap-2 text-sm">
-              <span className="shrink-0">bis</span>
-              <input
-                name="arrivalEndTime"
-                type="time"
-                value={form.arrivalEndTime}
-                disabled={saving}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    arrivalEndTime: event.target.value,
-                  }))
-                }
-                className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
-              />
-            </label>
-          </div>
-          <p className="mt-1 text-xs text-muted">„bis“ ist optional.</p>
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      arrivalEndTime: event.target.value,
+                    }))
+                  }
+                  className="w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-3 py-3"
+                />
+              </label>
+            </div>
+            <p className="mt-1 text-xs text-muted">„bis“ ist optional.</p>
         </fieldset>
 
         <fieldset>
@@ -442,6 +467,7 @@ export function GuestModal({
             />
           ) : null}
         </div>
+        </fieldset>
 
         <div>
           <label className="flex items-center gap-2 text-sm font-bold">

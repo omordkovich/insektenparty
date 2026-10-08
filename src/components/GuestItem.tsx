@@ -45,44 +45,67 @@ export function GuestItem({
           </button>
         ) : null}
       </td>
-      {/* Without the table header (below sm) the two time columns are
-          ambiguous, so they collapse into one clock icon that opens a dialog. */}
-      <td className="block sm:hidden">
-        <button
-          type="button"
-          onClick={() => onShowTime(guest)}
-          disabled={disabled}
-          aria-label={`Ankunfts- und Abreisezeit von ${guest.name} anzeigen`}
-          title="Ankunfts- und Abreisezeit"
-          className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
-        >
-          <ClockIcon />
-        </button>
-      </td>
-      <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
-        {formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)}
-      </td>
-      <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
-        {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
-      </td>
-      <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
-        {guest.bringingSomething ? (
-          <button
-            type="button"
-            onClick={() => onShowBringing(guest)}
-            disabled={disabled}
-            aria-label={`${guest.name} bringt etwas mit - anzeigen`}
-            title="Bringt etwas mit"
-            className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+      {guest.declined ? (
+        <>
+          {/* Instead of the clock and gift icons (mobile) and the time and
+              "Ich bringe was mit" columns (desktop): greyed-out "Abgesagt". */}
+          <td className="block sm:hidden">
+            <span className="block text-muted" role="img" aria-label="Abgesagt" title="Abgesagt">
+              <DeclinedIcon />
+            </span>
+          </td>
+          <td
+            colSpan={3}
+            className="hidden sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-bold text-muted"
           >
-            <GiftIcon />
-          </button>
-        ) : (
-          <span className="text-muted/40" aria-label="Bringt nichts mit" title="Bringt nichts mit">
-            <GiftIcon />
-          </span>
-        )}
-      </td>
+            <span className="flex items-center gap-2">
+              <DeclinedIcon />
+              Abgesagt
+            </span>
+          </td>
+        </>
+      ) : (
+        <>
+          {/* Without the table header (below sm) the two time columns are
+              ambiguous, so they collapse into one clock icon that opens a dialog. */}
+          <td className="block sm:hidden">
+            <button
+              type="button"
+              onClick={() => onShowTime(guest)}
+              disabled={disabled}
+              aria-label={`Ankunfts- und Abreisezeit von ${guest.name} anzeigen`}
+              title="Ankunfts- und Abreisezeit"
+              className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+            >
+              <ClockIcon />
+            </button>
+          </td>
+          <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+            {guest.arrivalTime ? formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime) : null}
+          </td>
+          <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
+            {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
+          </td>
+          <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
+            {guest.bringingSomething ? (
+              <button
+                type="button"
+                onClick={() => onShowBringing(guest)}
+                disabled={disabled}
+                aria-label={`${guest.name} bringt etwas mit - anzeigen`}
+                title="Bringt etwas mit"
+                className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
+              >
+                <GiftIcon />
+              </button>
+            ) : (
+              <span className="text-muted/40" aria-label="Bringt nichts mit" title="Bringt nichts mit">
+                <GiftIcon />
+              </span>
+            )}
+          </td>
+        </>
+      )}
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         {guest.hasMessage ? (
           <button
@@ -153,6 +176,15 @@ function ClockIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function DeclinedIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="2" />
+      <path d="M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

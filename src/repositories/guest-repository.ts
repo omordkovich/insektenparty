@@ -10,7 +10,8 @@ export async function getGuestsByEventId(eventId: string): Promise<GuestRow[]> {
     .select()
     .from(guests)
     .where(eq(guests.eventId, eventId))
-    .orderBy(asc(guests.arrivalTime), asc(guests.name));
+    // Declined guests go to the end of the list.
+    .orderBy(asc(guests.declined), asc(guests.arrivalTime), asc(guests.name));
 }
 
 export async function createGuest(eventId: string, input: GuestInput): Promise<GuestRow> {
@@ -29,6 +30,7 @@ export async function createGuest(eventId: string, input: GuestInput): Promise<G
       bringingDescription: input.bringingDescription,
       hasMessage: input.hasMessage,
       message: input.message,
+      declined: input.declined,
     })
     .returning();
   return created;
@@ -53,6 +55,7 @@ export async function updateGuest(
       bringingDescription: input.bringingDescription,
       hasMessage: input.hasMessage,
       message: input.message,
+      declined: input.declined,
       updatedAt: new Date(),
     })
     .where(and(eq(guests.id, guestId), eq(guests.eventId, eventId)))

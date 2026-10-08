@@ -35,6 +35,7 @@ Stand: 2026-10-06
 - [ ] Screenshot einer Beispiel-Einladung → als `screenshot` ins Schema und auf die Startseite
 - [ ] Seite `/preise`, sobald das Bezahlmodell steht (Stripe ist pausiert)
 - [ ] Nach 2–3 Monaten Search Console: ranken zwei Anlass-Seiten auf dieselben Begriffe → zusammenlegen + Weiterleitung
+- [ ] FAQ der Anlass-Seiten: basieren seit 2026-10-08 auf echten Google-Suchanfragen (Autovervollständigung). Für Kultur, Proben, Advent, Halloween, Sport gab es kaum Daten → nach dem Livegang mit echten Suchanfragen aus der Search Console nachschärfen; jährlich wiederholen
 - [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“
 
 ## Außerhalb der Seite (für KI-Empfehlungen am wichtigsten)

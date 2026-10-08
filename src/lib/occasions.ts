@@ -40,9 +40,9 @@ export const OCCASIONS_HUB = {
   title: "Online-Einladungen für jeden Anlass",
   metaTitle: "Online-Einladungen für jeden Anlass – GASTZILLA",
   description:
-    "Ob Kindergeburtstag, Hochzeit oder Grillabend: Erstelle kostenlos eine digitale Einladung, teile den Link und sammle alle Zusagen in einer Gästeliste.",
+    "Ob Kindergeburtstag, Hochzeit oder Grillabend: Erstelle kostenlos eine digitale Einladung, teile den Link und sammle alle Zu- und Absagen in einer Gästeliste.",
   intro:
-    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite. Deine Gäste sagen per Link zu – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat.",
+    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat.",
 };
 
 export const OCCASIONS: Occasion[] = [
@@ -75,7 +75,7 @@ export const OCCASIONS: Occasion[] = [
       },
       {
         title: "Ein Link für den Klassenchat",
-        text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder neuen Zusage bekommst du eine Benachrichtigung per E-Mail.",
+        text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder Zu- oder Absage bekommst du eine Benachrichtigung per E-Mail.",
       },
     ],
     invitationText: [
@@ -89,19 +89,24 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie viele Kinder sollte ich einladen?",
+        question: "Wie viele Kinder lädt man zum Kindergeburtstag ein?",
         answer:
           "Eine beliebte Faustregel: so viele Kinder, wie das Geburtstagskind alt wird. Mit GASTZILLA siehst du jederzeit, wie viele zugesagt haben – Geschwister und Begleitpersonen werden mitgezählt.",
       },
       {
-        question: "Wie früh sollte ich zum Kindergeburtstag einladen?",
+        question: "Wie früh sollte man zum Kindergeburtstag einladen?",
         answer:
           "Üblich sind zwei bis drei Wochen vorher. So können die Eltern den Termin und ein Geschenk planen.",
       },
       {
+        question: "Wie lange dauert ein Kindergeburtstag?",
+        answer:
+          "Für jüngere Kinder reichen meist zwei bis drei Stunden, für ältere Kinder auch drei bis vier. Mit GASTZILLA tragen die Eltern Bring- und Abholzeit selbst ein – so ist das Ende für alle klar.",
+      },
+      {
         question: "Sehen andere Eltern, wer zum Kindergeburtstag kommt?",
         answer:
-          "Alle, die den Einladungslink haben – also die eingeladenen Familien. Suchmaschinen finden deine Event-Seite nicht. Teile den Link deshalb nur mit den Eltern, die du einladen möchtest.",
+          "Ja – alle, die den Einladungslink haben, also die eingeladenen Familien. Suchmaschinen finden deine Event-Seite nicht. Teile den Link deshalb nur mit den Eltern, die du einladen möchtest.",
       },
     ],
     updated: "2026-10-06",
@@ -148,6 +153,11 @@ export const OCCASIONS: Occasion[] = [
       "[Dein Name]",
     ],
     faq: [
+      {
+        question: "Ab wann machen Kinder Spielverabredungen?",
+        answer:
+          "Viele Kinder verabreden sich ab dem Kindergartenalter – anfangs oft mit einem Elternteil dabei, später allein.",
+      },
       {
         question: "Wie lange sollte eine Spielverabredung dauern?",
         answer:
@@ -209,14 +219,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wann sollte ich zur Einschulungsfeier einladen?",
+        question: "Wie feiert man die Einschulung?",
         answer:
-          "Etwa drei bis vier Wochen vorher. Den genauen Termin der Einschulung erfahrt ihr von der Schule – meist liegt er kurz nach den Sommerferien.",
+          "Meist geht es nach der Feier in der Schule mit Kaffee und Kuchen oder einem Essen weiter – zu Hause oder im Restaurant, mit Familie, Paten und Freunden.",
       },
       {
-        question: "Kann ich auch ein Treffen zum neuen Schuljahr für die ganze Klasse planen?",
+        question: "Wie viele Personen dürfen zur Einschulung mitkommen?",
         answer:
-          "Ja. Teile den Link im Klassenchat – Eltern tragen ihre Familie ein, und alle sehen, wer kommt.",
+          "Das legt jede Schule selbst fest – oft sind es wegen begrenzter Plätze nur wenige Begleitpersonen pro Kind. Die Feier danach planst du frei: Mit GASTZILLA tragen sich Großeltern, Paten und Freunde selbst ein.",
+      },
+      {
+        question: "Wann sollte ich zur Einschulungsfeier einladen?",
+        answer:
+          "Etwa drei bis vier Wochen vorher. Den genauen Termin der Einschulung erfahrt ihr von der Schule.",
       },
       {
         question: "Wer sieht die Zusagen zur Einschulungsfeier?",
@@ -269,14 +284,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wer kann die Anmeldungen sehen?",
+        question: "Was bringt man zum Kita-Sommerfest mit?",
         answer:
-          "Alle, die den Link haben – also alle Familien, an die ihr ihn schickt. Suchmaschinen finden die Seite nicht. Familien können sich auch nur mit Vornamen oder als „Familie M.“ eintragen.",
+          "Meist steuern Familien etwas zum Buffet bei – Kuchen, Muffins, Salate, Obst oder Getränke. Mit GASTZILLA trägt jede Familie ein, was sie mitbringt, und das Buffet ist gut gemischt.",
       },
       {
         question: "Eignet sich das für einen Tag der offenen Tür?",
         answer:
           "Ja. Interessierte Familien melden sich an und geben an, wann sie kommen möchten. So wisst ihr, wie viele Besucher zu welcher Zeit da sind. Bedenkt: Alle mit dem Link sehen die Anmeldungen.",
+      },
+      {
+        question: "Wer kann die Anmeldungen sehen?",
+        answer:
+          "Alle, die den Link haben – also alle Familien, an die ihr ihn schickt. Suchmaschinen finden die Seite nicht. Familien können sich auch nur mit Vornamen oder als „Familie M.“ eintragen.",
       },
       {
         question: "Braucht die Kita oder Schule ein eigenes Konto?",
@@ -329,14 +349,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Kann ich über GASTZILLA Karten für den Abiball verkaufen?",
+        question: "Wer wird zum Abiball eingeladen?",
         answer:
-          "Nein. GASTZILLA sammelt nur die Zusagen. Ticketverkauf und Bezahlung organisiert ihr wie gewohnt – aber mit der richtigen Gästezahl.",
+          "Meist die Abiturientinnen und Abiturienten mit Familie und Partnern, dazu Lehrkräfte und Schulleitung. Wie viele Gäste jeder mitbringen darf, legt ihr selbst fest – mit GASTZILLA trägt jeder seine Gäste ein.",
       },
       {
         question: "Wie früh sollte man den Abiball planen?",
         answer:
           "Location und Termin werden oft ein Jahr oder länger im Voraus gebucht. Die Zusagen der Gäste sammelt ihr dann meist zwei bis drei Monate vor dem Ball.",
+      },
+      {
+        question: "Kann ich über GASTZILLA Karten für den Abiball verkaufen?",
+        answer:
+          "Nein. GASTZILLA sammelt nur die Zusagen. Ticketverkauf und Bezahlung organisiert ihr wie gewohnt – aber mit der richtigen Gästezahl.",
       },
       {
         question: "Wer sieht, wer zum Abiball kommt?",
@@ -363,7 +388,7 @@ export const OCCASIONS: Occasion[] = [
     benefits: [
       {
         title: "Alle Zusagen an einem Ort",
-        text: "Statt Nachrichten zu zählen, siehst du auf einen Blick, wer kommt. Bei jeder neuen Zusage bekommst du eine E-Mail.",
+        text: "Statt Nachrichten zu zählen, siehst du auf einen Blick, wer kommt. Bei jeder Zu- oder Absage bekommst du eine E-Mail.",
       },
       {
         title: "Partner und Freunde mitbringen",
@@ -389,9 +414,14 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie früh sollte ich zum Geburtstag einladen?",
+        question: "Wie früh lädt man zum Geburtstag ein?",
         answer:
           "Für eine kleine Feier reichen meist zwei bis drei Wochen. Für einen runden Geburtstag mit vielen Gästen sind vier bis sechs Wochen üblich.",
+      },
+      {
+        question: "Kann man per WhatsApp zum Geburtstag einladen?",
+        answer:
+          "Ja, das ist heute ganz normal. Mit GASTZILLA schickst du per WhatsApp einen Link zu deiner Einladungsseite – dort stehen alle Infos, und die Zusagen landen gesammelt in einer Liste statt verstreut im Chat.",
       },
       {
         question: "Kann ich eine Überraschungsparty planen?",
@@ -401,7 +431,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wie bekomme ich die Zusagen bis zu einem Stichtag?",
         answer:
-          "Nenne den Stichtag im Einladungstext, zum Beispiel „Bitte sagt bis zum 1. Mai zu“. Bei jeder neuen Zusage bekommst du eine E-Mail, und in der Liste siehst du, wer schon dabei ist.",
+          "Nenne den Stichtag im Einladungstext, zum Beispiel „Bitte sagt bis zum 1. Mai zu“. Bei jeder Zu- oder Absage bekommst du eine E-Mail, und in der Liste siehst du, wer schon dabei ist – und wer nicht kann.",
       },
     ],
     updated: "2026-10-06",
@@ -431,7 +461,7 @@ export const OCCASIONS: Occasion[] = [
       },
       {
         title: "Immer die aktuelle Liste",
-        text: "Bei jeder neuen Zusage bekommst du eine E-Mail. Ändert jemand seinen Eintrag, siehst du das sofort – ohne Excel-Tabelle und Nachzählen.",
+        text: "Bei jeder Zu- oder Absage bekommst du eine E-Mail. Ändert jemand seinen Eintrag, siehst du das sofort – ohne Excel-Tabelle und Nachzählen.",
       },
       {
         title: "Ein Link für alle",
@@ -449,9 +479,14 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie früh sollte man zur Hochzeit einladen?",
+        question: "Wie lange vor der Hochzeit verschickt man die Einladungen?",
         answer:
           "Üblich ist ein „Save the Date“ sechs bis zwölf Monate vorher und die eigentliche Einladung drei bis vier Monate vor der Hochzeit. Mit GASTZILLA legst du die Seite früh an und ergänzt Details später – bereits verschickte Links funktionieren weiter.",
+      },
+      {
+        question: "Wie viele Hochzeitsgäste sagen ab?",
+        answer:
+          "Häufig wird mit etwa zehn bis zwanzig Prozent Absagen gerechnet – je nach Anreise und Jahreszeit. Mit GASTZILLA sagen Gäste über den Link zu oder ab – du siehst jederzeit, wer kommt und wer nicht, und kannst bei den anderen gezielt nachfragen.",
       },
       {
         question: "Können Gäste ihre Begleitung angeben?",
@@ -462,11 +497,6 @@ export const OCCASIONS: Occasion[] = [
         question: "Wer sieht unsere Gästeliste?",
         answer:
           "Alle, die den Einladungslink haben. Suchmaschinen finden eure Event-Seite nicht. Teile den Link deshalb nur mit den Gästen, die du einladen möchtest.",
-      },
-      {
-        question: "Können Gäste den Termin in ihren Kalender übernehmen?",
-        answer:
-          "Ja – sofern du Datum und Uhrzeit angibst: Ein Klick aufs Datum bietet den Termin für den eigenen Kalender oder Google Kalender an.",
       },
     ],
     updated: "2026-10-06",
@@ -510,14 +540,19 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Wie lange vor der Hochzeit findet der JGA statt?",
+        answer:
+          "Meist einige Wochen vor der Hochzeit. Für ein ganzes Wochenende lohnt es sich, zwei bis drei Monate vorher einzuladen, damit Unterkunft und Programm gebucht werden können.",
+      },
+      {
+        question: "Wie viele Leute lädt man zum JGA ein?",
+        answer:
+          "Das hängt vom Programm ab – oft sind es enge Freundinnen und Freunde und Geschwister, meist zwischen einer Handvoll und rund fünfzehn Personen. Mit GASTZILLA siehst du früh, wie groß die Runde wird.",
+      },
+      {
         question: "Kann die Braut oder der Bräutigam die Planung sehen?",
         answer:
           "Nur mit dem Link: Alle, die ihn haben, sehen die Liste. Schick ihn deshalb nur an die Runde, die mitfeiert – Suchmaschinen finden die Seite nicht.",
-      },
-      {
-        question: "Wann sollte man den JGA planen?",
-        answer:
-          "Meist findet der Junggesellenabschied einige Wochen vor der Hochzeit statt. Für ein ganzes Wochenende lohnt es sich, zwei bis drei Monate vorher einzuladen, damit Unterkunft und Programm gebucht werden können.",
       },
       {
         question: "Kann ich über GASTZILLA Kosten aufteilen?",
@@ -566,9 +601,14 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wann findet eine Babyparty statt?",
+        question: "In welcher Schwangerschaftswoche feiert man die Babyparty?",
         answer:
-          "Meist einige Wochen vor dem Geburtstermin, oft im letzten Drittel der Schwangerschaft. Eine Gender Reveal Party wird häufig gefeiert, sobald das Geschlecht bekannt ist.",
+          "Meist im letzten Drittel der Schwangerschaft, einige Wochen vor dem Geburtstermin. Eine Gender Reveal Party wird häufig gefeiert, sobald das Geschlecht bekannt ist.",
+      },
+      {
+        question: "Was bringt man zur Babyparty mit?",
+        answer:
+          "Oft kleine Geschenke für das Baby oder die Eltern und etwas fürs Buffet. Mit GASTZILLA trägt jeder ein, was er mitbringt – so wird nichts doppelt geschenkt.",
       },
       {
         question: "Wie sammle ich die Tipps für die Gender Reveal Party?",
@@ -578,7 +618,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Können die werdenden Eltern die Planung sehen?",
         answer:
-          "Alle, die den Einladungslink haben. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschung für die werdenden Eltern, schick ihnen den Link also nicht.",
+          "Alle, die den Einladungslink haben, sehen die Liste. Suchmaschinen finden deine Event-Seite nicht. Planst du eine Überraschung für die werdenden Eltern, schick ihnen den Link also nicht.",
       },
     ],
     updated: "2026-10-07",
@@ -625,6 +665,11 @@ export const OCCASIONS: Occasion[] = [
       "[Eure Namen]",
     ],
     faq: [
+      {
+        question: "Wie feiert man eine Taufe?",
+        answer:
+          "Meist folgt auf den Gottesdienst ein Essen oder Kaffee und Kuchen mit Familie, Paten und Freunden – zu Hause, im Gemeindehaus oder im Restaurant.",
+      },
       {
         question: "Wie früh lädt man zur Taufe oder Kommunion ein?",
         answer:
@@ -686,6 +731,11 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
+        question: "Was kann man als Firmenfeier machen?",
+        answer:
+          "Beliebt sind ein Sommerfest mit Grill, die Weihnachtsfeier im Restaurant, ein Teamevent wie Escape Room, Bowling oder Kochkurs oder ein gemeinsamer Ausflug.",
+      },
+      {
         question: "Wie früh sollte man zur Weihnachtsfeier einladen?",
         answer:
           "Für Weihnachtsfeiern sind sechs bis acht Wochen üblich, weil Termine im Dezember schnell belegt sind. Für Sommerfest oder Teamevent reichen meist drei bis vier Wochen.",
@@ -746,9 +796,9 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie verhindere ich, dass alle dasselbe mitbringen?",
+        question: "Was bringt man zur Grillparty mit?",
         answer:
-          "Jeder Gast schreibt bei der Zusage dazu, was er mitbringt. Weil alle die Liste sehen, ergänzt sich das Buffet von selbst.",
+          "Typisch sind Salate, Brot, Dips, Nachtisch oder Getränke – oft bringt auch jeder sein eigenes Grillgut mit. Mit GASTZILLA schreibt jeder dazu, was er mitbringt; weil alle die Liste sehen, ergänzt sich das Buffet von selbst.",
       },
       {
         question: "Was mache ich, wenn es regnet?",
@@ -758,7 +808,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Können Gäste ihren Eintrag später ändern?",
         answer:
-          "Ja. Wenn sich etwas ändert – andere Uhrzeit, ein Gast mehr oder ein anderes Mitbringsel –, passen sie ihren Eintrag einfach an. Du bekommst dazu eine E-Mail.",
+          "Ja. Wenn sich etwas ändert – andere Uhrzeit, ein Gast mehr, ein anderes Mitbringsel oder doch eine Absage –, passen sie ihren Eintrag einfach an. Du bekommst dazu eine E-Mail.",
       },
     ],
     updated: "2026-10-06",
@@ -861,9 +911,14 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie früh muss ich einen Tisch im Festzelt reservieren?",
+        question: "Ab wann kann man Wiesn-Tische reservieren?",
         answer:
-          "Für die großen Festzelte – etwa auf der Wiesn in München – werden Reservierungen oft schon Monate vorher vergeben. Sammle die Zusagen also früh, dann weißt du rechtzeitig, für wie viele Plätze du anfragen musst.",
+          "Das legt jedes Festzelt selbst fest – bei den großen Zelten oft schon viele Monate vorher. Sammle die Zusagen also früh, dann weißt du rechtzeitig, für wie viele Plätze du anfragen musst.",
+      },
+      {
+        question: "Wie viele Leute passen an einen Wiesn-Tisch?",
+        answer:
+          "An einen Tisch im Festzelt passen meist rund zehn Personen. Mit der Zusagenliste weißt du, wie viele Tische du anfragen musst.",
       },
       {
         question: "Kann ich über GASTZILLA einen Tisch im Festzelt reservieren?",
@@ -907,7 +962,7 @@ export const OCCASIONS: Occasion[] = [
       },
       {
         title: "Ein Link für die ganze Clique",
-        text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder neuen Zusage bekommst du eine E-Mail.",
+        text: "Teile die Einladung per WhatsApp, Signal, Telegram oder E-Mail. Bei jeder Zu- oder Absage bekommst du eine E-Mail.",
       },
     ],
     invitationText: [
@@ -1102,14 +1157,19 @@ export const OCCASIONS: Occasion[] = [
           "Am besten drei bis vier Wochen vorher, denn viele planen Silvester früh. Kurzfristig geht es aber auch – die Seite steht in wenigen Minuten.",
       },
       {
+        question: "Was bringt man zur Silvesterparty mit?",
+        answer:
+          "Typisch sind Sekt oder andere Getränke, Knabbereien, Salate oder Zutaten für Raclette oder Fondue. Mit GASTZILLA trägt jeder ein, was er mitbringt – alle sehen es, und nichts fehlt.",
+      },
+      {
+        question: "Was kann man an Silvester zu Hause machen?",
+        answer:
+          "Beliebt sind Raclette oder Fondue, ein Spieleabend, eine Mottoparty oder ein gemeinsames Anstoßen um Mitternacht mit Blick aufs Feuerwerk.",
+      },
+      {
         question: "Können Gäste angeben, ob sie übernachten?",
         answer:
           "Gäste geben an, bis wann sie bleiben, und können eine Nachricht hinterlassen – etwa, ob sie einen Schlafplatz brauchen.",
-      },
-      {
-        question: "Wie stimmen wir Raclette oder Buffet ab?",
-        answer:
-          "Jeder trägt bei der Zusage ein, was er mitbringt – Käse, Brot, Salat oder Sekt. Alle sehen es, und nichts fehlt.",
       },
     ],
     updated: "2026-10-06",
@@ -1153,7 +1213,7 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie finde ich ein gutes Motto?",
+        question: "Welche Mottopartys gibt es?",
         answer:
           "Beliebt sind zum Beispiel 80er, 90er, Bad Taste, Hawaii, Casino oder Hollywood. Wichtig ist ein Motto, zu dem jeder leicht ein Outfit findet.",
       },
@@ -1380,7 +1440,7 @@ export const OCCASIONS: Occasion[] = [
     ],
     faq: [
       {
-        question: "Wie groß sollte eine Escape-Room-Gruppe sein?",
+        question: "Wie viele Personen braucht man für einen Escape Room?",
         answer:
           "Die meisten Escape Rooms sind für etwa zwei bis sechs Personen ausgelegt – die genaue Gruppengröße nennt der Anbieter. Mit der Zusagenliste siehst du, ob ihr ein oder zwei Teams braucht.",
       },
@@ -1446,7 +1506,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Können sich Mitspieler wieder austragen?",
         answer:
-          "Ja. Wer doch nicht kann, ändert oder löscht seinen Eintrag einfach. Du bekommst dazu eine E-Mail.",
+          "Ja. Wer doch nicht kann, hakt in seinem Eintrag einfach „Ich sage ab“ an. Du bekommst dazu eine E-Mail.",
       },
       {
         question: "Kann ich mehrere Termine anlegen?",
@@ -1494,6 +1554,11 @@ export const OCCASIONS: Occasion[] = [
       "[Dein Name]",
     ],
     faq: [
+      {
+        question: "Was bringt man zum Spieleabend mit?",
+        answer:
+          "Spiele, die man gern zeigen möchte, dazu Snacks und Getränke. Mit GASTZILLA schreibt jeder dazu, was er mitbringt – so liegen am Ende nicht drei Exemplare desselben Spiels auf dem Tisch.",
+      },
       {
         question: "Wie viele Leute passen zu einem Spieleabend?",
         answer:
@@ -1550,6 +1615,11 @@ export const OCCASIONS: Occasion[] = [
       "[Dein Name]",
     ],
     faq: [
+      {
+        question: "Wie funktioniert eine LAN-Party?",
+        answer:
+          "Alle bringen ihren Rechner oder ihre Konsole mit und verbinden sich über ein gemeinsames Netzwerk, um zusammen zu spielen – oft einen ganzen Tag oder ein Wochenende lang. Mit GASTZILLA klärst du vorher, wer kommt und wer Netzwerk-Switch, Kabel oder Steckdosenleisten mitbringt.",
+      },
       {
         question: "Kann ich eine LAN-Party über mehrere Tage planen?",
         answer:

@@ -5,7 +5,7 @@ import { CalendarPlusIcon, ListCheckIcon, ShareIcon } from "./LandingIcons";
 const STEPS: { text: string; icon: ReactNode }[] = [
   { text: "Event anlegen und Design für jeden Anlass aussuchen", icon: <CalendarPlusIcon /> },
   { text: "Einladungslink teilen – der passende Einladungstext ist schon fertig", icon: <ShareIcon /> },
-  { text: "Zusagen jederzeit im Blick – mit Benachrichtigung per E-Mail", icon: <ListCheckIcon /> },
+  { text: "Zu- und Absagen jederzeit im Blick – mit Benachrichtigung per E-Mail", icon: <ListCheckIcon /> },
 ];
 
 // "So funktioniert's" card - the same three steps on the start page and

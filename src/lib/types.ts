@@ -3,7 +3,8 @@ export type GuestDto = {
   name: string;
   additionalGuests: number;
   additionalGuestNames: string[];
-  arrivalTime: string;
+  /** Null only for a declined guest. */
+  arrivalTime: string | null;
   arrivalEndTime: string | null;
   departureTime: string | null;
   departureEndTime: string | null;
@@ -11,6 +12,7 @@ export type GuestDto = {
   bringingDescription: string | null;
   hasMessage: boolean;
   message: string | null;
+  declined: boolean;
   createdAt: string;
   updatedAt: string;
 };

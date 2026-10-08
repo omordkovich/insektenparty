@@ -18,7 +18,7 @@ export const FEATURES = [
   "Digitale Einladungsseite für Geburtstag, Kindergeburtstag, Hochzeit, Grillabend oder Firmenfeier",
   "Gäste sagen über einen Link zu oder ab – ohne Konto und ohne App",
   "Begleitpersonen, Kinder, Mitbringsel und Nachrichten direkt bei der Zusage",
-  "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail",
+  "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail bei jeder Zu- und Absage",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
   "Designs für verschiedene Anlässe",
   "Fertiger Einladungstext mit Datum, Ort und Link – anpassbar und mit einem Klick kopierbar",
