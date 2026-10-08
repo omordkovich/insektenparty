@@ -1,18 +1,22 @@
-import { EditableDateField } from "@/components/EditableDateField";
+import { AddToCalendarLink } from "@/components/AddToCalendarLink";
+import { DateEditButton } from "@/components/DateEditButton";
 import { EditableField } from "@/components/EditableField";
-import { EditableTimeRangeField } from "@/components/EditableTimeRangeField";
 import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
+import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
 
 type HeroProps = {
   config: EventConfig;
   eventId: string;
   isOwner: boolean;
+  /** Owner only: shows the pencil at the date that opens the "Termin" window. */
+  dateSettings?: DateSettings | null;
 };
 
-export function Hero({ config, eventId, isOwner }: HeroProps) {
+export function Hero({ config, eventId, isOwner, dateSettings }: HeroProps) {
+  const dateFixed = config.dateMode === "fixed";
   const hasEventDateTime =
-    !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
+    dateFixed && !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
 
   const calendarParams = hasEventDateTime
     ? {
@@ -73,34 +77,35 @@ export function Hero({ config, eventId, isOwner }: HeroProps) {
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
             <dd className="mt-1 font-semibold">
-              <EditableDateField
-                eventId={eventId}
-                value={config.eventDate}
-                endValue={config.eventEndDate}
-                displayLabel={config.dateLabel}
-                isOwner={isOwner}
-                ariaLabel="Datum bearbeiten"
-                className="font-semibold"
-                calendarLinks={
-                  icsLink && googleCalendarLink
-                    ? { icsHref: icsLink, googleHref: googleCalendarLink }
-                    : undefined
-                }
-              />
+              {/* Date and time are set in the owner's "Termin" window. */}
+              <span className="inline-flex items-center gap-2">
+                {dateFixed && config.dateLabel ? (
+                  icsLink && googleCalendarLink ? (
+                    <AddToCalendarLink
+                      icsHref={icsLink}
+                      googleHref={googleCalendarLink}
+                      className="underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark"
+                    >
+                      {config.dateLabel}
+                    </AddToCalendarLink>
+                  ) : (
+                    config.dateLabel
+                  )
+                ) : dateFixed ? (
+                  dateSettings ? <span className="opacity-40">Datum festlegen</span> : null
+                ) : (
+                  <span className="text-muted">
+                    {config.dateMode === "poll" ? "Wird abgestimmt" : "Termin folgt"}
+                  </span>
+                )}
+                {dateSettings ? <DateEditButton eventId={eventId} dateSettings={dateSettings} /> : null}
+              </span>
             </dd>
           </div>
           <div>
             <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Uhrzeit</dt>
             <dd className="mt-1 font-semibold">
-              <EditableTimeRangeField
-                eventId={eventId}
-                startValue={config.eventStartTime}
-                endValue={config.eventEndTime}
-                displayLabel={config.timeLabel}
-                isOwner={isOwner}
-                ariaLabel="Uhrzeit bearbeiten"
-                className="font-semibold"
-              />
+              {dateFixed ? config.timeLabel : <span className="text-muted">–</span>}
             </dd>
           </div>
           <div>

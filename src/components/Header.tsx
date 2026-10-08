@@ -7,7 +7,7 @@ import { ThemeEditButton } from "./ThemeEditButton";
 type HeaderProps = {
   config: EventConfig;
   logoHref: string;
-  /** Owner only: shows the settings pencil (design, password) at the logo's corner. */
+  /** Owner only: shows the settings gear (design, password) at the logo's corner. */
   themeEdit?: {
     eventId: string;
     theme: ThemeKey;

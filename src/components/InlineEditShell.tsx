@@ -28,8 +28,7 @@ type InlineEditShellProps = {
 };
 
 // Shared "pencil to edit, checkmark/X to save/cancel" shell used by every
-// inline-editable field on an event page (EditableField, EditableDateField,
-// EditableTimeRangeField). Owns the editing/saving/error state and the
+// inline-editable field on an event page (EditableField). Owns the editing/saving/error state and the
 // view/edit toggle; the caller only supplies the display content, the
 // editor markup (its own inputs + refs), and how to persist a save.
 export function InlineEditShell({

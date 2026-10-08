@@ -103,6 +103,7 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
                     contactName: config.contact.name,
                     url: buildEventShareUrl(slug),
                     password: accessPassword,
+                    dateMode: config.dateMode,
                   }}
                 />
               </>

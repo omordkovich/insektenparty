@@ -34,12 +34,38 @@ function buildMessage(
   }
 }
 
-// Best-effort: a failure here must never fail the guest request that
-// triggered it, so every error is caught and logged rather than thrown.
-export async function notifyOwnerOfGuestChange(
+export type PollVoteChangeKind = "created" | "updated" | "deleted";
+
+export function buildPollVoteMessage(
+  kind: PollVoteChangeKind,
+  voterName: string,
+  choice: string,
+  eventTitle: string,
+): { subject: string; text: string } {
+  switch (kind) {
+    case "created":
+      return {
+        subject: `Neue Stimme bei deinem Event „${eventTitle}“`,
+        text: `„${voterName}“ hat bei der Terminabstimmung für „${eventTitle}“ abgestimmt: ${choice}.`,
+      };
+    case "updated":
+      return {
+        subject: `Geänderte Stimme bei deinem Event „${eventTitle}“`,
+        text: `„${voterName}“ hat die Auswahl bei der Terminabstimmung für „${eventTitle}“ geändert: ${choice}.`,
+      };
+    case "deleted":
+      return {
+        subject: `Stimme bei deinem Event „${eventTitle}“ entfernt`,
+        text: `„${voterName}“ wurde aus der Terminabstimmung für „${eventTitle}“ entfernt.`,
+      };
+  }
+}
+
+// Best-effort: a failure here must never fail the request that triggered
+// it, so every error is caught and logged rather than thrown.
+async function notifyOwner(
   eventId: string,
-  kind: GuestChangeKind,
-  guestName: string,
+  build: (eventTitle: string) => { subject: string; text: string },
 ): Promise<void> {
   try {
     const event = await getEventForNotification(eventId);
@@ -48,15 +74,33 @@ export async function notifyOwnerOfGuestChange(
     const owner = await getUserContact(event.ownerId);
     if (!owner?.email) return;
 
-    const { subject, text } = buildMessage(kind, guestName, event.title);
+    const { subject, text } = build(event.title);
     const link = buildEventShareUrl(event.slug);
 
+    // "Event ansehen": during a poll the page shows the vote, not the list.
     await sendEmail({
       to: owner.email,
       subject,
-      text: `${text}\n\nGästeliste ansehen: ${link}`,
+      text: `${text}\n\nEvent ansehen: ${link}`,
     });
   } catch (error) {
-    console.error("notifyOwnerOfGuestChange failed:", error);
+    console.error("notifyOwner failed:", error);
   }
+}
+
+export async function notifyOwnerOfGuestChange(
+  eventId: string,
+  kind: GuestChangeKind,
+  guestName: string,
+): Promise<void> {
+  await notifyOwner(eventId, (eventTitle) => buildMessage(kind, guestName, eventTitle));
+}
+
+export async function notifyOwnerOfPollVote(
+  eventId: string,
+  kind: PollVoteChangeKind,
+  voterName: string,
+  choice: string,
+): Promise<void> {
+  await notifyOwner(eventId, (eventTitle) => buildPollVoteMessage(kind, voterName, choice, eventTitle));
 }

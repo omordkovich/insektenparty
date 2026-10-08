@@ -33,6 +33,11 @@ export default async function EventOpengraphImage({
     imageHeight: 300,
     kicker: "Du bist eingeladen!",
     title: event.title || "Einladung",
-    subtitle: event.dateLabel || undefined,
+    subtitle:
+      event.dateMode === "unknown"
+        ? "Termin folgt"
+        : event.dateMode === "poll"
+          ? "Termin wird abgestimmt"
+          : event.dateLabel || undefined,
   });
 }

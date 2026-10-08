@@ -33,6 +33,7 @@ export async function POST(request: Request) {
       theme: (body as { theme?: unknown })?.theme,
       title: (body as { title?: unknown })?.title,
       accessPassword: (body as { accessPassword?: unknown })?.accessPassword,
+      date: (body as { date?: unknown })?.date,
     });
 
     if (!result.ok) {

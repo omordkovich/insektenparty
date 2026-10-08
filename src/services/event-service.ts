@@ -1,4 +1,5 @@
 import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
+import { todayInBerlin } from "@/lib/date-poll";
 import { buildSlug, generateSlug, slugKeyOf, slugNamePart } from "@/lib/slug";
 import type { ThemeKey } from "@/lib/theme-presets";
 import {
@@ -23,7 +24,9 @@ import {
   updateEvent,
   type EventRow,
 } from "@/repositories/event-repository";
+import { applyDateModeChange, getEventDateMode } from "@/repositories/date-poll-repository";
 import { getUserDisplayName } from "@/repositories/user-repository";
+import { parseDateModeRequest } from "@/services/date-mode-service";
 import { canCreateEvent, canUseTheme } from "@/lib/features";
 import { getUserEntitlements } from "@/services/entitlement-service";
 
@@ -48,7 +51,7 @@ export type EventServiceResult<T> =
 
 export async function createEventForOwner(
   ownerId: string,
-  input: { theme: unknown; title: unknown; accessPassword?: unknown },
+  input: { theme: unknown; title: unknown; accessPassword?: unknown; date?: unknown },
 ): Promise<EventServiceResult<{ slug: string }>> {
   const themeValidation = validateTheme(input.theme);
   if (!themeValidation.ok) {
@@ -66,6 +69,13 @@ export async function createEventForOwner(
     return { ok: false, status: 400, error: passwordValidation.error };
   }
 
+  // The event starts without a date; the chosen mode is applied right after
+  // creating it (nothing can be lost on a brand-new event).
+  const dateValidation = parseDateModeRequest(input.date, [], todayInBerlin());
+  if (!dateValidation.ok) {
+    return { ok: false, status: 400, error: dateValidation.error };
+  }
+
   const entitlements = await getUserEntitlements(ownerId);
   if (!canCreateEvent(entitlements)) {
     return { ok: false, status: 403, error: EVENT_LIMIT_ERROR };
@@ -75,10 +85,11 @@ export async function createEventForOwner(
   }
 
   const ownerName = await getUserDisplayName(ownerId);
-  for (let attempt = 1; ; attempt++) {
+  let created: { id: string; slug: string } | null = null;
+  for (let attempt = 1; created === null; attempt++) {
     try {
       const { slug, key, namePart } = generateSlug({ title: titleValidation.value, ownerName });
-      const created = await createEvent({
+      created = await createEvent({
         ownerId,
         slug,
         slugKey: key,
@@ -86,12 +97,30 @@ export async function createEventForOwner(
         theme,
         title: titleValidation.value,
         accessPassword: passwordValidation.value,
+        dateMode: "unknown",
       });
-      return { ok: true, data: { slug: created.slug } };
     } catch (error) {
       if (!isUniqueViolation(error) || attempt >= SLUG_ATTEMPTS) throw error;
     }
   }
+
+  const { request, schedule } = dateValidation.value;
+  if (request.mode !== "unknown") {
+    await applyDateModeChange(created.id, ownerId, {
+      mode: request.mode,
+      schedule,
+      plan: {
+        clearGuests: false,
+        clearPoll: false,
+        newOptions: request.mode === "poll" && "proposals" in request ? request.proposals : [],
+        transferOptionId: null,
+        lostGuests: 0,
+        lostVotes: 0,
+      },
+      transferGuests: [],
+    });
+  }
+  return { ok: true, data: { slug: created.slug } };
 }
 
 export async function updateEventForOwner(
@@ -152,6 +181,11 @@ export async function updateEventForOwner(
   // earlier end time only on a later end date), so the stored values fill in
   // whatever this request doesn't change. Both labels are derived from the
   // resulting schedule.
+  // While the date is open or being voted on, it is set in the dialog.
+  if (Object.keys(scheduleChanges).length > 0 && (await getEventDateMode(id)) !== "fixed") {
+    return { ok: false, status: 409, error: "Datum und Uhrzeit legst du in den Event-Einstellungen fest." };
+  }
+
   let schedule: EventSchedule | undefined;
   if (Object.keys(scheduleChanges).length > 0) {
     const stored = await getEventSchedule(id, ownerId);

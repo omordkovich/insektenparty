@@ -94,7 +94,9 @@ export function EventDialog(props: EventDialogProps) {
         const response = await fetch("/api/events", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ theme, title: trimmedName, accessPassword }),
+          // New events start without a date ("Noch kein Termin bekannt");
+          // the owner sets it with the pencil at the date on the event page.
+          body: JSON.stringify({ theme, title: trimmedName, accessPassword, date: { mode: "unknown" } }),
         });
 
         if (!response.ok) {

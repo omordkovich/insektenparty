@@ -40,6 +40,8 @@ export const events = pgTable("events", {
   // Plain text on purpose: the owner needs it in the invitation text. Only
   // ever sent to the signed-in owner (see services/event-access-service.ts).
   accessPassword: text("access_password"),
+  // Termin-Status: "unknown" | "poll" | "fixed" (see lib/date-poll.ts).
+  dateMode: text("date_mode").notNull().default("fixed"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -86,6 +88,33 @@ export const guests = pgTable("guests", {
 
 export type Guest = typeof guests.$inferSelect;
 export type NewGuest = typeof guests.$inferInsert;
+
+// Terminabstimmung: 2-4 proposals per event while date_mode = 'poll'
+// (FK + on delete cascade live in the Supabase migration, like guests).
+export const datePollOptions = pgTable("date_poll_options", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  eventId: uuid("event_id").notNull(),
+  date: date("date").notNull(),
+  // Optional: a proposal may be just a day.
+  startTime: time("start_time"),
+  endTime: time("end_time"),
+  position: integer("position").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// One row per participant: the ticked proposals or "Nichts davon passt".
+export const datePollVotes = pgTable("date_poll_votes", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  eventId: uuid("event_id").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  optionIds: uuid("option_ids").array().notNull().default([]),
+  noneFit: boolean("none_fit").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
 
 // One row per unlock (append-only ledger). user_id references auth.users
 // (FK + on delete cascade live in the Supabase migration, like events.owner_id

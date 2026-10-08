@@ -1,11 +1,16 @@
 import { notFound, permanentRedirect } from "next/navigation";
+import { DatePollSection } from "@/components/DatePollSection";
+import { DateUnknownNotice } from "@/components/DateUnknownNotice";
 import { EventLockedPage } from "@/components/EventLockedPage";
 import { Footer } from "@/components/Footer";
 import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
+import { countYes, isDateMode } from "@/lib/date-poll";
+import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
+import { getPollOptions, getPollVotes } from "@/repositories/date-poll-repository";
 import { getEventByAddress } from "@/repositories/event-repository";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { normalizeArrivalTime } from "@/lib/validation";
@@ -38,6 +43,25 @@ export default async function EventPage({ params }: EventPageProps) {
   const theme = event.theme as ThemeKey;
   const unlockedThemes =
     isOwner && event.ownerId ? (await getUserEntitlements(event.ownerId)).unlockedThemes : [];
+  const dateMode = isDateMode(event.dateMode) ? event.dateMode : "fixed";
+  const eventStartTime = event.eventStartTime ? normalizeArrivalTime(event.eventStartTime) : null;
+  const eventEndTime = event.eventEndTime ? normalizeArrivalTime(event.eventEndTime) : null;
+
+  // Owner only: what the "Termin" window (pencil at the date) starts from.
+  let dateSettings: DateSettings | null = null;
+  if (isOwner) {
+    const [options, votes] =
+      dateMode === "poll" ? await Promise.all([getPollOptions(event.id), getPollVotes(event.id)]) : [[], []];
+    dateSettings = {
+      mode: dateMode,
+      date: event.eventDate,
+      endDate: event.eventEndDate,
+      startTime: eventStartTime,
+      endTime: eventEndTime,
+      options: options.map((option) => ({ ...option, yesCount: countYes(option, votes) })),
+      voteCount: votes.length,
+    };
+  }
 
   const config: EventConfig = {
     kicker: event.kicker,
@@ -47,10 +71,11 @@ export default async function EventPage({ params }: EventPageProps) {
     timeLabel: event.timeLabel,
     locationLabel: event.locationLabel,
     defaultArrivalTime: event.defaultArrivalTime,
+    dateMode,
     eventDate: event.eventDate,
     eventEndDate: event.eventEndDate,
-    eventStartTime: event.eventStartTime ? normalizeArrivalTime(event.eventStartTime) : null,
-    eventEndTime: event.eventEndTime ? normalizeArrivalTime(event.eventEndTime) : null,
+    eventStartTime,
+    eventEndTime,
     contact: {
       name: event.contactName,
       phone: event.contactPhone,
@@ -65,18 +90,22 @@ export default async function EventPage({ params }: EventPageProps) {
         config={config}
         logoHref={isOwner ? "/" : `/event/${slug}/info`}
         themeEdit={
-          isOwner
-            ? { eventId: event.id, theme, unlockedThemes, accessPassword: ownerAccessPassword }
-            : undefined
+          isOwner ? { eventId: event.id, theme, unlockedThemes, accessPassword: ownerAccessPassword } : undefined
         }
       />
       <main>
-        <Hero config={config} eventId={event.id} isOwner={isOwner} />
-        <GuestSection
-          apiBasePath={`/api/events/${event.id}/guests`}
-          defaultArrivalTime={config.defaultArrivalTime}
-          isOwner={isOwner}
-        />
+        <Hero config={config} eventId={event.id} isOwner={isOwner} dateSettings={dateSettings} />
+        {dateMode === "fixed" ? (
+          <GuestSection
+            apiBasePath={`/api/events/${event.id}/guests`}
+            defaultArrivalTime={config.defaultArrivalTime}
+            isOwner={isOwner}
+          />
+        ) : dateMode === "poll" ? (
+          <DatePollSection eventId={event.id} isOwner={isOwner} />
+        ) : (
+          <DateUnknownNotice />
+        )}
       </main>
       <Footer
         config={config}

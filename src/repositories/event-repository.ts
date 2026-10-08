@@ -145,7 +145,8 @@ export async function createEvent(input: {
   theme: string;
   title: string;
   accessPassword: string | null;
-}): Promise<{ slug: string }> {
+  dateMode: string;
+}): Promise<{ id: string; slug: string }> {
   // Every other field starts empty - the owner fills them in via the
   // inline-editable fields on the event page (placeholders guide them
   // there); only name and theme are picked up front.
@@ -172,8 +173,9 @@ export async function createEvent(input: {
       contactPhone: "",
       contactEmail: "",
       accessPassword: input.accessPassword,
+      dateMode: input.dateMode,
     })
-    .returning({ slug: events.slug });
+    .returning({ id: events.id, slug: events.slug });
   return created;
 }
 

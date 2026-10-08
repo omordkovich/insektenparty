@@ -3,6 +3,8 @@
 // the event and stay fixed; the wording around them is the owner's to edit
 // and only lives in their browser. Kept free of React so it can be tested.
 
+import type { DateMode } from "@/lib/date-poll";
+
 export type InvitationFacts = {
   title: string;
   dateLabel: string;
@@ -12,6 +14,8 @@ export type InvitationFacts = {
   url: string;
   /** Password-protected event: shown right after the link; null = open. */
   password: string | null;
+  /** Termin-Status: "unknown"/"poll" replace the date with a hint. */
+  dateMode: DateMode;
 };
 
 export type InvitationWording = {
@@ -38,10 +42,15 @@ export type InvitationLine =
 // The text's structure: editable wording around the fixed event facts.
 // Facts that are not filled in are left out entirely; the link never is.
 export function invitationLines(facts: InvitationFacts): InvitationLine[] {
-  const when = [facts.dateLabel, facts.timeLabel]
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .join(", ");
+  const when =
+    facts.dateMode === "unknown"
+      ? "Termin folgt"
+      : facts.dateMode === "poll"
+        ? "wird abgestimmt – bitte stimmt über den Link ab"
+        : [facts.dateLabel, facts.timeLabel]
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .join(", ");
 
   const fixed = (text: string): InvitationLine[] =>
     text.trim() ? [{ kind: "fixed", text: text.trim() }] : [];

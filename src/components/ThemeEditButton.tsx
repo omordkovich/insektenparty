@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ThemeKey } from "@/lib/theme-presets";
-import { PencilIcon } from "./EditIcons";
+import { GearIcon } from "./EditIcons";
 import { EventDialog } from "./EventDialog";
 import { EDIT_ICON_BUTTON_CLASS } from "./InlineEditShell";
 
@@ -14,7 +14,7 @@ type ThemeEditButtonProps = {
   className?: string;
 };
 
-// Owner-only pencil next to the event logo: opens design and password settings.
+// Owner-only gear next to the event logo: opens design and password settings.
 export function ThemeEditButton({
   eventId,
   theme,
@@ -33,7 +33,7 @@ export function ThemeEditButton({
         title="Event-Einstellungen"
         onClick={() => setOpen(true)}
       >
-        <PencilIcon />
+        <GearIcon />
       </button>
       {open ? (
         <EventDialog

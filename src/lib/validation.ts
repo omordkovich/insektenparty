@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { proposalSchedule, type Proposal } from "@/lib/date-poll";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 
 // All input validation, shared by the forms (browser) and the API routes
@@ -585,4 +586,135 @@ export const eventScheduleSchema = z
 
 export function validateEventSchedule(schedule: EventSchedule): FieldResult<EventSchedule> {
   return toFieldResult(eventScheduleSchema.safeParse(schedule));
+}
+
+// --- Date poll (Terminabstimmung) ------------------------------------------------------
+
+const PROPOSAL_DATE_ERROR = "Bitte gib für jeden Termin ein gültiges Datum an.";
+const END_WITHOUT_START_ERROR = "Bitte gib bei einem Termin mit „bis“ auch „von“ an.";
+
+const proposalSchema = z.object(
+  {
+    date: z
+      .string({ error: PROPOSAL_DATE_ERROR })
+      .regex(EVENT_DATE_PATTERN, PROPOSAL_DATE_ERROR)
+      .refine(isRealDate, PROPOSAL_DATE_ERROR),
+    // The time is optional - a proposal may be just a day.
+    startTime: optionalTimeSchema("Die Startzeit eines Termins muss im Format HH:mm angegeben werden.").optional(),
+    endTime: optionalTimeSchema("Die Endzeit eines Termins muss im Format HH:mm angegeben werden.").optional(),
+  },
+  { error: "Ungültiger Terminvorschlag." },
+);
+
+function parseProposal(raw: unknown): FieldResult<Proposal> {
+  const result = proposalSchema.safeParse(raw);
+  if (!result.success) return { ok: false, error: firstError(result.error) };
+  const proposal = {
+    date: result.data.date,
+    startTime: result.data.startTime ?? null,
+    endTime: result.data.endTime ?? null,
+  };
+  if (proposal.endTime && !proposal.startTime) return { ok: false, error: END_WITHOUT_START_ERROR };
+  return { ok: true, value: proposal };
+}
+
+// A new poll needs 2-4 proposals, added ones are checked against the
+// existing proposals too. An end before the start means "until after
+// midnight" (see proposalSchedule), so only equality is rejected.
+export function validateProposals(
+  raw: unknown,
+  options: { today: string; min: number; max: number; existing?: Proposal[] },
+): FieldResult<Proposal[]> {
+  if (!Array.isArray(raw)) return { ok: false, error: "Ungültige Terminvorschläge." };
+  if (raw.length < options.min) {
+    return {
+      ok: false,
+      error: options.min === 1 ? "Bitte gib einen Termin an." : `Bitte gib mindestens ${options.min} Termine an.`,
+    };
+  }
+  if (raw.length > options.max) {
+    return { ok: false, error: "Es sind höchstens 4 Termine möglich." };
+  }
+
+  const proposals: Proposal[] = [];
+  for (const item of raw) {
+    const result = parseProposal(item);
+    if (!result.ok) return result;
+    const proposal = result.value;
+    if (proposal.date < options.today) {
+      return { ok: false, error: "Ein Termin liegt in der Vergangenheit." };
+    }
+    if (proposal.startTime && proposal.endTime === proposal.startTime) {
+      return { ok: false, error: "Bei einem Termin dürfen „von“ und „bis“ nicht gleich sein." };
+    }
+    const taken = [...(options.existing ?? []), ...proposals];
+    if (taken.some((other) => other.date === proposal.date && other.startTime === proposal.startTime)) {
+      return { ok: false, error: "Zwei Termine haben dasselbe Datum und dieselbe Startzeit." };
+    }
+    proposals.push(proposal);
+  }
+  return { ok: true, value: proposals };
+}
+
+// "Fester Termin" in the date dialog: a date is required, the time is
+// optional; an optional end date makes it an event over several days (an
+// end date equal to the start date means a single day).
+export function validateFixedDate(
+  raw: unknown,
+): FieldResult<{ proposal: Proposal; endDate: string | null; schedule: EventSchedule }> {
+  const value = (raw ?? {}) as { date?: unknown; endDate?: unknown; startTime?: unknown; endTime?: unknown };
+  if (typeof value.date !== "string" || value.date.trim() === "") {
+    return { ok: false, error: "Bitte gib ein Datum ein." };
+  }
+  const result = parseProposal({ date: value.date, startTime: value.startTime, endTime: value.endTime });
+  if (!result.ok) return result;
+  const proposal = result.value;
+
+  let endDate: string | null = null;
+  if (typeof value.endDate === "string" && value.endDate.trim() !== "" && value.endDate !== proposal.date) {
+    if (!EVENT_DATE_PATTERN.test(value.endDate) || !isRealDate(value.endDate)) {
+      return { ok: false, error: "Das Enddatum ist ungültig." };
+    }
+    endDate = value.endDate;
+  }
+
+  if (!endDate && proposal.startTime && proposal.endTime === proposal.startTime) {
+    return { ok: false, error: "Die Endzeit muss nach der Startzeit liegen." };
+  }
+  const schedule = validateEventSchedule(
+    endDate
+      ? { eventDate: proposal.date, eventEndDate: endDate, eventStartTime: proposal.startTime, eventEndTime: proposal.endTime }
+      : proposalSchedule(proposal),
+  );
+  return schedule.ok ? { ok: true, value: { proposal, endDate, schedule: schedule.value } } : schedule;
+}
+
+export type PollVoteInput = { name: string; optionIds: string[]; noneFit: boolean };
+
+const pollVoteSchema = z.object(
+  {
+    name: guestNameSchema,
+    optionIds: z.array(z.string(), { error: "Ungültige Terminauswahl." }).optional(),
+    noneFit: z
+      .unknown()
+      .optional()
+      .transform((value) => value === true),
+  },
+  { error: "Ungültige Anfragedaten." },
+);
+
+export function validatePollVote(body: unknown, allowedOptionIds: string[]): FieldResult<PollVoteInput> {
+  const result = pollVoteSchema.safeParse(body);
+  if (!result.success) return { ok: false, error: firstError(result.error) };
+  const optionIds = [...new Set(result.data.optionIds ?? [])];
+  if (optionIds.some((id) => !allowedOptionIds.includes(id))) {
+    return { ok: false, error: "Ungültige Terminauswahl." };
+  }
+  if (result.data.noneFit && optionIds.length > 0) {
+    return { ok: false, error: "„Nichts davon passt“ kann nicht zusammen mit einem Termin gewählt werden." };
+  }
+  if (!result.data.noneFit && optionIds.length === 0) {
+    return { ok: false, error: "Bitte wähle mindestens einen Termin oder „Nichts davon passt“." };
+  }
+  return { ok: true, value: { name: result.data.name, optionIds, noneFit: result.data.noneFit } };
 }

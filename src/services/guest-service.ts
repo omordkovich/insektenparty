@@ -1,6 +1,7 @@
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import type { GuestDto } from "@/lib/types";
 import { normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
+import { getEventDateMode } from "@/repositories/date-poll-repository";
 import { getEventOwnerId } from "@/repositories/event-repository";
 import {
   createGuest,
@@ -14,6 +15,13 @@ import { notifyOwnerOfGuestChange } from "@/services/notification-service";
 export type GuestServiceResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };
+
+export const DATE_NOT_FIXED_ERROR = "Der Termin steht noch nicht fest.";
+
+// Entries only once the date is fixed - before that guests vote instead.
+async function isDateFixed(eventId: string): Promise<boolean> {
+  return (await getEventDateMode(eventId)) === "fixed";
+}
 
 // Postgres TIME comes back as HH:mm:ss; null stays null.
 function optionalTime(value: string | null): string | null {
@@ -54,6 +62,9 @@ export async function createGuestForEvent(
   if (ownerId === undefined) {
     return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
+  if (!(await isDateFixed(eventId))) {
+    return { ok: false, status: 409, error: DATE_NOT_FIXED_ERROR };
+  }
 
   // The event owner manages their own guest list while signed in, so the
   // bot check (aimed at the public RSVP form) doesn't apply to them.
@@ -87,6 +98,9 @@ export async function updateGuestForEvent(
 ): Promise<GuestServiceResult<GuestDto>> {
   const ownerId = await getEventOwnerId(eventId);
   const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+  if (!(await isDateFixed(eventId))) {
+    return { ok: false, status: 409, error: DATE_NOT_FIXED_ERROR };
+  }
   if (!isOwnerRequest) {
     const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));
     if (!recaptcha.ok) {

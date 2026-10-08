@@ -18,6 +18,14 @@ vi.mock("@/repositories/event-repository", () => ({
 }));
 vi.mock("@/services/entitlement-service", () => ({ getUserEntitlements: vi.fn() }));
 vi.mock("@/repositories/user-repository", () => ({ getUserDisplayName: vi.fn(async () => "Anna Müller") }));
+vi.mock("@/repositories/date-poll-repository", () => ({
+  applyDateModeChange: vi.fn(async () => true),
+  getEventDateMode: vi.fn(async () => "fixed"),
+}));
+vi.mock("@/lib/date-poll", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/date-poll")>()),
+  todayInBerlin: () => "2026-07-01",
+}));
 
 const { createEventForOwner, updateEventForOwner } = await import("@/services/event-service");
 const { createEvent, getEventAddress, updateEvent } = await import("@/repositories/event-repository");
@@ -119,8 +127,8 @@ describe("createEventForOwner – event address", () => {
   });
 
   it("builds the address from the owner's first name and the title", async () => {
-    vi.mocked(createEvent).mockImplementation(async (input) => ({ slug: input.slug }));
-    const result = await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" });
+    vi.mocked(createEvent).mockImplementation(async (input) => ({ id: "event-id", slug: input.slug }));
+    const result = await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" } });
     expect(result.ok && result.data.slug).toMatch(/^anna-sommerfest-[a-z2-9]{6}$/);
     const [input] = vi.mocked(createEvent).mock.calls[0];
     expect(input.slug.endsWith(`-${input.slugKey}`)).toBe(true);
@@ -130,8 +138,8 @@ describe("createEventForOwner – event address", () => {
   it("rolls a new suffix when the address is already taken", async () => {
     vi.mocked(createEvent)
       .mockRejectedValueOnce(uniqueViolation())
-      .mockImplementation(async (input) => ({ slug: input.slug }));
-    const result = await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" });
+      .mockImplementation(async (input) => ({ id: "event-id", slug: input.slug }));
+    const result = await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" } });
 
     expect(result.ok).toBe(true);
     const [first, second] = vi.mocked(createEvent).mock.calls.map(([input]) => input.slug);
@@ -141,13 +149,13 @@ describe("createEventForOwner – event address", () => {
 
   it("gives up after a few taken addresses instead of looping forever", async () => {
     vi.mocked(createEvent).mockRejectedValue(uniqueViolation());
-    await expect(createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" })).rejects.toThrow();
+    await expect(createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" } })).rejects.toThrow();
     expect(vi.mocked(createEvent).mock.calls.length).toBe(5);
   });
 
   it("does not retry on other database errors", async () => {
     vi.mocked(createEvent).mockRejectedValue(new Error("connection lost"));
-    await expect(createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" })).rejects.toThrow(
+    await expect(createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" } })).rejects.toThrow(
       "connection lost",
     );
     expect(vi.mocked(createEvent).mock.calls.length).toBe(1);
@@ -208,7 +216,7 @@ describe("updateEventForOwner – renaming", () => {
 describe("event password", () => {
   beforeEach(() => {
     vi.mocked(createEvent).mockReset();
-    vi.mocked(createEvent).mockImplementation(async (input) => ({ slug: input.slug }));
+    vi.mocked(createEvent).mockImplementation(async (input) => ({ id: "event-id", slug: input.slug }));
     vi.mocked(updateEvent).mockClear();
     vi.mocked(getUserEntitlements).mockResolvedValue({
       unlockedThemes: ["weiss"],
@@ -218,18 +226,18 @@ describe("event password", () => {
   });
 
   it("stores the trimmed password when creating", async () => {
-    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", accessPassword: " Sommer " });
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" }, accessPassword: " Sommer " });
     expect(vi.mocked(createEvent).mock.calls[0][0].accessPassword).toBe("Sommer");
   });
 
   it("creates an open event without a password", async () => {
-    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest" });
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" } });
     expect(vi.mocked(createEvent).mock.calls[0][0].accessPassword).toBeNull();
   });
 
   it("rejects a too short password when creating", async () => {
     expect(
-      await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", accessPassword: "abc" }),
+      await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: { mode: "unknown" }, accessPassword: "abc" }),
     ).toEqual({ ok: false, status: 400, error: "Das Passwort muss mindestens 4 Zeichen lang sein." });
     expect(createEvent).not.toHaveBeenCalled();
   });
@@ -241,6 +249,56 @@ describe("event password", () => {
       ok: false,
       status: 400,
       error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+    });
+  });
+});
+
+describe("createEventForOwner – date mode", () => {
+  beforeEach(async () => {
+    vi.mocked(createEvent).mockReset();
+    vi.mocked(createEvent).mockImplementation(async (input) => ({ id: "event-id", slug: input.slug }));
+    vi.mocked(getUserEntitlements).mockResolvedValue({ unlockedThemes: ["weiss"], eventLimit: 1, eventCount: 0 });
+    const { applyDateModeChange } = await import("@/repositories/date-poll-repository");
+    vi.mocked(applyDateModeChange).mockClear();
+  });
+
+  it("requires a date mode", async () => {
+    expect(await createEventForOwner("owner-id", { theme: "weiss", title: "Fest" })).toEqual({
+      ok: false,
+      status: 400,
+      error: "Bitte wähle, wie der Termin festgelegt wird.",
+    });
+  });
+
+  it("creates the event open and then applies the chosen date", async () => {
+    const { applyDateModeChange } = await import("@/repositories/date-poll-repository");
+    await createEventForOwner("owner-id", {
+      theme: "weiss",
+      title: "Fest",
+      date: { mode: "fixed", date: "2026-07-11", startTime: "15:00", endTime: null },
+    });
+    expect(vi.mocked(createEvent).mock.calls[0][0].dateMode).toBe("unknown");
+    expect(vi.mocked(applyDateModeChange).mock.calls[0][2]).toMatchObject({
+      mode: "fixed",
+      schedule: { eventDate: "2026-07-11", eventStartTime: "15:00" },
+    });
+  });
+
+  it("does not touch the date for \"Noch kein Termin\"", async () => {
+    const { applyDateModeChange } = await import("@/repositories/date-poll-repository");
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Fest", date: { mode: "unknown" } });
+    expect(applyDateModeChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateEventForOwner – date only when fixed", () => {
+  it("rejects inline date changes while the date is open", async () => {
+    const { getEventDateMode } = await import("@/repositories/date-poll-repository");
+    vi.mocked(getEventDateMode).mockResolvedValueOnce("poll");
+    expect(await update({ eventDate: "2026-09-04" })).toEqual({
+      ok: false,
+      status: 409,
+      error: "Datum und Uhrzeit legst du in den Event-Einstellungen fest.",
     });
   });
 });

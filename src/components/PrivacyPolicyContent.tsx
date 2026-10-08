@@ -240,6 +240,15 @@ export function PrivacyPolicyContent() {
           Gästeliste). Du kannst deinen Eintrag jederzeit selbst ändern oder
           löschen.
         </p>
+        <SubHeading>Terminabstimmung</SubHeading>
+        <p>
+          Lässt der Veranstalter über den Termin abstimmen, verarbeiten wir
+          deinen Namen und die Termine, die dir passen (oder dass keiner
+          passt). Deine Auswahl ist wie die Gästeliste für alle sichtbar, die
+          die Event-Seite öffnen können. Legt der Veranstalter einen Termin
+          fest, übernehmen wir deinen Namen als Zu- oder Absage in die
+          Gästeliste und löschen die Abstimmung.
+        </p>
         <SubHeading>Passwort-Anfrage</SubHeading>
         <p>
           Ist ein Event passwortgeschützt, kannst du das Passwort beim

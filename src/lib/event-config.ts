@@ -1,3 +1,5 @@
+import type { DateMode } from "@/lib/date-poll";
+
 export type EventConfig = {
   kicker: string;
   title: string;
@@ -6,6 +8,8 @@ export type EventConfig = {
   timeLabel: string;
   locationLabel: string;
   defaultArrivalTime: string;
+  /** Termin-Status (see lib/date-poll.ts). */
+  dateMode: DateMode;
   /** ISO date (YYYY-MM-DD) and 24h times (HH:MM), used to build the "add to
    * calendar" link - kept separate from the human-readable labels above
    * since those aren't reliably machine-parseable. Null until the owner

@@ -14,6 +14,7 @@ const facts: InvitationFacts = {
   contactName: "Anna Müller",
   url: "https://gastzilla.de/event/abc123",
   password: null,
+  dateMode: "fixed",
 };
 
 describe("buildInvitationText", () => {
@@ -105,5 +106,17 @@ describe("invitation text for a password-protected event", () => {
 
   it("has no password line for an open event", () => {
     expect(buildInvitationText(facts, DEFAULT_WORDING)).not.toContain("Passwort");
+  });
+});
+
+describe("invitation text while the date is open", () => {
+  it("says the date follows", () => {
+    expect(buildInvitationText({ ...facts, dateMode: "unknown" }, DEFAULT_WORDING)).toContain("Wann: Termin folgt");
+  });
+
+  it("asks to vote during a poll", () => {
+    const text = buildInvitationText({ ...facts, dateMode: "poll" }, DEFAULT_WORDING);
+    expect(text).toContain("Wann: wird abgestimmt – bitte stimmt über den Link ab");
+    expect(text).not.toContain("Samstag");
   });
 });

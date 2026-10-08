@@ -14,6 +14,9 @@ import {
   validateAccessPassword,
   validateEventPasswordPair,
   validatePasswordRequest,
+  validateFixedDate,
+  validatePollVote,
+  validateProposals,
 } from "@/lib/validation";
 
 const validGuest = {
@@ -473,5 +476,157 @@ describe("validatePasswordRequest", () => {
     expect(requestError({ ...byEmail, message: "x".repeat(501) })).toBe(
       "Die Nachricht darf höchstens 500 Zeichen lang sein.",
     );
+  });
+});
+
+describe("validateProposals", () => {
+  const today = "2026-07-01";
+  const options = { today, min: 2, max: 4 };
+  const p = (date: string, startTime: string | null, endTime: string | null = null) => ({ date, startTime, endTime });
+
+  it("accepts 2 to 4 proposals and treats an empty end as none", () => {
+    expect(validateProposals([p("2026-07-11", "15:00", ""), p("2026-07-12", "20:00", "01:00")], options)).toEqual({
+      ok: true,
+      value: [p("2026-07-11", "15:00"), p("2026-07-12", "20:00", "01:00")],
+    });
+  });
+
+  it("checks count, fields, past dates and duplicates", () => {
+    expect(validateProposals([p("2026-07-11", "15:00")], options)).toEqual({
+      ok: false,
+      error: "Bitte gib mindestens 2 Termine an.",
+    });
+    expect(validateProposals(Array.from({ length: 5 }, (_, i) => p(`2026-07-1${i}`, "15:00")), options)).toEqual({
+      ok: false,
+      error: "Es sind höchstens 4 Termine möglich.",
+    });
+    expect(validateProposals([p("", "15:00"), p("2026-07-12", "15:00")], options)).toEqual({
+      ok: false,
+      error: "Bitte gib für jeden Termin ein gültiges Datum an.",
+    });
+    expect(validateProposals([p("2026-07-11", "", "18:00"), p("2026-07-12", "15:00")], options)).toEqual({
+      ok: false,
+      error: "Bitte gib bei einem Termin mit „bis“ auch „von“ an.",
+    });
+    expect(validateProposals([p("2026-06-30", "15:00"), p("2026-07-12", "15:00")], options)).toEqual({
+      ok: false,
+      error: "Ein Termin liegt in der Vergangenheit.",
+    });
+    expect(validateProposals([p("2026-07-11", "15:00", "15:00"), p("2026-07-12", "15:00")], options)).toEqual({
+      ok: false,
+      error: "Bei einem Termin dürfen „von“ und „bis“ nicht gleich sein.",
+    });
+    expect(validateProposals([p("2026-07-11", "15:00"), p("2026-07-11", "15:00", "18:00")], options)).toEqual({
+      ok: false,
+      error: "Zwei Termine haben dasselbe Datum und dieselbe Startzeit.",
+    });
+  });
+
+  it("makes the time optional", () => {
+    expect(validateProposals([p("2026-07-11", ""), p("2026-07-12", "")], options)).toEqual({
+      ok: true,
+      value: [p("2026-07-11", null), p("2026-07-12", null)],
+    });
+    expect(validateProposals([p("2026-07-11", ""), p("2026-07-11", "")], options)).toEqual({
+      ok: false,
+      error: "Zwei Termine haben dasselbe Datum und dieselbe Startzeit.",
+    });
+    expect(validateProposals([p("2026-07-11", ""), p("2026-07-11", "15:00")], options).ok).toBe(true);
+  });
+
+  it("checks added proposals against the existing ones", () => {
+    const existing = [p("2026-07-11", "15:00")];
+    expect(validateProposals([p("2026-07-11", "15:00")], { today, min: 1, max: 3, existing })).toEqual({
+      ok: false,
+      error: "Zwei Termine haben dasselbe Datum und dieselbe Startzeit.",
+    });
+    expect(validateProposals([], { today, min: 1, max: 3, existing })).toEqual({
+      ok: false,
+      error: "Bitte gib einen Termin an.",
+    });
+  });
+});
+
+describe("validateFixedDate", () => {
+  it("returns the proposal and the event schedule", () => {
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "01:00" })).toEqual({
+      ok: true,
+      value: {
+        proposal: { date: "2026-07-11", startTime: "20:00", endTime: "01:00" },
+        endDate: null,
+        schedule: { eventDate: "2026-07-11", eventEndDate: "2026-07-12", eventStartTime: "20:00", eventEndTime: "01:00" },
+      },
+    });
+  });
+
+  it("supports events over several days", () => {
+    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-13", startTime: "18:00", endTime: "12:00" })).toEqual({
+      ok: true,
+      value: {
+        proposal: { date: "2026-07-11", startTime: "18:00", endTime: "12:00" },
+        endDate: "2026-07-13",
+        schedule: { eventDate: "2026-07-11", eventEndDate: "2026-07-13", eventStartTime: "18:00", eventEndTime: "12:00" },
+      },
+    });
+    const sameDay = validateFixedDate({ date: "2026-07-11", endDate: "2026-07-11", startTime: "18:00", endTime: "20:00" });
+    expect(sameDay.ok && sameDay.value.endDate).toBeNull();
+    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-10", startTime: "18:00" })).toEqual({
+      ok: false,
+      error: "Das Enddatum darf nicht vor dem Startdatum liegen.",
+    });
+  });
+
+  it("requires a date, the time is optional", () => {
+    expect(validateFixedDate({ date: "", startTime: "20:00" })).toEqual({ ok: false, error: "Bitte gib ein Datum ein." });
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "" })).toEqual({
+      ok: true,
+      value: {
+        proposal: { date: "2026-07-11", startTime: null, endTime: null },
+        endDate: null,
+        schedule: { eventDate: "2026-07-11", eventEndDate: null, eventStartTime: null, eventEndTime: null },
+      },
+    });
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "", endTime: "20:00" })).toEqual({
+      ok: false,
+      error: "Bitte gib bei einem Termin mit „bis“ auch „von“ an.",
+    });
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "20:00" })).toEqual({
+      ok: false,
+      error: "Die Endzeit muss nach der Startzeit liegen.",
+    });
+  });
+});
+
+describe("validatePollVote", () => {
+  const allowed = ["a", "b"];
+
+  it("accepts ticked proposals or none fit", () => {
+    expect(validatePollVote({ name: " Anna ", optionIds: ["a", "a", "b"] }, allowed)).toEqual({
+      ok: true,
+      value: { name: "Anna", optionIds: ["a", "b"], noneFit: false },
+    });
+    expect(validatePollVote({ name: "Anna", optionIds: [], noneFit: true }, allowed)).toEqual({
+      ok: true,
+      value: { name: "Anna", optionIds: [], noneFit: true },
+    });
+  });
+
+  it("requires exactly one of both and known proposals", () => {
+    expect(validatePollVote({ name: "Anna", optionIds: [] }, allowed)).toEqual({
+      ok: false,
+      error: "Bitte wähle mindestens einen Termin oder „Nichts davon passt“.",
+    });
+    expect(validatePollVote({ name: "Anna", optionIds: ["a"], noneFit: true }, allowed)).toEqual({
+      ok: false,
+      error: "„Nichts davon passt“ kann nicht zusammen mit einem Termin gewählt werden.",
+    });
+    expect(validatePollVote({ name: "Anna", optionIds: ["x"] }, allowed)).toEqual({
+      ok: false,
+      error: "Ungültige Terminauswahl.",
+    });
+    expect(validatePollVote({ name: "A", optionIds: ["a"] }, allowed)).toEqual({
+      ok: false,
+      error: "Name muss mindestens 2 Zeichen lang sein.",
+    });
   });
 });

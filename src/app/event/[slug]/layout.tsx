@@ -38,9 +38,13 @@ export async function generateMetadata({
   // Password-protected: the preview names the event but nothing else.
   const description = event.accessPassword
     ? "Passwortgeschützte Einladung – öffne den Link und gib das Passwort ein."
-    : event.dateLabel
-      ? `Du bist eingeladen – ${event.dateLabel}. Jetzt zusagen und Gästeliste ansehen.`
-      : "Du bist eingeladen! Jetzt zusagen und Gästeliste ansehen.";
+    : event.dateMode === "unknown"
+      ? "Du bist eingeladen! Der Termin folgt."
+      : event.dateMode === "poll"
+        ? "Du bist eingeladen! Stimme ab, wann es dir passt."
+        : event.dateLabel
+          ? `Du bist eingeladen – ${event.dateLabel}. Jetzt zusagen und Gästeliste ansehen.`
+          : "Du bist eingeladen! Jetzt zusagen und Gästeliste ansehen.";
 
   return {
     title: `${event.title} - Einladung`,

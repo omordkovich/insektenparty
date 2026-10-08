@@ -50,7 +50,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={`relative z-10 w-full ${widthClass} rounded-3xl bg-surface p-5 shadow-(--shadow) sm:p-7`}
+        className={`relative z-10 max-h-[95dvh] w-full overflow-y-auto ${widthClass} rounded-3xl bg-surface p-5 shadow-(--shadow) sm:p-7`}
       >
         {showCloseButton ? (
           <button
