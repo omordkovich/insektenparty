@@ -17,12 +17,13 @@ import {
 export const FEATURES = [
   "Digitale Einladungsseite für Geburtstag, Kindergeburtstag, Hochzeit, Grillabend oder Firmenfeier",
   "Gäste sagen über einen Link zu oder ab – ohne Konto und ohne App",
+  "Terminabstimmung: 2–4 Terminvorschläge, Gäste stimmen per Link ab, der gewählte Termin wird mit einem Klick zur Gästeliste – mit fertiger Terminbestätigung zum Teilen",
   "Begleitpersonen, Kinder, Mitbringsel und Nachrichten direkt bei der Zusage",
   "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail bei jeder Zu- und Absage",
   "Optionaler Passwortschutz für Event-Seite und Gästeliste – Gäste können das Passwort beim Gastgeber anfragen",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
   "Designs für verschiedene Anlässe",
-  "Fertiger Einladungstext mit Datum, Ort und Link – anpassbar und mit einem Klick kopierbar",
+  "Fertiger Einladungstext und Terminbestätigung mit Datum, Ort und Link – anpassbar, mit einem Klick kopierbar oder per WhatsApp, E-Mail & Co. teilbar",
   "Termin in den eigenen Kalender übernehmen",
   "Werbefrei, ohne Tracking-Cookies, Server in der EU",
 ];

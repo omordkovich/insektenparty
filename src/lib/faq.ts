@@ -14,6 +14,11 @@ export const FAQ: FaqItem[] = [
     answer: "Nein, sie öffnen einfach den Einladungslink und tragen sich ein.",
   },
   {
+    question: "Kann ich den Termin mit meinen Gästen abstimmen?",
+    answer:
+      "Ja. Steht der Termin noch nicht fest, schlägst du zwei bis vier Termine vor – mit oder ohne Uhrzeit. Deine Gäste haken über den Link an, was ihnen passt. Den Favoriten legst du mit einem Klick fest, und alle Stimmen werden automatisch zu Zu- und Absagen in der Gästeliste. Danach bekommst du einen fertigen Text, mit dem du allen den Termin per WhatsApp, E-Mail & Co. mitteilst.",
+  },
+  {
     question: "Können Gäste auch absagen?",
     answer:
       "Ja. Wer nicht kommen kann, hakt beim Eintragen „Ich sage ab“ an – auf Wunsch mit einer Nachricht. In der Gästeliste steht der Gast dann als „Abgesagt“, und du bekommst eine E-Mail. So weißt du nicht nur, wer kommt, sondern auch, wer sicher nicht kommt.",
@@ -31,7 +36,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Muss ich den Einladungstext selbst schreiben?",
     answer:
-      "Nein. Auf deiner Event-Seite setzt GASTZILLA automatisch einen Einladungstext mit Titel, Datum, Ort und Link zusammen. Anrede und Gruß passt du nach Wunsch an und kopierst den Text mit einem Klick.",
+      "Nein. Auf deiner Event-Seite setzt GASTZILLA automatisch einen Einladungstext mit Titel, Datum, Ort und Link zusammen. Anrede und Gruß passt du nach Wunsch an und kopierst oder teilst den Text mit einem Klick. Nach einer Terminabstimmung gibt es ebenso einen fertigen Text, der allen den festgelegten Termin mitteilt.",
   },
   {
     question: "Gibt es Werbung?",

@@ -50,21 +50,25 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={`relative z-10 max-h-[95dvh] w-full overflow-y-auto ${widthClass} rounded-3xl bg-surface p-5 shadow-(--shadow) sm:p-7`}
+        className={`relative z-10 flex max-h-[95dvh] w-full flex-col overflow-hidden ${widthClass} rounded-3xl bg-surface p-2 shadow-(--shadow)`}
       >
-        {showCloseButton ? (
-          <button
-            ref={internalCloseRef}
-            type="button"
-            onClick={onCloseAction}
-            disabled={closeDisabled}
-            aria-label="Schließen"
-            className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
-          >
-            <CloseIcon />
-          </button>
-        ) : null}
-        {children}
+        {/* The frame (p-2) keeps the scrollbar off the rounded edge; the
+            content scrolls inside it. */}
+        <div className="relative min-h-0 overflow-y-auto p-3 sm:p-5">
+          {showCloseButton ? (
+            <button
+              ref={internalCloseRef}
+              type="button"
+              onClick={onCloseAction}
+              disabled={closeDisabled}
+              aria-label="Schließen"
+              className="absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
+            >
+              <CloseIcon />
+            </button>
+          ) : null}
+          {children}
+        </div>
       </div>
     </div>
   );

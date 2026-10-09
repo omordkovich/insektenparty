@@ -19,12 +19,12 @@ const BENEFITS: { title: string; text: string; icon: ReactNode }[] = [
   },
   {
     title: "Gäste brauchen kein Konto",
-    text: "Zu- und Absagen, Begleitpersonen, Mitbringsel und Nachrichten direkt über den Link.",
+    text: "Terminabstimmung, Zu- und Absagen, Begleitpersonen, Mitbringsel und Nachrichten direkt über den Link.",
     icon: <GuestIcon />,
   },
   {
     title: "Teilen, wo deine Gäste sind",
-    text: "WhatsApp, Signal, Telegram, E-Mail – mit fertigem Einladungstext zum Kopieren.",
+    text: "WhatsApp, Signal, Telegram, E-Mail – mit fertigen Texten zum Kopieren und Teilen.",
     icon: <ShareIcon />,
   },
 ];
@@ -45,6 +45,7 @@ export function LandingContent() {
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
           Erstelle in wenigen Minuten eine Einladungsseite für Geburtstag, Hochzeit,
           Grillabend oder Firmenfeier. Teile den Link – deine Gäste sagen selbst zu oder ab.
+          Noch kein Termin? Lass sie einfach abstimmen.
         </p>
         <div className="mt-6 flex justify-center">
           <AuthButtons registerLabel="Kostenlos starten" />

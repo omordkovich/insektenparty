@@ -437,7 +437,7 @@ export const EVENT_GREETING_MAX_LENGTH = 1000;
 // rather than for a whole-event object - an empty value is always valid
 // (that's the "not filled in yet" placeholder state).
 export const EVENT_FIELDS = {
-  kicker: { label: "Kicker", maxLength: EVENT_TEXT_MAX_LENGTH },
+  kicker: { label: "Überschrift", maxLength: EVENT_TEXT_MAX_LENGTH },
   title: { label: "Titel", maxLength: EVENT_TEXT_MAX_LENGTH },
   greeting: { label: "Begrüßungstext", maxLength: EVENT_GREETING_MAX_LENGTH },
   dateLabel: { label: "Datum", maxLength: EVENT_TEXT_MAX_LENGTH },

@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
-import type { EventFieldKey } from "@/lib/validation";
+import { EVENT_FIELDS, type EventFieldKey } from "@/lib/validation";
+import { CharCounter } from "./CharCounter";
 import { InlineEditShell } from "./InlineEditShell";
 
 type EditableFieldProps = {
@@ -67,6 +68,9 @@ export function EditableField({
   }
 
   const [currentValue, setCurrentValue] = useState(value);
+  // Length of the text being edited, for the "noch … Zeichen" counter.
+  const [draftLength, setDraftLength] = useState(value.length);
+  const maxLength = EVENT_FIELDS[fieldKey].maxLength;
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -106,15 +110,24 @@ export function EditableField({
       editHint={editHint}
       renderEditor={({ saving, hintId }) =>
         as === "textarea" ? (
-          <textarea
-            ref={textareaRef}
-            defaultValue={currentValue}
-            placeholder={placeholder}
-            disabled={saving}
-            aria-describedby={hintId}
-            rows={2}
-            className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
-          />
+          <>
+            <textarea
+              ref={(element) => {
+                textareaRef.current = element;
+                // Opening the editor starts from the saved text.
+                if (element) setDraftLength(element.value.length);
+              }}
+              defaultValue={currentValue}
+              placeholder={placeholder}
+              disabled={saving}
+              aria-describedby={hintId}
+              maxLength={maxLength}
+              onInput={(event) => setDraftLength(event.currentTarget.value.length)}
+              rows={2}
+              className={`${className} w-full resize-none rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
+            />
+            <CharCounter length={draftLength} max={maxLength} />
+          </>
         ) : (
           <input
             ref={inputRef}
@@ -123,6 +136,7 @@ export function EditableField({
             placeholder={placeholder}
             disabled={saving}
             aria-describedby={hintId}
+            maxLength={maxLength}
             className={`${className} w-full rounded-lg border border-leaf/25 bg-surface px-2 py-1`}
           />
         )

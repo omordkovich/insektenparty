@@ -42,7 +42,7 @@ export const OCCASIONS_HUB = {
   description:
     "Ob Kindergeburtstag, Hochzeit oder Grillabend: Erstelle kostenlos eine digitale Einladung, teile den Link und sammle alle Zu- und Absagen in einer Gästeliste.",
   intro:
-    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat.",
+    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat. Steht der Termin noch nicht fest, stimmen sie vorher einfach darüber ab.",
 };
 
 export const OCCASIONS: Occasion[] = [
@@ -528,6 +528,10 @@ export const OCCASIONS: Occasion[] = [
         title: "Für den Abend oder das ganze Wochenende",
         text: "Für ein JGA-Wochenende gibst du einen Zeitraum an. Gäste schreiben dazu, wann sie kommen und auf Wunsch, bis wann sie bleiben.",
       },
+      {
+        title: "Termin gemeinsam finden",
+        text: "Bei vielen Kalendern ist der Termin das Schwierigste. Schlag bis zu vier Wochenenden vor, alle stimmen per Link ab – der Favorit wird mit einem Klick festgelegt.",
+      },
     ],
     invitationText: [
       "Hallo zusammen,",
@@ -560,7 +564,7 @@ export const OCCASIONS: Occasion[] = [
           "Nein. GASTZILLA sammelt die Zusagen und wer was übernimmt. Die Kosten teilt ihr wie gewohnt untereinander – du weißt dann aber genau, durch wie viele.",
       },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "baby-shower",
@@ -689,6 +693,69 @@ export const OCCASIONS: Occasion[] = [
     updated: "2026-10-07",
   },
   {
+    id: "funeral",
+    slug: "trauerfeier",
+    name: "Trauerfeier & Beerdigung",
+    title: "Trauerfeier, Beerdigung oder Gedenkfeier – Einladung online erstellen",
+    metaTitle: "Einladung zur Trauerfeier & Beerdigung online – GASTZILLA",
+    description:
+      "Trauerfeier, Beerdigung, Urnenbeisetzung oder Trauerkaffee: Angehörige und Freunde geben per Link Bescheid, ob sie kommen – auf Wunsch mit Passwort geschützt.",
+    teaser: "Trauerfeier, Beisetzung oder Trauerkaffee – in Ruhe wissen, wer kommt.",
+    intro: [
+      "Wenn ein geliebter Mensch stirbt, bleibt wenig Zeit und viel zu organisieren: Trauerfeier, Beerdigung oder Urnenbeisetzung, danach oft ein Trauerkaffee oder Leichenschmaus. Dafür müsst ihr wissen, wer kommt – und viele Telefonate und Nachrichten sind in dieser Zeit eine zusätzliche Last.",
+      "Mit GASTZILLA erstellst du eine schlichte Seite mit Ort und Zeit und teilst den Link mit Familie, Freunden und Bekannten. Sie geben selbst Bescheid, ob sie kommen – ohne Konto oder App. Auf Wunsch schützt du die Seite mit einem Passwort.",
+    ],
+    benefitsTitle: "So hilft GASTZILLA bei Trauerfeier und Beerdigung",
+    benefits: [
+      {
+        title: "Wissen, wer zum Trauerkaffee kommt",
+        text: "Angehörige und Freunde geben selbst Bescheid und tragen Begleitpersonen mit ein. So weißt du, für wie viele Personen du im Café oder Restaurant reservieren musst.",
+      },
+      {
+        title: "Trauerfeier, Beisetzung und Kaffee im Blick",
+        text: "Gäste geben an, wann sie kommen – ob schon zur Trauerfeier oder erst zur Beisetzung oder zum Kaffee danach.",
+      },
+      {
+        title: "Rückmeldung ohne Telefonate",
+        text: "Wer kommen kann, sagt zu; wer verhindert ist, sagt ab und kann ein paar Worte hinterlassen. Du musst niemandem hinterhertelefonieren.",
+      },
+      {
+        title: "Geschützt und ohne Werbung",
+        text: "Die Seite erscheint nicht in Suchmaschinen und lässt sich mit einem Passwort schützen. GASTZILLA zeigt keine Werbung.",
+      },
+    ],
+    invitationText: [
+      "Liebe Angehörige, Freunde und Bekannte,",
+      "in stiller Trauer nehmen wir Abschied von [Name].",
+      "Die Trauerfeier findet am [Datum] um [Uhrzeit] in [Ort] statt. Anschließend [Beisetzung / Trauerkaffee in Ort].",
+      "Bitte geben Sie uns über diesen Link Bescheid, ob Sie kommen: [Link]",
+      "[Ihre Namen]",
+    ],
+    faq: [
+      {
+        question: "Kann man per WhatsApp zur Trauerfeier einladen?",
+        answer:
+          "Ja, das ist heute üblich – gerade wenn wenig Zeit bleibt. Mit GASTZILLA verschickst du einen Link per WhatsApp, E-Mail oder Nachricht; dort stehen Ort und Zeit, und die Rückmeldungen kommen gesammelt an. Angehörige ohne Smartphone erreichst du natürlich weiterhin am besten persönlich.",
+      },
+      {
+        question: "Wen lädt man zur Beerdigung und zum Trauerkaffee ein?",
+        answer:
+          "Zur Trauerfeier kann meist jeder kommen, der sich verabschieden möchte – Ort und Zeit stehen oft in der Traueranzeige. Zum anschließenden Trauerkaffee oder Leichenschmaus laden viele Familien gezielt ein, etwa Familie, enge Freunde und Wegbegleiter. Den Link für die Rückmeldung schickst du dann nur an diese Gäste.",
+      },
+      {
+        question: "Wie lange vor der Trauerfeier sollte man da sein?",
+        answer:
+          "Üblich ist es, etwa eine Viertelstunde vor Beginn da zu sein, um in Ruhe anzukommen und einen Platz zu finden.",
+      },
+      {
+        question: "Wer kann die Seite sehen?",
+        answer:
+          "Nur wer den Link hat – und wenn du ein Passwort setzt, nur wer auch das Passwort kennt. Suchmaschinen finden die Seite nicht. Für einen ruhigen Rahmen eignen sich schlichte Designs wie „Weiß“ oder „Schwarz“.",
+      },
+    ],
+    updated: "2026-10-09",
+  },
+  {
     id: "company-party",
     slug: "firmenfeier",
     name: "Firmenfeier",
@@ -738,7 +805,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wie früh sollte man zur Weihnachtsfeier einladen?",
         answer:
-          "Für Weihnachtsfeiern sind sechs bis acht Wochen üblich, weil Termine im Dezember schnell belegt sind. Für Sommerfest oder Teamevent reichen meist drei bis vier Wochen.",
+          "Für Weihnachtsfeiern sind sechs bis acht Wochen üblich, weil Termine im Dezember schnell belegt sind. Für Sommerfest oder Teamevent reichen meist drei bis vier Wochen. Steht der Abend noch nicht fest, schlägst du bis zu vier Termine vor und lässt das Team per Link abstimmen.",
       },
       {
         question: "Müssen sich die Kollegen registrieren?",
@@ -751,7 +818,7 @@ export const OCCASIONS: Occasion[] = [
           "GASTZILLA ist werbefrei, setzt keine Tracking-Cookies ein und speichert die Daten auf Servern in der EU. Teilnehmende tragen nur ihren Namen ein – ein Konto brauchen sie nicht.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-09",
   },
   {
     id: "barbecue",
@@ -1110,8 +1177,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Ja. Allergien, vegetarisches Essen oder Speisevorschriften schreiben Gäste einfach als Nachricht zu ihrer Zusage.",
       },
+      {
+        question: "Wie finden wir einen Termin, an dem die ganze Familie kann?",
+        answer:
+          "Lass die Familie abstimmen: Du schlägst zwei bis vier Termine vor, jeder hakt per Link an, was passt. Den Termin mit den meisten Stimmen legst du fest – alle, die abgestimmt haben, stehen danach direkt in der Gästeliste.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "new-years-eve",
@@ -1287,8 +1359,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Alle, die den Link haben. Suchmaschinen finden die Seite nicht. Teile den Link deshalb nur mit der Gruppe, die mitfahren soll – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
+      {
+        question: "Wie legen wir den Reisetermin gemeinsam fest?",
+        answer:
+          "Schlage zwei bis vier mögliche Termine vor und lass die Gruppe per Link abstimmen. So siehst du, wann die meisten mitfahren können – und buchst Bus und Unterkunft für den beliebtesten Termin.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "culture-outing",
@@ -1343,8 +1420,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Nein. GASTZILLA ist kein Ticketshop – du sammelst nur die Zusagen. Die Karten besorgst du wie gewohnt beim Kino, Theater oder Veranstalter.",
       },
+      {
+        question: "Wie finden wir einen Termin für den Theater- oder Kinobesuch?",
+        answer:
+          "Trag die möglichen Vorstellungen als Terminvorschläge ein, zum Beispiel zwei Abende mit Uhrzeit. Alle stimmen per Link ab, und du kaufst die Karten für den Termin, an dem die meisten können.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "rehearsal",
@@ -1398,8 +1480,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Ja. Für Konzert oder Vereinsfest tragen sich Musiker und Helfer ein und schreiben dazu, wann sie kommen und was sie mitbringen.",
       },
+      {
+        question: "Wie finden wir einen Probentermin, der allen passt?",
+        answer:
+          "Schlage bis zu vier Probentermine vor. Alle haken an, was passt – fehlt jemand Wichtiges, siehst du es sofort und legst den Termin fest, an dem die Besetzung steht.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "going-out",
@@ -1454,8 +1541,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Nein. GASTZILLA sammelt nur die Zusagen. Reservierung und Buchung erledigst du wie gewohnt beim Restaurant, der Bar, dem Bowlingcenter oder dem Escape-Room-Anbieter – aber mit der richtigen Personenzahl.",
       },
+      {
+        question: "Wie finden wir einen Abend, an dem alle Zeit haben?",
+        answer:
+          "Statt im Chat hin und her zu schreiben, schlägst du ein paar Abende vor und alle haken an, was passt. Für den Favoriten reservierst du dann – mit der richtigen Personenzahl.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "sports-together",
@@ -1513,8 +1605,13 @@ export const OCCASIONS: Occasion[] = [
         answer:
           "Ein Event mit allen Grundfunktionen ist kostenlos. Weitere Events kannst du bald dazukaufen.",
       },
+      {
+        question: "Wie finden wir einen Termin, an dem genug Leute können?",
+        answer:
+          "Schlage zwei bis vier Termine vor und lass alle abstimmen. Du siehst für jeden Termin, wie viele können – und legst den fest, an dem genug Mitspieler zusammenkommen.",
+      },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "tabletop-night",
@@ -1542,6 +1639,10 @@ export const OCCASIONS: Occasion[] = [
       {
         title: "Wünsche und Absprachen",
         text: "Gäste können eine Nachricht hinterlassen – etwa, worauf sie Lust haben oder ob ihr Charakterbogen noch beim Spielleiter liegt.",
+      },
+      {
+        title: "Spieleabend-Termin finden",
+        text: "Für die Pen-&-Paper-Runde muss die ganze Gruppe können. Schlag bis zu vier Abende vor – alle stimmen per Link ab, und der Favorit wird zum festen Termin.",
       },
     ],
     invitationText: [
@@ -1575,7 +1676,7 @@ export const OCCASIONS: Occasion[] = [
           "Ja. Die Spielrunde trägt sich ein, und per Nachricht klärt ihr Charakterbögen, Snacks oder wer später dazukommt.",
       },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
   },
   {
     id: "gaming-night",
@@ -1603,6 +1704,10 @@ export const OCCASIONS: Occasion[] = [
       {
         title: "Wer ist dabei?",
         text: "Die Liste zeigt allen mit dem Link, wer zugesagt hat – so wisst ihr, für welches Spiel genug Leute da sind.",
+      },
+      {
+        title: "Termin für die LAN-Party finden",
+        text: "Schlag mögliche Wochenenden vor und lass alle abstimmen. Wer zustimmt, steht nach dem Festlegen direkt auf der Gästeliste.",
       },
     ],
     invitationText: [
@@ -1636,7 +1741,70 @@ export const OCCASIONS: Occasion[] = [
           "Ja. Alle tragen sich ein, und du siehst vorher, wie viele mitspielen – so planst du Runden und Controller passend.",
       },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-09",
+  },
+  {
+    id: "date-poll",
+    slug: "terminabstimmung",
+    name: "Termin abstimmen",
+    title: "Termin abstimmen und einladen – Terminumfrage per Link",
+    metaTitle: "Termin abstimmen: Terminumfrage & Einladung per Link – GASTZILLA",
+    description:
+      "Gemeinsamen Termin finden: bis zu 4 Vorschläge, Gäste stimmen per Link ohne Konto ab. Termin festlegen und allen per WhatsApp & Co. mitteilen – kostenlos.",
+    teaser: "Noch kein Datum? Gäste stimmen per Link ab, welcher Termin passt – danach sagen sie direkt zu.",
+    intro: [
+      "Bevor man einlädt, muss oft erst ein Termin her: Wann haben die meisten Zeit? Im Gruppenchat endet die Frage nach dem passenden Datum schnell in Dutzenden Nachrichten – und am Ende weiß niemand mehr, wer wann kann.",
+      "Mit GASTZILLA schlägst du zwei bis vier Termine vor – mit oder ohne Uhrzeit – und teilst den Link. Deine Gäste haken an, was ihnen passt, oder wählen „Nichts davon passt“, ganz ohne Konto oder App. Du siehst sofort, welcher Termin vorne liegt, legst ihn mit einem Klick fest, und alle, die abgestimmt haben, stehen direkt als Zu- oder Absage in der Gästeliste. Zum Schluss bekommst du einen fertigen Text, mit dem du allen den Termin per WhatsApp, E-Mail & Co. mitteilst.",
+    ],
+    benefitsTitle: "Darum lohnt sich die Terminabstimmung mit GASTZILLA",
+    benefits: [
+      {
+        title: "Abstimmung und Einladung in einem",
+        text: "Erst den Termin finden, dann zusagen lassen – über denselben Link. Niemand muss sich nach der Abstimmung noch einmal eintragen, und die Terminbestätigung zum Teilen ist schon fertig.",
+      },
+      {
+        title: "Ohne Konto, ohne App",
+        text: "Gäste öffnen den Link, tragen ihren Namen ein und haken die passenden Termine an. Fertig.",
+      },
+      {
+        title: "Der Favorit auf einen Blick",
+        text: "Eine Übersicht zeigt, wer welchen Termin kann. Der Termin mit den meisten Stimmen ist hervorgehoben.",
+      },
+      {
+        title: "Flexibel bleiben",
+        text: "Fehlt ein Termin, fügst du ihn später hinzu – die bisherigen Stimmen bleiben erhalten. Bei jeder Stimme bekommst du eine E-Mail.",
+      },
+    ],
+    invitationText: [
+      "Hallo zusammen,",
+      "ich möchte [Anlass] mit euch feiern – aber wann passt es euch am besten?",
+      "Stimmt bitte bis [Datum] hier ab, welche Termine euch passen: [Link]",
+      "Sobald der Termin feststeht, könnt ihr euch über denselben Link eintragen.",
+      "[Dein Name]",
+    ],
+    faq: [
+      {
+        question: "Wie finde ich einen gemeinsamen Termin?",
+        answer:
+          "Schlage zwei bis vier Termine vor und schick den Link an alle. Jeder hakt an, was passt. Der Termin mit den meisten Stimmen ist hervorgehoben – den legst du fest, und die Abstimmung wird zur Gästeliste.",
+      },
+      {
+        question: "Wie teile ich allen den festgelegten Termin mit?",
+        answer:
+          "Sobald du den Termin festlegst, schlägt GASTZILLA dir einen Text vor: dass ihr euch gemeinsam für diesen Termin entschieden habt, mit Datum, Ort und Link, und der Bitte, die Angaben in der Gästeliste zu vervollständigen. Anrede und Gruß passt du an, dann kopierst du den Text oder teilst ihn direkt per WhatsApp, E-Mail & Co.",
+      },
+      {
+        question: "Muss ich bei den Terminvorschlägen eine Uhrzeit angeben?",
+        answer:
+          "Nein, die Uhrzeit ist optional. Du kannst auch nur Tage vorschlagen und die Uhrzeit ergänzen, sobald der Termin feststeht.",
+      },
+      {
+        question: "Was passiert, wenn ich den Termin festlege?",
+        answer:
+          "Die Abstimmung endet. Wer den Termin angehakt hat, steht als Zusage in der Gästeliste, alle anderen als Absage. Gäste können ihren Eintrag danach wie gewohnt ergänzen, etwa um Begleitpersonen oder Mitbringsel.",
+      },
+    ],
+    updated: "2026-10-09",
   },
 ];
 

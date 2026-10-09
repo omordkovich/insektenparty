@@ -8,6 +8,7 @@ import {
   validateGuestInput,
 } from "@/lib/validation";
 import { Button } from "./Button";
+import { CharCounter } from "./CharCounter";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
@@ -466,6 +467,9 @@ export function GuestModal({
               className="mt-2 w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
             />
           ) : null}
+          {form.bringingSomething ? (
+            <CharCounter length={form.bringingDescription.length} max={BRINGING_DESCRIPTION_MAX_LENGTH} />
+          ) : null}
         </div>
         </fieldset>
 
@@ -506,6 +510,7 @@ export function GuestModal({
               className="mt-2 w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3"
             />
           ) : null}
+          {form.hasMessage ? <CharCounter length={form.message.length} max={MESSAGE_MAX_LENGTH} /> : null}
         </div>
 
         {!isOwner ? (

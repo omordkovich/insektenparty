@@ -178,12 +178,12 @@ body {
   --ring: #c7c7cc;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #1c1c1e;
-  /* Muted graphite instead of the light --leaf/--honey silver, which reads
-     as a glaring pale block on a black page - see --button-primary. */
-  --button-primary: #232325;
-  --button-primary-text: #c7c7cc;
-  --button-secondary: #232325;
-  --button-secondary-text: #c7c7cc;
+  /* Mid graphite: clearly lighter than the black surface (so it never looks
+     disabled) without the glaring pale block of the --leaf silver. */
+  --button-primary: #48484a;
+  --button-primary-text: #ffffff;
+  --button-secondary: #48484a;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -221,10 +221,10 @@ body {
   --ring: #48484a;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
   --on-honey: #ffffff;
-  --button-primary: #e5e5ea;
-  --button-primary-text: #1c1c1e;
-  --button-secondary: #e5e5ea;
-  --button-secondary-text: #1c1c1e;
+  --button-primary: #1c1c1e;
+  --button-primary-text: #ffffff;
+  --button-secondary: #1c1c1e;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -260,10 +260,10 @@ body {
   --ring: #34d399;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #052e1c;
-  --button-primary: #0d5a41;
-  --button-primary-text: #d1fae5;
-  --button-secondary: #0d5a41;
-  --button-secondary-text: #d1fae5;
+  --button-primary: #047857;
+  --button-primary-text: #ffffff;
+  --button-secondary: #047857;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -298,10 +298,10 @@ body {
   --ring: #60a5fa;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
   --on-honey: #041225;
-  --button-primary: #14337a;
-  --button-primary-text: #dbeafe;
-  --button-secondary: #14337a;
-  --button-secondary-text: #dbeafe;
+  --button-primary: #2563eb;
+  --button-primary-text: #ffffff;
+  --button-secondary: #2563eb;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -336,10 +336,10 @@ body {
   --ring: #f87171;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
   --on-honey: #2b0505;
-  --button-primary: #450a0a;
-  --button-primary-text: #fecaca;
-  --button-secondary: #450a0a;
-  --button-secondary-text: #fecaca;
+  --button-primary: #dc2626;
+  --button-primary-text: #ffffff;
+  --button-secondary: #dc2626;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -376,10 +376,10 @@ body {
   --ring: #a16207;
   --shadow: 0 18px 40px rgba(202, 138, 4, 0.25);
   --on-honey: #ffffff;
-  --button-primary: #fde047;
-  --button-primary-text: #713f12;
-  --button-secondary: #fde047;
-  --button-secondary-text: #713f12;
+  --button-primary: #a16207;
+  --button-primary-text: #ffffff;
+  --button-secondary: #a16207;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -414,10 +414,10 @@ body {
   --ring: #fb923c;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
   --on-honey: #431407;
-  --button-primary: #431407;
-  --button-primary-text: #fed7aa;
-  --button-secondary: #431407;
-  --button-secondary-text: #fed7aa;
+  --button-primary: #fb923c;
+  --button-primary-text: #431407;
+  --button-secondary: #fb923c;
+  --button-secondary-text: #431407;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -452,10 +452,10 @@ body {
   --ring: #db2777;
   --shadow: 0 18px 40px rgba(219, 39, 119, 0.18);
   --on-honey: #ffffff;
-  --button-primary: #fbcfe8;
-  --button-primary-text: #831843;
-  --button-secondary: #fbcfe8;
-  --button-secondary-text: #831843;
+  --button-primary: #db2777;
+  --button-primary-text: #ffffff;
+  --button-secondary: #db2777;
+  --button-secondary-text: #ffffff;
 
   min-height: 100dvh;
   background: var(--bg-mid);
@@ -569,4 +569,20 @@ body.modal-open {
 
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
+}
+
+/* Scrollbars follow the theme - thin, in its muted text color - instead of
+   the browser's light default. Dark themes also tell the browser they are
+   dark, so native controls (scrollbars, date and time pickers) match. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted) 60%, transparent) transparent;
+}
+
+.event-theme-schwarz,
+.event-theme-gruen,
+.event-theme-blau,
+.event-theme-rot,
+.event-theme-orange {
+  color-scheme: dark;
 }

@@ -15,7 +15,7 @@ export function GET() {
 
 > ${SITE_DESCRIPTION}
 
-${SITE_NAME} ist ein deutschsprachiger Online-Dienst für digitale Einladungen und Gästelisten. Gastgeber legen in wenigen Minuten eine Einladungsseite an und teilen den Link – die Gäste sagen darüber selbst zu oder ab, ganz ohne Konto oder App. Betrieben von ${LEGAL_INFO.name} aus Köln.
+${SITE_NAME} ist ein deutschsprachiger Online-Dienst für digitale Einladungen und Gästelisten. Gastgeber legen in wenigen Minuten eine Einladungsseite an und teilen den Link – die Gäste sagen darüber selbst zu oder ab, ganz ohne Konto oder App. Steht der Termin noch nicht fest, stellen Gastgeber zwei bis vier Terminvorschläge zur Abstimmung; den gewählten Termin legen sie mit einem Klick fest, die Stimmen werden zu Zu- und Absagen, und ein fertiger, anpassbarer Text teilt allen den Termin per WhatsApp, E-Mail & Co. mit. Betrieben von ${LEGAL_INFO.name} aus Köln.
 
 ## Funktionen
 
@@ -23,7 +23,7 @@ ${FEATURES.map((feature) => `- ${feature}`).join("\n")}
 
 ## Für wen
 
-Privatpersonen, Familien, Vereine und kleine Teams, die eine Feier organisieren und Zusagen nicht mehr im Gruppenchat zählen wollen – z. B. Kindergeburtstag, Geburtstag, Hochzeit, Grillabend, Sommerfest oder Firmenfeier.
+Privatpersonen, Familien, Vereine und kleine Teams, die ein Event organisieren – eine Feier, ein Treffen, einen Ausflug oder einen Spieleabend – und Zusagen nicht mehr im Gruppenchat zählen wollen, z. B. Kindergeburtstag, Geburtstag, Hochzeit, Grillabend, Sommerfest, Firmenfeier, Sport oder Gruppenreise.
 
 ## Preise
 

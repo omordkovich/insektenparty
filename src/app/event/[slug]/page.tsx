@@ -10,6 +10,8 @@ import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
 import { countYes, isDateMode } from "@/lib/date-poll";
 import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
+import type { InvitationBase } from "@/lib/invitation-text";
+import { buildEventShareUrl } from "@/lib/share";
 import { getPollOptions, getPollVotes } from "@/repositories/date-poll-repository";
 import { getEventByAddress } from "@/repositories/event-repository";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
@@ -84,6 +86,17 @@ export default async function EventPage({ params }: EventPageProps) {
     assets: THEME_ASSETS[theme],
   };
 
+  // Owner only: the event facts for the "Termin steht fest" message.
+  const announcement: InvitationBase | null = isOwner
+    ? {
+        title: config.title,
+        location: config.locationLabel,
+        contactName: config.contact.name,
+        url: buildEventShareUrl(slug),
+        password: ownerAccessPassword,
+      }
+    : null;
+
   return (
     <div className="relative flex min-h-dvh flex-col" style={{ isolation: "isolate" }}>
       <Header
@@ -94,7 +107,13 @@ export default async function EventPage({ params }: EventPageProps) {
         }
       />
       <main>
-        <Hero config={config} eventId={event.id} isOwner={isOwner} dateSettings={dateSettings} />
+        <Hero
+          config={config}
+          eventId={event.id}
+          isOwner={isOwner}
+          dateSettings={dateSettings}
+          announcement={announcement}
+        />
         {dateMode === "fixed" ? (
           <GuestSection
             apiBasePath={`/api/events/${event.id}/guests`}
@@ -102,7 +121,7 @@ export default async function EventPage({ params }: EventPageProps) {
             isOwner={isOwner}
           />
         ) : dateMode === "poll" ? (
-          <DatePollSection eventId={event.id} isOwner={isOwner} />
+          <DatePollSection eventId={event.id} isOwner={isOwner} announcement={announcement} />
         ) : (
           <DateUnknownNotice />
         )}

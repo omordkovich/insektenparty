@@ -13,7 +13,10 @@ Stand: 2026-10-06
 - [x] Footer-Links als `<nav>` (Landmark für Screenreader und Crawler)
 - [x] `/sitemap.xml` und `/llms.txt` bleiben auch im Wartungsmodus erreichbar
 - [x] H1, Seitentitel und Vorschaubild: „Online-Einladung & Gästeliste kostenlos erstellen“
-- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 26 Anlässe: Kindergeburtstag, Spielverabredung, Einschulung & Schulstart, Kita- & Schulfeste, Abifeier & Abiball, Geburtstag, Hochzeit, Junggesellenabschied, Babyparty & Gender Reveal, Taufe & Kommunion, Firmenfeier, Grillparty & Gartenfest, Karneval, Oktoberfest, Halloweenparty, Advent & Weihnachtsmarkt, Familienfest & Feiertage, Silvester, Mottoparty, Gruppenreise & Vereinsfahrt, Kultur, Proben & Auftritte, Ausgehen, Sport zusammen, Tabletop & Brettspiele, Gaming & LAN-Party; jede Seite mit Einladungstext-Vorlage zum Kopieren und eigenen, anlass-spezifischen FAQ und Vorteilen (keine Doppelungen) – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
+- [x] Anlass-Seiten: Vorlage `/einladung/<slug>`, Übersicht `/einladung`, Abschnitt „Für jeden Anlass“ auf der Startseite, Sitemap, llms.txt, Schema (WebPage, BreadcrumbList, FAQPage) – 28 Anlässe: Kindergeburtstag, Spielverabredung, Einschulung & Schulstart, Kita- & Schulfeste, Abifeier & Abiball, Geburtstag, Hochzeit, Junggesellenabschied, Babyparty & Gender Reveal, Taufe & Kommunion, Trauerfeier & Beerdigung, Firmenfeier, Grillparty & Gartenfest, Karneval, Oktoberfest, Halloweenparty, Advent & Weihnachtsmarkt, Familienfest & Feiertage, Silvester, Mottoparty, Gruppenreise & Vereinsfahrt, Kultur, Proben & Auftritte, Ausgehen, Sport zusammen, Tabletop & Brettspiele, Gaming & LAN-Party; jede Seite mit Einladungstext-Vorlage zum Kopieren und eigenen, anlass-spezifischen FAQ und Vorteilen (keine Doppelungen) – **neue Anlässe = ein Eintrag in `src/lib/occasions.ts`**
+
+- [x] Terminabstimmung (2026-10-09): eigene Seite `/einladung/terminabstimmung` für „Termin abstimmen“, „Terminumfrage“, „gemeinsamen Termin finden“ (Titel, Beschreibung, FAQ-Schema); Start-FAQ, Funktionsliste, Meta-Beschreibung der Startseite, llms.txt und die Anlass-Seiten JGA, Familienfest, Gruppenreise, Kultur, Proben, Ausgehen, Sport, Tabletop, Gaming, Firmenfeier ergänzt
+- [x] Terminbestätigung zum Teilen (2026-10-09): Start-FAQ, Funktionsliste, Vorteil „Teilen, wo deine Gäste sind“, llms.txt und `/einladung/terminabstimmung` (Beschreibung, Einleitung, Vorteil, neue FAQ „Wie teile ich allen den festgelegten Termin mit?“)
 
 ## Du selbst (Dashboards & Konten)
 
@@ -36,7 +39,8 @@ Stand: 2026-10-06
 - [ ] Seite `/preise`, sobald das Bezahlmodell steht (Stripe ist pausiert)
 - [ ] Nach 2–3 Monaten Search Console: ranken zwei Anlass-Seiten auf dieselben Begriffe → zusammenlegen + Weiterleitung
 - [ ] FAQ der Anlass-Seiten: basieren seit 2026-10-08 auf echten Google-Suchanfragen (Autovervollständigung). Für Kultur, Proben, Advent, Halloween, Sport gab es kaum Daten → nach dem Livegang mit echten Suchanfragen aus der Search Console nachschärfen; jährlich wiederholen
-- [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“
+- [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“ – seit der Terminabstimmung naheliegend; Markennamen dabei nur sachlich vergleichend nennen
+- [ ] Nach dem Livegang in der Search Console beobachten, ob `/einladung/terminabstimmung` für „Termin abstimmen“ / „Terminumfrage“ erscheint; ggf. Titel und FAQ an die echten Suchanfragen anpassen
 
 ## Außerhalb der Seite (für KI-Empfehlungen am wichtigsten)
 

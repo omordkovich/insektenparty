@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   buildInvitationText,
+  DATE_FIXED_WORDING,
   DEFAULT_WORDING,
+  fixedDateFacts,
   type InvitationFacts,
   parseStoredWording,
+  WORDING_MAX_LENGTH,
+  wordingStorageKey,
 } from "@/lib/invitation-text";
 
 const facts: InvitationFacts = {
@@ -118,5 +122,73 @@ describe("invitation text while the date is open", () => {
     const text = buildInvitationText({ ...facts, dateMode: "poll" }, DEFAULT_WORDING);
     expect(text).toContain("Wann: wird abgestimmt – bitte stimmt über den Link ab");
     expect(text).not.toContain("Samstag");
+  });
+});
+
+describe("message after fixing the date", () => {
+  const base = {
+    title: "Sommerfest",
+    location: "Garten",
+    contactName: "Anna",
+    url: "https://gastzilla.de/event/abc123",
+    password: null,
+  };
+
+  it("takes date and time from the chosen proposal", () => {
+    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: "18:00" })).toEqual({
+      ...base,
+      dateMode: "fixed",
+      dateLabel: "Samstag, 11. Juli 2026",
+      timeLabel: "15:00 - 18:00 Uhr",
+    });
+    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: null, endTime: null }).timeLabel).toBe("");
+  });
+
+  it("tells the guests about the date and asks them to complete their entries", () => {
+    const text = buildInvitationText(
+      fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: null }),
+      DATE_FIXED_WORDING,
+    );
+    expect(text).toBe(
+      [
+        "Hallo zusammen,",
+        "nach der Abstimmung haben wir uns gemeinsam für diesen Termin entschieden:",
+        "Sommerfest",
+        "Wann: Samstag, 11. Juli 2026, ab 15:00 Uhr",
+        "Wo: Garten",
+        "Bitte vervollständigt eure Angaben in der Gästeliste – z. B. Ankunftszeit, Begleitung oder Mitbringsel:",
+        "https://gastzilla.de/event/abc123",
+        "Ich freue mich auf euch!",
+        "Anna",
+      ].join("\n"),
+    );
+  });
+
+  it("stores its wording separately and falls back to its own defaults", () => {
+    expect(wordingStorageKey("e1", "dateFixed")).not.toBe(wordingStorageKey("e1"));
+    expect(parseStoredWording(null, DATE_FIXED_WORDING)).toEqual(DATE_FIXED_WORDING);
+    expect(parseStoredWording(JSON.stringify({ greeting: "Moin," }), DATE_FIXED_WORDING)).toEqual({
+      ...DATE_FIXED_WORDING,
+      greeting: "Moin,",
+    });
+  });
+});
+
+describe("wording length", () => {
+  it("cuts stored texts to the allowed length", () => {
+    const long = "x".repeat(1000);
+    const wording = parseStoredWording(JSON.stringify({ greeting: long, intro: long, callToAction: long, closing: long }));
+    expect(wording.greeting).toHaveLength(WORDING_MAX_LENGTH.greeting);
+    expect(wording.intro).toHaveLength(WORDING_MAX_LENGTH.intro);
+    expect(wording.callToAction).toHaveLength(WORDING_MAX_LENGTH.callToAction);
+    expect(wording.closing).toHaveLength(WORDING_MAX_LENGTH.closing);
+  });
+
+  it("leaves room for every default text", () => {
+    for (const defaults of [DEFAULT_WORDING, DATE_FIXED_WORDING]) {
+      for (const key of Object.keys(WORDING_MAX_LENGTH) as (keyof typeof WORDING_MAX_LENGTH)[]) {
+        expect(defaults[key].length).toBeLessThanOrEqual(WORDING_MAX_LENGTH[key]);
+      }
+    }
   });
 });

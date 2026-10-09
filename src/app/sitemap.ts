@@ -7,7 +7,7 @@ import { latestOccasionUpdate, OCCASIONS, OCCASIONS_PATH, occasionPath } from "@
 // Date of the last real content change per page - search engines only
 // trust lastModified while it stays accurate, so bump these by hand when a
 // page's text changes (privacy policy and terms follow their versions).
-const HOME_UPDATED = "2026-10-07";
+const HOME_UPDATED = "2026-10-09";
 const ABOUT_UPDATED = "2026-10-06";
 const LEGAL_UPDATED: Record<LegalDocument, string> = {
   imprint: "2026-09-30",

@@ -56,6 +56,41 @@ export function buildShareLinks({ url, title }: { url: string; title: string }):
   ];
 }
 
+// Sharing a whole message (invitation text, "Termin steht fest") instead of
+// just the link: only platforms that take free text. Telegram adds the link
+// itself from `url`, so it is taken out of the text there.
+export function buildMessageShareLinks({
+  text,
+  url,
+  subject,
+}: {
+  text: string;
+  url: string;
+  subject: string;
+}): ShareLink[] {
+  const withoutLink = text
+    .split("\n")
+    .filter((line) => line.trim() !== url)
+    .join("\n");
+
+  return [
+    { id: "whatsapp", label: "WhatsApp", href: `https://wa.me/?text=${encodeURIComponent(text)}`, newTab: true },
+    {
+      id: "telegram",
+      label: "Telegram",
+      href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(withoutLink)}`,
+      newTab: true,
+    },
+    {
+      id: "email",
+      label: "E-Mail",
+      href: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,
+      newTab: false,
+    },
+    { id: "sms", label: "SMS", href: `sms:?&body=${encodeURIComponent(text)}`, newTab: false },
+  ];
+}
+
 // Clipboard with a fallback for browsers/contexts without the async
 // Clipboard API (older browsers, some in-app webviews). Browser-only.
 export async function copyToClipboard(text: string): Promise<boolean> {

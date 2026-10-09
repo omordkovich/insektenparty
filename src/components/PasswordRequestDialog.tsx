@@ -11,6 +11,7 @@ import {
   type PhoneChannel,
 } from "@/lib/validation";
 import { Button } from "./Button";
+import { CharCounter } from "./CharCounter";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
@@ -255,6 +256,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
               onChange={(event) => setMessage(event.target.value)}
               className={inputClass}
             />
+            <CharCounter length={message.length} max={PASSWORD_REQUEST_MESSAGE_MAX_LENGTH} />
           </div>
 
           <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />

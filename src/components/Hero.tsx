@@ -4,6 +4,7 @@ import { EditableField } from "@/components/EditableField";
 import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
 import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
+import type { InvitationBase } from "@/lib/invitation-text";
 
 type HeroProps = {
   config: EventConfig;
@@ -11,9 +12,11 @@ type HeroProps = {
   isOwner: boolean;
   /** Owner only: shows the pencil at the date that opens the "Termin" window. */
   dateSettings?: DateSettings | null;
+  /** Owner only: for the message to the guests after fixing a poll date. */
+  announcement?: InvitationBase | null;
 };
 
-export function Hero({ config, eventId, isOwner, dateSettings }: HeroProps) {
+export function Hero({ config, eventId, isOwner, dateSettings, announcement }: HeroProps) {
   const dateFixed = config.dateMode === "fixed";
   const hasEventDateTime =
     dateFixed && !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
@@ -42,9 +45,9 @@ export function Hero({ config, eventId, isOwner, dateSettings }: HeroProps) {
             eventId={eventId}
             fieldKey="kicker"
             value={config.kicker}
-            placeholder="z. B. Kindergeburtstag"
+            placeholder="Überschrift"
             isOwner={isOwner}
-            ariaLabel="Kicker bearbeiten"
+            ariaLabel="Überschrift bearbeiten"
             className="text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark"
           />
         </p>
@@ -98,7 +101,9 @@ export function Hero({ config, eventId, isOwner, dateSettings }: HeroProps) {
                     {config.dateMode === "poll" ? "Wird abgestimmt" : "Termin folgt"}
                   </span>
                 )}
-                {dateSettings ? <DateEditButton eventId={eventId} dateSettings={dateSettings} /> : null}
+                {dateSettings && announcement ? (
+                  <DateEditButton eventId={eventId} dateSettings={dateSettings} announcement={announcement} />
+                ) : null}
               </span>
             </dd>
           </div>
@@ -115,7 +120,7 @@ export function Hero({ config, eventId, isOwner, dateSettings }: HeroProps) {
                 eventId={eventId}
                 fieldKey="locationLabel"
                 value={config.locationLabel}
-                placeholder="Adresse oder Ort der Feier"
+                placeholder="Adresse oder Ort des Events"
                 isOwner={isOwner}
                 ariaLabel="Ort bearbeiten"
                 className="font-semibold"

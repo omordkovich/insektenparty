@@ -3,13 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { formatPollOptionLabel, type PollOption, type PollVoteDto } from "@/lib/date-poll";
+import { fixedDateFacts, type InvitationBase, type InvitationFacts } from "@/lib/invitation-text";
 import { Button } from "./Button";
+import { InvitationTextDialog } from "./InvitationTextDialog";
 import { Modal } from "./Modal";
 
 type FixPollOptionDialogProps = {
   eventId: string;
   option: PollOption;
   votes: PollVoteDto[];
+  /** For the "Termin steht fest" message shown right after fixing. */
+  announcement: InvitationBase;
   onCloseAction: () => void;
 };
 
@@ -19,12 +23,20 @@ function count(n: number, one: string, many: string) {
 
 // Owner: "Diesen Termin festlegen" - same as choosing the proposal under
 // "Fester Termin" in the event settings.
-export function FixPollOptionDialog({ eventId, option, votes, onCloseAction }: FixPollOptionDialogProps) {
+export function FixPollOptionDialog({
+  eventId,
+  option,
+  votes,
+  announcement,
+  onCloseAction,
+}: FixPollOptionDialogProps) {
   const router = useRouter();
   const titleId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Set once the date is fixed: the page reloads only when this closes.
+  const [fixedFacts, setFixedFacts] = useState<InvitationFacts | null>(null);
 
   const answers = votes.map((vote) => vote.answers[option.id]);
   const yes = answers.filter((answer) => answer === "yes").length;
@@ -53,13 +65,26 @@ export function FixPollOptionDialog({ eventId, option, votes, onCloseAction }: F
         setError(payload?.error ?? "Der Termin konnte nicht festgelegt werden. Bitte versuche es erneut.");
         return;
       }
-      router.refresh();
-      onCloseAction();
+      setFixedFacts(fixedDateFacts(announcement, option));
     } catch {
       setError("Der Termin konnte nicht festgelegt werden. Bitte versuche es erneut.");
     } finally {
       setSaving(false);
     }
+  }
+
+  if (fixedFacts) {
+    return (
+      <InvitationTextDialog
+        eventId={eventId}
+        facts={fixedFacts}
+        kind="dateFixed"
+        onCloseAction={() => {
+          router.refresh();
+          onCloseAction();
+        }}
+      />
+    );
   }
 
   return (

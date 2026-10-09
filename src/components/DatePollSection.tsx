@@ -10,6 +10,7 @@ import {
   type PollVoteDto,
   type VoteAnswer,
 } from "@/lib/date-poll";
+import type { InvitationBase } from "@/lib/invitation-text";
 import { Button } from "./Button";
 import { DeletePollVoteDialog } from "./DeletePollVoteDialog";
 import { PencilIcon } from "./EditIcons";
@@ -19,10 +20,12 @@ import { PollVoteModal } from "./PollVoteModal";
 type DatePollSectionProps = {
   eventId: string;
   isOwner: boolean;
+  /** Owner only: for the message to the guests after fixing a date. */
+  announcement?: InvitationBase | null;
 };
 
 // Status "Termin abstimmen lassen": instead of the guest list.
-export function DatePollSection({ eventId, isOwner }: DatePollSectionProps) {
+export function DatePollSection({ eventId, isOwner, announcement }: DatePollSectionProps) {
   const apiBasePath = `/api/events/${eventId}/poll-votes`;
   const [poll, setPoll] = useState<PollDto | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -249,12 +252,13 @@ export function DatePollSection({ eventId, isOwner }: DatePollSectionProps) {
           onDeletedAction={load}
         />
       ) : null}
-      {fixOption ? (
+      {fixOption && announcement ? (
         <FixPollOptionDialog
           key={fixOption.id}
           eventId={eventId}
           option={fixOption}
           votes={votes}
+          announcement={announcement}
           onCloseAction={() => setFixOption(null)}
         />
       ) : null}

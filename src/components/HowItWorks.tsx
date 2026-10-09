@@ -3,7 +3,7 @@ import { cardClass } from "./card";
 import { CalendarPlusIcon, ListCheckIcon, ShareIcon } from "./LandingIcons";
 
 const STEPS: { text: string; icon: ReactNode }[] = [
-  { text: "Event anlegen und Design für jeden Anlass aussuchen", icon: <CalendarPlusIcon /> },
+  { text: "Event anlegen, Design aussuchen – Termin festlegen oder abstimmen lassen", icon: <CalendarPlusIcon /> },
   { text: "Einladungslink teilen – der passende Einladungstext ist schon fertig", icon: <ShareIcon /> },
   { text: "Zu- und Absagen jederzeit im Blick – mit Benachrichtigung per E-Mail", icon: <ListCheckIcon /> },
 ];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEventShareUrl, buildShareLinks, buildShareText } from "@/lib/share";
+import { buildEventShareUrl, buildMessageShareLinks, buildShareLinks, buildShareText } from "@/lib/share";
 
 describe("buildEventShareUrl", () => {
   it("appends the event path to the share base URL", () => {
@@ -72,5 +72,30 @@ describe("buildShareLinks", () => {
     expect(byId.whatsapp.newTab).toBe(true);
     expect(byId.email.newTab).toBe(false);
     expect(byId.sms.newTab).toBe(false);
+  });
+});
+
+describe("buildMessageShareLinks", () => {
+  const url = "https://gastzilla.de/event/abc123";
+  const text = ["Hallo zusammen,", "Sommerfest", url, "Bis bald!"].join("\n");
+  const links = buildMessageShareLinks({ text, url, subject: "Einladung: Sommerfest" });
+  const href = (id: string) => links.find((link) => link.id === id)?.href ?? "";
+
+  it("offers the platforms that take a whole message", () => {
+    expect(links.map((link) => link.id)).toEqual(["whatsapp", "telegram", "email", "sms"]);
+  });
+
+  it("puts the complete text into WhatsApp, e-mail and SMS", () => {
+    expect(decodeURIComponent(href("whatsapp").split("text=")[1])).toBe(text);
+    expect(href("email")).toBe(
+      `mailto:?subject=${encodeURIComponent("Einladung: Sommerfest")}&body=${encodeURIComponent(text)}`,
+    );
+    expect(decodeURIComponent(href("sms").split("body=")[1])).toBe(text);
+  });
+
+  it("does not repeat the link in Telegram, which adds it itself", () => {
+    const params = new URL(href("telegram")).searchParams;
+    expect(params.get("url")).toBe(url);
+    expect(params.get("text")).toBe("Hallo zusammen,\nSommerfest\nBis bald!");
   });
 });

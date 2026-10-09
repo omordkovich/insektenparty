@@ -4,26 +4,32 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { todayInBerlin } from "@/lib/date-poll";
 import { buildDateModeRequest, initialDateDraft, type DateSettings } from "@/lib/date-poll-form";
+import { fixedDateFacts, type InvitationBase, type InvitationFacts } from "@/lib/invitation-text";
 import { Button } from "./Button";
 import { DateModeFields } from "./DateModeFields";
+import { InvitationTextDialog } from "./InvitationTextDialog";
 import { Modal } from "./Modal";
 
 type DateSettingsDialogProps = {
   eventId: string;
   original: DateSettings;
+  /** For the "Termin steht fest" message after fixing a poll proposal. */
+  announcement: InvitationBase;
   onCloseAction: () => void;
 };
 
 // Owner's "Termin" window, opened from the pencil at the date: no date yet,
 // a poll or a fixed date. Anything that would delete guests or votes is
 // asked first (the server answers 409 with the counts).
-export function DateSettingsDialog({ eventId, original, onCloseAction }: DateSettingsDialogProps) {
+export function DateSettingsDialog({ eventId, original, announcement, onCloseAction }: DateSettingsDialogProps) {
   const router = useRouter();
   const titleId = useId();
   const [draft, setDraft] = useState(() => initialDateDraft(original));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmLoss, setConfirmLoss] = useState<{ guests: number; votes: number } | null>(null);
+  // Set after fixing a poll proposal: the page reloads only when this closes.
+  const [fixedFacts, setFixedFacts] = useState<InvitationFacts | null>(null);
 
   async function handleSave(confirmed: boolean) {
     if (saving) return;
@@ -57,6 +63,11 @@ export function DateSettingsDialog({ eventId, original, onCloseAction }: DateSet
         }
         return;
       }
+      const request = result.request;
+      if (request.mode === "fixed" && request.fromOptionId) {
+        setFixedFacts(fixedDateFacts(announcement, request));
+        return;
+      }
       // Date, guest list and poll are all server-rendered parts of the page.
       router.refresh();
       onCloseAction();
@@ -65,6 +76,20 @@ export function DateSettingsDialog({ eventId, original, onCloseAction }: DateSet
     } finally {
       setSaving(false);
     }
+  }
+
+  if (fixedFacts) {
+    return (
+      <InvitationTextDialog
+        eventId={eventId}
+        facts={fixedFacts}
+        kind="dateFixed"
+        onCloseAction={() => {
+          router.refresh();
+          onCloseAction();
+        }}
+      />
+    );
   }
 
   return (
