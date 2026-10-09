@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { AuthButtons } from "@/components/AuthButtons";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { cardClass } from "@/components/card";
 import { JsonLd } from "@/components/JsonLd";
 import { LegalLinks } from "@/components/LegalLinks";
+import { OccasionActions } from "@/components/OccasionActions";
+import { OccasionIcon } from "@/components/OccasionIcon";
 import { SiteHeader } from "@/components/SiteHeader";
 import { hubBreadcrumbs, OCCASIONS, OCCASIONS_HUB, OCCASIONS_PATH, occasionPath } from "@/lib/occasions";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -31,7 +32,7 @@ export default function OccasionsPage() {
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{OCCASIONS_HUB.intro}</p>
             <div className="mt-6 flex justify-center">
-              <AuthButtons registerLabel="Kostenlos starten" afterLoginHref="/" />
+              <OccasionActions backHref="/" />
             </div>
           </section>
 
@@ -40,9 +41,14 @@ export default function OccasionsPage() {
               <li key={occasion.id}>
                 <Link
                   href={occasionPath(occasion)}
-                  className={`${cardClass} block h-full transition hover:border-leaf/50`}
+                  className={`${cardClass} group block h-full transition hover:border-leaf/50`}
                 >
-                  <h2 className="font-display text-xl text-leaf-dark">{occasion.name}</h2>
+                  {/* Above the title, so the text keeps the full card width. */}
+                  <OccasionIcon
+                    occasion={occasion}
+                    className="mx-auto h-20 w-20 opacity-40 transition group-hover:opacity-70 sm:h-24 sm:w-24"
+                  />
+                  <h2 className="mt-3 font-display text-xl text-leaf-dark hyphens-auto">{occasion.name}</h2>
                   <p className="mt-2 text-muted">{occasion.teaser}</p>
                   <span className="mt-3 inline-block font-bold text-leaf-dark">Mehr erfahren →</span>
                 </Link>

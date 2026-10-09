@@ -2,14 +2,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { FAQ } from "@/lib/faq";
 import { siteStructuredData } from "@/lib/structured-data";
-import { OCCASIONS, OCCASIONS_PATH } from "@/lib/occasions";
+import { OCCASIONS_PATH } from "@/lib/occasions";
 import { AuthButtons } from "./AuthButtons";
 import { cardClass } from "./card";
 import { FaqSection } from "./FaqSection";
 import { HowItWorks } from "./HowItWorks";
 import { JsonLd } from "./JsonLd";
 import { ClockIcon, GuestIcon, ShareIcon } from "./LandingIcons";
-import { OccasionChips } from "./OccasionChips";
 
 const BENEFITS: { title: string; text: string; icon: ReactNode }[] = [
   {
@@ -29,28 +28,30 @@ const BENEFITS: { title: string; text: string; icon: ReactNode }[] = [
   },
 ];
 
-// Start page for visitors who are not logged in - the content search
-// engines index (logged-in users see their event list instead).
-export function LandingContent() {
+// Start page content - the part search engines index. Logged-in users pass
+// their event list as `hero`, which replaces the intro section at the top.
+export function LandingContent({ hero }: { hero?: ReactNode }) {
   return (
     <div className="w-full max-w-3xl space-y-8">
       <JsonLd data={siteStructuredData()} />
-      <section className="text-center">
-        <h1 className="font-display text-3xl leading-tight text-leaf-dark sm:text-5xl">
-          Online-Einladung &amp; Gästeliste kostenlos erstellen
-        </h1>
-        <p className="mt-4 text-xl font-bold text-amber-700 sm:text-2xl">
-          Schluss mit Zusagen-Chaos im Gruppenchat.
-        </p>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-          Erstelle in wenigen Minuten eine Einladungsseite für Geburtstag, Hochzeit,
-          Grillabend oder Firmenfeier. Teile den Link – deine Gäste sagen selbst zu oder ab.
-          Noch kein Termin? Lass sie einfach abstimmen.
-        </p>
-        <div className="mt-6 flex justify-center">
-          <AuthButtons registerLabel="Kostenlos starten" />
-        </div>
-      </section>
+      {hero ?? (
+        <section className="text-center">
+          <h1 className="font-display text-3xl leading-tight text-leaf-dark sm:text-5xl">
+            Online-Einladung &amp; Gästeliste kostenlos erstellen
+          </h1>
+          <p className="mt-4 text-xl font-bold text-amber-700 sm:text-2xl">
+            Schluss mit Zusagen-Chaos im Gruppenchat.
+          </p>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+            Erstelle in wenigen Minuten eine Einladungsseite für Geburtstag, Hochzeit,
+            Grillabend oder Firmenfeier. Teile den Link – deine Gäste sagen selbst zu oder ab.
+            Noch kein Termin? Lass sie einfach abstimmen.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <AuthButtons registerLabel="Kostenlos starten" />
+          </div>
+        </section>
+      )}
 
       <section aria-labelledby="benefits-title" className={cardClass}>
         <h2 id="benefits-title" className="sr-only">
@@ -67,23 +68,14 @@ export function LandingContent() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <HowItWorks />
-
-      <section aria-labelledby="occasions-title" className={cardClass}>
-        <h2 id="occasions-title" className="text-center font-display text-2xl text-leaf-dark sm:text-3xl">
-          Für jeden Anlass
-        </h2>
-        <div className="mt-6">
-          <OccasionChips occasions={OCCASIONS} />
-        </div>
         <p className="mt-6 text-center text-sm">
           <Link href={OCCASIONS_PATH} className="font-bold text-leaf-dark underline underline-offset-2">
-            Alle Anlässe →
+            Für jeden Anlass →
           </Link>
         </p>
       </section>
+
+      <HowItWorks />
 
       <FaqSection items={FAQ}>
         <p className="mt-6 text-center text-sm text-muted">

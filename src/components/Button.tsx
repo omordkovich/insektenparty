@@ -30,6 +30,11 @@ const sizeClasses: Record<ButtonSize, string> = {
   icon: "min-h-11 min-w-11 rounded-xl",
 };
 
+// Also used to style links (e.g. next/link) like a button.
+export function buttonClassName(variant: ButtonVariant = "primary", size: ButtonSize = "md") {
+  return `inline-flex items-center justify-center transition disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]}`;
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = "primary", size = "md", children, className = "", type = "button", ...rest },
   ref,
@@ -38,7 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       type={type}
-      className={`inline-flex items-center justify-center transition disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`${buttonClassName(variant, size)} ${className}`}
       {...rest}
     >
       {children}

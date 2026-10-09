@@ -46,31 +46,36 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader
+        action={
+          claims ? (
+            <AccountButton
+              email={claims.email ?? ""}
+              name={name}
+              methods={getSignInMethods(claims.app_metadata)}
+            />
+          ) : undefined
+        }
+      />
       <main className="flex min-h-full flex-col items-center px-6 py-16 text-center">
-        {!claims ? (
-          <LandingContent />
-        ) : (
-          <>
-            <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
-              Hi {name ?? claims.email}
-            </h1>
-            <div className="mt-8 w-full">
-              <EventList
-                initialEvents={myEvents}
-                eventLimit={entitlements?.eventLimit ?? 1}
-                unlockedThemes={entitlements?.unlockedThemes ?? []}
-              />
-            </div>
-            <div className="mt-6">
-              <AccountButton
-                email={claims.email ?? ""}
-                name={name}
-                methods={getSignInMethods(claims.app_metadata)}
-              />
-            </div>
-          </>
-        )}
+        <LandingContent
+          hero={
+            claims ? (
+              <section className="flex flex-col items-center">
+                <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
+                  Hi {name ?? claims.email}
+                </h1>
+                <div className="mt-8 w-full">
+                  <EventList
+                    initialEvents={myEvents}
+                    eventLimit={entitlements?.eventLimit ?? 1}
+                    unlockedThemes={entitlements?.unlockedThemes ?? []}
+                  />
+                </div>
+              </section>
+            ) : undefined
+          }
+        />
 
         <LegalLinks className="mt-auto pt-12" />
       </main>

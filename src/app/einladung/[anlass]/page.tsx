@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AuthButtons } from "@/components/AuthButtons";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { cardClass } from "@/components/card";
 import { FaqSection } from "@/components/FaqSection";
@@ -8,7 +7,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { InvitationTemplate } from "@/components/InvitationTemplate";
 import { JsonLd } from "@/components/JsonLd";
 import { LegalLinks } from "@/components/LegalLinks";
-import { OccasionChips } from "@/components/OccasionChips";
+import { OccasionActions } from "@/components/OccasionActions";
 import { SiteHeader } from "@/components/SiteHeader";
 import { getOccasionBySlug, OCCASIONS, occasionBreadcrumbs, occasionPath } from "@/lib/occasions";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -47,8 +46,6 @@ export default async function OccasionPage({ params }: OccasionPageProps) {
   const occasion = getOccasionBySlug(anlass);
   if (!occasion) notFound();
 
-  const otherOccasions = OCCASIONS.filter((other) => other.id !== occasion.id);
-
   return (
     <>
       <SiteHeader />
@@ -67,7 +64,7 @@ export default async function OccasionPage({ params }: OccasionPageProps) {
               ))}
             </div>
             <div className="mt-6 flex justify-center">
-              <AuthButtons registerLabel="Kostenlos starten" afterLoginHref="/" />
+              <OccasionActions />
             </div>
           </section>
 
@@ -93,20 +90,6 @@ export default async function OccasionPage({ params }: OccasionPageProps) {
           <HowItWorks />
 
           <FaqSection items={occasion.faq} />
-
-          {otherOccasions.length > 0 ? (
-            <section aria-labelledby="more-occasions-title" className={cardClass}>
-              <h2
-                id="more-occasions-title"
-                className="text-center font-display text-2xl text-leaf-dark sm:text-3xl"
-              >
-                Weitere Anlässe
-              </h2>
-              <div className="mt-6">
-                <OccasionChips occasions={otherOccasions} />
-              </div>
-            </section>
-          ) : null}
         </div>
 
         <LegalLinks className="mt-auto pt-12" />

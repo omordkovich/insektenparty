@@ -33,7 +33,7 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
 
   return (
     <>
-      <section className="mx-auto w-full max-w-xl">
+      <section className="w-full">
         <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
           <h2 className="text-center font-display text-3xl text-leaf-dark sm:text-4xl">
             Meine Events

@@ -6,6 +6,7 @@ import {
   OCCASIONS,
   OCCASIONS_HUB,
   occasionBreadcrumbs,
+  occasionIconPath,
   occasionPath,
 } from "@/lib/occasions";
 
@@ -112,5 +113,16 @@ describe("latestOccasionUpdate", () => {
   it("is the newest updated date of all occasions", () => {
     const newest = OCCASIONS.map((o) => o.updated).sort().at(-1);
     expect(latestOccasionUpdate()).toBe(newest);
+  });
+});
+
+describe("occasionIconPath", () => {
+  it("points every occasion at its versioned icon on Cloudinary", () => {
+    for (const occasion of OCCASIONS) {
+      const url = occasionIconPath(occasion);
+      const [version, file] = url.replace("https://res.cloudinary.com/d6sufegz/image/upload/", "").split("/");
+      expect(version, `Icon-Version für ${occasion.id} fehlt`).toMatch(/^v\d+$/);
+      expect(file).toBe(`${occasion.id}.webp`);
+    }
   });
 });

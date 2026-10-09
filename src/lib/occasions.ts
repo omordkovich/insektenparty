@@ -1,3 +1,4 @@
+import { occasionIconUrl } from "@/lib/occasion-icons";
 import type { FaqItem } from "@/lib/faq";
 
 // Info pages per occasion (/einladung/<slug>) - for search engines and AI
@@ -1810,6 +1811,12 @@ export const OCCASIONS: Occasion[] = [
 
 export function occasionPath(occasion: Occasion): string {
   return `${OCCASIONS_PATH}/${occasion.slug}`;
+}
+
+// Monoline icon per occasion, hosted on Cloudinary (see occasion-icons.ts).
+// Named after the id, so it survives slug or language changes.
+export function occasionIconPath(occasion: Occasion): string {
+  return occasionIconUrl(occasion.id);
 }
 
 export function getOccasionBySlug(slug: string): Occasion | undefined {

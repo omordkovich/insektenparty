@@ -516,6 +516,17 @@ body.modal-open {
   background-color: var(--leaf-dark);
 }
 
+/* Occasion icons (OccasionIcon): the PNG only provides the shape. */
+.occasion-icon {
+  background-color: var(--leaf);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
 .floating-accent {
   position: absolute;
   pointer-events: none;
