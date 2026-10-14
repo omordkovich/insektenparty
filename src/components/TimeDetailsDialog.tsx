@@ -18,11 +18,9 @@ export function TimeDetailsDialog({ guest, onCloseAction }: TimeDetailsDialogPro
       </h2>
 
       <dl className="mt-4 space-y-3">
-        {guest.arrivalTime ? (
-          <TimeRow icon={<DoorInIcon />} label="Ankunftszeit">
-            {formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)}
-          </TimeRow>
-        ) : null}
+        <TimeRow icon={<DoorInIcon />} label="Ankunftszeit">
+          {guest.arrivalTime ? formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime) : "noch offen"}
+        </TimeRow>
         {guest.departureTime ? (
           <TimeRow icon={<DoorOutIcon />} label="Bleibt bis">
             {formatTimeWindow(guest.departureTime, guest.departureEndTime)}

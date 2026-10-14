@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { capacityLabel, occupiedSeats, seatsOf } from "@/lib/guest-capacity";
 import { isIdle, shouldPoll } from "@/lib/polling";
 import type { GuestDto } from "@/lib/types";
 import { AdditionalGuestsDialog } from "./AdditionalGuestsDialog";
@@ -52,14 +53,20 @@ type GuestSectionProps = {
   apiBasePath: string;
   defaultArrivalTime?: string;
   isOwner?: boolean;
+  /** "Teilnehmerzahl begrenzen": max. people incl. companions; null = no limit. */
+  maxGuests?: number | null;
 };
 
 export function GuestSection({
   apiBasePath,
   defaultArrivalTime = "09:00",
   isOwner = false,
+  maxGuests = null,
 }: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);
+  // Seats taken right now - for the "Noch 4 von 12 Plätzen frei" line and
+  // the guest form.
+  const occupied = occupiedSeats(guests);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(closedModal);
@@ -200,6 +207,7 @@ export function GuestSection({
         onShowMessage={setMessageGuest}
         onShowTime={setTimeGuest}
         onShowDeclined={setDeclinedGuest}
+        capacityText={maxGuests !== null && !loading ? capacityLabel(maxGuests, occupied) : null}
       />
 
       {modal.isOpen ? (
@@ -214,6 +222,15 @@ export function GuestSection({
           apiBasePath={apiBasePath}
           defaultArrivalTime={defaultArrivalTime}
           isOwner={isOwner}
+          capacity={
+            maxGuests !== null
+              ? {
+                  max: maxGuests,
+                  own: modal.mode === "edit" && modal.selectedGuest ? seatsOf(modal.selectedGuest) : 0,
+                  occupied,
+                }
+              : null
+          }
           onClose={closeModal}
           onSaved={loadGuests}
         />

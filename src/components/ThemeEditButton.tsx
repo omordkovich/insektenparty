@@ -11,6 +11,7 @@ type ThemeEditButtonProps = {
   theme: ThemeKey;
   unlockedThemes: ThemeKey[];
   accessPassword: string | null;
+  maxGuests: number | null;
   className?: string;
 };
 
@@ -20,6 +21,7 @@ export function ThemeEditButton({
   theme,
   unlockedThemes,
   accessPassword,
+  maxGuests,
   className = "",
 }: ThemeEditButtonProps) {
   const [open, setOpen] = useState(false);
@@ -38,7 +40,7 @@ export function ThemeEditButton({
       {open ? (
         <EventDialog
           mode="settings"
-          event={{ id: eventId, theme, accessPassword }}
+          event={{ id: eventId, theme, accessPassword, maxGuests }}
           unlockedThemes={unlockedThemes}
           onCloseAction={() => setOpen(false)}
         />

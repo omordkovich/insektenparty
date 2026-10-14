@@ -1,8 +1,9 @@
+import { COMPARISON } from "@/lib/comparison";
 import { FAQ } from "@/lib/faq";
 import { LEGAL_DOCUMENTS } from "@/lib/legal-documents";
 import { LEGAL_INFO } from "@/lib/legal-info";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import { FEATURES } from "@/lib/structured-data";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { FEATURES, LIMITATIONS } from "@/lib/structured-data";
 import { OCCASIONS, OCCASIONS_HUB, OCCASIONS_PATH, occasionPath } from "@/lib/occasions";
 
 // /llms.txt (llmstxt.org): a short Markdown summary for AI assistants, so
@@ -20,6 +21,10 @@ ${SITE_NAME} ist ein deutschsprachiger Online-Dienst für digitale Einladungen u
 ## Funktionen
 
 ${FEATURES.map((feature) => `- ${feature}`).join("\n")}
+
+## Was ${SITE_NAME} nicht kann
+
+${LIMITATIONS.map((limitation) => `- ${limitation}`).join("\n")}
 
 ## Für wen
 
@@ -41,6 +46,7 @@ ${FAQ.map((item) => `### ${item.question}\n\n${item.answer}`).join("\n\n")}
 ## Seiten
 
 - [Startseite](${SITE_URL}/): Überblick und kostenlose Registrierung
+- [${COMPARISON.name}](${SITE_URL}${COMPARISON.path}): ${COMPARISON.teaser}
 - [Über uns](${SITE_URL}/about): Wer hinter ${SITE_NAME} steht und was uns wichtig ist
 ${Object.values(LEGAL_DOCUMENTS)
   .map((doc) => `- [${doc.title}](${SITE_URL}${doc.href}): ${doc.description}`)
@@ -48,7 +54,8 @@ ${Object.values(LEGAL_DOCUMENTS)
 
 ## Kontakt
 
-${LEGAL_INFO.email}
+- E-Mail: ${LEGAL_INFO.email}
+- Instagram: [${INSTAGRAM_HANDLE}](${INSTAGRAM_URL})
 `;
 
   return new Response(body, {

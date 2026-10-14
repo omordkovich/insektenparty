@@ -94,7 +94,11 @@ export function GuestItem({
             </button>
           </td>
           <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
-            {guest.arrivalTime ? formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime) : null}
+            {guest.arrivalTime ? (
+              formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)
+            ) : (
+              <span className="font-sans text-sm font-normal tracking-normal text-muted">noch offen</span>
+            )}
           </td>
           <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
             {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}

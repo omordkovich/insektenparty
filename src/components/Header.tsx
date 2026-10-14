@@ -13,6 +13,7 @@ type HeaderProps = {
     theme: ThemeKey;
     unlockedThemes: ThemeKey[];
     accessPassword: string | null;
+    maxGuests: number | null;
   };
 };
 
@@ -74,6 +75,7 @@ export function Header({ config, logoHref, themeEdit }: HeaderProps) {
             theme={themeEdit.theme}
             unlockedThemes={themeEdit.unlockedThemes}
             accessPassword={themeEdit.accessPassword}
+            maxGuests={themeEdit.maxGuests}
             className="absolute bottom-2 left-full ml-3"
           />
         ) : null}

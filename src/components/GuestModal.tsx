@@ -1,4 +1,5 @@
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import { seatsLeftError, seatsOf } from "@/lib/guest-capacity";
 import type { GuestDto } from "@/lib/types";
 import {
   BRINGING_DESCRIPTION_MAX_LENGTH,
@@ -21,6 +22,8 @@ type GuestModalProps = {
   apiBasePath: string;
   defaultArrivalTime?: string;
   isOwner?: boolean;
+  /** Seat limit: max. people, seats taken (all entries) and this entry's own. */
+  capacity?: { max: number; occupied: number; own: number } | null;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
 };
@@ -31,6 +34,8 @@ type FormState = {
   additionalGuestNames: string[];
   arrivalTime: string;
   arrivalEndTime: string;
+  /** "Weiß ich noch nicht": the arrival fields are greyed out and not saved. */
+  arrivalUnknown: boolean;
   departureTime: string;
   departureEndTime: string;
   bringingSomething: boolean;
@@ -53,6 +58,8 @@ function getInitialForm(
       // A declined guest has no arrival time; un-declining starts from the default.
       arrivalTime: guest.arrivalTime ?? defaultArrivalTime,
       arrivalEndTime: guest.arrivalEndTime ?? "",
+      // An acceptance without a time was saved with "Weiß ich noch nicht".
+      arrivalUnknown: !guest.declined && guest.arrivalTime === null,
       departureTime: guest.departureTime ?? "",
       departureEndTime: guest.departureEndTime ?? "",
       bringingSomething: guest.bringingSomething,
@@ -69,6 +76,7 @@ function getInitialForm(
     additionalGuestNames: [],
     arrivalTime: defaultArrivalTime,
     arrivalEndTime: "",
+    arrivalUnknown: false,
     departureTime: "",
     departureEndTime: "",
     bringingSomething: false,
@@ -113,6 +121,7 @@ export function GuestModal({
   apiBasePath,
   defaultArrivalTime = "09:00",
   isOwner = false,
+  capacity = null,
   onClose,
   onSaved,
 }: GuestModalProps) {
@@ -127,8 +136,15 @@ export function GuestModal({
   const declinedId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const initialForm = getInitialForm(mode, guest, defaultArrivalTime);
+  // Seats this entry may take: what is free plus what it already holds.
+  const freeSeats = capacity ? capacity.max - capacity.occupied + capacity.own : null;
+  // Sold out: entries without a seat (new or a decline) can only decline or
+  // leave a message - the owner too. Whoever already has seats keeps them.
+  const soldOut = capacity !== null && capacity.own === 0 && freeSeats !== null && freeSeats <= 0;
 
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [form, setForm] = useState<FormState>(
+    soldOut ? { ...initialForm, declined: true } : initialForm,
+  );
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -156,6 +172,7 @@ export function GuestModal({
       additionalGuestNames: form.additionalGuestNames,
       arrivalTime: form.arrivalTime,
       arrivalEndTime: form.arrivalEndTime,
+      arrivalUnknown: form.arrivalUnknown,
       departureTime: form.departureTime,
       departureEndTime: form.departureEndTime,
       bringingSomething: form.bringingSomething,
@@ -167,6 +184,14 @@ export function GuestModal({
 
     if (!validation.ok) {
       setFieldError(validation.error);
+      return;
+    }
+
+    // Same rule as the server (lib/guest-capacity): more seats than before
+    // need free ones.
+    const seats = seatsOf(validation.data);
+    if (capacity && freeSeats !== null && seats > capacity.own && seats > freeSeats) {
+      setFieldError(seatsLeftError(freeSeats));
       return;
     }
 
@@ -265,7 +290,7 @@ export function GuestModal({
             name="declined"
             type="checkbox"
             checked={form.declined}
-            disabled={saving}
+            disabled={saving || soldOut}
             onChange={(event) =>
               setForm((current) => ({ ...current, declined: event.target.checked }))
             }
@@ -273,6 +298,13 @@ export function GuestModal({
           />
           Ich sage ab
         </label>
+        {soldOut ? (
+          <p className="-mt-2 text-sm text-muted" role="status">
+            {isOwner
+              ? "Das Event ist ausgebucht. Für weitere Zusagen erhöhe die Teilnehmerzahl in den Event-Einstellungen (Zahnrad)."
+              : "Das Event ist ausgebucht – du kannst nur absagen oder eine Nachricht hinterlassen."}
+          </p>
+        ) : null}
 
         {/* A declined guest doesn't come: times, extra people and "Ich bringe
             was mit" are greyed out (their values are kept for un-declining,
@@ -353,7 +385,24 @@ export function GuestModal({
 
           <fieldset>
             <legend className="mb-1 block text-sm font-bold">Ankunftszeit</legend>
-            <div className="flex gap-2">
+            <label className="mb-2 flex items-center gap-2 text-sm">
+              <input
+                name="arrivalUnknown"
+                type="checkbox"
+                checked={form.arrivalUnknown}
+                disabled={saving}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, arrivalUnknown: event.target.checked }))
+                }
+                className="h-5 w-5 rounded border-leaf/40"
+              />
+              Weiß ich noch nicht
+            </label>
+            {/* Greyed out while the arrival is unknown; the times are kept for
+                unticking, but not saved. */}
+            <div
+              className={`flex gap-2 transition-opacity ${form.arrivalUnknown ? "opacity-40" : ""}`}
+            >
               <label className="flex flex-1 items-center gap-2 text-sm">
                 <span className="shrink-0">von</span>
                 <input
@@ -361,7 +410,7 @@ export function GuestModal({
                   name="arrivalTime"
                   type="time"
                   value={form.arrivalTime}
-                  disabled={saving}
+                  disabled={saving || form.arrivalUnknown}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
@@ -377,7 +426,7 @@ export function GuestModal({
                   name="arrivalEndTime"
                   type="time"
                   value={form.arrivalEndTime}
-                  disabled={saving}
+                  disabled={saving || form.arrivalUnknown}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
@@ -388,7 +437,7 @@ export function GuestModal({
                 />
               </label>
             </div>
-            <p className="mt-1 text-xs text-muted">„bis“ ist optional.</p>
+            <p className="mt-1 text-xs text-muted">Optional – auch „bis“ kannst du leer lassen.</p>
         </fieldset>
 
         <fieldset>

@@ -17,6 +17,7 @@ import {
   validateFixedDate,
   validatePollVote,
   validateProposals,
+  validateMaxGuests,
 } from "@/lib/validation";
 
 const validGuest = {
@@ -103,10 +104,33 @@ describe("validateGuestInput", () => {
     );
   });
 
-  it("checks the arrival time", () => {
-    expect(guestError({ arrivalTime: undefined })).toBe("Ankunftszeit ist erforderlich.");
-    expect(guestError({ arrivalTime: " " })).toBe("Ankunftszeit ist erforderlich.");
+  it("checks the arrival time, which is optional", () => {
+    const missing = validateGuestInput({ ...validGuest, arrivalTime: undefined });
+    expect(missing.ok && missing.data.arrivalTime).toBeNull();
+    const empty = validateGuestInput({ ...validGuest, arrivalTime: " " });
+    expect(empty.ok && empty.data.arrivalTime).toBeNull();
     expect(guestError({ arrivalTime: "25:00" })).toBe("Ankunftszeit muss im Format HH:mm angegeben werden.");
+    expect(guestError({ arrivalTime: "", arrivalEndTime: "10:30" })).toBe(
+      "Bitte gib bei der Ankunftszeit zuerst die „von“-Zeit an.",
+    );
+  });
+
+  it("accepts an unknown arrival time and ignores the greyed-out fields", () => {
+    const result = validateGuestInput({
+      ...validGuest,
+      arrivalUnknown: true,
+      arrivalTime: "",
+      arrivalEndTime: "kaputt",
+    });
+    expect(result.ok && [result.data.arrivalTime, result.data.arrivalEndTime, result.data.declined]).toEqual([
+      null,
+      null,
+      false,
+    ]);
+    // Only an explicit true counts.
+    expect(guestError({ arrivalUnknown: "true", arrivalTime: "25:00" })).toBe(
+      "Ankunftszeit muss im Format HH:mm angegeben werden.",
+    );
   });
 
   it("accepts an optional end of the arrival window", () => {
@@ -628,5 +652,20 @@ describe("validatePollVote", () => {
       ok: false,
       error: "Name muss mindestens 2 Zeichen lang sein.",
     });
+  });
+});
+
+describe("validateMaxGuests", () => {
+  it("accepts 1 to 300 people, null removes the limit", () => {
+    expect(validateMaxGuests(12)).toEqual({ ok: true, value: 12 });
+    expect(validateMaxGuests("12")).toEqual({ ok: true, value: 12 });
+    expect(validateMaxGuests(null)).toEqual({ ok: true, value: null });
+  });
+
+  it("rejects everything else", () => {
+    const error = "Die Teilnehmerzahl muss eine ganze Zahl zwischen 1 und 300 sein.";
+    for (const value of [0, 301, 2.5, "", "zwölf", -3]) {
+      expect(validateMaxGuests(value)).toEqual({ ok: false, error });
+    }
   });
 });

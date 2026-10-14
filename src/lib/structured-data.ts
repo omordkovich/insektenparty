@@ -1,6 +1,7 @@
+import { COMPARISON, comparisonBreadcrumbs } from "@/lib/comparison";
 import { FAQ, type FaqItem } from "@/lib/faq";
 import { LEGAL_INFO } from "@/lib/legal-info";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { INSTAGRAM_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   type Breadcrumb,
   hubBreadcrumbs,
@@ -22,10 +23,22 @@ export const FEATURES = [
   "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail bei jeder Zu- und Absage",
   "Optionaler Passwortschutz für Event-Seite und Gästeliste – Gäste können das Passwort beim Gastgeber anfragen",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
-  "Designs für verschiedene Anlässe",
+  "Acht Farbdesigns kostenlos (Weiß, Schwarz, Grün, Blau, Rot, Pink, Orange, Gelb), Premium-Designs Natur und Ballons bald zum Dazukaufen",
   "Fertiger Einladungstext und Terminbestätigung mit Datum, Ort und Link – anpassbar, mit einem Klick kopierbar oder per WhatsApp, E-Mail & Co. teilbar",
   "Termin in den eigenen Kalender übernehmen",
   "Werbefrei, ohne Tracking-Cookies, Server in der EU",
+];
+
+// What GASTZILLA deliberately does not do - stated openly on /vergleich and
+// in llms.txt, so AI assistants don't recommend it for the wrong job.
+export const LIMITATIONS = [
+  "Keine Tickets, kein Bezahlen und keine Kostenteilung – GASTZILLA sammelt nur Zu- und Absagen",
+  "Keine Tisch- oder Platzreservierung und kein Sitzplan",
+  "Keine automatischen Erinnerungen an Gäste – Neuigkeiten teilst du selbst per Link",
+  "Keine wiederkehrenden Termine – jedes Treffen ist ein eigenes Event",
+  "Keine Obergrenze für Zusagen – volle Plätze werden nicht automatisch gesperrt",
+  "Keine Team-Konten – ein Event verwaltet, wer es angelegt hat",
+  "Keine Designs für bestimmte Anlässe wie Halloween oder Karneval – zur Wahl stehen Farbdesigns",
 ];
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
@@ -58,6 +71,21 @@ function breadcrumbList(items: Breadcrumb[], id: string) {
   };
 }
 
+// Who runs GASTZILLA - on the start page and "Über uns".
+function organization() {
+  return {
+    "@type": "Organization",
+    "@id": ORGANIZATION_ID,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.png`, width: 512, height: 512 },
+    email: LEGAL_INFO.email,
+    founder: { "@type": "Person", name: LEGAL_INFO.name },
+    address: { "@type": "PostalAddress", addressLocality: "Köln", addressCountry: "DE" },
+    sameAs: [INSTAGRAM_URL],
+  };
+}
+
 // schema.org description of the site for the start page: who runs it
 // (Organization), the site itself (WebSite), the app (WebApplication) and
 // the visible FAQ (FAQPage), linked to each other via @id.
@@ -65,16 +93,7 @@ export function siteStructuredData() {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": ORGANIZATION_ID,
-        name: SITE_NAME,
-        url: SITE_URL,
-        logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.png`, width: 512, height: 512 },
-        email: LEGAL_INFO.email,
-        founder: { "@type": "Person", name: LEGAL_INFO.name },
-        address: { "@type": "PostalAddress", addressLocality: "Köln", addressCountry: "DE" },
-      },
+      organization(),
       {
         "@type": "WebSite",
         "@id": WEBSITE_ID,
@@ -154,6 +173,51 @@ export function occasionsHubStructuredData() {
         },
       },
       breadcrumbList(hubBreadcrumbs(), `${url}#breadcrumb`),
+    ],
+  };
+}
+
+// The comparison page (/vergleich): the page, its breadcrumb and its FAQ.
+export function comparisonStructuredData() {
+  const url = `${SITE_URL}${COMPARISON.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: COMPARISON.metaTitle,
+        description: COMPARISON.description,
+        inLanguage: "de",
+        dateModified: COMPARISON.updated,
+        isPartOf: { "@id": WEBSITE_ID },
+        about: { "@id": APP_ID },
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+      },
+      breadcrumbList(comparisonBreadcrumbs(), `${url}#breadcrumb`),
+      faqPage(COMPARISON.faq, `${url}#faq`),
+    ],
+  };
+}
+
+// "Über uns" (/about): an AboutPage whose subject is the organization.
+export function aboutStructuredData({ updated }: { updated: string }) {
+  const url = `${SITE_URL}/about`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: `Über uns – ${SITE_NAME}`,
+        inLanguage: "de",
+        dateModified: updated,
+        isPartOf: { "@id": WEBSITE_ID },
+        mainEntity: { "@id": ORGANIZATION_ID },
+      },
+      organization(),
     ],
   };
 }

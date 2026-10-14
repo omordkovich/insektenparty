@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
+import { COMPARISON } from "@/lib/comparison";
 import { latestOccasionUpdate, OCCASIONS } from "@/lib/occasions";
 
 describe("sitemap", () => {
@@ -15,6 +16,10 @@ describe("sitemap", () => {
       const entry = byUrl.get(`https://gastzilla.de/einladung/${occasion.slug}`);
       expect(entry?.lastModified).toBe(occasion.updated);
     }
+  });
+
+  it("lists the comparison page with its date", () => {
+    expect(byUrl.get("https://gastzilla.de/vergleich")?.lastModified).toBe(COMPARISON.updated);
   });
 
   it("never lists event pages", () => {

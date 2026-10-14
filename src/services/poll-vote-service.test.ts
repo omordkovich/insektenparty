@@ -6,6 +6,7 @@ vi.mock("@/repositories/date-poll-repository", () => ({
   getEventDateMode: vi.fn(async () => "poll"),
   getPollOptions: vi.fn(),
   getPollVotes: vi.fn(async () => []),
+  countPollVotes: vi.fn(async () => 0),
   insertPollVote: vi.fn(async (_eventId: string, input: { name: string; optionIds: string[]; noneFit: boolean }) => ({
     id: "v1",
     updatedAt: "2026-06-02T10:00:00.000Z",
@@ -49,6 +50,15 @@ describe("poll votes", () => {
     await service.createPollVoteForEvent("event-1", { name: "Anna", noneFit: true }, "owner-1");
     expect(verifyRecaptchaToken).not.toHaveBeenCalled();
     expect(notifications.notifyOwnerOfPollVote).not.toHaveBeenCalled();
+  });
+
+  it("refuses more than 300 votes", async () => {
+    vi.mocked(repo.countPollVotes).mockResolvedValueOnce(300);
+    expect(await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] })).toEqual({
+      ok: false,
+      status: 409,
+      error: "Die Abstimmung ist voll.",
+    });
   });
 
   it("refuses votes once the poll is over", async () => {

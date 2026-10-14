@@ -1,4 +1,5 @@
 import { MIN_REGISTRATION_AGE } from "@/lib/legal-info";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/site";
 import {
   EmailLink,
   ExternalLink,
@@ -337,7 +338,63 @@ export function PrivacyPolicyContent() {
         </p>
       </Section>
 
-      <Section title="13. Zahlungen über Stripe">
+      <Section title="13. Unser Auftritt auf Instagram">
+        <p>
+          Wir betreiben ein Profil auf Instagram ({INSTAGRAM_HANDLE}). Anbieter
+          ist die Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04
+          X2K5, Irland („Meta“).
+        </p>
+        <p>
+          Auf GASTZILLA verlinken wir dieses Profil nur mit einem einfachen
+          Link. Beim Aufruf unserer Seiten werden dadurch keine Daten an
+          Instagram übertragen und keine Inhalte von Instagram geladen. Erst
+          wenn du den Link anklickst, wirst du zu Instagram weitergeleitet; dort
+          gelten die Datenschutzbestimmungen von Meta.
+        </p>
+        <p>
+          Wenn du unser Profil besuchst oder mit uns interagierst (z. B.
+          folgen, liken, kommentieren, Direktnachrichten), verarbeitet Meta
+          personenbezogene Daten – u. a. IP-Adresse, Geräte- und
+          Browserinformationen sowie dein Nutzungsverhalten – und setzt dazu
+          Cookies oder ähnliche Technologien ein, teilweise auch dann, wenn du
+          kein Instagram-Konto hast oder nicht eingeloggt bist. Eine
+          Übermittlung in die USA an die Meta Platforms, Inc. ist möglich; Meta
+          ist unter dem EU-US Data Privacy Framework zertifiziert.
+        </p>
+        <SubHeading>Gemeinsame Verantwortlichkeit</SubHeading>
+        <p>
+          Meta erstellt aus diesen Daten Statistiken über die Nutzung unseres
+          Profils („Insights“), die wir in anonymisierter Form einsehen
+          können. Für diese Verarbeitung sind wir und Meta gemeinsam
+          verantwortlich (Art. 26 DSGVO). Meta hat sich in einer Vereinbarung
+          verpflichtet, die Hauptverantwortung dafür zu übernehmen, dich über
+          die Verarbeitung zu informieren und deine Rechte zu erfüllen:{" "}
+          <ExternalLink href="https://www.facebook.com/legal/terms/page_controller_addendum" />
+          . Auf einzelne Nutzerprofile oder die Rohdaten haben wir keinen
+          Zugriff.
+        </p>
+        <p>
+          Inhalte, die du uns selbst schickst – etwa Kommentare oder
+          Direktnachrichten –, verarbeiten wir, um dir zu antworten.
+        </p>
+        <p>
+          Rechtsgrundlage ist unser berechtigtes Interesse, GASTZILLA bekannt
+          zu machen und mit Interessierten zu kommunizieren (Art. 6 Abs. 1 lit.
+          f DSGVO); geht es in deiner Nachricht um die Nutzung von GASTZILLA,
+          auch Art. 6 Abs. 1 lit. b DSGVO. Deine Rechte (Abschnitt 16) kannst
+          du sowohl bei uns als auch bei Meta geltend machen; Anfragen, die nur
+          Meta erfüllen kann, leiten wir an Meta weiter.
+        </p>
+        <p>
+          Unser Profil:{" "}
+          <ExternalLink href={INSTAGRAM_URL} />
+          <br />
+          Datenschutzrichtlinie von Instagram:{" "}
+          <ExternalLink href="https://privacycenter.instagram.com/policy" />
+        </p>
+      </Section>
+
+      <Section title="14. Zahlungen über Stripe">
         <p>
           Für kostenpflichtige Erweiterungen wickeln wir Zahlungen über Stripe
           ab. Anbieter ist die Stripe Payments Europe, Ltd., 1 Grand Canal
@@ -365,7 +422,7 @@ export function PrivacyPolicyContent() {
         </p>
       </Section>
 
-      <Section title="14. Speicherdauer">
+      <Section title="15. Speicherdauer">
         <List>
           <li>
             <strong>Benutzerkonto:</strong> bis zur Löschung deines Kontos.
@@ -397,7 +454,7 @@ export function PrivacyPolicyContent() {
         </p>
       </Section>
 
-      <Section title="15. Deine Rechte">
+      <Section title="16. Deine Rechte">
         <p>Du hast gegenüber uns folgende Rechte hinsichtlich deiner Daten:</p>
         <List>
           <li>Auskunft (Art. 15 DSGVO)</li>
@@ -429,7 +486,7 @@ export function PrivacyPolicyContent() {
         </p>
       </Section>
 
-      <Section title="16. Pflicht zur Bereitstellung, automatisierte Entscheidungen">
+      <Section title="17. Pflicht zur Bereitstellung, automatisierte Entscheidungen">
         <p>
           Die Bereitstellung deiner Daten ist weder gesetzlich noch vertraglich
           vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben
@@ -439,7 +496,7 @@ export function PrivacyPolicyContent() {
         </p>
       </Section>
 
-      <Section title="17. Änderungen">
+      <Section title="18. Änderungen">
         <p>
           Wir passen diese Datenschutzerklärung an, wenn sich unsere Leistungen
           oder die Rechtslage ändern. Es gilt die jeweils hier veröffentlichte

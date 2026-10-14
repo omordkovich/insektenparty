@@ -59,6 +59,14 @@ export async function getPollVotes(eventId: string): Promise<PollVote[]> {
   return rows.map(toVote);
 }
 
+export async function countPollVotes(eventId: string): Promise<number> {
+  const [row] = await getDb()
+    .select({ value: count() })
+    .from(datePollVotes)
+    .where(eq(datePollVotes.eventId, eventId));
+  return row?.value ?? 0;
+}
+
 export async function countGuests(eventId: string): Promise<number> {
   const [row] = await getDb().select({ value: count() }).from(guests).where(eq(guests.eventId, eventId));
   return row?.value ?? 0;

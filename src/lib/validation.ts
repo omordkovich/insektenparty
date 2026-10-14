@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { proposalSchedule, type Proposal } from "@/lib/date-poll";
+import { MAX_GUEST_CAPACITY } from "@/lib/guest-capacity";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 
 // All input validation, shared by the forms (browser) and the API routes
@@ -133,12 +134,6 @@ const additionalGuestsSchema = z
       .max(MAX_ADDITIONAL_GUESTS, `Zusätzliche Personen dürfen höchstens ${MAX_ADDITIONAL_GUESTS} sein.`),
   );
 
-const arrivalTimeSchema = z
-  .string({ error: "Ankunftszeit ist erforderlich." })
-  .trim()
-  .min(1, "Ankunftszeit ist erforderlich.")
-  .regex(ARRIVAL_TIME_PATTERN, "Ankunftszeit muss im Format HH:mm angegeben werden.");
-
 // Optional time: missing or empty means "not given". In a "von – bis"
 // window an earlier "bis" means it runs past midnight (22:00 – 01:00), so
 // only equality is rejected (see guestInputSchema).
@@ -149,6 +144,8 @@ function optionalTimeSchema(formatError: string) {
   );
 }
 
+// The arrival is optional: guests who don't know it yet leave it empty.
+const arrivalTimeSchema = optionalTimeSchema("Ankunftszeit muss im Format HH:mm angegeben werden.");
 const arrivalEndTimeSchema = optionalTimeSchema("Das Ende der Ankunftszeit muss im Format HH:mm angegeben werden.");
 const DEPARTURE_FORMAT_ERROR = "„Ich bleibe bis“ muss im Format HH:mm angegeben werden.";
 const departureTimeSchema = optionalTimeSchema(DEPARTURE_FORMAT_ERROR);
@@ -172,8 +169,13 @@ const guestBaseSchema = z.object(
     additionalGuestNames: z.array(additionalGuestNameSchema, {
       error: "Namen der zusätzlichen Personen sind ungültig.",
     }),
-    arrivalTime: arrivalTimeSchema,
-    arrivalEndTime: arrivalEndTimeSchema,
+    // Checked below: "Weiß ich noch nicht" greys them out and saves none.
+    arrivalTime: z.unknown().optional(),
+    arrivalEndTime: z.unknown().optional(),
+    arrivalUnknown: z
+      .unknown()
+      .optional()
+      .transform((value) => value === true),
     departureTime: departureTimeSchema,
     departureEndTime: departureTimeSchema,
     // Only an explicit true counts; the matching text is checked below.
@@ -210,9 +212,29 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
     return z.NEVER;
   }
 
-  if (guest.arrivalEndTime === guest.arrivalTime) {
-    ctx.addIssue({ code: "custom", message: "Das Ende der Ankunftszeit darf nicht gleich dem Beginn sein." });
-    return z.NEVER;
+  let arrivalTime: string | null = null;
+  let arrivalEndTime: string | null = null;
+  if (!guest.arrivalUnknown) {
+    const start = arrivalTimeSchema.safeParse(guest.arrivalTime);
+    if (!start.success) {
+      ctx.addIssue({ code: "custom", message: firstError(start.error) });
+      return z.NEVER;
+    }
+    const end = arrivalEndTimeSchema.safeParse(guest.arrivalEndTime);
+    if (!end.success) {
+      ctx.addIssue({ code: "custom", message: firstError(end.error) });
+      return z.NEVER;
+    }
+    arrivalTime = start.data;
+    arrivalEndTime = end.data;
+    if (arrivalEndTime && !arrivalTime) {
+      ctx.addIssue({ code: "custom", message: "Bitte gib bei der Ankunftszeit zuerst die „von“-Zeit an." });
+      return z.NEVER;
+    }
+    if (arrivalEndTime && arrivalEndTime === arrivalTime) {
+      ctx.addIssue({ code: "custom", message: "Das Ende der Ankunftszeit darf nicht gleich dem Beginn sein." });
+      return z.NEVER;
+    }
   }
 
   if (guest.departureEndTime && !guest.departureTime) {
@@ -239,8 +261,8 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
     name: guest.name,
     additionalGuests: guest.additionalGuests,
     additionalGuestNames: guest.additionalGuestNames,
-    arrivalTime: guest.arrivalTime,
-    arrivalEndTime: guest.arrivalEndTime,
+    arrivalTime,
+    arrivalEndTime,
     departureTime: guest.departureTime,
     departureEndTime: guest.departureEndTime,
     bringingSomething: guest.bringingSomething,
@@ -717,4 +739,18 @@ export function validatePollVote(body: unknown, allowedOptionIds: string[]): Fie
     return { ok: false, error: "Bitte wähle mindestens einen Termin oder „Nichts davon passt“." };
   }
   return { ok: true, value: { name: result.data.name, optionIds, noneFit: result.data.noneFit } };
+}
+
+// --- Seat limit ("Teilnehmerzahl begrenzen") ---------------------------------------
+
+const MAX_GUESTS_ERROR = `Die Teilnehmerzahl muss eine ganze Zahl zwischen 1 und ${MAX_GUEST_CAPACITY} sein.`;
+
+// null = no limit. The settings form sends the number as a string.
+export function validateMaxGuests(value: unknown): FieldResult<number | null> {
+  if (value === null) return { ok: true, value: null };
+  const parsed = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+  if (typeof parsed !== "number" || !Number.isInteger(parsed) || parsed < 1 || parsed > MAX_GUEST_CAPACITY) {
+    return { ok: false, error: MAX_GUESTS_ERROR };
+  }
+  return { ok: true, value: parsed };
 }

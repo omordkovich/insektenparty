@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/site";
+import { INSTAGRAM_URL, SITE_URL } from "@/lib/site";
 
 // "Under construction" mode for the public domain, switched on with the env
 // var MAINTENANCE_MODE=true (on Vercel; needs a redeploy). Only gastzilla.de
@@ -74,7 +74,7 @@ export function maintenanceHtml(): string {
   <img src="${LOGO_SRC}" alt="GASTZILLA" width="256" height="91">
   <h1>Hier wird gerade gebaut</h1>
   <p>GASTZILLA ist bald wieder für dich da – digitale Einladungen &amp; Gästelisten für jedes Event.</p>
-  <nav><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></nav>
+  <nav><a href="${INSTAGRAM_URL}" rel="me noopener noreferrer">Instagram</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></nav>
 </body>
 </html>`;
 }

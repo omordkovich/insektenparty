@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { isThemeSelectable } from "@/lib/features";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+import { MAX_GUEST_CAPACITY } from "@/lib/guest-capacity";
 import {
   EVENT_TEXT_MAX_LENGTH,
   validateEventPasswordPair,
+  validateMaxGuests,
   validateNewEventTitle,
 } from "@/lib/validation";
 import { Button } from "./Button";
@@ -28,7 +30,7 @@ type EventDialogProps =
       // Owner's event page: design and password protection - the title is
       // edited inline on the page itself.
       mode: "settings";
-      event: { id: string; theme: ThemeKey; accessPassword: string | null };
+      event: { id: string; theme: ThemeKey; accessPassword: string | null; maxGuests: number | null };
       unlockedThemes: ThemeKey[];
       onCloseAction: () => void;
     };
@@ -50,6 +52,10 @@ export function EventDialog(props: EventDialogProps) {
   const [isProtected, setIsProtected] = useState(originalPassword !== null);
   const [password, setPassword] = useState(originalPassword ?? "");
   const [passwordRepeat, setPasswordRepeat] = useState(originalPassword ?? "");
+  const maxGuestsId = useId();
+  const originalMaxGuests = mode === "settings" ? props.event.maxGuests : null;
+  const [limitGuests, setLimitGuests] = useState(originalMaxGuests !== null);
+  const [maxGuestsInput, setMaxGuestsInput] = useState(originalMaxGuests !== null ? String(originalMaxGuests) : "");
 
   async function handleSubmit() {
     if (saving) return;
@@ -75,11 +81,22 @@ export function EventDialog(props: EventDialogProps) {
       accessPassword = passwordResult.value;
     }
 
+    let maxGuests: number | null = null;
+    if (mode === "settings" && limitGuests) {
+      const capacityResult = validateMaxGuests(maxGuestsInput);
+      if (!capacityResult.ok) {
+        setError(capacityResult.error);
+        return;
+      }
+      maxGuests = capacityResult.value;
+    }
+
     // Settings: only send what changed; nothing changed = just close.
-    const changes: { theme?: ThemeKey; accessPassword?: string | null } = {};
+    const changes: { theme?: ThemeKey; accessPassword?: string | null; maxGuests?: number | null } = {};
     if (mode === "settings") {
       if (theme !== originalTheme) changes.theme = theme;
       if (accessPassword !== originalPassword) changes.accessPassword = accessPassword;
+      if (maxGuests !== originalMaxGuests) changes.maxGuests = maxGuests;
       if (Object.keys(changes).length === 0) {
         onCloseAction();
         return;
@@ -132,8 +149,8 @@ export function EventDialog(props: EventDialogProps) {
         return;
       }
 
-      // Theme and password both shape the server-rendered page (wrapper
-      // class, assets, badge, invitation text), so re-render it.
+      // Theme, password and seat limit all shape the server-rendered page
+      // (wrapper class, assets, badge, invitation text, guest list).
       router.refresh();
       onCloseAction();
     } catch {
@@ -233,6 +250,50 @@ export function EventDialog(props: EventDialogProps) {
         onPasswordRepeatChange={setPasswordRepeat}
         disabled={saving}
       />
+
+      {mode === "settings" ? (
+        <div className="mt-5">
+          <label className="flex items-center gap-2 text-sm font-semibold text-leaf-dark">
+            <input
+              type="checkbox"
+              checked={limitGuests}
+              disabled={saving}
+              onChange={(event) => {
+                setLimitGuests(event.target.checked);
+                setError(null);
+              }}
+              className="h-5 w-5 rounded border-leaf/40"
+            />
+            Teilnehmerzahl begrenzen
+          </label>
+          {limitGuests ? (
+            <div className="mt-2">
+              <div className="flex items-center gap-2 text-sm">
+                <label htmlFor={maxGuestsId} className="shrink-0">
+                  max.
+                </label>
+                <input
+                  id={maxGuestsId}
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={MAX_GUEST_CAPACITY}
+                  step={1}
+                  value={maxGuestsInput}
+                  disabled={saving}
+                  onChange={(event) => setMaxGuestsInput(event.target.value)}
+                  className="w-24 rounded-xl border border-leaf/25 bg-surface px-3 py-2"
+                />
+                <span>Personen</span>
+              </div>
+              <p className="mt-1 text-xs text-muted">
+                Begleitpersonen zählen mit, Absagen nicht. Ist alles belegt, sind nur noch Absagen
+                möglich – auch für dich. Für mehr Zusagen erhöhst du die Zahl hier.
+              </p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {mode === "create" ? (
         <p className="mt-4 text-xs text-muted">

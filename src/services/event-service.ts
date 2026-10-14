@@ -6,6 +6,7 @@ import {
   isEventFieldKey,
   normalizeArrivalTime,
   validateAccessPassword,
+  validateMaxGuests,
   validateEventDate,
   validateEventField,
   validateEventSchedule,
@@ -132,11 +133,21 @@ export async function updateEventForOwner(
   let themeUpdate: ThemeKey | undefined;
   // undefined = not part of this request; null = protection switched off.
   let passwordUpdate: string | null | undefined;
+  // undefined = not part of this request; null = no seat limit.
+  let capacityUpdate: number | null | undefined;
   // Only the date/time fields present in the request; merged with the
   // stored ones below so the rules between them can be checked.
   const scheduleChanges: Partial<EventSchedule> = {};
 
   for (const [key, rawValue] of Object.entries(body)) {
+    if (key === "maxGuests") {
+      const validation = validateMaxGuests(rawValue);
+      if (!validation.ok) {
+        return { ok: false, status: 400, error: validation.error };
+      }
+      capacityUpdate = validation.value;
+      continue;
+    }
     if (key === "accessPassword") {
       const validation = validateAccessPassword(rawValue);
       if (!validation.ok) {
@@ -208,7 +219,10 @@ export async function updateEventForOwner(
   }
 
   const hasAnyUpdate =
-    Object.keys(updates).length > 0 || themeUpdate !== undefined || passwordUpdate !== undefined;
+    Object.keys(updates).length > 0 ||
+    themeUpdate !== undefined ||
+    passwordUpdate !== undefined ||
+    capacityUpdate !== undefined;
 
   if (!hasAnyUpdate) {
     return { ok: false, status: 400, error: "Kein gültiges Feld angegeben." };
@@ -254,6 +268,7 @@ export async function updateEventForOwner(
     ...(themeUpdate ? { theme: themeUpdate } : {}),
     ...(schedule ?? {}),
     ...(passwordUpdate !== undefined ? { accessPassword: passwordUpdate } : {}),
+    ...(capacityUpdate !== undefined ? { maxGuests: capacityUpdate } : {}),
   });
 
   if (!updated) {

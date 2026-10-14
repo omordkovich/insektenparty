@@ -6,6 +6,7 @@ import { LegalLinks } from "@/components/LegalLinks";
 import { OccasionActions } from "@/components/OccasionActions";
 import { OccasionIcon } from "@/components/OccasionIcon";
 import { SiteHeader } from "@/components/SiteHeader";
+import { COMPARISON } from "@/lib/comparison";
 import { hubBreadcrumbs, OCCASIONS, OCCASIONS_HUB, OCCASIONS_PATH, occasionPath } from "@/lib/occasions";
 import { pageMetadata } from "@/lib/page-metadata";
 import { occasionsHubStructuredData } from "@/lib/structured-data";
@@ -55,6 +56,17 @@ export default function OccasionsPage() {
               </li>
             ))}
           </ul>
+
+          <Link
+            href={COMPARISON.path}
+            className={`${cardClass} block text-center transition hover:border-leaf/50`}
+          >
+            <h2 className="font-display text-xl text-leaf-dark">
+              WhatsApp-Umfrage, Doodle oder GASTZILLA?
+            </h2>
+            <p className="mt-2 text-muted">{COMPARISON.teaser}</p>
+            <span className="mt-3 inline-block font-bold text-leaf-dark">Zum Vergleich →</span>
+          </Link>
         </div>
 
         <LegalLinks className="mt-auto pt-12" />

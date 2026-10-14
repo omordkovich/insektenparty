@@ -14,6 +14,8 @@ type GuestListProps = {
   onShowMessage: (guest: GuestDto) => void;
   onShowTime: (guest: GuestDto) => void;
   onShowDeclined: (guest: GuestDto) => void;
+  /** "Noch 4 von 12 Plätzen frei" / "Ausgebucht"; null without a limit. */
+  capacityText?: string | null;
   actionsDisabled?: boolean;
 };
 
@@ -29,6 +31,7 @@ export function GuestList({
   onShowMessage,
   onShowTime,
   onShowDeclined,
+  capacityText = null,
   actionsDisabled = false,
 }: GuestListProps) {
   return (
@@ -40,6 +43,11 @@ export function GuestList({
         >
           Wer kommt zum Event?
         </h2>
+        {capacityText ? (
+          <p className="mt-2 text-center text-sm font-semibold text-muted" role="status">
+            {capacityText}
+          </p>
+        ) : null}
 
         {loading ? (
           <p className="mt-8 text-center text-muted" role="status">

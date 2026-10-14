@@ -5,9 +5,11 @@ import {
   type PollOption,
   type PollVote,
 } from "@/lib/date-poll";
+import { MAX_POLL_VOTES } from "@/lib/guest-capacity";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import { validatePollVote } from "@/lib/validation";
 import {
+  countPollVotes,
   deletePollVote,
   getEventDateMode,
   getPollOptions,
@@ -70,6 +72,9 @@ export async function createPollVoteForEvent(
 
   const validation = validatePollVote(body, check.options.map((option) => option.id));
   if (!validation.ok) return { ok: false, status: 400, error: validation.error };
+  if ((await countPollVotes(eventId)) >= MAX_POLL_VOTES) {
+    return { ok: false, status: 409, error: "Die Abstimmung ist voll." };
+  }
 
   const vote = await insertPollVote(eventId, validation.value);
   if (!check.isOwner) {

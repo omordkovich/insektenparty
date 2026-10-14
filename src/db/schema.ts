@@ -42,6 +42,8 @@ export const events = pgTable("events", {
   accessPassword: text("access_password"),
   // Termin-Status: "unknown" | "poll" | "fixed" (see lib/date-poll.ts).
   dateMode: text("date_mode").notNull().default("fixed"),
+  // "Teilnehmerzahl begrenzen": max. people incl. companions; null = no limit.
+  maxGuests: integer("max_guests"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

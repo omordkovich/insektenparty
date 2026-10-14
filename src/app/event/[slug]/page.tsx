@@ -103,7 +103,15 @@ export default async function EventPage({ params }: EventPageProps) {
         config={config}
         logoHref={isOwner ? "/" : `/event/${slug}/info`}
         themeEdit={
-          isOwner ? { eventId: event.id, theme, unlockedThemes, accessPassword: ownerAccessPassword } : undefined
+          isOwner
+            ? {
+                eventId: event.id,
+                theme,
+                unlockedThemes,
+                accessPassword: ownerAccessPassword,
+                maxGuests: event.maxGuests,
+              }
+            : undefined
         }
       />
       <main>
@@ -117,8 +125,10 @@ export default async function EventPage({ params }: EventPageProps) {
         {dateMode === "fixed" ? (
           <GuestSection
             apiBasePath={`/api/events/${event.id}/guests`}
-            defaultArrivalTime={config.defaultArrivalTime}
+            // The guest form starts with the event's start time.
+            defaultArrivalTime={config.eventStartTime ?? config.defaultArrivalTime}
             isOwner={isOwner}
+            maxGuests={event.maxGuests}
           />
         ) : dateMode === "poll" ? (
           <DatePollSection eventId={event.id} isOwner={isOwner} announcement={announcement} />

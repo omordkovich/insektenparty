@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LegalLinks } from "@/components/LegalLinks";
 import { OccasionActions } from "@/components/OccasionActions";
 import { SiteHeader } from "@/components/SiteHeader";
+import { UpdatedDate } from "@/components/UpdatedDate";
 import { getOccasionBySlug, OCCASIONS, occasionBreadcrumbs, occasionPath } from "@/lib/occasions";
 import { pageMetadata } from "@/lib/page-metadata";
 import { occasionStructuredData } from "@/lib/structured-data";
@@ -90,6 +91,8 @@ export default async function OccasionPage({ params }: OccasionPageProps) {
           <HowItWorks />
 
           <FaqSection items={occasion.faq} />
+
+          <UpdatedDate date={occasion.updated} />
         </div>
 
         <LegalLinks className="mt-auto pt-12" />

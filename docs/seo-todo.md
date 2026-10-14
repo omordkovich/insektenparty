@@ -1,6 +1,6 @@
 # SEO & KI-Sichtbarkeit – To-do
 
-Stand: 2026-10-06
+Stand: 2026-10-14
 
 ## Erledigt (im Code)
 
@@ -18,6 +18,8 @@ Stand: 2026-10-06
 - [x] Terminabstimmung (2026-10-09): eigene Seite `/einladung/terminabstimmung` für „Termin abstimmen“, „Terminumfrage“, „gemeinsamen Termin finden“ (Titel, Beschreibung, FAQ-Schema); Start-FAQ, Funktionsliste, Meta-Beschreibung der Startseite, llms.txt und die Anlass-Seiten JGA, Familienfest, Gruppenreise, Kultur, Proben, Ausgehen, Sport, Tabletop, Gaming, Firmenfeier ergänzt
 - [x] Terminbestätigung zum Teilen (2026-10-09): Start-FAQ, Funktionsliste, Vorteil „Teilen, wo deine Gäste sind“, llms.txt und `/einladung/terminabstimmung` (Beschreibung, Einleitung, Vorteil, neue FAQ „Wie teile ich allen den festgelegten Termin mit?“)
 
+- [x] GEO-Ausbau (2026-10-14): Vergleichsseite `/vergleich` („WhatsApp-Umfrage, Doodle oder GASTZILLA?“, FAQ aus echten Suchanfragen wie „doodle einladung erstellen kostenlos“, „wie terminumfrage whatsapp“) – Inhalt in `src/lib/comparison.ts`, verlinkt von der Anlass-Übersicht `/einladung`, „Über uns“, llms.txt, Sitemap; Liste „Was GASTZILLA nicht kann“ (`LIMITATIONS` in `src/lib/structured-data.ts`) auf `/vergleich` und in llms.txt; sichtbares „Aktualisiert am“ auf Anlass-Seiten, `/vergleich` und „Über uns“; AboutPage-Schema + Kontakt auf „Über uns“; falsche Funktionsangabe „Designs für verschiedene Anlässe“ durch die echten Farbdesigns ersetzt
+
 ## Du selbst (Dashboards & Konten)
 
 - [x] **Datenbank-Migration Event-Adressen, Schritt 1** – eingespielt am 2026-10-07
@@ -34,12 +36,14 @@ Stand: 2026-10-06
 
 ## Offene Entscheidungen (mit mir abstimmen)
 
-- [ ] Social-Media-Profile (Instagram, LinkedIn, …) → als `sameAs` ins Organization-Schema, sobald es welche gibt
+- [x] Instagram @gastzilla (2026-10-14): `INSTAGRAM_URL` in `src/lib/site.ts` → `sameAs` im Organization-Schema, Footer-Links (alle Seiten inkl. Event-Seiten), „Über uns“, llms.txt, Wartungsseite. Weitere Profile (LinkedIn, …) genauso ergänzen
 - [ ] Screenshot einer Beispiel-Einladung → als `screenshot` ins Schema und auf die Startseite
 - [ ] Seite `/preise`, sobald das Bezahlmodell steht (Stripe ist pausiert)
 - [ ] Nach 2–3 Monaten Search Console: ranken zwei Anlass-Seiten auf dieselben Begriffe → zusammenlegen + Weiterleitung
 - [ ] FAQ der Anlass-Seiten: basieren seit 2026-10-08 auf echten Google-Suchanfragen (Autovervollständigung). Für Kultur, Proben, Advent, Halloween, Sport gab es kaum Daten → nach dem Livegang mit echten Suchanfragen aus der Search Console nachschärfen; jährlich wiederholen
-- [ ] Vergleichsseite, z. B. „GASTZILLA vs. WhatsApp-Umfrage / Doodle“ – seit der Terminabstimmung naheliegend; Markennamen dabei nur sachlich vergleichend nennen
+- [ ] „Über uns“: persönliche Geschichte ergänzen (warum gebaut, seit wann, für wen) – nur mit echten Angaben von dir
+- [ ] `/vergleich`: Angaben zu WhatsApp/Doodle jährlich prüfen (Stand-Hinweis auf der Seite), nach dem Livegang Suchanfragen aus der Search Console einarbeiten
+- [ ] Nach dem Livegang mit echten Daten: anonymisierte Kennzahlen (z. B. typische Zusagequote, wie früh eingeladen wird) als zitierbare Quelle – nur nach Datenschutz-Check, nie geschätzt
 - [ ] Nach dem Livegang in der Search Console beobachten, ob `/einladung/terminabstimmung` für „Termin abstimmen“ / „Terminumfrage“ erscheint; ggf. Titel und FAQ an die echten Suchanfragen anpassen
 
 ## Außerhalb der Seite (für KI-Empfehlungen am wichtigsten)
@@ -48,5 +52,5 @@ KI-Assistenten empfehlen vor allem, was anderswo erwähnt wird.
 
 - [ ] Eintrag in Verzeichnissen und Produktlisten (z. B. Product Hunt, alternativeTo, deutsche Tool-Listen)
 - [ ] Erwähnungen in Eltern-, Hochzeits- und Event-Blogs, Foren, Reddit (r/de, Eltern-Communities)
-- [ ] Social-Media-Profile anlegen und auf gastzilla.de verlinken
+- [ ] Weitere Social-Media-Profile anlegen; im Instagram-Profil gastzilla.de als Link eintragen (Verknüpfung in beide Richtungen)
 - [ ] Nach den ersten Nutzern: echte Bewertungen sammeln (z. B. Trustpilot) – **keine** erfundenen Bewertungen ins Schema

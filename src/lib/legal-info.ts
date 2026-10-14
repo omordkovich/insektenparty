@@ -28,4 +28,4 @@ export const MIN_REGISTRATION_AGE = 16;
 // Konto gespeichert wird (Nachweis, welcher Fassung zugestimmt wurde).
 // Bei inhaltlichen Änderungen hochsetzen.
 export const TERMS_VERSION = "2026-09-30";
-export const PRIVACY_VERSION = "2026-09-30";
+export const PRIVACY_VERSION = "2026-10-14";

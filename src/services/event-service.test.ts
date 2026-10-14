@@ -302,3 +302,15 @@ describe("updateEventForOwner – date only when fixed", () => {
     });
   });
 });
+
+describe("seat limit in the settings", () => {
+  it("sets and removes the limit, rejects invalid numbers", async () => {
+    expect(await update({ maxGuests: "12" })).toMatchObject({ ok: true, data: { maxGuests: 12 } });
+    expect(await update({ maxGuests: null })).toMatchObject({ ok: true, data: { maxGuests: null } });
+    expect(await update({ maxGuests: 0 })).toEqual({
+      ok: false,
+      status: 400,
+      error: "Die Teilnehmerzahl muss eine ganze Zahl zwischen 1 und 300 sein.",
+    });
+  });
+});

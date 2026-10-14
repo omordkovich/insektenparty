@@ -56,6 +56,7 @@ describe("maintenanceHtml", () => {
     expect(html).toContain("banner_l.webp");
     expect(html).toContain('href="/impressum"');
     expect(html).toContain('href="/datenschutz"');
+    expect(html).toContain('href="https://www.instagram.com/gastzilla/"');
     expect(html).toContain('<meta name="robots" content="noindex">');
   });
 });

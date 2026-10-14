@@ -1,3 +1,4 @@
+import { checkGuestCapacity } from "@/lib/guest-capacity";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import type { GuestDto } from "@/lib/types";
 import { normalizeArrivalTime, validateGuestInput } from "@/lib/validation";
@@ -8,6 +9,7 @@ import {
   deleteGuest,
   getGuestsByEventId,
   updateGuest,
+  type CapacityGuard,
   type GuestRow,
 } from "@/repositories/guest-repository";
 import { notifyOwnerOfGuestChange } from "@/services/notification-service";
@@ -17,6 +19,15 @@ export type GuestServiceResult<T> =
   | { ok: false; status: number; error: string };
 
 export const DATE_NOT_FIXED_ERROR = "Der Termin steht noch nicht fest.";
+
+// Seat limit and entry cap, checked while the event row is locked (see
+// guest-repository). They apply to the owner too.
+function capacityGuard(next: { declined: boolean; additionalGuests: number }): CapacityGuard {
+  return (snapshot) => {
+    const check = checkGuestCapacity({ ...snapshot, next });
+    return check.ok ? null : check.error;
+  };
+}
 
 // Entries only once the date is fixed - before that guests vote instead.
 async function isDateFixed(eventId: string): Promise<boolean> {
@@ -81,7 +92,13 @@ export async function createGuestForEvent(
     return { ok: false, status: 400, error: validation.error };
   }
 
-  const created = await createGuest(eventId, validation.data);
+  const result = await createGuest(eventId, validation.data, capacityGuard(validation.data));
+  if (!result.ok) {
+    return result.reason === "refused"
+      ? { ok: false, status: 409, error: result.error }
+      : { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+  }
+  const created = result.row;
 
   if (!isOwnerRequest) {
     await notifyOwnerOfGuestChange(eventId, created.declined ? "declined" : "created", created.name);
@@ -113,10 +130,18 @@ export async function updateGuestForEvent(
     return { ok: false, status: 400, error: validation.error };
   }
 
-  const updated = await updateGuest(eventId, guestId, validation.data);
-  if (!updated) {
-    return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
+  const result = await updateGuest(
+    eventId,
+    guestId,
+    validation.data,
+    capacityGuard(validation.data),
+  );
+  if (!result.ok) {
+    return result.reason === "refused"
+      ? { ok: false, status: 409, error: result.error }
+      : { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
   }
+  const updated = result.row;
 
   if (!isOwnerRequest) {
     await notifyOwnerOfGuestChange(eventId, updated.declined ? "declined" : "updated", updated.name);
