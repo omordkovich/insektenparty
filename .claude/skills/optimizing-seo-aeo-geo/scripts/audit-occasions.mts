@@ -1,8 +1,12 @@
 // Cross-occasion content audit (run from the repo root):
 //   npx tsx .claude/skills/optimizing-seo-aeo-geo/scripts/audit-occasions.mts
 // Finds what the unit tests can't: wording duplicated across occasions.
-import { OCCASIONS } from "@/lib/occasions";
-import { OCCASION_ICON_VERSIONS } from "@/lib/occasion-icons";
+// Relative on purpose: this file is not covered by the TypeScript config, so the
+// IDE can't resolve the "@/" alias here.
+// noinspection ES6PreferShortImport
+import { OCCASIONS } from "../../../../src/lib/occasions";
+// noinspection ES6PreferShortImport
+import { OCCASION_ICON_VERSIONS } from "../../../../src/lib/occasion-icons";
 
 const problems: string[] = [];
 const duplicates = (label: string, items: [string, string][]) => {
