@@ -1,17 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { capacityLabel, occupiedSeats, seatsOf } from "@/lib/guest-capacity";
 import { isIdle, shouldPoll } from "@/lib/polling";
 import type { GuestDto } from "@/lib/types";
 import { AdditionalGuestsDialog } from "./AdditionalGuestsDialog";
 import { BringingDetailsDialog } from "./BringingDetailsDialog";
-import { DeleteGuestDialog } from "./DeleteGuestDialog";
 import { GuestList } from "./GuestList";
-import { GuestModal, type GuestModalMode } from "./GuestModal";
+import type { GuestModalMode } from "./GuestModal";
 import { DeclinedDetailsDialog } from "./DeclinedDetailsDialog";
 import { MessageDetailsDialog } from "./MessageDetailsDialog";
 import { TimeDetailsDialog } from "./TimeDetailsDialog";
+
+// The form dialogs open on a click only and carry reCAPTCHA, the validation
+// and the legal texts - loaded then instead of with the event page.
+const GuestModal = dynamic(() => import("./GuestModal").then((m) => m.GuestModal));
+const DeleteGuestDialog = dynamic(() => import("./DeleteGuestDialog").then((m) => m.DeleteGuestDialog));
 
 type ModalState = {
   isOpen: boolean;

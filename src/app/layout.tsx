@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import { CookieBanner } from "@/components/CookieBanner";
+import { CONSENT_BANNER_SCRIPT } from "@/lib/cookie-consent";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import React from "react";
 
@@ -29,8 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className={`${nunito.variable} ${fredoka.variable} h-full`}>
+    // suppressHydrationWarning: the inline script below may add an attribute
+    // to <html> before React hydrates.
+    <html lang="de" className={`${nunito.variable} ${fredoka.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full antialiased">
+        {/* First in <body> (no own <head> needed): it runs while parsing,
+            before the cookie banner further down is painted. */}
+        <script dangerouslySetInnerHTML={{ __html: CONSENT_BANNER_SCRIPT }} />
         {children}
         <CookieBanner />
       </body>

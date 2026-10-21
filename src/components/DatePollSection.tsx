@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import {
   countYes,
@@ -12,10 +13,17 @@ import {
 } from "@/lib/date-poll";
 import type { InvitationBase } from "@/lib/invitation-text";
 import { Button } from "./Button";
-import { DeletePollVoteDialog } from "./DeletePollVoteDialog";
 import { PencilIcon } from "./EditIcons";
-import { FixPollOptionDialog } from "./FixPollOptionDialog";
-import { PollVoteModal } from "./PollVoteModal";
+
+// The dialogs open on a click only and carry reCAPTCHA and the validation -
+// loaded then instead of with the event page.
+const PollVoteModal = dynamic(() => import("./PollVoteModal").then((m) => m.PollVoteModal));
+const DeletePollVoteDialog = dynamic(() =>
+  import("./DeletePollVoteDialog").then((m) => m.DeletePollVoteDialog),
+);
+const FixPollOptionDialog = dynamic(() =>
+  import("./FixPollOptionDialog").then((m) => m.FixPollOptionDialog),
+);
 
 type DatePollSectionProps = {
   eventId: string;

@@ -1,10 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useId, useState } from "react";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
 import { LockIcon } from "./EditIcons";
-import { EventDialog } from "./EventDialog";
+
+// Loaded on the first click, together with the form validation it uses.
+const EventDialog = dynamic(() => import("./EventDialog").then((m) => m.EventDialog));
 
 type CreateEventButtonProps = {
   unlockedThemes: ThemeKey[];

@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 // Cookie consent for optional third-party services. Strictly necessary
 // cookies (Supabase login session, this consent entry itself) need no
 // consent; Google reCAPTCHA does. The choice lives in localStorage so it
@@ -20,14 +18,10 @@ export function createConsent(recaptcha: boolean, now: Date = new Date()): Cooki
   return { version: CONSENT_VERSION, recaptcha, decidedAt: now.toISOString() };
 }
 
-const storedConsentSchema = z.object({
-  version: z.literal(CONSENT_VERSION),
-  recaptcha: z.boolean(),
-  decidedAt: z.string(),
-});
-
 // Whatever is in localStorage may be outdated, hand-edited or garbage -
 // anything that isn't a current, well-formed consent counts as "not decided".
+// Checked by hand rather than with zod: this runs in the root layout's
+// cookie banner, so zod would otherwise ship on every page.
 export function parseConsent(raw: string | null): CookieConsent | null {
   if (raw === null) return null;
 
@@ -38,9 +32,26 @@ export function parseConsent(raw: string | null): CookieConsent | null {
     return null;
   }
 
-  const result = storedConsentSchema.safeParse(value);
-  return result.success ? result.data : null;
+  if (typeof value !== "object" || value === null) return null;
+  const { version, recaptcha, decidedAt } = value as Record<string, unknown>;
+  if (version !== CONSENT_VERSION || typeof recaptcha !== "boolean" || typeof decidedAt !== "string") {
+    return null;
+  }
+  return { version, recaptcha, decidedAt };
 }
+
+// Attribute on <html> that makes the server-rendered cookie banner visible
+// (see globals.css).
+export const SHOW_BANNER_ATTRIBUTE = "data-cookie-banner";
+
+// Inlined at the top of <body> by the root layout and run before the first
+// paint.
+// The banner is part of the server HTML so it shows up right away instead
+// of only after the JavaScript has loaded (it is often the largest element
+// on screen, i.e. the LCP). This script reveals it unless a valid choice is
+// stored - the same rules as parseConsent. Without JavaScript it stays
+// hidden, since its buttons couldn't work anyway.
+export const CONSENT_BANNER_SCRIPT = `try{var c=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}));if(!c||c.version!==${CONSENT_VERSION}||typeof c.recaptcha!=="boolean"||typeof c.decidedAt!=="string")throw 0}catch(e){document.documentElement.setAttribute("${SHOW_BANNER_ATTRIBUTE}","")}`;
 
 // --- Browser-only helpers (used via useCookieConsent) ---
 

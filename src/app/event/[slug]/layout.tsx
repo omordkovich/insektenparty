@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CookieBanner } from "@/components/CookieBanner";
 import { buildEventShareUrl } from "@/lib/share";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
 import { getEventByAddress } from "@/repositories/event-repository";
@@ -73,10 +74,12 @@ export default async function EventLayout({ children, params }: EventLayoutProps
   const themeClassName = THEME_CLASS_NAMES[event.theme as ThemeKey];
 
   // data-theme-root lets portalled dialogs (e.g. the privacy policy) mount
-  // inside the themed wrapper so they pick up the event's CSS variables.
+  // inside the themed wrapper so they pick up the event's CSS variables. The
+  // cookie banner is rendered right here for the same reason.
   return (
     <div className={themeClassName} data-theme-root>
       {children}
+      <CookieBanner insideEvent />
     </div>
   );
 }

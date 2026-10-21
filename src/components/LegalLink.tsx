@@ -1,21 +1,32 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { LEGAL_DOCUMENTS, type LegalDocument } from "@/lib/legal-documents";
-import { ImprintContent } from "./ImprintContent";
 import { LegalDialog } from "./LegalDialog";
-import { PrivacyPolicyContent } from "./PrivacyPolicyContent";
-import { TermsContent } from "./TermsContent";
-import { WithdrawalContent } from "./WithdrawalContent";
 
 export type { LegalDocument };
 
+function LoadingText() {
+  return <p className="text-sm text-muted">Wird geladen …</p>;
+}
+
+// Loaded only when a dialog is opened: the link sits in the cookie banner
+// (root layout), so static imports would put all four texts on every page.
 const CONTENT: Record<LegalDocument, ComponentType> = {
-  imprint: ImprintContent,
-  privacy: PrivacyPolicyContent,
-  terms: TermsContent,
-  withdrawal: WithdrawalContent,
+  imprint: dynamic(() => import("./ImprintContent").then((m) => m.ImprintContent), {
+    loading: LoadingText,
+  }),
+  privacy: dynamic(() => import("./PrivacyPolicyContent").then((m) => m.PrivacyPolicyContent), {
+    loading: LoadingText,
+  }),
+  terms: dynamic(() => import("./TermsContent").then((m) => m.TermsContent), {
+    loading: LoadingText,
+  }),
+  withdrawal: dynamic(() => import("./WithdrawalContent").then((m) => m.WithdrawalContent), {
+    loading: LoadingText,
+  }),
 };
 
 type LegalLinkProps = {

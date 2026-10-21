@@ -1,8 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { SignInMethods } from "@/lib/account";
-import { AccountDialog } from "./AccountDialog";
+
+// Loaded on the first click, together with the Supabase client it uses.
+const AccountDialog = dynamic(() => import("./AccountDialog").then((m) => m.AccountDialog));
 
 type AccountButtonProps = {
   email: string;

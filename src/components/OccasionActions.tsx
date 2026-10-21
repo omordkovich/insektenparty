@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { OCCASIONS_PATH } from "@/lib/occasions";
-import { createClient } from "@/lib/supabase/client";
 import { AuthButtons } from "./AuthButtons";
 import { buttonClassName } from "./Button";
 
@@ -16,11 +15,22 @@ export function OccasionActions({ backHref = OCCASIONS_PATH }: { backHref?: stri
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setLoggedIn(session !== null);
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+    // Imported here instead of at the top: the Supabase client is by far
+    // the biggest library on these landing pages and not needed to render
+    // them, so it loads after the page instead of before it.
+    void import("@/lib/supabase/client").then(({ createClient }) => {
+      if (cancelled) return;
+      const { data } = createClient().auth.onAuthStateChange((_event, session) => {
+        setLoggedIn(session !== null);
+      });
+      unsubscribe = () => data.subscription.unsubscribe();
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   if (loggedIn) {

@@ -474,6 +474,16 @@ body.modal-open {
   overflow: hidden;
 }
 
+/* Server-rendered cookie banner: only shown once the inline consent check
+   in the root layout found no stored choice (see CONSENT_BANNER_SCRIPT). */
+.cookie-banner {
+  display: none;
+}
+
+html[data-cookie-banner] .cookie-banner {
+  display: contents;
+}
+
 /* Element defaults live in the base layer: unlayered rules beat every
    Tailwind utility regardless of specificity, so an unlayered
    `a { color: inherit }` silently overrode text-* classes on links (e.g.

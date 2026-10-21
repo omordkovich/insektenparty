@@ -1,13 +1,11 @@
-import { AccountButton } from "@/components/AccountButton";
 import { AuthErrorDialog } from "@/components/AuthErrorDialog";
-import { ConsentDialog } from "@/components/ConsentDialog";
-import { EventList } from "@/components/EventList";
 import { LandingContent } from "@/components/LandingContent";
 import { LegalLinks } from "@/components/LegalLinks";
 import { LinkExpiredDialog, type LinkExpiredKind } from "@/components/LinkExpiredDialog";
 import { pageMetadata } from "@/lib/page-metadata";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
+import { AccountButton, ConsentDialog, EventList } from "@/components/SignedInHomeParts";
 import { getAccountName, getSignInMethods } from "@/lib/account";
 import { hasAcceptedTerms } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";

@@ -1,13 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useId, useState, type SubmitEvent } from "react";
-import { AuthDialog } from "./AuthDialog";
 import { Button } from "./Button";
 import { cardClass } from "./card";
 import { PasswordInput } from "./PasswordInput";
-import { PasswordRequestDialog } from "./PasswordRequestDialog";
 import { SiteHeader } from "./SiteHeader";
+
+// Both open on a click only - loaded then, with their Supabase/reCAPTCHA code.
+const AuthDialog = dynamic(() => import("./AuthDialog").then((m) => m.AuthDialog));
+const PasswordRequestDialog = dynamic(() =>
+  import("./PasswordRequestDialog").then((m) => m.PasswordRequestDialog),
+);
 
 type EventLockedPageProps = {
   eventId: string;
