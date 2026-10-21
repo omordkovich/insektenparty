@@ -30,9 +30,15 @@ const sizeClasses: Record<ButtonSize, string> = {
   icon: "min-h-11 min-w-11 rounded-xl",
 };
 
+// Only the properties the variants actually change on hover/disable are
+// animated. Plain `transition` would also animate outline-color, so the
+// focus ring fading in (e.g. a dialog focusing its first button on open)
+// became an animation the browser can't composite (flagged by Lighthouse).
+const transitionClass = "transition-[background-color,filter,opacity]";
+
 // Also used to style links (e.g. next/link) like a button.
 export function buttonClassName(variant: ButtonVariant = "primary", size: ButtonSize = "md") {
-  return `inline-flex items-center justify-center transition disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]}`;
+  return `inline-flex items-center justify-center ${transitionClass} disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]}`;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
