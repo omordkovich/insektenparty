@@ -19,8 +19,11 @@
   --shadow: 0 18px 40px rgba(36, 53, 40, 0.12);
   /* Text color for content sitting on a --honey background. Kept as its own
      variable (not just leaf-dark) because a theme can darken honey itself
-     (see .event-theme-ballons) - the text needs to invert with it. */
-  --on-honey: var(--leaf-dark);
+     (see .event-theme-ballons) - the text needs to invert with it.
+     A shade darker than --leaf-dark: that one only reaches 4.4:1 on honey
+     (WCAG AA needs 4.5:1); this keeps >= 4.5:1 even on the hover-darkened
+     button. */
+  --on-honey: #174528;
   /* Button fill colors, separate from --leaf/--honey: those double as the
      accent color for text/borders/icons scattered across the page (which
      need to read as light on a dark theme), while a button fill wants a

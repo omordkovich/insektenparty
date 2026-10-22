@@ -2,8 +2,9 @@
   "regions": ["fra1"],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/:path((?!_next/).+)",
       "has": [{ "type": "host", "value": "mordkovich.vercel.app" }],
+      "missing": [{ "type": "header", "key": "rsc" }],
       "destination": "https://gastzilla.de/:path*",
       "permanent": true
     }
