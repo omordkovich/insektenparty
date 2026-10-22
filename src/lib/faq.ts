@@ -7,7 +7,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Ist GASTZILLA kostenlos?",
     answer:
-      "Ja – ein Event mit allen Grundfunktionen ist kostenlos. Weitere Events und Premium-Designs kannst du bald dazukaufen.",
+      "Ja – ein Event mit allen Grundfunktionen und den Farbdesigns ist kostenlos. Premium-Designs sind kostenpflichtig, weitere Events kannst du bald dazukaufen.",
   },
   {
     question: "Brauchen meine Gäste ein Konto?",

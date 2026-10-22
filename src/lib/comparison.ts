@@ -48,6 +48,10 @@ export const COMPARISON = {
         "Gäste Begleitpersonen, Ankunftszeit oder Mitbringsel angeben sollen",
         "auch Gäste außerhalb deiner Chatgruppe dabei sind – sie brauchen nur den Link, kein Konto und keine App",
         "erst der Termin abgestimmt werden soll (zwei bis vier Vorschläge) und die Stimmen danach direkt zur Gästeliste werden",
+        "deine Einladung zum Anlass passen soll, statt nach Umfrage auszusehen – mit eigener Einladungsseite im passenden Design: Farbdesigns kostenlos, dazu kostenpflichtige Premium-Designs",
+        "du den Einladungstext nicht selbst schreiben willst – Titel, Datum, Ort und Link sind schon drin, Anrede und Gruß passt du an",
+        "du bei jeder Zu- oder Absage eine E-Mail bekommen möchtest, statt im Chat nachzuzählen",
+        "dir Privatsphäre wichtig ist – werbefrei, ohne Tracking-Cookies, Server in der EU, auf Wunsch mit Passwort",
       ],
       note: "Als Gastgeber legst du ein kostenloses Konto an. Ein Event mit allen Grundfunktionen ist kostenlos.",
     },
@@ -61,7 +65,7 @@ export const COMPARISON = {
     {
       question: "Kann man eine Einladung mit Terminabstimmung kostenlos erstellen?",
       answer:
-        "Ja. Bei GASTZILLA ist ein Event mit allen Grundfunktionen kostenlos – Terminabstimmung, Gästeliste und fertiger Einladungstext eingeschlossen. Weitere Events und Premium-Designs kannst du bald dazukaufen.",
+        "Ja. Bei GASTZILLA ist ein Event mit allen Grundfunktionen kostenlos – Terminabstimmung, Gästeliste und fertiger Einladungstext eingeschlossen. Premium-Designs sind kostenpflichtig, weitere Events kannst du bald dazukaufen.",
     },
     {
       question: "Muss man sich für eine Terminabstimmung anmelden?",
@@ -83,7 +87,7 @@ export const COMPARISON = {
   disclaimer:
     "Stand: Oktober 2026. WhatsApp ist eine Marke der WhatsApp LLC, Doodle eine Marke der Doodle AG. Angaben zu anderen Diensten ohne Gewähr – ihre Funktionen können sich ändern.",
   // Last real text change (sitemap lastModified, visible date), YYYY-MM-DD.
-  updated: "2026-10-14",
+  updated: "2026-10-22",
 };
 
 export function comparisonBreadcrumbs(): Breadcrumb[] {

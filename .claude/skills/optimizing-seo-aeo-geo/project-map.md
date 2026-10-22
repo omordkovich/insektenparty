@@ -21,9 +21,14 @@
 | Open SEO tasks | `docs/seo-todo.md` |
 
 ## Verified features (may be claimed)
-Gäste sagen per Link zu oder ab – ohne Konto/App · Begleitpersonen mit Namen, mitgezählt · Ankunftszeit (Pflicht) + „bleibe bis“ (optional) · Mitbringsel-Eintrag, für alle sichtbar · Nachricht zur Zusage (für Link-Inhaber sichtbar) · Gäste ändern/löschen ihren Eintrag · E-Mail an den Gastgeber bei neuer Zusage, Änderung, Löschung · Teilen per WhatsApp, Signal, Telegram, E-Mail, Link kopieren · Termin in Kalender (nur mit Datum + Uhrzeit) · Zeitraum über mehrere Tage · Passwortschutz der Event-Seite · Terminabstimmung · Einladungstext-Editor für den Owner · Farbdesigns (Weiß, Schwarz, Grün, Blau, Rot, Pink, Orange, Gelb) kostenlos; Natur + Ballons Premium · 1 Event kostenlos, weitere Events/Premium „bald“ · werbefrei, keine Tracking-Cookies, Server in der EU · Event-Seiten nicht in Suchmaschinen.
+Gäste sagen per Link zu oder ab – ohne Konto/App · Begleitpersonen mit Namen, mitgezählt · Ankunftszeit (Pflicht) + „bleibe bis“ (optional) · Mitbringsel-Eintrag, für alle sichtbar · Nachricht zur Zusage (für Link-Inhaber sichtbar) · Gäste ändern/löschen ihren Eintrag · E-Mail an den Gastgeber bei neuer Zusage, Änderung, Löschung · Teilen per WhatsApp, Signal, Telegram, E-Mail, Link kopieren · Termin in Kalender (nur mit Datum + Uhrzeit) · Zeitraum über mehrere Tage · Passwortschutz der Event-Seite · Terminabstimmung · Einladungstext-Editor für den Owner · Farbdesigns kostenlos; kostenpflichtige Premium-Designs · 1 Event kostenlos, weitere Events „bald“ · werbefrei, keine Tracking-Cookies, Server in der EU · Event-Seiten nicht in Suchmaschinen.
 
-**Not available (never imply):** Tickets/Bezahlung/Kostenteilung, Tisch- oder Escape-Room-Reservierung, Sitzplan, Teams, wiederkehrende Termine, Teilnehmerlimit, Erinnerungen/Benachrichtigungen an Gäste, anlassbezogene Designs (Halloween, Karneval …).
+**Not available (never imply):** Tickets/Bezahlung/Kostenteilung, Tisch- oder Escape-Room-Reservierung, Sitzplan, Teams, wiederkehrende Termine, Teilnehmerlimit, Erinnerungen/Benachrichtigungen an Gäste.
+
+**Designs** (owner's decision 2026-10-22):
+- Frame as „Designs für jeden Anlass“ / „im passenden Design“: Farbdesigns kostenlos, dazu „kostenpflichtige Premium-Designs“.
+- Never name individual designs or colours („Schwarz“, Ballons …) and never state how many there are – describe them generically („ein dunkles Farbdesign“), so copy survives when designs change.
+- No „bald“ for Premium-Designs; never list designs as a limitation.
 
 Re-verify in code before relying on a feature that may have changed (`src/components/GuestModal.tsx`, `src/services/*`).
 

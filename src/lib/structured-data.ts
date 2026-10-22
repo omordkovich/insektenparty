@@ -23,7 +23,7 @@ export const FEATURES = [
   "Gästeliste in Echtzeit mit Benachrichtigung per E-Mail bei jeder Zu- und Absage",
   "Optionaler Passwortschutz für Event-Seite und Gästeliste – Gäste können das Passwort beim Gastgeber anfragen",
   "Teilen per WhatsApp, Signal, Telegram, E-Mail oder Link",
-  "Acht Farbdesigns kostenlos (Weiß, Schwarz, Grün, Blau, Rot, Pink, Orange, Gelb), Premium-Designs Natur und Ballons bald zum Dazukaufen",
+  "Designs für jeden Anlass: Farbdesigns kostenlos, dazu kostenpflichtige Premium-Designs",
   "Fertiger Einladungstext und Terminbestätigung mit Datum, Ort und Link – anpassbar, mit einem Klick kopierbar oder per WhatsApp, E-Mail & Co. teilbar",
   "Termin in den eigenen Kalender übernehmen",
   "Werbefrei, ohne Tracking-Cookies, Server in der EU",
@@ -38,7 +38,6 @@ export const LIMITATIONS = [
   "Keine wiederkehrenden Termine – jedes Treffen ist ein eigenes Event",
   "Keine Obergrenze für Zusagen – volle Plätze werden nicht automatisch gesperrt",
   "Keine Team-Konten – ein Event verwaltet, wer es angelegt hat",
-  "Keine Designs für bestimmte Anlässe wie Halloween oder Karneval – zur Wahl stehen Farbdesigns",
 ];
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;

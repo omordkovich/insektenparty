@@ -1,6 +1,6 @@
 # SEO & KI-Sichtbarkeit – To-do
 
-Stand: 2026-10-14
+Stand: 2026-10-22
 
 ## Erledigt (im Code)
 
@@ -18,7 +18,9 @@ Stand: 2026-10-14
 - [x] Terminabstimmung (2026-10-09): eigene Seite `/einladung/terminabstimmung` für „Termin abstimmen“, „Terminumfrage“, „gemeinsamen Termin finden“ (Titel, Beschreibung, FAQ-Schema); Start-FAQ, Funktionsliste, Meta-Beschreibung der Startseite, llms.txt und die Anlass-Seiten JGA, Familienfest, Gruppenreise, Kultur, Proben, Ausgehen, Sport, Tabletop, Gaming, Firmenfeier ergänzt
 - [x] Terminbestätigung zum Teilen (2026-10-09): Start-FAQ, Funktionsliste, Vorteil „Teilen, wo deine Gäste sind“, llms.txt und `/einladung/terminabstimmung` (Beschreibung, Einleitung, Vorteil, neue FAQ „Wie teile ich allen den festgelegten Termin mit?“)
 
-- [x] GEO-Ausbau (2026-10-14): Vergleichsseite `/vergleich` („WhatsApp-Umfrage, Doodle oder GASTZILLA?“, FAQ aus echten Suchanfragen wie „doodle einladung erstellen kostenlos“, „wie terminumfrage whatsapp“) – Inhalt in `src/lib/comparison.ts`, verlinkt von der Anlass-Übersicht `/einladung`, „Über uns“, llms.txt, Sitemap; Liste „Was GASTZILLA nicht kann“ (`LIMITATIONS` in `src/lib/structured-data.ts`) auf `/vergleich` und in llms.txt; sichtbares „Aktualisiert am“ auf Anlass-Seiten, `/vergleich` und „Über uns“; AboutPage-Schema + Kontakt auf „Über uns“; falsche Funktionsangabe „Designs für verschiedene Anlässe“ durch die echten Farbdesigns ersetzt
+- [x] GEO-Ausbau (2026-10-14): Vergleichsseite `/vergleich` („WhatsApp-Umfrage, Doodle oder GASTZILLA?“, FAQ aus echten Suchanfragen wie „doodle einladung erstellen kostenlos“, „wie terminumfrage whatsapp“) – Inhalt in `src/lib/comparison.ts`, verlinkt von der Anlass-Übersicht `/einladung`, „Über uns“, llms.txt, Sitemap; Liste „Was GASTZILLA nicht kann“ (`LIMITATIONS` in `src/lib/structured-data.ts`) auf `/vergleich` und in llms.txt; sichtbares „Aktualisiert am“ auf Anlass-Seiten, `/vergleich` und „Über uns“; AboutPage-Schema + Kontakt auf „Über uns“; falsche Funktionsangabe „Designs für verschiedene Anlässe“ korrigiert
+
+- [x] Design-Formulierung (2026-10-22): überall „Designs für jeden Anlass – Farbdesigns kostenlos, dazu kostenpflichtige Premium-Designs“; keine einzelnen Design- oder Farbnamen und keine Anzahl mehr (Funktionsliste, Start-FAQ, llms.txt, `/vergleich`, Anlass-FAQ Karneval, Oktoberfest, Halloween, Mottoparty, Trauerfeier); „Keine Designs für bestimmte Anlässe“ aus „Was GASTZILLA nicht kann“ entfernt. **Live erst nach dem nächsten Deploy** – `gastzilla.de/llms.txt` zeigt bis dahin noch „Acht Farbdesigns …“
 
 ## Du selbst (Dashboards & Konten)
 

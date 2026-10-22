@@ -43,7 +43,7 @@ export const OCCASIONS_HUB = {
   description:
     "Ob Kindergeburtstag, Hochzeit oder Grillabend: Erstelle kostenlos eine digitale Einladung, teile den Link und sammle alle Zu- und Absagen in einer Gästeliste.",
   intro:
-    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat. Steht der Termin noch nicht fest, stimmen sie vorher einfach darüber ab.",
+    "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite im passenden Design. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat. Steht der Termin noch nicht fest, stimmen sie vorher einfach darüber ab.",
 };
 
 export const OCCASIONS: Occasion[] = [
@@ -751,10 +751,10 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wer kann die Seite sehen?",
         answer:
-          "Nur wer den Link hat – und wenn du ein Passwort setzt, nur wer auch das Passwort kennt. Suchmaschinen finden die Seite nicht. Für einen ruhigen Rahmen eignen sich schlichte Designs wie „Weiß“ oder „Schwarz“.",
+          "Nur wer den Link hat – und wenn du ein Passwort setzt, nur wer auch das Passwort kennt. Suchmaschinen finden die Seite nicht. Für einen ruhigen Rahmen eignet sich ein schlichtes, dezentes Farbdesign.",
       },
     ],
-    updated: "2026-10-09",
+    updated: "2026-10-22",
   },
   {
     id: "company-party",
@@ -933,12 +933,12 @@ export const OCCASIONS: Occasion[] = [
           "Nein. GASTZILLA sammelt nur die Zusagen. Die Karten besorgst du wie gewohnt beim Karnevalsverein – aber mit der richtigen Anzahl.",
       },
       {
-        question: "Gibt es ein Karnevals-Design?",
+        question: "Welches Design passt zur Karnevalseinladung?",
         answer:
-          "Ein eigenes Karnevals-Design gibt es nicht, aber mit bunten Farbdesigns wie „Rot“, „Gelb“ oder „Blau“ bekommt deine Einladung schnell die passende Stimmung.",
+          "Ein kräftiges, buntes Farbdesign bringt sofort Jecken-Stimmung auf deine Einladungsseite – kostenlos. Noch verspielter wird es mit einem der kostenpflichtigen Premium-Designs.",
       },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-22",
   },
   {
     id: "oktoberfest",
@@ -994,12 +994,12 @@ export const OCCASIONS: Occasion[] = [
           "Nein. GASTZILLA sammelt nur die Zusagen. Die Reservierung erledigst du wie gewohnt beim Festwirt – aber mit der richtigen Personenzahl.",
       },
       {
-        question: "Gibt es ein Oktoberfest-Design?",
+        question: "Welches Design passt zur Oktoberfest-Einladung?",
         answer:
-          "Ein eigenes Oktoberfest-Design gibt es nicht, aber mit den Farbdesigns „Blau“ oder „Weiß“ bekommt deine Einladung schnell den passenden Look.",
+          "Wähle unter den kostenlosen Farbdesigns eines, das zu deiner Wiesn-Stimmung passt – oder eines der kostenpflichtigen Premium-Designs.",
       },
     ],
-    updated: "2026-10-07",
+    updated: "2026-10-22",
   },
   {
     id: "halloween-party",
@@ -1018,7 +1018,7 @@ export const OCCASIONS: Occasion[] = [
     benefits: [
       {
         title: "Passendes Design",
-        text: "Wähle ein dunkles Design wie „Schwarz“ oder ein kräftiges „Orange“ – und gib deiner Einladung den richtigen Grusel-Look.",
+        text: "Wähle ein dunkles oder kräftiges Farbdesign – und gib deiner Einladung den richtigen Grusel-Look.",
       },
       {
         title: "Kostüme abstimmen",
@@ -1054,12 +1054,12 @@ export const OCCASIONS: Occasion[] = [
           "Ja. Eltern tragen ihr Kind ein und geben an, wann sie es bringen und wieder abholen – praktisch, wenn die Kinder danach noch um die Häuser ziehen.",
       },
       {
-        question: "Gibt es ein Halloween-Design?",
+        question: "Welches Design passt zur Halloween-Einladung?",
         answer:
-          "Ein eigenes Halloween-Design gibt es nicht, aber mit den Farbdesigns „Schwarz“ oder „Orange“ bekommt deine Einladung schnell eine passende Stimmung.",
+          "Für Grusel-Stimmung sorgt ein dunkles Farbdesign – kostenlos. Wer mehr will, wählt eines der kostenpflichtigen Premium-Designs.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-22",
   },
   {
     id: "advent-party",
@@ -1298,10 +1298,10 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Gibt es Designs passend zu meinem Motto?",
         answer:
-          "Eigene Motto-Designs gibt es nicht, aber du kannst aus mehreren Farbdesigns wählen und Titel und Begrüßungstext frei auf dein Motto zuschneiden.",
+          "Ja. Du wählst eines der kostenlosen Farbdesigns oder ein kostenpflichtiges Premium-Design und schneidest Titel und Begrüßungstext frei auf dein Motto zu.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-10-22",
   },
   {
     id: "group-travel",

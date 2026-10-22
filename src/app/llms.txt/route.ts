@@ -32,7 +32,7 @@ Privatpersonen, Familien, Vereine und kleine Teams, die ein Event organisieren �
 
 ## Preise
 
-Ein Event mit allen Grundfunktionen ist kostenlos. Weitere Events und Premium-Designs sollen bald dazugekauft werden können.
+Ein Event mit allen Grundfunktionen und den Farbdesigns ist kostenlos. Premium-Designs sind kostenpflichtig; weitere Events sollen bald dazugekauft werden können.
 
 ## Anlässe
 
