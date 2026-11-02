@@ -6,12 +6,17 @@ vi.mock("@/lib/recaptcha", () => ({
   getRecaptchaToken: vi.fn(() => "token"),
   verifyRecaptchaToken: vi.fn(async () => ({ ok: true })),
 }));
+vi.mock("@/services/event-lifecycle-service", () => ({
+  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  denyIfOver: vi.fn(async () => null),
+}));
 vi.mock("@/lib/email", () => ({ sendEmail: vi.fn(async () => {}) }));
 
 const { buildPasswordRequestEmail, requestEventPassword } = await import("@/services/password-request-service");
 const { getEventAccessInfo } = await import("@/repositories/event-repository");
 const { getUserContact } = await import("@/repositories/user-repository");
 const { sendEmail } = await import("@/lib/email");
+const { denyIfOver } = await import("@/services/event-lifecycle-service");
 
 const LINK = "https://gastzilla.de/event/fest-abc123";
 
@@ -86,6 +91,16 @@ describe("requestEventPassword", () => {
       replyTo: "max@example.de",
       subject: "Passwort-Anfrage für „Sommerfest“",
     });
+  });
+
+  it("refuses with 409 once the event is over, without mailing", async () => {
+    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    expect(await requestEventPassword("event-1", body)).toEqual({
+      ok: false,
+      status: 409,
+      error: "Dieses Event ist vorbei.",
+    });
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it("rejects invalid requests without mailing", async () => {

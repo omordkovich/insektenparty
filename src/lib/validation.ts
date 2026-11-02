@@ -680,9 +680,14 @@ export function validateProposals(
 
 // "Fester Termin" in the date dialog: a date is required, the time is
 // optional; an optional end date makes it an event over several days (an
-// end date equal to the start date means a single day).
+// end date equal to the start date means a single day). Neither day may lie
+// before `today`; with `latest` (the plan's window) neither may lie after it -
+// the service checks the window itself, the form may pass it too.
+export const DATE_IN_PAST_ERROR = "Das Datum liegt in der Vergangenheit.";
+
 export function validateFixedDate(
   raw: unknown,
+  options: { today: string; latest?: string; latestError?: string },
 ): FieldResult<{ proposal: Proposal; endDate: string | null; schedule: EventSchedule }> {
   const value = (raw ?? {}) as { date?: unknown; endDate?: unknown; startTime?: unknown; endTime?: unknown };
   if (typeof value.date !== "string" || value.date.trim() === "") {
@@ -698,6 +703,12 @@ export function validateFixedDate(
       return { ok: false, error: "Das Enddatum ist ungültig." };
     }
     endDate = value.endDate;
+  }
+
+  const days = endDate ? [proposal.date, endDate] : [proposal.date];
+  if (days.some((day) => day < options.today)) return { ok: false, error: DATE_IN_PAST_ERROR };
+  if (options.latest !== undefined && days.some((day) => day > options.latest!)) {
+    return { ok: false, error: options.latestError ?? "Das Datum liegt zu weit in der Zukunft." };
   }
 
   if (!endDate && proposal.startTime && proposal.endTime === proposal.startTime) {

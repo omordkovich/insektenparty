@@ -32,7 +32,9 @@ Privatpersonen, Familien, Vereine und kleine Teams, die ein Event organisieren �
 
 ## Preise
 
-Ein Event mit allen Grundfunktionen und den Farbdesigns ist kostenlos. Premium-Designs sind kostenpflichtig; weitere Events sollen bald dazugekauft werden können.
+Jedes Konto bekommt einmalig ein kostenloses Event: mit festem Termin, der höchstens drei Monate nach dem Erstellen liegt, mit Gästeliste, Einladungstext, Passwortschutz und den Farbdesigns. Wird es gelöscht, gibt es kein neues.
+
+Kostenpflichtige Extras sind ein freigeschaltetes Event (alle Designs inklusive, Terminabstimmung, Termin vorerst offen lassen, Termin bis zwölf Monate nach dem Erstellen des Events), einzelne Premium-Designs und eine Event-Seite ohne den Hinweis „made with GASTZILLA“. Weitere Events sollen bald dazugekauft werden können. Wie lange Events gespeichert bleiben, steht unten bei den häufigen Fragen.
 
 ## Anlässe
 

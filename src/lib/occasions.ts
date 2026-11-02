@@ -482,7 +482,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Wie lange vor der Hochzeit verschickt man die Einladungen?",
         answer:
-          "Üblich ist ein „Save the Date“ sechs bis zwölf Monate vorher und die eigentliche Einladung drei bis vier Monate vor der Hochzeit. Mit GASTZILLA legst du die Seite früh an und ergänzt Details später – bereits verschickte Links funktionieren weiter.",
+          "Üblich ist ein „Save the Date“ sechs bis zwölf Monate vorher und die eigentliche Einladung drei bis vier Monate vor der Hochzeit. Mit GASTZILLA legst du die Seite früh an und ergänzt Details später – bereits verschickte Links funktionieren weiter. Liegt die Hochzeit mehr als drei Monate entfernt, brauchst du dafür ein kostenpflichtiges Event.",
       },
       {
         question: "Wie viele Hochzeitsgäste sagen ab?",
@@ -500,7 +500,7 @@ export const OCCASIONS: Occasion[] = [
           "Alle, die den Einladungslink haben. Suchmaschinen finden eure Event-Seite nicht. Teile den Link deshalb nur mit den Gästen, die du einladen möchtest – oder schütze die Seite zusätzlich mit einem Passwort.",
       },
     ],
-    updated: "2026-10-06",
+    updated: "2026-11-02",
   },
   {
     id: "bachelor-party",
@@ -1469,7 +1469,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Kann ich regelmäßige Proben anlegen?",
         answer:
-          "Jeder Termin ist bei GASTZILLA ein eigenes Event. Ein Event mit allen Grundfunktionen ist kostenlos, weitere Events kannst du bald dazukaufen. Für ein Probenwochenende reicht ein Event mit Zeitraum.",
+          "Jeder Termin ist bei GASTZILLA ein eigenes Event. Dein erstes Event ist kostenlos, weitere Events kannst du bald dazukaufen. Für ein Probenwochenende reicht ein Event mit Zeitraum.",
       },
       {
         question: "Wie sehe ich, wer welches Instrument spielt?",
@@ -1487,7 +1487,7 @@ export const OCCASIONS: Occasion[] = [
           "Schlage bis zu vier Probentermine vor. Alle haken an, was passt – fehlt jemand Wichtiges, siehst du es sofort und legst den Termin fest, an dem die Besetzung steht.",
       },
     ],
-    updated: "2026-10-09",
+    updated: "2026-11-02",
   },
   {
     id: "going-out",
@@ -1604,7 +1604,7 @@ export const OCCASIONS: Occasion[] = [
       {
         question: "Kann ich mehrere Termine anlegen?",
         answer:
-          "Ein Event mit allen Grundfunktionen ist kostenlos. Weitere Events kannst du bald dazukaufen.",
+          "Jeder Termin ist ein eigenes Event. Das erste ist kostenlos, weitere kannst du bald dazukaufen.",
       },
       {
         question: "Wie finden wir einen Termin, an dem genug Leute können?",
@@ -1612,7 +1612,7 @@ export const OCCASIONS: Occasion[] = [
           "Schlage zwei bis vier Termine vor und lass alle abstimmen. Du siehst für jeden Termin, wie viele können – und legst den fest, an dem genug Mitspieler zusammenkommen.",
       },
     ],
-    updated: "2026-10-09",
+    updated: "2026-11-02",
   },
   {
     id: "tabletop-night",
@@ -1751,7 +1751,7 @@ export const OCCASIONS: Occasion[] = [
     title: "Termin abstimmen und einladen – Terminumfrage per Link",
     metaTitle: "Termin abstimmen: Terminumfrage & Einladung per Link – GASTZILLA",
     description:
-      "Gemeinsamen Termin finden: bis zu 4 Vorschläge, Gäste stimmen per Link ohne Konto ab. Termin festlegen und allen per WhatsApp & Co. mitteilen – kostenlos.",
+      "Gemeinsamen Termin finden: bis zu 4 Vorschläge, Gäste stimmen per Link ohne Konto ab. Termin festlegen und allen per WhatsApp & Co. mitteilen.",
     teaser: "Noch kein Datum? Gäste stimmen per Link ab, welcher Termin passt – danach sagen sie direkt zu.",
     intro: [
       "Bevor man einlädt, muss oft erst ein Termin her: Wann haben die meisten Zeit? Im Gruppenchat endet die Frage nach dem passenden Datum schnell in Dutzenden Nachrichten – und am Ende weiß niemand mehr, wer wann kann.",
@@ -1795,9 +1795,9 @@ export const OCCASIONS: Occasion[] = [
           "Sobald du den Termin festlegst, schlägt GASTZILLA dir einen Text vor: dass ihr euch gemeinsam für diesen Termin entschieden habt, mit Datum, Ort und Link, und der Bitte, die Angaben in der Gästeliste zu vervollständigen. Anrede und Gruß passt du an, dann kopierst du den Text oder teilst ihn direkt per WhatsApp, E-Mail & Co.",
       },
       {
-        question: "Muss ich bei den Terminvorschlägen eine Uhrzeit angeben?",
+        question: "Ist die Terminabstimmung kostenlos?",
         answer:
-          "Nein, die Uhrzeit ist optional. Du kannst auch nur Tage vorschlagen und die Uhrzeit ergänzen, sobald der Termin feststeht.",
+          "Nein, die Terminabstimmung ist bei GASTZILLA ein kostenpflichtiges Extra. Kostenlos ist dein erstes Event mit festem Termin – Gästeliste, Einladungstext und Teilen inklusive.",
       },
       {
         question: "Was passiert, wenn ich den Termin festlege?",
@@ -1805,7 +1805,7 @@ export const OCCASIONS: Occasion[] = [
           "Die Abstimmung endet. Wer den Termin angehakt hat, steht als Zusage in der Gästeliste, alle anderen als Absage. Gäste können ihren Eintrag danach wie gewohnt ergänzen, etwa um Begleitpersonen oder Mitbringsel.",
       },
     ],
-    updated: "2026-10-09",
+    updated: "2026-11-02",
   },
 ];
 

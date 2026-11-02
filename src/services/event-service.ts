@@ -1,5 +1,6 @@
 import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
 import { todayInBerlin } from "@/lib/date-poll";
+import { checkPlanRules, dateWindowError, latestAllowedDate } from "@/lib/event-plan";
 import { buildSlug, generateSlug, slugKeyOf, slugNamePart } from "@/lib/slug";
 import type { ThemeKey } from "@/lib/theme-presets";
 import {
@@ -20,6 +21,7 @@ import {
   createEvent,
   deleteEvent,
   getEventAddress,
+  getEventPlanInfo,
   getEventSchedule,
   getEventTheme,
   updateEvent,
@@ -28,11 +30,14 @@ import {
 import { applyDateModeChange, getEventDateMode } from "@/repositories/date-poll-repository";
 import { getUserDisplayName } from "@/repositories/user-repository";
 import { parseDateModeRequest } from "@/services/date-mode-service";
-import { canCreateEvent, canUseTheme } from "@/lib/features";
+import { canUseTheme, nextEventPlan, unlockedThemesFor } from "@/lib/features";
 import { getUserEntitlements } from "@/services/entitlement-service";
+import { denyIfOver } from "@/services/event-lifecycle-service";
 
-const EVENT_LIMIT_ERROR = "Du hast dein Event-Kontingent erreicht.";
+const NO_QUOTA_ERROR = "Du hast kein freies Event mehr.";
 const THEME_LOCKED_ERROR = "Dieses Design ist noch nicht freigeschaltet.";
+const NOT_FOUND_ERROR = "Event wurde nicht gefunden.";
+const DATE_IN_PAST_ERROR = "Das Datum liegt in der Vergangenheit.";
 
 // A taken address only happens on a (very unlikely) suffix collision, so a
 // few fresh suffixes are plenty; more failures mean something else is wrong.
@@ -46,13 +51,30 @@ function isUniqueViolation(error: unknown): boolean {
   return codeOf(error) === "23505" || codeOf(cause) === "23505";
 }
 
+// DB backstop (see the free-event migration): one 'free_event' ledger row per
+// user. Hit only if two requests slip past the ledger lock; it is a used-up
+// quota, not a taken address, so it must not trigger the slug retry.
+const ONE_FREE_EVENT_INDEX = "user_entitlements_one_free_event";
+
+function isOneFreeEventViolation(error: unknown): boolean {
+  const nameOf = (value: unknown) => {
+    if (typeof value !== "object" || value === null) return undefined;
+    // postgres-js: constraint_name, node-postgres: constraint.
+    if ("constraint_name" in value) return value.constraint_name;
+    if ("constraint" in value) return value.constraint;
+    return undefined;
+  };
+  const cause = typeof error === "object" && error !== null && "cause" in error ? error.cause : undefined;
+  return isUniqueViolation(error) && (nameOf(error) === ONE_FREE_EVENT_INDEX || nameOf(cause) === ONE_FREE_EVENT_INDEX);
+}
+
 export type EventServiceResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };
 
 export async function createEventForOwner(
   ownerId: string,
-  input: { theme: unknown; title: unknown; accessPassword?: unknown; date?: unknown },
+  input: { theme: unknown; title: unknown; accessPassword?: unknown; date?: unknown; paid?: unknown },
 ): Promise<EventServiceResult<{ slug: string }>> {
   const themeValidation = validateTheme(input.theme);
   if (!themeValidation.ok) {
@@ -72,21 +94,32 @@ export async function createEventForOwner(
 
   // The event starts without a date; the chosen mode is applied right after
   // creating it (nothing can be lost on a brand-new event).
-  const dateValidation = parseDateModeRequest(input.date, [], todayInBerlin());
+  const today = todayInBerlin();
+  const dateValidation = parseDateModeRequest(input.date, [], today);
   if (!dateValidation.ok) {
     return { ok: false, status: 400, error: dateValidation.error };
   }
+  const { request, schedule } = dateValidation.value;
 
+  // The free event goes first unless a paid one is asked for; the plan
+  // decides which date modes, how far ahead and which themes are allowed.
   const entitlements = await getUserEntitlements(ownerId);
-  if (!canCreateEvent(entitlements)) {
-    return { ok: false, status: 403, error: EVENT_LIMIT_ERROR };
+  const plan = nextEventPlan(entitlements, input.paid === true);
+  if (!plan) {
+    return { ok: false, status: 403, error: NO_QUOTA_ERROR };
   }
-  if (!canUseTheme(entitlements, theme)) {
+  const planViolation = checkPlanRules(plan, today, request);
+  if (planViolation) {
+    return { ok: false, status: planViolation.status, error: planViolation.error };
+  }
+  if (!canUseTheme({ unlockedThemes: unlockedThemesFor(entitlements, plan) }, theme)) {
     return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
   }
 
   const ownerName = await getUserDisplayName(ownerId);
-  let created: { id: string; slug: string } | null = null;
+  // createEvent re-checks the quota under a lock ("no_quota" when another
+  // request used it up in the meantime).
+  let created: { id: string; slug: string } | "no_quota" | null = null;
   for (let attempt = 1; created === null; attempt++) {
     try {
       const { slug, key, namePart } = generateSlug({ title: titleValidation.value, ownerName });
@@ -99,13 +132,17 @@ export async function createEventForOwner(
         title: titleValidation.value,
         accessPassword: passwordValidation.value,
         dateMode: "unknown",
+        plan,
       });
     } catch (error) {
-      if (!isUniqueViolation(error) || attempt >= SLUG_ATTEMPTS) throw error;
+      if (isOneFreeEventViolation(error)) created = "no_quota";
+      else if (!isUniqueViolation(error) || attempt >= SLUG_ATTEMPTS) throw error;
     }
   }
+  if (created === "no_quota") {
+    return { ok: false, status: 403, error: NO_QUOTA_ERROR };
+  }
 
-  const { request, schedule } = dateValidation.value;
   if (request.mode !== "unknown") {
     await applyDateModeChange(created.id, ownerId, {
       mode: request.mode,
@@ -129,6 +166,10 @@ export async function updateEventForOwner(
   ownerId: string,
   body: Record<string, unknown>,
 ): Promise<EventServiceResult<EventRow>> {
+  // An event that is over is read-only (the owner can still delete it).
+  const over = await denyIfOver(id);
+  if (over) return over;
+
   const updates: Partial<Record<EventFieldKey, string>> = {};
   let themeUpdate: ThemeKey | undefined;
   // undefined = not part of this request; null = protection switched off.
@@ -196,6 +237,11 @@ export async function updateEventForOwner(
   if (Object.keys(scheduleChanges).length > 0 && (await getEventDateMode(id)) !== "fixed") {
     return { ok: false, status: 409, error: "Datum und Uhrzeit legst du in den Event-Einstellungen fest." };
   }
+  // A fixed event keeps a date; "no date yet" is a different mode that is
+  // switched in the dialog (it has other plan rules and another Stichtag).
+  if (scheduleChanges.eventDate === null) {
+    return { ok: false, status: 400, error: "Bitte gib ein Datum ein." };
+  }
 
   let schedule: EventSchedule | undefined;
   if (Object.keys(scheduleChanges).length > 0) {
@@ -214,6 +260,27 @@ export async function updateEventForOwner(
       return { ok: false, status: 400, error: validation.error };
     }
     schedule = validation.value;
+
+    // A changed day must not lie in the past nor beyond the plan's window.
+    // Only days that actually change are checked, so changing a time (or
+    // re-sending the same day) of an event that is already over keeps working.
+    const changedDays = [
+      schedule.eventDate !== stored.eventDate ? schedule.eventDate : null,
+      schedule.eventEndDate !== stored.eventEndDate ? schedule.eventEndDate : null,
+    ].filter((day): day is string => day !== null);
+    if (changedDays.length > 0) {
+      const info = await getEventPlanInfo(id);
+      if (!info || info.ownerId !== ownerId) {
+        return { ok: false, status: 404, error: NOT_FOUND_ERROR };
+      }
+      if (changedDays.some((day) => day < todayInBerlin())) {
+        return { ok: false, status: 400, error: DATE_IN_PAST_ERROR };
+      }
+      const latest = latestAllowedDate(info.plan, info.createdOn);
+      if (changedDays.some((day) => day > latest)) {
+        return { ok: false, status: 400, error: dateWindowError(info.plan) };
+      }
+    }
     updates.dateLabel = formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate);
     updates.timeLabel = formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime);
   }
@@ -236,8 +303,12 @@ export async function updateEventForOwner(
       return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
     }
     if (themeUpdate !== currentTheme) {
+      const info = await getEventPlanInfo(id);
+      if (!info || info.ownerId !== ownerId) {
+        return { ok: false, status: 404, error: NOT_FOUND_ERROR };
+      }
       const entitlements = await getUserEntitlements(ownerId);
-      if (!canUseTheme(entitlements, themeUpdate)) {
+      if (!canUseTheme({ unlockedThemes: unlockedThemesFor(entitlements, info.plan) }, themeUpdate)) {
         return { ok: false, status: 403, error: THEME_LOCKED_ERROR };
       }
     }

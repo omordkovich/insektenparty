@@ -3,7 +3,11 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
-import { isThemeSelectable } from "@/lib/features";
+import { todayInBerlin, type DateMode, type DateModeRequest } from "@/lib/date-poll";
+import { buildDateModeRequest, dateWindowOf, initialDateDraft, type DateDraft } from "@/lib/date-poll-form";
+import { dateWindowError, latestAllowedDate, type EventPlan } from "@/lib/event-plan";
+import { isThemeSelectable, unlockedThemesFor } from "@/lib/features";
+import type { UnlockContext } from "@/lib/products";
 import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 import { MAX_GUEST_CAPACITY } from "@/lib/guest-capacity";
 import {
@@ -13,27 +17,40 @@ import {
   validateNewEventTitle,
 } from "@/lib/validation";
 import { Button } from "./Button";
+import { DateModeFields } from "./DateModeFields";
 import { LockIcon } from "./EditIcons";
 import { EventPasswordFields } from "./EventPasswordFields";
 import { LegalLink } from "./LegalLink";
 import { Modal } from "./Modal";
+import { UnlockDialog, type UnlockScope } from "./UnlockDialog";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
-type EventDialogProps =
+type EventDialogProps = (
   | {
       mode: "create";
+      /** What the new event becomes: a free one needs a fixed date in its
+       *  short window; a paid one starts without a date, as before. */
+      createPlan: EventPlan;
+      /** The user's own designs; a paid event gets all of them. */
       unlockedThemes: ThemeKey[];
-      onCloseAction: () => void;
     }
   | {
       // Owner's event page: design and password protection - the title is
       // edited inline on the page itself.
       mode: "settings";
       event: { id: string; theme: ThemeKey; accessPassword: string | null; maxGuests: number | null };
+      /** The designs this event may use (all of them for a paid event). */
       unlockedThemes: ThemeKey[];
-      onCloseAction: () => void;
-    };
+    }
+) & {
+  unlock: UnlockContext;
+  onCloseAction: () => void;
+};
+
+// A locked spot that was clicked: a design, or (create dialog) a locked
+// date mode or "Mehr Zeit?" (mode null).
+type UnlockTarget = { kind: "theme"; theme: ThemeKey } | { kind: "credit"; mode: DateMode | null };
 
 export function EventDialog(props: EventDialogProps) {
   const { mode, onCloseAction } = props;
@@ -46,7 +63,11 @@ export function EventDialog(props: EventDialogProps) {
   const [theme, setTheme] = useState<ThemeKey>(mode === "settings" ? props.event.theme : THEME_KEYS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lockHint, setLockHint] = useState<string | null>(null);
+  const [unlockTarget, setUnlockTarget] = useState<UnlockTarget | null>(null);
+  // Unlocked from this dialog: designs bought one by one, and the whole
+  // event (create: it is created as a paid event; settings: it was upgraded).
+  const [boughtThemes, setBoughtThemes] = useState<ThemeKey[]>([]);
+  const [paidUnlocked, setPaidUnlocked] = useState(false);
   const originalTheme = mode === "settings" ? props.event.theme : undefined;
   const originalPassword = mode === "settings" ? props.event.accessPassword : null;
   const [isProtected, setIsProtected] = useState(originalPassword !== null);
@@ -56,6 +77,32 @@ export function EventDialog(props: EventDialogProps) {
   const originalMaxGuests = mode === "settings" ? props.event.maxGuests : null;
   const [limitGuests, setLimitGuests] = useState(originalMaxGuests !== null);
   const [maxGuestsInput, setMaxGuestsInput] = useState(originalMaxGuests !== null ? String(originalMaxGuests) : "");
+
+  const createPlan: EventPlan | null =
+    mode === "create" ? (paidUnlocked ? "paid" : props.createPlan) : null;
+  const unlockedThemes = unlockedThemesFor(
+    { unlockedThemes: [...props.unlockedThemes, ...boughtThemes] },
+    paidUnlocked || createPlan === "paid" ? "paid" : "free",
+  );
+  // Creating a free event: the "Termin" block with "Fester Termin" preset.
+  // It stays once the event is unlocked here, then with every mode.
+  const withDateBlock = mode === "create" && props.createPlan === "free";
+  const [today] = useState(todayInBerlin);
+  const [dateDraft, setDateDraft] = useState<DateDraft>(() => ({ ...initialDateDraft(null), mode: "fixed" }));
+  const dateWindow = createPlan ? dateWindowOf(createPlan, latestAllowedDate(createPlan, today)) : undefined;
+
+  function handleUnlocked(target: UnlockTarget, scope: UnlockScope) {
+    setError(null);
+    if (target.kind === "theme") {
+      if (scope === "theme") setBoughtThemes((current) => [...current, target.theme]);
+      else setPaidUnlocked(true);
+      setTheme(target.theme);
+      return;
+    }
+    setPaidUnlocked(true);
+    const unlockedMode = target.mode;
+    if (unlockedMode) setDateDraft((draft) => ({ ...draft, mode: unlockedMode }));
+  }
 
   async function handleSubmit() {
     if (saving) return;
@@ -69,6 +116,17 @@ export function EventDialog(props: EventDialogProps) {
         return;
       }
       trimmedName = titleResult.value;
+    }
+
+    // A free event needs its fixed date; a paid one may start without.
+    let date: DateModeRequest = { mode: "unknown" };
+    if (withDateBlock) {
+      const dateResult = buildDateModeRequest(null, dateDraft, todayInBerlin(), dateWindow);
+      if (!dateResult.ok) {
+        setError(dateResult.error);
+        return;
+      }
+      if (dateResult.request) date = dateResult.request;
     }
 
     let accessPassword: string | null = null;
@@ -111,9 +169,15 @@ export function EventDialog(props: EventDialogProps) {
         const response = await fetch("/api/events", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          // New events start without a date ("Noch kein Termin bekannt");
-          // the owner sets it with the pencil at the date on the event page.
-          body: JSON.stringify({ theme, title: trimmedName, accessPassword, date: { mode: "unknown" } }),
+          // A paid event may start without a date ("Noch kein Termin
+          // bekannt"); the owner sets it with the pencil on the event page.
+          body: JSON.stringify({
+            theme,
+            title: trimmedName,
+            accessPassword,
+            date,
+            paid: createPlan === "paid",
+          }),
         });
 
         if (!response.ok) {
@@ -191,17 +255,16 @@ export function EventDialog(props: EventDialogProps) {
       <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {THEME_KEYS.map((key) => {
-          const selectable = isThemeSelectable(props.unlockedThemes, key, originalTheme);
+          const selectable = isThemeSelectable(unlockedThemes, key, originalTheme);
           return (
             <button
               key={key}
               type="button"
               onClick={() => {
                 if (!selectable) {
-                  setLockHint("Dieses Design kannst du bald freischalten.");
+                  setUnlockTarget({ kind: "theme", theme: key });
                   return;
                 }
-                setLockHint(null);
                 setTheme(key);
               }}
               disabled={saving}
@@ -232,10 +295,28 @@ export function EventDialog(props: EventDialogProps) {
         })}
       </div>
 
-      {lockHint ? (
-        <p className="mt-3 text-sm text-muted" role="status">
-          {lockHint}
-        </p>
+      {withDateBlock ? (
+        <div className="mt-5">
+          <p className="text-sm font-semibold text-leaf-dark">Termin</p>
+          {createPlan === "free" ? (
+            <p className="mt-1 text-xs text-muted">
+              Dein kostenloses Event braucht ein festes Datum, höchstens 3 Monate im Voraus.
+            </p>
+          ) : null}
+          <DateModeFields
+            original={null}
+            draft={dateDraft}
+            onChange={(next) => {
+              setDateDraft(next);
+              setError(null);
+            }}
+            disabled={saving}
+            lockedModes={createPlan === "free" ? ["unknown", "poll"] : undefined}
+            onLockedClickAction={(lockedMode) => setUnlockTarget({ kind: "credit", mode: lockedMode })}
+            minDate={today}
+            maxDate={dateWindow?.latest}
+          />
+        </div>
       ) : null}
 
       <EventPasswordFields
@@ -308,9 +389,21 @@ export function EventDialog(props: EventDialogProps) {
       ) : null}
 
       {error ? (
-        <p className="mt-4 text-sm text-danger" role="alert">
-          {error}
-        </p>
+        <div className="mt-4">
+          <p className="text-sm text-danger" role="alert">
+            {error}
+          </p>
+          {createPlan === "free" && error === dateWindowError("free") ? (
+            <Button
+              variant="outline"
+              className="mt-2"
+              onClick={() => setUnlockTarget({ kind: "credit", mode: null })}
+              disabled={saving}
+            >
+              Mehr Zeit? Event freischalten
+            </Button>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -321,6 +414,28 @@ export function EventDialog(props: EventDialogProps) {
           {saving ? "Wird gespeichert ..." : "Bestätigen"}
         </Button>
       </div>
+
+      {unlockTarget?.kind === "theme" ? (
+        <UnlockDialog
+          kind="theme"
+          theme={unlockTarget.theme}
+          // Settings: the event itself is upgraded. Create: a credit for
+          // the event being created.
+          eventId={mode === "settings" ? props.event.id : undefined}
+          eventCredits={props.unlock.eventCredits}
+          dummyPayments={props.unlock.dummyPayments}
+          onCloseAction={() => setUnlockTarget(null)}
+          onUnlockedAction={(scope) => handleUnlocked(unlockTarget, scope)}
+        />
+      ) : unlockTarget?.kind === "credit" ? (
+        <UnlockDialog
+          kind="credit"
+          eventCredits={props.unlock.eventCredits}
+          dummyPayments={props.unlock.dummyPayments}
+          onCloseAction={() => setUnlockTarget(null)}
+          onUnlockedAction={(scope) => handleUnlocked(unlockTarget, scope)}
+        />
+      ) : null}
     </Modal>
   );
 }

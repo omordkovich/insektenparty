@@ -4,6 +4,7 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { buildEventShareUrl } from "@/lib/share";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
 import { getEventByAddress } from "@/repositories/event-repository";
+import { getEventLifecycle } from "@/services/event-lifecycle-service";
 import React from "react";
 
 type EventLayoutProps = {
@@ -31,6 +32,26 @@ export async function generateMetadata({
 
   if (!event) {
     return { title: "Event nicht gefunden", robots: NO_INDEX };
+  }
+
+  // Link previews are fetched anonymously, so an expired event reveals
+  // nothing to anyone: no title, no date.
+  if ((await getEventLifecycle(event.id))?.stage === "expired") {
+    const expiredDescription = "Diese Einladung ist abgelaufen.";
+    return {
+      title: "Abgelaufene Einladung",
+      description: expiredDescription,
+      robots: NO_INDEX,
+      openGraph: {
+        type: "website",
+        siteName: "GASTZILLA",
+        locale: "de_DE",
+        title: "Abgelaufene Einladung",
+        description: expiredDescription,
+        url: buildEventShareUrl(event.slug),
+      },
+      twitter: { card: "summary_large_image", title: "Abgelaufene Einladung", description: expiredDescription },
+    };
   }
 
   // Not for search engines (see NO_INDEX), but this is what WhatsApp & co.

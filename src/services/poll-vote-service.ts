@@ -18,6 +18,7 @@ import {
   updatePollVote,
 } from "@/repositories/date-poll-repository";
 import { getEventOwnerId } from "@/repositories/event-repository";
+import { denyIfOver } from "@/services/event-lifecycle-service";
 import { notifyOwnerOfPollVote } from "@/services/notification-service";
 
 export type PollServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string };
@@ -52,6 +53,8 @@ async function checkWrite(
 ): Promise<{ ok: true; isOwner: boolean; options: PollOption[] } | { ok: false; status: number; error: string }> {
   const ownerId = await getEventOwnerId(eventId);
   if (ownerId === undefined) return { ok: false, status: 404, error: NOT_FOUND };
+  const over = await denyIfOver(eventId);
+  if (over) return over;
   if ((await getEventDateMode(eventId)) !== "poll") return { ok: false, status: 409, error: POLL_CLOSED };
 
   const isOwner = requesterId !== undefined && requesterId === ownerId;

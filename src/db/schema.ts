@@ -44,6 +44,17 @@ export const events = pgTable("events", {
   dateMode: text("date_mode").notNull().default("fixed"),
   // "Teilnehmerzahl begrenzen": max. people incl. companions; null = no limit.
   maxGuests: integer("max_guests"),
+  // "free" | "paid" (see lib/event-plan.ts); the check lives in the migration.
+  plan: text("plan").notNull().default("free"),
+  // Expiry mails already sent (null = not yet), see lib/event-lifecycle.ts.
+  deletionNoticeSentAt: timestamp("deletion_notice_sent_at", {
+    withTimezone: true,
+  }),
+  dateReminderSentAt: timestamp("date_reminder_sent_at", {
+    withTimezone: true,
+  }),
+  // "Ohne GASTZILLA-Hinweis" (0,99 € per event): hides the GASTZILLA badge.
+  badgeHidden: boolean("badge_hidden").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -128,6 +139,10 @@ export const userEntitlements = pgTable("user_entitlements", {
   quantity: integer("quantity").notNull().default(1),
   source: text("source").notNull().default("manual"),
   note: text("note"),
+  // paid_event / free_event rows: the event that used this credit (null =
+  // unused). Deliberately no FK, so the row survives deleting the event.
+  consumedEventId: uuid("consumed_event_id"),
+  consumedAt: timestamp("consumed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

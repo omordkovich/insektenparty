@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { EventExpiredPage } from "@/components/EventExpiredPage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatCreatedDate } from "@/lib/calendar";
 import { getEventByAddress } from "@/repositories/event-repository";
 import { getUserDisplayName } from "@/repositories/user-repository";
+import { getViewerAccess } from "@/services/event-access-service";
+import { getEventLifecycle } from "@/services/event-lifecycle-service";
 
 type EventInfoPageProps = {
   params: Promise<{ slug: string }>;
@@ -18,6 +21,12 @@ export default async function EventInfoPage({ params }: EventInfoPageProps) {
   }
   if (event.slug !== slug) {
     permanentRedirect(`/event/${event.slug}/info`);
+  }
+
+  // Like the event page: long past, only the owner still gets in.
+  const [{ isOwner }, lifecycle] = await Promise.all([getViewerAccess(event), getEventLifecycle(event.id)]);
+  if (lifecycle?.stage === "expired" && !isOwner) {
+    return <EventExpiredPage />;
   }
 
   const ownerName = event.ownerId ? await getUserDisplayName(event.ownerId) : null;

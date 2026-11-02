@@ -11,23 +11,34 @@ type MadeWithBadgeProps = {
   share?: { url: string; title: string };
   /** Extra icon button placed right of the share/copy buttons. */
   extraAction?: ReactNode;
+  /** "Ohne GASTZILLA-Hinweis": only the badge goes - the share buttons and
+   *  the legal links always stay. */
+  hidden?: boolean;
+  /** Owner only: a small button at the badge's top right corner that
+   *  offers removing it (a client component - see BadgeRemoveButton). */
+  removeButton?: ReactNode;
 };
 
-export function MadeWithBadge({ share, extraAction }: MadeWithBadgeProps) {
+export function MadeWithBadge({ share, extraAction, hidden = false, removeButton }: MadeWithBadgeProps) {
   return (
     <div className="mt-6 text-center">
       {/* Wraps on narrow phones: the owner gets up to four icon buttons. */}
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Link href="/" className="inline-block">
-          {/* The badge (black on transparent) is used as a mask so it can be
-              filled with the event theme's color - see .made-with-badge. */}
-          <span
-            role="img"
-            aria-label="made with Gastzilla© 2026"
-            className="made-with-badge mx-auto block aspect-[2/1] w-32"
-            style={{ maskImage: `url(${BADGE_SRC})`, WebkitMaskImage: `url(${BADGE_SRC})` }}
-          />
-        </Link>
+        {hidden ? null : (
+          <div className="relative">
+            <Link href="/" className="block">
+              {/* The badge (black on transparent) is used as a mask so it can be
+                  filled with the event theme's color - see .made-with-badge. */}
+              <span
+                role="img"
+                aria-label="made with Gastzilla© 2026"
+                className="made-with-badge mx-auto block aspect-[2/1] w-32"
+                style={{ maskImage: `url(${BADGE_SRC})`, WebkitMaskImage: `url(${BADGE_SRC})` }}
+              />
+            </Link>
+            {removeButton}
+          </div>
+        )}
         {share ? (
           <ShareButtons url={share.url} title={share.title} className="bg-surface">
             {extraAction}

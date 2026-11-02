@@ -1,6 +1,7 @@
 import { cloudinaryPng, OG_SIZE, renderOgCard, renderSiteOgImage } from "@/lib/og-image";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { getEventByAddress } from "@/repositories/event-repository";
+import { getEventLifecycle } from "@/services/event-lifecycle-service";
 
 // Link preview for a shared invitation: the event's theme logo, title and
 // date - nothing a link holder couldn't see on the page anyway. Password-
@@ -17,6 +18,11 @@ export default async function EventOpengraphImage({
   const { slug } = await params;
   const event = await getEventByAddress(slug);
   if (!event) return renderSiteOgImage();
+
+  // Expired: the preview is fetched anonymously - no title, no date.
+  if ((await getEventLifecycle(event.id))?.stage === "expired") {
+    return renderSiteOgImage({ title: "Abgelaufene Einladung", subtitle: "GASTZILLA" });
+  }
 
   // Password-protected: neither the theme (hints at the occasion) nor the date.
   if (event.accessPassword) {

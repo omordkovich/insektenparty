@@ -11,12 +11,14 @@ import {
 } from "@/lib/event-access";
 import { createClient } from "@/lib/supabase/server";
 import { getEventAccessInfo } from "@/repositories/event-repository";
+import { getEventLifecycle } from "@/services/event-lifecycle-service";
 
 export type EventAccessResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };
 
 export const EVENT_LOCKED_ERROR = "Dieses Event ist passwortgeschützt.";
+export const EVENT_EXPIRED_ERROR = "Diese Einladung ist abgelaufen.";
 
 // A small pause after a wrong password slows down guessing (passwords may
 // be as short as 4 characters - this is a privacy screen, not a vault).
@@ -46,6 +48,18 @@ export async function denyLockedEvent(eventId: string): Promise<NextResponse | n
   if (!event) return null;
   const { hasAccess } = await getViewerAccess(event);
   return hasAccess ? null : NextResponse.json({ error: EVENT_LOCKED_ERROR }, { status: 403 });
+}
+
+// Guest API routes that hand out data (GET): 410 for an expired event, to
+// everyone but its owner - the event page shows the same to non-owners.
+// Unknown events pass through (404 comes from the service).
+export async function denyExpiredEvent(eventId: string): Promise<NextResponse | null> {
+  const lifecycle = await getEventLifecycle(eventId);
+  if (lifecycle?.stage !== "expired") return null;
+  const event = await getEventAccessInfo(eventId);
+  if (!event) return null;
+  const { isOwner } = await getViewerAccess(event);
+  return isOwner ? null : NextResponse.json({ error: EVENT_EXPIRED_ERROR }, { status: 410 });
 }
 
 export async function unlockEvent(

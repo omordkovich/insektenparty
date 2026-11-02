@@ -130,6 +130,8 @@ export async function applyDateModeChange(
         eventEndTime: schedule?.eventEndTime ?? null,
         dateLabel: schedule ? formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate) : "",
         timeLabel: schedule ? formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime) : "",
+        // A new mode or date: a date reminder may be due again later.
+        dateReminderSentAt: null,
         updatedAt: new Date(),
       })
       .where(and(eq(events.id, eventId), eq(events.ownerId, ownerId)))

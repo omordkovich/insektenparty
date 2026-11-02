@@ -4,6 +4,7 @@ import {
   buildGoogleCalendarLink,
   formatCreatedDate,
   formatDateRangeLabel,
+  formatDottedDate,
 } from "@/lib/calendar";
 
 describe("formatDateRangeLabel", () => {
@@ -67,5 +68,12 @@ describe("formatCreatedDate", () => {
   it("uses German local time, not UTC", () => {
     // 23:30 UTC on 3 Sept is already 01:30 on 4 Sept in Berlin (CEST).
     expect(formatCreatedDate(new Date("2026-09-03T23:30:00Z"))).toBe("4. September 2026");
+  });
+});
+
+describe("formatDottedDate", () => {
+  it("writes an ISO date as TT.MM.JJJJ", () => {
+    expect(formatDottedDate("2026-12-05")).toBe("05.12.2026");
+    expect(formatDottedDate("2027-01-31")).toBe("31.01.2027");
   });
 });

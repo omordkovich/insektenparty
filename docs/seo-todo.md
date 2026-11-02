@@ -1,6 +1,6 @@
 # SEO & KI-Sichtbarkeit – To-do
 
-Stand: 2026-10-22
+Stand: 2026-11-02
 
 ## Erledigt (im Code)
 
@@ -21,6 +21,8 @@ Stand: 2026-10-22
 - [x] GEO-Ausbau (2026-10-14): Vergleichsseite `/vergleich` („WhatsApp-Umfrage, Doodle oder GASTZILLA?“, FAQ aus echten Suchanfragen wie „doodle einladung erstellen kostenlos“, „wie terminumfrage whatsapp“) – Inhalt in `src/lib/comparison.ts`, verlinkt von der Anlass-Übersicht `/einladung`, „Über uns“, llms.txt, Sitemap; Liste „Was GASTZILLA nicht kann“ (`LIMITATIONS` in `src/lib/structured-data.ts`) auf `/vergleich` und in llms.txt; sichtbares „Aktualisiert am“ auf Anlass-Seiten, `/vergleich` und „Über uns“; AboutPage-Schema + Kontakt auf „Über uns“; falsche Funktionsangabe „Designs für verschiedene Anlässe“ korrigiert
 
 - [x] Design-Formulierung (2026-10-22): überall „Designs für jeden Anlass – Farbdesigns kostenlos, dazu kostenpflichtige Premium-Designs“; keine einzelnen Design- oder Farbnamen und keine Anzahl mehr (Funktionsliste, Start-FAQ, llms.txt, `/vergleich`, Anlass-FAQ Karneval, Oktoberfest, Halloween, Mottoparty, Trauerfeier); „Keine Designs für bestimmte Anlässe“ aus „Was GASTZILLA nicht kann“ entfernt. **Live erst nach dem nächsten Deploy** – `gastzilla.de/llms.txt` zeigt bis dahin noch „Acht Farbdesigns …“
+
+- [x] Free-Event & automatische Löschung (2026-11-02): Start-FAQ „Ist GASTZILLA kostenlos?“ (ein kostenloses Event pro Konto, einmalig, fester Termin ≤ 3 Monate; Terminabstimmung, offener Termin, Termin bis 12 Monate, ohne GASTZILLA-Hinweis = kostenpflichtige Extras) und neue Start-FAQ „Wie lange bleibt mein Event gespeichert?“; Hinweis in der Start-FAQ zur Terminabstimmung; Funktionsliste (Terminabstimmung als Extra, neue Zeile „Datensparsam …“); Startseiten-Hero; llms.txt „Preise“; `/vergleich` (Hinweis + FAQ „… Terminabstimmung kostenlos …“); Anlass-Seiten Terminabstimmung (Meta-Beschreibung ohne „kostenlos“, FAQ „Ist die Terminabstimmung kostenlos?“ statt der Uhrzeit-Frage), Hochzeit, Proben, Sport. Keine Preise genannt (Zahlung in Testphase). Für Preis-Fragen lieferte die Autovervollständigung keine Daten (Netz) → nach dem Livegang mit Search-Console-Anfragen nachschärfen
 
 ## Du selbst (Dashboards & Konten)
 

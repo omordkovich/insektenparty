@@ -7,7 +7,12 @@ export const FAQ: FaqItem[] = [
   {
     question: "Ist GASTZILLA kostenlos?",
     answer:
-      "Ja – ein Event mit allen Grundfunktionen und den Farbdesigns ist kostenlos. Premium-Designs sind kostenpflichtig, weitere Events kannst du bald dazukaufen.",
+      "Dein erstes Event ist kostenlos: Jedes Konto bekommt einmalig ein Event mit festem Termin, der höchstens drei Monate nach dem Erstellen liegt – mit Gästeliste, Einladungstext, Passwortschutz und den Farbdesigns. Terminabstimmung, ein noch offener Termin, Termine bis zwölf Monate nach dem Erstellen und eine Event-Seite ohne GASTZILLA-Hinweis sind kostenpflichtige Extras, ebenso die Premium-Designs. Weitere Events kannst du bald dazukaufen.",
+  },
+  {
+    question: "Wie lange bleibt mein Event gespeichert?",
+    answer:
+      "Bis 90 Tage nach dem Event – dann löscht GASTZILLA Event, Gästeliste und Abstimmung automatisch. Maßgeblich ist der letzte Tag des Events, bei einer Terminabstimmung der späteste Vorschlag und ohne Termin sechs Monate nach dem Erstellen. Schon 30 Tage nach dem Event zeigt der Einladungslink nur noch, dass die Einladung abgelaufen ist. Etwa eine Woche vor dem Löschen erinnern wir dich per E-Mail daran.",
   },
   {
     question: "Brauchen meine Gäste ein Konto?",
@@ -16,7 +21,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Kann ich den Termin mit meinen Gästen abstimmen?",
     answer:
-      "Ja. Steht der Termin noch nicht fest, schlägst du zwei bis vier Termine vor – mit oder ohne Uhrzeit. Deine Gäste haken über den Link an, was ihnen passt. Den Favoriten legst du mit einem Klick fest, und alle Stimmen werden automatisch zu Zu- und Absagen in der Gästeliste. Danach bekommst du einen fertigen Text, mit dem du allen den Termin per WhatsApp, E-Mail & Co. mitteilst.",
+      "Ja. Steht der Termin noch nicht fest, schlägst du zwei bis vier Termine vor – mit oder ohne Uhrzeit. Deine Gäste haken über den Link an, was ihnen passt. Den Favoriten legst du mit einem Klick fest, und alle Stimmen werden automatisch zu Zu- und Absagen in der Gästeliste. Danach bekommst du einen fertigen Text, mit dem du allen den Termin per WhatsApp, E-Mail & Co. mitteilst. Die Terminabstimmung gehört zu den kostenpflichtigen Extras.",
   },
   {
     question: "Können Gäste auch absagen?",

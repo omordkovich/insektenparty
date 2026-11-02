@@ -1,3 +1,4 @@
+import { buildLifecycleMessage, type LifecycleMail } from "@/lib/lifecycle-mails";
 import { sendEmail } from "@/lib/email";
 import { buildEventShareUrl } from "@/lib/share";
 import { getEventForNotification } from "@/repositories/event-repository";
@@ -103,4 +104,22 @@ export async function notifyOwnerOfPollVote(
   choice: string,
 ): Promise<void> {
   await notifyOwner(eventId, (eventTitle) => buildPollVoteMessage(kind, voterName, choice, eventTitle));
+}
+
+// Daily lifecycle mails (deletion notice, date and poll reminders). Unlike
+// the best-effort notifications above, a send error is thrown so the job
+// does not mark the mail as sent. Returns false when there is nobody to
+// mail (no owner or no address) - nothing is sent and nothing is an error.
+export async function sendLifecycleMail(
+  kind: LifecycleMail,
+  event: { ownerId: string | null; title: string; slug: string },
+  date: string,
+): Promise<boolean> {
+  if (!event.ownerId) return false;
+  const owner = await getUserContact(event.ownerId);
+  if (!owner?.email) return false;
+
+  const { subject, text } = buildLifecycleMessage(kind, event, date);
+  await sendEmail({ to: owner.email, subject, text });
+  return true;
 }

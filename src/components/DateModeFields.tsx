@@ -3,12 +3,19 @@
 import { DATE_MODES, POLL_MAX_OPTIONS, formatPollOptionLabel, sameProposal, type DateMode } from "@/lib/date-poll";
 import { emptyRow, type DateDraft, type DateSettings, type ProposalRow } from "@/lib/date-poll-form";
 import { Button } from "./Button";
+import { LockIcon } from "./EditIcons";
 
 type DateModeFieldsProps = {
   original: DateSettings | null;
   draft: DateDraft;
   onChange: (draft: DateDraft) => void;
   disabled?: boolean;
+  /** Shown dimmed with a lock (free event); a click asks to unlock. */
+  lockedModes?: DateMode[];
+  onLockedClickAction?: (mode: DateMode) => void;
+  /** Bounds for the date pickers: today and the plan's latest day. */
+  minDate?: string;
+  maxDate?: string;
 };
 
 const MODE_LABELS: Record<DateMode, string> = {
@@ -22,7 +29,16 @@ const boxClass = "mt-3 space-y-3 rounded-xl border border-leaf/15 bg-leaf/5 p-3"
 
 // The "Termin" dialog on the owner's event page: no date yet, a poll (new,
 // running or restarted) or a fixed date - see lib/date-poll-form.ts.
-export function DateModeFields({ original, draft, onChange, disabled = false }: DateModeFieldsProps) {
+export function DateModeFields({
+  original,
+  draft,
+  onChange,
+  disabled = false,
+  lockedModes = [],
+  onLockedClickAction,
+  minDate,
+  maxDate,
+}: DateModeFieldsProps) {
   const update = (changes: Partial<DateDraft>) => onChange({ ...draft, ...changes });
   const runningOptions = original?.mode === "poll" && !draft.restart ? original.options : null;
   const canAddRow = (runningOptions?.length ?? 0) + draft.rows.length < POLL_MAX_OPTIONS;
@@ -43,22 +59,42 @@ export function DateModeFields({ original, draft, onChange, disabled = false }: 
     <fieldset className="mt-4">
       <legend className="sr-only">Termin-Art</legend>
       <div className="space-y-1">
-        {DATE_MODES.map((mode) => (
-          <label key={mode} className="flex items-center gap-2 text-sm">
-            <input
-              type="radio"
-              name="dateMode"
-              checked={draft.mode === mode}
+        {DATE_MODES.map((mode) =>
+          lockedModes.includes(mode) ? (
+            // Locked like the design tiles: visible, dimmed, a click opens
+            // the unlock dialog instead of choosing it.
+            <button
+              key={mode}
+              type="button"
               disabled={disabled}
-              onChange={() => update({ mode })}
-              className="h-5 w-5"
-            />
-            {MODE_LABELS[mode]}
-          </label>
-        ))}
+              onClick={() => onLockedClickAction?.(mode)}
+              className="flex items-center gap-2 text-left text-sm opacity-50"
+            >
+              <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-leaf/40 text-leaf-dark">
+                <LockIcon />
+              </span>
+              {MODE_LABELS[mode]}
+              <span className="sr-only"> (gesperrt)</span>
+            </button>
+          ) : (
+            <label key={mode} className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="dateMode"
+                checked={draft.mode === mode}
+                disabled={disabled}
+                onChange={() => update({ mode })}
+                className="h-5 w-5"
+              />
+              {MODE_LABELS[mode]}
+            </label>
+          ),
+        )}
       </div>
 
-      {draft.mode === "poll" ? (
+      {/* A locked mode can still be the event's current one (older free
+          events): its options stay hidden until it is unlocked. */}
+      {draft.mode === "poll" && !lockedModes.includes("poll") ? (
         <div className={boxClass}>
           {runningOptions ? (
             <div>
@@ -80,6 +116,8 @@ export function DateModeFields({ original, draft, onChange, disabled = false }: 
                 type="date"
                 aria-label="Datum"
                 value={row.date}
+                min={minDate}
+                max={maxDate}
                 disabled={disabled}
                 onChange={(event) => setRow(row.key, { date: event.target.value })}
                 className={`${inputClass} col-span-2`}
@@ -183,6 +221,8 @@ export function DateModeFields({ original, draft, onChange, disabled = false }: 
               <input
                 type="date"
                 value={draft.fixed.date}
+                min={minDate}
+                max={maxDate}
                 disabled={disabled}
                 onChange={(event) => update({ fixed: { ...draft.fixed, date: event.target.value } })}
                 className={inputClass}
@@ -193,7 +233,8 @@ export function DateModeFields({ original, draft, onChange, disabled = false }: 
               <input
                 type="date"
                 value={draft.fixed.endDate}
-                min={draft.fixed.date || undefined}
+                min={draft.fixed.date || minDate}
+                max={maxDate}
                 disabled={disabled}
                 onChange={(event) => update({ fixed: { ...draft.fixed, endDate: event.target.value } })}
                 className={inputClass}

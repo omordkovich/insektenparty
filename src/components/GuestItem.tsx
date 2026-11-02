@@ -12,6 +12,8 @@ type GuestItemProps = {
   onShowTime: (guest: GuestDto) => void;
   onShowDeclined: (guest: GuestDto) => void;
   disabled?: boolean;
+  /** The event is over: no edit / delete buttons. */
+  readOnly?: boolean;
 };
 
 export function GuestItem({
@@ -24,6 +26,7 @@ export function GuestItem({
   onShowTime,
   onShowDeclined,
   disabled = false,
+  readOnly = false,
 }: GuestItemProps) {
   return (
     <tr className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-leaf/15 bg-surface/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm sm:table-row sm:rounded-none sm:border-0 sm:border-b sm:border-leaf/10 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none sm:last:border-0">
@@ -141,6 +144,7 @@ export function GuestItem({
           </td>
         </>
       )}
+      {readOnly ? null : (
       <td className="block w-full sm:w-auto sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
         <div className="flex justify-end gap-2">
           <Button
@@ -164,6 +168,7 @@ export function GuestItem({
           </Button>
         </div>
       </td>
+      )}
     </tr>
   );
 }

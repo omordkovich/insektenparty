@@ -53,7 +53,7 @@ export const COMPARISON = {
         "du bei jeder Zu- oder Absage eine E-Mail bekommen möchtest, statt im Chat nachzuzählen",
         "dir Privatsphäre wichtig ist – werbefrei, ohne Tracking-Cookies, Server in der EU, auf Wunsch mit Passwort",
       ],
-      note: "Als Gastgeber legst du ein kostenloses Konto an. Ein Event mit allen Grundfunktionen ist kostenlos.",
+      note: "Als Gastgeber legst du ein kostenloses Konto an. Dein erstes Event mit festem Termin ist kostenlos, die Terminabstimmung ist ein kostenpflichtiges Extra.",
     },
   ],
   faq: [
@@ -65,7 +65,7 @@ export const COMPARISON = {
     {
       question: "Kann man eine Einladung mit Terminabstimmung kostenlos erstellen?",
       answer:
-        "Ja. Bei GASTZILLA ist ein Event mit allen Grundfunktionen kostenlos – Terminabstimmung, Gästeliste und fertiger Einladungstext eingeschlossen. Premium-Designs sind kostenpflichtig, weitere Events kannst du bald dazukaufen.",
+        "Mit einer WhatsApp-Umfrage ja – bei GASTZILLA ist die Terminabstimmung ein kostenpflichtiges Extra. Kostenlos ist dort dein erstes Event mit festem Termin, mit Gästeliste und fertigem Einladungstext. Premium-Designs sind ebenfalls kostenpflichtig, weitere Events kannst du bald dazukaufen.",
     },
     {
       question: "Muss man sich für eine Terminabstimmung anmelden?",
@@ -87,7 +87,7 @@ export const COMPARISON = {
   disclaimer:
     "Stand: Oktober 2026. WhatsApp ist eine Marke der WhatsApp LLC, Doodle eine Marke der Doodle AG. Angaben zu anderen Diensten ohne Gewähr – ihre Funktionen können sich ändern.",
   // Last real text change (sitemap lastModified, visible date), YYYY-MM-DD.
-  updated: "2026-10-22",
+  updated: "2026-11-02",
 };
 
 export function comparisonBreadcrumbs(): Breadcrumb[] {

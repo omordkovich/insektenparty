@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/repositories/event-repository", () => ({ getEventOwnerId: vi.fn(async () => "owner-1") }));
 vi.mock("@/repositories/date-poll-repository", () => ({ getEventDateMode: vi.fn(async () => "poll") }));
@@ -13,9 +13,14 @@ vi.mock("@/repositories/guest-repository", () => ({
   getGuestsByEventId: vi.fn(),
 }));
 vi.mock("@/services/notification-service", () => ({ notifyOwnerOfGuestChange: vi.fn() }));
+vi.mock("@/services/event-lifecycle-service", () => ({
+  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  denyIfOver: vi.fn(async () => null),
+}));
 
-const { createGuestForEvent, updateGuestForEvent } = await import("@/services/guest-service");
-const { createGuest } = await import("@/repositories/guest-repository");
+const { createGuestForEvent, deleteGuestForEvent, updateGuestForEvent } = await import("@/services/guest-service");
+const { createGuest, updateGuest, deleteGuest } = await import("@/repositories/guest-repository");
+const { denyIfOver } = await import("@/services/event-lifecycle-service");
 const { getEventDateMode } = await import("@/repositories/date-poll-repository");
 
 describe("guest list while the date is open", () => {
@@ -27,6 +32,30 @@ describe("guest list while the date is open", () => {
     });
     expect(await updateGuestForEvent("event-1", "guest-1", {}, "owner-1")).toMatchObject({ ok: false, status: 409 });
     expect(createGuest).not.toHaveBeenCalled();
+  });
+});
+
+describe("guest list once the event is over", () => {
+  beforeEach(() => {
+    vi.mocked(getEventDateMode).mockResolvedValue("fixed");
+    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(createGuest).mockClear();
+    vi.mocked(updateGuest).mockClear();
+    vi.mocked(deleteGuest).mockClear();
+  });
+
+  afterEach(() => {
+    vi.mocked(denyIfOver).mockResolvedValue(null);
+  });
+
+  it("refuses new, changed and deleted entries without writing", async () => {
+    const over = { ok: false, status: 409, error: "Dieses Event ist vorbei." };
+    expect(await createGuestForEvent("event-1", {}, "owner-1")).toEqual(over);
+    expect(await updateGuestForEvent("event-1", "guest-1", {}, "owner-1")).toEqual(over);
+    expect(await deleteGuestForEvent("event-1", "guest-1", {}, "owner-1")).toEqual(over);
+    expect(createGuest).not.toHaveBeenCalled();
+    expect(updateGuest).not.toHaveBeenCalled();
+    expect(deleteGuest).not.toHaveBeenCalled();
   });
 });
 

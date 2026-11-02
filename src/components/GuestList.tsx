@@ -17,6 +17,8 @@ type GuestListProps = {
   /** "Noch 4 von 12 Plätzen frei" / "Ausgebucht"; null without a limit. */
   capacityText?: string | null;
   actionsDisabled?: boolean;
+  /** The event is over: nobody can add, change or delete entries. */
+  readOnly?: boolean;
 };
 
 export function GuestList({
@@ -33,6 +35,7 @@ export function GuestList({
   onShowDeclined,
   capacityText = null,
   actionsDisabled = false,
+  readOnly = false,
 }: GuestListProps) {
   return (
     <section className="page-shell py-6" aria-labelledby="guest-heading">
@@ -63,11 +66,17 @@ export function GuestList({
 
         {!loading && !error && guests.length === 0 ? (
           <div className="mt-8 text-center">
-            <p className="text-lg text-muted">Noch hat sich niemand eingetragen.</p>
-            <p className="mt-1 text-xl font-bold text-leaf-dark">Sei der Erste!</p>
-            <Button variant="primary" size="lg" onClick={onAdd} className="mt-6">
-              + Gast hinzufügen
-            </Button>
+            <p className="text-lg text-muted">
+              {readOnly ? "Es hat sich niemand eingetragen." : "Noch hat sich niemand eingetragen."}
+            </p>
+            {readOnly ? null : (
+              <>
+                <p className="mt-1 text-xl font-bold text-leaf-dark">Sei der Erste!</p>
+                <Button variant="primary" size="lg" onClick={onAdd} className="mt-6">
+                  + Gast hinzufügen
+                </Button>
+              </>
+            )}
           </div>
         ) : null}
 
@@ -99,16 +108,19 @@ export function GuestList({
                       onShowTime={onShowTime}
                       onShowDeclined={onShowDeclined}
                       disabled={actionsDisabled}
+                      readOnly={readOnly}
                     />
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="mt-6 flex justify-center">
-              <Button variant="secondary" size="lg" onClick={onAdd} disabled={actionsDisabled}>
-                + Gast hinzufügen
-              </Button>
-            </div>
+            {readOnly ? null : (
+              <div className="mt-6 flex justify-center">
+                <Button variant="secondary" size="lg" onClick={onAdd} disabled={actionsDisabled}>
+                  + Gast hinzufügen
+                </Button>
+              </div>
+            )}
           </>
         ) : null}
       </div>

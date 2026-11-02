@@ -12,6 +12,7 @@ import {
   type CapacityGuard,
   type GuestRow,
 } from "@/repositories/guest-repository";
+import { denyIfOver } from "@/services/event-lifecycle-service";
 import { notifyOwnerOfGuestChange } from "@/services/notification-service";
 
 export type GuestServiceResult<T> =
@@ -73,6 +74,8 @@ export async function createGuestForEvent(
   if (ownerId === undefined) {
     return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
+  const over = await denyIfOver(eventId);
+  if (over) return over;
   if (!(await isDateFixed(eventId))) {
     return { ok: false, status: 409, error: DATE_NOT_FIXED_ERROR };
   }
@@ -115,6 +118,8 @@ export async function updateGuestForEvent(
 ): Promise<GuestServiceResult<GuestDto>> {
   const ownerId = await getEventOwnerId(eventId);
   const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+  const over = await denyIfOver(eventId);
+  if (over) return over;
   if (!(await isDateFixed(eventId))) {
     return { ok: false, status: 409, error: DATE_NOT_FIXED_ERROR };
   }
@@ -158,6 +163,8 @@ export async function deleteGuestForEvent(
 ): Promise<GuestServiceResult<{ ok: true }>> {
   const ownerId = await getEventOwnerId(eventId);
   const isOwnerRequest = requesterId !== undefined && requesterId === ownerId;
+  const over = await denyIfOver(eventId);
+  if (over) return over;
 
   if (!isOwnerRequest) {
     const recaptcha = await verifyRecaptchaToken(getRecaptchaToken(body));

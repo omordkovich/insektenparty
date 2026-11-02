@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { EventConfig } from "@/lib/event-config";
+import type { UnlockContext } from "@/lib/products";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { ThemeEditButton } from "./ThemeEditButton";
 
@@ -11,10 +12,14 @@ type HeaderProps = {
   themeEdit?: {
     eventId: string;
     theme: ThemeKey;
+    /** The designs this event may use (all of them for a paid event). */
     unlockedThemes: ThemeKey[];
     accessPassword: string | null;
     maxGuests: number | null;
+    unlock: UnlockContext;
   };
+  /** The event is over: no settings gear, whatever `themeEdit` says. */
+  readOnly?: boolean;
 };
 
 // Logo is fixed at w-64 (256px), so half its width is a constant here.
@@ -27,7 +32,7 @@ const ACCENT_OFFSET = `calc(50% + ${LOGO_HALF_WIDTH}px + ${ACCENT_GAP}px)`;
 // renders at half size on high-DPI screens.
 const ACCENT_SIZE = 110;
 
-export function Header({ config, logoHref, themeEdit }: HeaderProps) {
+export function Header({ config, logoHref, themeEdit, readOnly = false }: HeaderProps) {
   return (
     <header className="relative flex items-center justify-center overflow-hidden pt-6 pb-4">
       {config.assets.accentOne ? (
@@ -69,13 +74,14 @@ export function Header({ config, logoHref, themeEdit }: HeaderProps) {
             priority
           />
         </Link>
-        {themeEdit ? (
+        {themeEdit && !readOnly ? (
           <ThemeEditButton
             eventId={themeEdit.eventId}
             theme={themeEdit.theme}
             unlockedThemes={themeEdit.unlockedThemes}
             accessPassword={themeEdit.accessPassword}
             maxGuests={themeEdit.maxGuests}
+            unlock={themeEdit.unlock}
             className="absolute bottom-2 left-full ml-3"
           />
         ) : null}

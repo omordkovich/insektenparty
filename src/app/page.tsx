@@ -7,6 +7,9 @@ import { SITE_DESCRIPTION } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
 import { AccountButton, ConsentDialog, EventList } from "@/components/SignedInHomeParts";
 import { getAccountName, getSignInMethods } from "@/lib/account";
+import { todayInBerlin } from "@/lib/date-poll";
+import { lifecycleOf } from "@/lib/event-lifecycle";
+import { isDummyPaymentEnabled } from "@/lib/payments";
 import { hasAcceptedTerms } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -33,11 +36,21 @@ export default async function Home({ searchParams }: HomeProps) {
   const claims = data?.claims;
   const name = getAccountName(claims?.user_metadata);
 
+  // Stage and deletion day of every event, worked out here on the server.
+  const today = todayInBerlin();
   const myEvents = claims
-    ? (await getEventsByOwner(claims.sub)).map((event) => ({
-        ...event,
-        theme: event.theme as ThemeKey,
-      }))
+    ? (await getEventsByOwner(claims.sub)).map((event) => {
+        const { stage, deletionDate } = lifecycleOf(event, today);
+        return {
+          id: event.id,
+          slug: event.slug,
+          title: event.title,
+          theme: event.theme as ThemeKey,
+          plan: event.plan,
+          stage,
+          deletionDate,
+        };
+      })
     : [];
 
   const entitlements = claims ? await getUserEntitlements(claims.sub) : null;
@@ -58,7 +71,7 @@ export default async function Home({ searchParams }: HomeProps) {
       <main className="flex min-h-full flex-col items-center px-6 py-16 text-center">
         <LandingContent
           hero={
-            claims ? (
+            claims && entitlements ? (
               <section className="flex flex-col items-center">
                 <h1 className="max-w-xl text-2xl font-normal text-zinc-800 sm:text-3xl">
                   Hi {name ?? claims.email}
@@ -66,8 +79,8 @@ export default async function Home({ searchParams }: HomeProps) {
                 <div className="mt-8 w-full">
                   <EventList
                     initialEvents={myEvents}
-                    eventLimit={entitlements?.eventLimit ?? 1}
-                    unlockedThemes={entitlements?.unlockedThemes ?? []}
+                    entitlements={entitlements}
+                    dummyPayments={isDummyPaymentEnabled()}
                   />
                 </div>
               </section>

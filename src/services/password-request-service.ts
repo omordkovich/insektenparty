@@ -8,6 +8,7 @@ import {
 } from "@/lib/validation";
 import { getEventAccessInfo } from "@/repositories/event-repository";
 import { getUserContact } from "@/repositories/user-repository";
+import { denyIfOver } from "@/services/event-lifecycle-service";
 import type { EventAccessResult } from "@/services/event-access-service";
 
 // "Passwort anfragen" on a locked event page: forwarded once to the owner's
@@ -46,6 +47,8 @@ export async function requestEventPassword(
   if (!event) {
     return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
+  const over = await denyIfOver(eventId);
+  if (over) return over;
   if (!event.accessPassword) {
     return {
       ok: false,

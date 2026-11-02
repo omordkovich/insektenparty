@@ -6,6 +6,7 @@ import {
   type DateModeRequest,
   type PollOption,
 } from "@/lib/date-poll";
+import { dateWindowError, type EventPlan } from "@/lib/event-plan";
 import { validateFixedDate, validateProposals } from "@/lib/validation";
 
 // The "Termin" block of the event dialog as editable state, and how it
@@ -22,7 +23,18 @@ export type DateSettings = {
   endTime: string | null;
   options: PollOptionSummary[];
   voteCount: number;
+  /** A free event only allows a fixed date; see lib/event-plan.ts. */
+  plan: EventPlan;
+  /** The latest day the event's date may lie on (its plan's window). */
+  maxDate: string;
 };
+
+/** The plan's date window: no new day after `latest`, else `error`. */
+export type DateWindow = { latest: string; error: string };
+
+export function dateWindowOf(plan: EventPlan, maxDate: string): DateWindow {
+  return { latest: maxDate, error: dateWindowError(plan) };
+}
 
 export type ProposalRow = { key: number; date: string; startTime: string; endTime: string };
 
@@ -33,6 +45,9 @@ export type DateDraft = {
   restart: boolean;
   fixed: { date: string; endDate: string; startTime: string; endTime: string };
 };
+
+// Lower than any date: validateFixedDate then skips its "in the past" check.
+const NO_PAST_CHECK = "0000-01-01";
 
 let nextRowKey = 0;
 
@@ -57,7 +72,12 @@ export function initialDateDraft(original: DateSettings | null): DateDraft {
 
 type BuildResult = { ok: true; request: DateModeRequest | null } | { ok: false; error: string };
 
-export function buildDateModeRequest(original: DateSettings | null, draft: DateDraft, today: string): BuildResult {
+export function buildDateModeRequest(
+  original: DateSettings | null,
+  draft: DateDraft,
+  today: string,
+  dateWindow?: DateWindow,
+): BuildResult {
   if (!draft.mode) return { ok: false, error: "Bitte wähle, wie der Termin festgelegt wird." };
 
   if (draft.mode === "unknown") {
@@ -76,10 +96,16 @@ export function buildDateModeRequest(original: DateSettings | null, draft: DateD
         max: POLL_MAX_OPTIONS - original.options.length,
         existing: original.options,
       });
-      return added.ok ? { ok: true, request: { mode: "poll", addProposals: added.value } } : added;
+      if (!added.ok) return added;
+      const outside = windowError(added.value, dateWindow);
+      if (outside) return { ok: false, error: outside };
+      return { ok: true, request: { mode: "poll", addProposals: added.value } };
     }
     const proposals = validateProposals(rows, { today, min: POLL_MIN_OPTIONS, max: POLL_MAX_OPTIONS });
-    return proposals.ok ? { ok: true, request: { mode: "poll", proposals: proposals.value } } : proposals;
+    if (!proposals.ok) return proposals;
+    const outside = windowError(proposals.value, dateWindow);
+    if (outside) return { ok: false, error: outside };
+    return { ok: true, request: { mode: "poll", proposals: proposals.value } };
   }
 
   // Older events may be "fixed" without any date - saving only the design
@@ -95,9 +121,11 @@ export function buildDateModeRequest(original: DateSettings | null, draft: DateD
   ) {
     return { ok: true, request: null };
   }
-  const result = validateFixedDate(fixed);
-  if (!result.ok) return result;
-  const { proposal, endDate } = result.value;
+  // Unchanged first: an event that is already over keeps its (past) date
+  // while the owner saves something else.
+  const parsed = validateFixedDate(fixed, { today: NO_PAST_CHECK });
+  if (!parsed.ok) return parsed;
+  const { proposal, endDate } = parsed.value;
   if (
     original?.mode === "fixed" &&
     original.date &&
@@ -106,9 +134,21 @@ export function buildDateModeRequest(original: DateSettings | null, draft: DateD
   ) {
     return { ok: true, request: null };
   }
+  const result = validateFixedDate(fixed, {
+    today,
+    latest: dateWindow?.latest,
+    latestError: dateWindow?.error,
+  });
+  if (!result.ok) return result;
   const fromOption =
     original?.mode === "poll" && endDate === null
       ? original.options.find((option) => sameProposal(option, proposal))
       : undefined;
   return { ok: true, request: { mode: "fixed", ...proposal, endDate, fromOptionId: fromOption?.id ?? null } };
+}
+
+// A proposal after the window's last day: its error, else null.
+function windowError(proposals: { date: string }[], dateWindow: DateWindow | undefined): string | null {
+  if (!dateWindow) return null;
+  return proposals.some((proposal) => proposal.date > dateWindow.latest) ? dateWindow.error : null;
 }

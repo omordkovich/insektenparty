@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { UnlockContext } from "@/lib/products";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { GearIcon } from "./EditIcons";
 import { EventDialog } from "./EventDialog";
@@ -12,6 +13,7 @@ type ThemeEditButtonProps = {
   unlockedThemes: ThemeKey[];
   accessPassword: string | null;
   maxGuests: number | null;
+  unlock: UnlockContext;
   className?: string;
 };
 
@@ -22,6 +24,7 @@ export function ThemeEditButton({
   unlockedThemes,
   accessPassword,
   maxGuests,
+  unlock,
   className = "",
 }: ThemeEditButtonProps) {
   const [open, setOpen] = useState(false);
@@ -42,6 +45,7 @@ export function ThemeEditButton({
           mode="settings"
           event={{ id: eventId, theme, accessPassword, maxGuests }}
           unlockedThemes={unlockedThemes}
+          unlock={unlock}
           onCloseAction={() => setOpen(false)}
         />
       ) : null}

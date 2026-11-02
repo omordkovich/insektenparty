@@ -1,9 +1,11 @@
+import { BadgeRemoveButton } from "@/components/BadgeRemoveButton";
 import { CopyPasswordButton } from "@/components/CopyPasswordButton";
 import { EditableField } from "@/components/EditableField";
 import { InvitationTextButton } from "@/components/InvitationTextButton";
 import { LockIcon } from "@/components/EditIcons";
 import { MadeWithBadge } from "@/components/MadeWithBadge";
 import type { EventConfig } from "@/lib/event-config";
+import type { UnlockContext } from "@/lib/products";
 import { buildEventShareUrl } from "@/lib/share";
 import type { EventFieldKey } from "@/lib/validation";
 
@@ -14,6 +16,14 @@ type FooterProps = {
   isOwner: boolean;
   /** Owner only (null for everyone else): goes into the invitation text. */
   accessPassword: string | null;
+  /** "Ohne GASTZILLA-Hinweis" bought: the badge is gone for everyone. */
+  badgeHidden: boolean;
+  /** Owner only, while the badge shows and the event can still change:
+   *  the X at the badge that offers removing it. */
+  removeBadge: UnlockContext | null;
+  /** The event is over: nothing can be edited (sharing and the legal links
+   *  stay). */
+  readOnly?: boolean;
 };
 
 type ContactField = {
@@ -24,7 +34,17 @@ type ContactField = {
   link?: { href: string };
 };
 
-export function Footer({ config, eventId, slug, isOwner, accessPassword }: FooterProps) {
+export function Footer({
+  config,
+  eventId,
+  slug,
+  isOwner,
+  accessPassword,
+  badgeHidden,
+  removeBadge,
+  readOnly = false,
+}: FooterProps) {
+  const canEdit = isOwner && !readOnly;
   const contactFields: ContactField[] = [
     {
       fieldKey: "contactName",
@@ -50,7 +70,7 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
   // Guests only see filled-in rows (no blank lines, and no "Kontakt"
   // heading at all when nothing is filled in); the owner sees every row with
   // its placeholder so empty ones can still be filled in.
-  const visibleFields = isOwner
+  const visibleFields = canEdit
     ? contactFields
     : contactFields.filter((field) => field.value.trim() !== "");
 
@@ -68,7 +88,7 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
                     fieldKey={field.fieldKey}
                     value={field.value}
                     placeholder={field.placeholder}
-                    isOwner={isOwner}
+                    isOwner={canEdit}
                     ariaLabel={field.ariaLabel}
                     className="text-muted"
                     link={field.link}
@@ -86,12 +106,15 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
         ) : null}
         <MadeWithBadge
           share={{ url: buildEventShareUrl(slug), title: config.title }}
+          hidden={badgeHidden}
+          removeButton={removeBadge ? <BadgeRemoveButton eventId={eventId} unlock={removeBadge} /> : undefined}
           extraAction={
             isOwner ? (
               <>
                 {accessPassword ? (
                   <CopyPasswordButton password={accessPassword} className="bg-surface" />
                 ) : null}
+                {readOnly ? null : (
                 <InvitationTextButton
                   eventId={eventId}
                   className="bg-surface"
@@ -106,6 +129,7 @@ export function Footer({ config, eventId, slug, isOwner, accessPassword }: Foote
                     dateMode: config.dateMode,
                   }}
                 />
+                )}
               </>
             ) : null
           }

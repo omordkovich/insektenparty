@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
-import { denyLockedEvent } from "@/services/event-access-service";
+import { denyExpiredEvent, denyLockedEvent } from "@/services/event-access-service";
 import { createPollVoteForEvent, getPollForEvent } from "@/services/poll-vote-service";
 
 type RouteContext = {
@@ -17,6 +17,9 @@ export async function GET(_request: Request, context: RouteContext) {
 
     const denied = await denyLockedEvent(eventId);
     if (denied) return denied;
+
+    const expired = await denyExpiredEvent(eventId);
+    if (expired) return expired;
 
     const result = await getPollForEvent(eventId);
     if (!result.ok) {

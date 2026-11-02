@@ -30,10 +30,12 @@ type DatePollSectionProps = {
   isOwner: boolean;
   /** Owner only: for the message to the guests after fixing a date. */
   announcement?: InvitationBase | null;
+  /** The event is over: results are shown, nobody can vote or fix a date. */
+  readOnly?: boolean;
 };
 
 // Status "Termin abstimmen lassen": instead of the guest list.
-export function DatePollSection({ eventId, isOwner, announcement }: DatePollSectionProps) {
+export function DatePollSection({ eventId, isOwner, announcement, readOnly = false }: DatePollSectionProps) {
   const apiBasePath = `/api/events/${eventId}/poll-votes`;
   const [poll, setPoll] = useState<PollDto | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +70,7 @@ export function DatePollSection({ eventId, isOwner, announcement }: DatePollSect
   const noneFitNames = votes.filter((vote) => vote.noneFit).map((vote) => vote.name);
 
   function voteActions(vote: PollVoteDto) {
+    if (readOnly) return null;
     return (
       <div className="flex justify-end gap-2">
         <Button
@@ -98,7 +101,9 @@ export function DatePollSection({ eventId, isOwner, announcement }: DatePollSect
           Wann passt es dir?
         </h2>
         <p className="mt-2 text-center text-muted">
-          Hake an, welche Termine dir passen. Der Gastgeber legt danach den Termin fest.
+          {readOnly
+            ? "Die Abstimmung ist beendet."
+            : "Hake an, welche Termine dir passen. Der Gastgeber legt danach den Termin fest."}
         </p>
 
         {error ? (
@@ -126,7 +131,7 @@ export function DatePollSection({ eventId, isOwner, announcement }: DatePollSect
                         className={`px-2 py-2 text-center font-bold ${leading.includes(option.id) ? "rounded-t-xl bg-leaf/10" : ""}`}
                       >
                         <span className="block whitespace-nowrap">{formatPollOptionLabel(option)}</span>
-                        {isOwner ? (
+                        {isOwner && !readOnly ? (
                           <button
                             type="button"
                             onClick={() => setFixOption(option)}
@@ -194,7 +199,7 @@ export function DatePollSection({ eventId, isOwner, announcement }: DatePollSect
                       <span className="shrink-0 font-bold text-leaf">✓ {names.length}</span>
                     </div>
                     {names.length > 0 ? <p className="mt-1 text-sm text-muted">{names.join(", ")}</p> : null}
-                    {isOwner ? (
+                    {isOwner && !readOnly ? (
                       <Button
                         variant="outline"
                         className="mt-3 w-full bg-surface"
@@ -230,11 +235,13 @@ export function DatePollSection({ eventId, isOwner, announcement }: DatePollSect
               <p className="mt-6 text-center text-muted">Noch hat niemand abgestimmt.</p>
             ) : null}
 
-            <div className="mt-6 flex justify-center">
-              <Button variant="primary" size="lg" onClick={() => setVoteModal({ vote: null })}>
-                Abstimmen
-              </Button>
-            </div>
+            {readOnly ? null : (
+              <div className="mt-6 flex justify-center">
+                <Button variant="primary" size="lg" onClick={() => setVoteModal({ vote: null })}>
+                  Abstimmen
+                </Button>
+              </div>
+            )}
           </>
         ) : null}
       </div>

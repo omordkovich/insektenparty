@@ -5,6 +5,7 @@ import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib
 import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
 import type { InvitationBase } from "@/lib/invitation-text";
+import type { UnlockContext } from "@/lib/products";
 
 type HeroProps = {
   config: EventConfig;
@@ -14,9 +15,14 @@ type HeroProps = {
   dateSettings?: DateSettings | null;
   /** Owner only: for the message to the guests after fixing a poll date. */
   announcement?: InvitationBase | null;
+  /** Owner only: for unlocking the locked date modes of a free event. */
+  unlock?: UnlockContext | null;
+  /** The event is over: no pencils, whatever `isOwner` says. */
+  readOnly?: boolean;
 };
 
-export function Hero({ config, eventId, isOwner, dateSettings, announcement }: HeroProps) {
+export function Hero({ config, eventId, isOwner, dateSettings, announcement, unlock, readOnly = false }: HeroProps) {
+  const canEdit = isOwner && !readOnly;
   const dateFixed = config.dateMode === "fixed";
   const hasEventDateTime =
     dateFixed && !!config.eventDate && !!config.eventStartTime && !!config.eventEndTime;
@@ -46,7 +52,7 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement }: H
             fieldKey="kicker"
             value={config.kicker}
             placeholder="Überschrift"
-            isOwner={isOwner}
+            isOwner={canEdit}
             ariaLabel="Überschrift bearbeiten"
             className="text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark"
           />
@@ -57,7 +63,7 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement }: H
             fieldKey="title"
             value={config.title}
             placeholder="Titel deines Events"
-            isOwner={isOwner}
+            isOwner={canEdit}
             ariaLabel="Titel bearbeiten"
             editHint="Mit dem Titel ändert sich auch der Einladungslink. Bereits verschickte Links funktionieren weiter."
             className="font-display text-[clamp(1.5rem,9vw,3rem)] leading-none text-leaf-dark sm:text-6xl md:text-7xl"
@@ -69,7 +75,7 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement }: H
             fieldKey="greeting"
             value={config.greeting}
             placeholder="Begrüßungstext für deine Gäste"
-            isOwner={isOwner}
+            isOwner={canEdit}
             as="textarea"
             ariaLabel="Begrüßungstext bearbeiten"
             className="text-lg text-muted sm:text-xl"
@@ -95,14 +101,19 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement }: H
                     config.dateLabel
                   )
                 ) : dateFixed ? (
-                  dateSettings ? <span className="opacity-40">Datum festlegen</span> : null
+                  dateSettings && !readOnly ? <span className="opacity-40">Datum festlegen</span> : null
                 ) : (
                   <span className="text-muted">
                     {config.dateMode === "poll" ? "Wird abgestimmt" : "Termin folgt"}
                   </span>
                 )}
-                {dateSettings && announcement ? (
-                  <DateEditButton eventId={eventId} dateSettings={dateSettings} announcement={announcement} />
+                {dateSettings && announcement && unlock && !readOnly ? (
+                  <DateEditButton
+                    eventId={eventId}
+                    dateSettings={dateSettings}
+                    announcement={announcement}
+                    unlock={unlock}
+                  />
                 ) : null}
               </span>
             </dd>
@@ -121,7 +132,7 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement }: H
                 fieldKey="locationLabel"
                 value={config.locationLabel}
                 placeholder="Adresse oder Ort des Events"
-                isOwner={isOwner}
+                isOwner={canEdit}
                 ariaLabel="Ort bearbeiten"
                 className="font-semibold"
                 link={{ href: buildMapsLink(config.locationLabel), external: true }}

@@ -572,8 +572,10 @@ describe("validateProposals", () => {
 });
 
 describe("validateFixedDate", () => {
+  const today = "2026-07-01";
+
   it("returns the proposal and the event schedule", () => {
-    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "01:00" })).toEqual({
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "01:00" }, { today })).toEqual({
       ok: true,
       value: {
         proposal: { date: "2026-07-11", startTime: "20:00", endTime: "01:00" },
@@ -584,7 +586,7 @@ describe("validateFixedDate", () => {
   });
 
   it("supports events over several days", () => {
-    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-13", startTime: "18:00", endTime: "12:00" })).toEqual({
+    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-13", startTime: "18:00", endTime: "12:00" }, { today })).toEqual({
       ok: true,
       value: {
         proposal: { date: "2026-07-11", startTime: "18:00", endTime: "12:00" },
@@ -592,17 +594,17 @@ describe("validateFixedDate", () => {
         schedule: { eventDate: "2026-07-11", eventEndDate: "2026-07-13", eventStartTime: "18:00", eventEndTime: "12:00" },
       },
     });
-    const sameDay = validateFixedDate({ date: "2026-07-11", endDate: "2026-07-11", startTime: "18:00", endTime: "20:00" });
+    const sameDay = validateFixedDate({ date: "2026-07-11", endDate: "2026-07-11", startTime: "18:00", endTime: "20:00" }, { today });
     expect(sameDay.ok && sameDay.value.endDate).toBeNull();
-    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-10", startTime: "18:00" })).toEqual({
+    expect(validateFixedDate({ date: "2026-07-11", endDate: "2026-07-10", startTime: "18:00" }, { today })).toEqual({
       ok: false,
       error: "Das Enddatum darf nicht vor dem Startdatum liegen.",
     });
   });
 
   it("requires a date, the time is optional", () => {
-    expect(validateFixedDate({ date: "", startTime: "20:00" })).toEqual({ ok: false, error: "Bitte gib ein Datum ein." });
-    expect(validateFixedDate({ date: "2026-07-11", startTime: "" })).toEqual({
+    expect(validateFixedDate({ date: "", startTime: "20:00" }, { today })).toEqual({ ok: false, error: "Bitte gib ein Datum ein." });
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "" }, { today })).toEqual({
       ok: true,
       value: {
         proposal: { date: "2026-07-11", startTime: null, endTime: null },
@@ -610,14 +612,41 @@ describe("validateFixedDate", () => {
         schedule: { eventDate: "2026-07-11", eventEndDate: null, eventStartTime: null, eventEndTime: null },
       },
     });
-    expect(validateFixedDate({ date: "2026-07-11", startTime: "", endTime: "20:00" })).toEqual({
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "", endTime: "20:00" }, { today })).toEqual({
       ok: false,
       error: "Bitte gib bei einem Termin mit „bis“ auch „von“ an.",
     });
-    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "20:00" })).toEqual({
+    expect(validateFixedDate({ date: "2026-07-11", startTime: "20:00", endTime: "20:00" }, { today })).toEqual({
       ok: false,
       error: "Die Endzeit muss nach der Startzeit liegen.",
     });
+  });
+
+  it("rejects a start or end date in the past", () => {
+    expect(validateFixedDate({ date: "2026-06-30" }, { today })).toEqual({
+      ok: false,
+      error: "Das Datum liegt in der Vergangenheit.",
+    });
+    expect(validateFixedDate({ date: "2026-07-01" }, { today })).toMatchObject({ ok: true });
+    expect(validateFixedDate({ date: "2026-06-30", endDate: "2026-07-02" }, { today })).toEqual({
+      ok: false,
+      error: "Das Datum liegt in der Vergangenheit.",
+    });
+    expect(validateFixedDate({ date: "2026-07-05", endDate: "2026-06-20" }, { today })).toEqual({
+      ok: false,
+      error: "Das Datum liegt in der Vergangenheit.",
+    });
+  });
+
+  it("checks the start and the end date against the latest allowed date", () => {
+    const options = { today, latest: "2026-10-01", latestError: "zu spät" };
+    expect(validateFixedDate({ date: "2026-10-01" }, options)).toMatchObject({ ok: true });
+    expect(validateFixedDate({ date: "2026-10-02" }, options)).toEqual({ ok: false, error: "zu spät" });
+    expect(validateFixedDate({ date: "2026-09-30", endDate: "2026-10-02" }, options)).toEqual({
+      ok: false,
+      error: "zu spät",
+    });
+    expect(validateFixedDate({ date: "2026-09-30", endDate: "2026-10-01" }, options)).toMatchObject({ ok: true });
   });
 });
 

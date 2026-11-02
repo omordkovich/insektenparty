@@ -45,7 +45,7 @@ export function LandingContent({ hero }: { hero?: ReactNode }) {
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
             Erstelle in wenigen Minuten eine Einladungsseite für Geburtstag, Hochzeit,
             Grillabend oder Firmenfeier. Teile den Link – deine Gäste sagen selbst zu oder ab.
-            Noch kein Termin? Lass sie einfach abstimmen.
+            Dein erstes Event ist kostenlos.
           </p>
           <div className="mt-6 flex justify-center">
             <AuthButtons registerLabel="Kostenlos starten" />

@@ -19,6 +19,10 @@ vi.mock("@/lib/recaptcha", () => ({
   getRecaptchaToken: vi.fn(() => "token"),
   verifyRecaptchaToken: vi.fn(async () => ({ ok: true })),
 }));
+vi.mock("@/services/event-lifecycle-service", () => ({
+  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  denyIfOver: vi.fn(async () => null),
+}));
 vi.mock("@/services/notification-service", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services/notification-service")>()),
   notifyOwnerOfPollVote: vi.fn(async () => {}),
@@ -28,6 +32,7 @@ const service = await import("@/services/poll-vote-service");
 const repo = await import("@/repositories/date-poll-repository");
 const { verifyRecaptchaToken } = await import("@/lib/recaptcha");
 const notifications = await import("@/services/notification-service");
+const { denyIfOver } = await import("@/services/event-lifecycle-service");
 
 const option: PollOption = { id: "a", date: "2026-07-11", startTime: "15:00", endTime: null, createdAt: "2026-06-01T10:00:00.000Z" };
 
@@ -37,6 +42,9 @@ describe("poll votes", () => {
     vi.mocked(repo.getPollOptions).mockResolvedValue([option]);
     vi.mocked(notifications.notifyOwnerOfPollVote).mockClear();
     vi.mocked(verifyRecaptchaToken).mockClear();
+    vi.mocked(repo.insertPollVote).mockClear();
+    vi.mocked(repo.updatePollVote).mockClear();
+    vi.mocked(repo.deletePollVote).mockClear();
   });
 
   it("saves a guest's vote and tells the owner", async () => {
@@ -69,6 +77,22 @@ describe("poll votes", () => {
       error: "Die Abstimmung ist beendet.",
     });
     expect(await service.getPollForEvent("event-1")).toMatchObject({ ok: false, status: 409 });
+  });
+
+  it("refuses every write once the event is over, without writing", async () => {
+    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    try {
+      const over = { ok: false, status: 409, error: "Dieses Event ist vorbei." };
+      expect(await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] })).toEqual(over);
+      expect(await service.updatePollVoteForEvent("event-1", "v1", { name: "Anna", optionIds: ["a"] })).toEqual(over);
+      expect(await service.deletePollVoteForEvent("event-1", "v1", {})).toEqual(over);
+      expect(repo.insertPollVote).not.toHaveBeenCalled();
+      expect(repo.updatePollVote).not.toHaveBeenCalled();
+      expect(repo.deletePollVote).not.toHaveBeenCalled();
+      expect(verifyRecaptchaToken).not.toHaveBeenCalled();
+    } finally {
+      vi.mocked(denyIfOver).mockResolvedValue(null);
+    }
   });
 
   it("adds each vote's answer per option", async () => {

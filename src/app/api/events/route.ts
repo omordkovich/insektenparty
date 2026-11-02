@@ -34,6 +34,7 @@ export async function POST(request: Request) {
       title: (body as { title?: unknown })?.title,
       accessPassword: (body as { accessPassword?: unknown })?.accessPassword,
       date: (body as { date?: unknown })?.date,
+      paid: (body as { paid?: unknown })?.paid,
     });
 
     if (!result.ok) {

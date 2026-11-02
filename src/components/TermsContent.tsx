@@ -2,7 +2,7 @@ import { LEGAL_INFO, MIN_REGISTRATION_AGE } from "@/lib/legal-info";
 import { EmailLink, LastUpdated, LegalBody, List, PostalAddress, Section } from "./LegalText";
 
 // Allgemeine Geschäftsbedingungen. Written for one-time purchases of
-// extensions (event slots, premium designs) paid via Stripe - no
+// extensions (paid events, premium designs, no badge) paid via Stripe - no
 // subscriptions. A subscription model would need additional clauses
 // (term, cancellation, "Kündigungsbutton" § 312k BGB).
 //
@@ -36,11 +36,30 @@ export function TermsContent() {
           erstellen, per Link zu teilen und darüber eine Gästeliste zu führen.
         </p>
         <p>
-          Die Grundfunktionen sind kostenlos. Darüber hinaus bieten wir
-          kostenpflichtige Erweiterungen an, insbesondere zusätzliche Events
-          über das kostenlose Kontingent hinaus sowie Premium-Designs. Umfang
-          und Preis der jeweiligen Erweiterung ergeben sich aus der
-          Beschreibung im Bestellvorgang.
+          Jedes Konto erhält einmalig ein kostenloses Event. Es braucht einen
+          festen Termin, der höchstens drei Monate nach dem Erstellen des
+          Events liegt. Wird das kostenlose Event gelöscht oder läuft es ab,
+          gibt es kein neues.
+        </p>
+        <p>
+          Darüber hinaus bieten wir kostenpflichtige Erweiterungen an,
+          insbesondere weitere Events, die Freischaltung eines Events (alle
+          Designs inklusive, Terminabstimmung, Termin vorerst offen lassen und
+          ein Termin bis zu zwölf Monate nach dem Erstellen), einzelne
+          Premium-Designs sowie eine Event-Seite ohne den Hinweis „made with
+          GASTZILLA“. Umfang und Preis der jeweiligen Erweiterung ergeben sich
+          aus der Beschreibung im Bestellvorgang.
+        </p>
+        <p>
+          Jedes Event, auch ein kostenpflichtiges, wird 90 Tage nach seinem
+          Stichtag automatisch gelöscht, einschließlich Gästeliste und
+          Terminabstimmung. Stichtag ist der letzte Tag des Events, bei einer
+          laufenden Terminabstimmung der späteste vorgeschlagene Termin und bei
+          einem Event ohne Datum der Tag sechs Monate nach dem Erstellen. Ab
+          dem Tag nach dem Stichtag lässt sich das Event nicht mehr ändern,
+          sondern nur noch löschen; ab 30 Tagen nach dem Stichtag zeigt der
+          Einladungslink das Event nicht mehr an. Etwa sieben Tage vor der
+          Löschung erinnern wir dich per E-Mail daran.
         </p>
         <p>
           Gäste können sich ohne eigenes Konto über den Einladungslink in die
@@ -111,7 +130,10 @@ export function TermsContent() {
           entstehen keine wiederkehrenden Kosten. Eine Erweiterung steht dir
           zeitlich unbegrenzt zur Verfügung, solange dein Konto besteht und
           GASTZILLA betrieben wird. Erweiterungen sind an dein Konto gebunden
-          und nicht übertragbar.
+          und nicht übertragbar. Erweiterungen für ein bestimmtes Event (etwa
+          die Freischaltung eines Events oder die Event-Seite ohne
+          GASTZILLA-Hinweis) gelten für dieses Event und enden mit seiner
+          Löschung (§ 2).
         </p>
       </Section>
 
@@ -222,7 +244,7 @@ export function TermsContent() {
         </p>
       </Section>
 
-      <LastUpdated date="Oktober 2026" />
+      <LastUpdated date="November 2026" />
     </LegalBody>
   );
 }

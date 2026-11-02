@@ -9,6 +9,7 @@ import {
   type DateModeRequest,
   type PollOption,
 } from "@/lib/date-poll";
+import { checkPlanRules } from "@/lib/event-plan";
 import {
   validateFixedDate,
   validateProposals,
@@ -22,7 +23,8 @@ import {
   getPollOptions,
   getPollVotes,
 } from "@/repositories/date-poll-repository";
-import { getEventOwnerId } from "@/repositories/event-repository";
+import { getEventPlanInfo } from "@/repositories/event-repository";
+import { denyIfOver } from "@/services/event-lifecycle-service";
 
 export type DateModeResult =
   | { ok: true }
@@ -59,7 +61,7 @@ export function parseDateModeRequest(
     return { ok: true, value: { request: { mode: "poll", proposals: proposals.value }, schedule: null } };
   }
 
-  const fixed = validateFixedDate(value);
+  const fixed = validateFixedDate(value, { today });
   if (!fixed.ok) return fixed;
   const fromOptionId = typeof value.fromOptionId === "string" ? value.fromOptionId : null;
   return {
@@ -75,11 +77,13 @@ export function parseDateModeRequest(
 // Termin". Anything that deletes guests or votes needs confirm: true -
 // without it the counts come back so the dialog can ask first.
 export async function changeDateMode(eventId: string, ownerId: string, body: unknown): Promise<DateModeResult> {
-  const eventOwner = await getEventOwnerId(eventId);
+  const info = await getEventPlanInfo(eventId);
   const mode = await getEventDateMode(eventId);
-  if (eventOwner !== ownerId || !mode) {
+  if (!info || info.ownerId !== ownerId || !mode) {
     return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
   }
+  const over = await denyIfOver(eventId);
+  if (over) return over;
 
   const [options, votes, guestCount] = await Promise.all([
     getPollOptions(eventId),
@@ -89,6 +93,11 @@ export async function changeDateMode(eventId: string, ownerId: string, body: unk
 
   const parsed = parseDateModeRequest(body, mode === "poll" ? options : [], todayInBerlin());
   if (!parsed.ok) return { ok: false, status: 400, error: parsed.error };
+
+  // What the event's plan allows: the mode (free = fixed only) and how far
+  // ahead the date may lie.
+  const violation = checkPlanRules(info.plan, info.createdOn, parsed.value.request);
+  if (violation) return { ok: false, status: violation.status, error: violation.error };
 
   const planned = planDateModeChange({ mode, options, voteCount: votes.length, guestCount }, parsed.value.request);
   if (!planned.ok) return { ok: false, status: 400, error: planned.error };

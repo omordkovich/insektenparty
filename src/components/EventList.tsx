@@ -3,6 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { formatDottedDate } from "@/lib/calendar";
+import type { EventPlan } from "@/lib/event-plan";
+import type { LifecycleStage } from "@/lib/event-lifecycle";
+import { canCreateEvent, type UserEntitlements } from "@/lib/features";
 import { buildEventShareUrl } from "@/lib/share";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
@@ -15,21 +19,27 @@ type EventListItem = {
   slug: string;
   title: string;
   theme: ThemeKey;
+  plan: EventPlan;
+  stage: LifecycleStage;
+  /** YYYY-MM-DD: the day the event is deleted. */
+  deletionDate: string;
 };
 
 type EventListProps = {
   initialEvents: EventListItem[];
-  eventLimit: number;
-  unlockedThemes: ThemeKey[];
+  entitlements: UserEntitlements;
+  dummyPayments: boolean;
 };
 
-export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventListProps) {
+export function EventList({ initialEvents, entitlements, dummyPayments }: EventListProps) {
   const [eventList, setEventList] = useState(initialEvents);
+  // From the server's entitlements only: deleting an event gives nothing
+  // back, so the list shrinking must not unlock the button.
+  const limitReached = !canCreateEvent(entitlements);
+  const createButton = (
+    <CreateEventButton entitlements={entitlements} limitReached={limitReached} dummyPayments={dummyPayments} />
+  );
   const [deleteTarget, setDeleteTarget] = useState<EventListItem | null>(null);
-
-  // Recomputed from the live list, so deleting an event frees the slot
-  // immediately. The server re-checks on create.
-  const limitReached = eventList.length >= eventLimit;
 
   return (
     <>
@@ -44,7 +54,7 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
               <p className="text-lg text-muted">Du hast noch keine Events erstellt.</p>
               <p className="mt-1 text-xl font-bold text-leaf-dark">Leg direkt los!</p>
               <div className="mt-6 flex justify-center">
-                <CreateEventButton unlockedThemes={unlockedThemes} limitReached={limitReached} />
+                {createButton}
               </div>
             </div>
           ) : (
@@ -66,8 +76,22 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
                         height={40}
                         className="h-10 w-10 shrink-0 rounded-full object-contain"
                       />
-                      <span className="min-w-0 flex-1 truncate text-base font-bold text-leaf-dark">
-                        {event.title || "Unbenanntes Event"}
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="min-w-0 truncate text-base font-bold text-leaf-dark">
+                            {event.title || "Unbenanntes Event"}
+                          </span>
+                          {event.plan === "free" ? (
+                            <span className="shrink-0 rounded-full bg-leaf/10 px-2 py-0.5 text-xs font-bold text-leaf-dark">
+                              Free
+                            </span>
+                          ) : null}
+                        </span>
+                        {event.stage !== "active" ? (
+                          <span className="block text-sm text-muted">
+                            Vorbei · wird am {formatDottedDate(event.deletionDate)} gelöscht
+                          </span>
+                        ) : null}
                       </span>
                     </Link>
                     <div className="flex shrink-0 gap-2">
@@ -89,7 +113,7 @@ export function EventList({ initialEvents, eventLimit, unlockedThemes }: EventLi
                 ))}
               </ul>
               <div className="mt-6 flex justify-center">
-                <CreateEventButton unlockedThemes={unlockedThemes} limitReached={limitReached} />
+                {createButton}
               </div>
             </>
           )}

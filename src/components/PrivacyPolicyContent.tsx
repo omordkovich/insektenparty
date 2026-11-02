@@ -139,7 +139,11 @@ export function PrivacyPolicyContent() {
           verschlüsselter Hash gespeichert) sowie technische Anmeldedaten wie
           Zeitpunkt und IP-Adresse von Login-Vorgängen zur Absicherung deines
           Kontos. Zur Bestätigung der Registrierung und für das Zurücksetzen
-          des Passworts senden wir dir E-Mails.
+          des Passworts senden wir dir E-Mails. An diese Adresse schicken wir
+          dir außerdem Hinweise zu deinen Events: eine Erinnerung, wenn ein
+          Event noch keinen Termin hat oder deine Terminabstimmung bald endet,
+          und etwa sieben Tage vor der automatischen Löschung eines Events eine
+          Erinnerung daran (siehe Abschnitt 15).
         </p>
         <p>
           Alternativ kannst du dich mit deinem Google-Konto registrieren und
@@ -204,6 +208,10 @@ export function PrivacyPolicyContent() {
           Passwort speichern wir, damit wir es dir in deinem Einladungstext
           anzeigen können; Gästen zeigen wir es nicht an.
         </p>
+        <p>
+          Events werden nach einer festen Frist automatisch gelöscht (siehe
+          Abschnitt 15).
+        </p>
         <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.</p>
       </Section>
 
@@ -238,8 +246,11 @@ export function PrivacyPolicyContent() {
         </p>
         <p>
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Teilnahme an der
-          Gästeliste). Du kannst deinen Eintrag jederzeit selbst ändern oder
-          löschen.
+          Gästeliste). Du kannst deinen Eintrag selbst ändern oder löschen,
+          bis das Event vorbei ist (ab dem Tag nach dem Stichtag, siehe
+          Abschnitt 15). Danach wende dich dafür an uns (Abschnitt 16); der
+          Veranstalter kann dann nur noch das ganze Event löschen. Spätestens 90 Tage nach dem Stichtag wird dein
+          Eintrag mit dem Event automatisch gelöscht.
         </p>
         <SubHeading>Terminabstimmung</SubHeading>
         <p>
@@ -272,7 +283,8 @@ export function PrivacyPolicyContent() {
       <Section title="9. E-Mail-Versand und Kontakt">
         <p>
           Systemnachrichten (Registrierungsbestätigung, Passwort zurücksetzen,
-          Benachrichtigungen über Änderungen an der Gästeliste) versenden wir
+          Benachrichtigungen über Änderungen an der Gästeliste, Erinnerungen
+          und Löschhinweise zu deinen Events) versenden wir
           über den E-Mail-Server der STRATO GmbH, Otto-Ostrowski-Straße 7,
           10249 Berlin. Mit STRATO besteht ein Vertrag zur
           Auftragsverarbeitung. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
@@ -428,13 +440,26 @@ export function PrivacyPolicyContent() {
             <strong>Benutzerkonto:</strong> bis zur Löschung deines Kontos.
           </li>
           <li>
-            <strong>Events und Gästelisten:</strong> bis der Veranstalter das
-            Event bzw. einzelne Einträge löscht, spätestens mit Löschung des
-            Kontos des Veranstalters.
+            <strong>Freischaltungen und Nutzung des kostenlosen Events:</strong>{" "}
+            bis zur Löschung deines Kontos, auch wenn das zugehörige Event
+            vorher gelöscht wurde.
           </li>
           <li>
-            <strong>Eigener Gasteintrag:</strong> bis du ihn selbst löschst oder
-            das Event gelöscht wird.
+            <strong>Events, Gästeeinträge und Terminabstimmungen:</strong> bis
+            der Veranstalter das Event bzw. einzelne Einträge löscht oder sein
+            Konto löscht, spätestens aber automatisch 90 Tage nach dem
+            Stichtag des Events. Stichtag ist der letzte Tag des Events, bei
+            einer laufenden Terminabstimmung der späteste vorgeschlagene Termin
+            und bei einem Event ohne Datum der Tag sechs Monate nach dem
+            Erstellen. Schon ab 30 Tagen nach dem Stichtag zeigt der
+            Einladungslink das Event nicht mehr an. Etwa sieben Tage
+            vor der Löschung erinnern wir den Veranstalter per E-Mail daran.
+          </li>
+          <li>
+            <strong>Eigener Gasteintrag:</strong> bis du ihn selbst löschst
+            (möglich, bis das Event vorbei ist; danach auf Anfrage bei uns,
+            siehe Abschnitt 16) oder das Event gelöscht wird,
+            spätestens automatisch 90 Tage nach dem Stichtag.
           </li>
           <li>
             <strong>Zahlungs- und Rechnungsdaten:</strong> gemäß den
@@ -503,7 +528,7 @@ export function PrivacyPolicyContent() {
           Fassung.
         </p>
       </Section>
-      <LastUpdated date="Oktober 2026" />
+      <LastUpdated date="November 2026" />
     </LegalBody>
   );
 }

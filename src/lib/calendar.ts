@@ -88,6 +88,12 @@ export function formatDateLabel(date: string | null): string {
   return dateLabelFormatter.format(new Date(`${date}T00:00:00Z`));
 }
 
+// An ISO date (YYYY-MM-DD) as "TT.MM.JJJJ", e.g. "05.12.2026".
+export function formatDottedDate(date: string): string {
+  const [year, month, day] = date.split("-");
+  return `${day}.${month}.${year}`;
+}
+
 const shortDateFormatter = new Intl.DateTimeFormat("de-DE", {
   weekday: "short",
   day: "numeric",

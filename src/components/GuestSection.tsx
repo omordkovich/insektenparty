@@ -60,6 +60,8 @@ type GuestSectionProps = {
   isOwner?: boolean;
   /** "Teilnehmerzahl begrenzen": max. people incl. companions; null = no limit. */
   maxGuests?: number | null;
+  /** The event is over: the list is shown, nothing can be changed. */
+  readOnly?: boolean;
 };
 
 export function GuestSection({
@@ -67,6 +69,7 @@ export function GuestSection({
   defaultArrivalTime = "09:00",
   isOwner = false,
   maxGuests = null,
+  readOnly = false,
 }: GuestSectionProps) {
   const [guests, setGuests] = useState<GuestDto[]>([]);
   // Seats taken right now - for the "Noch 4 von 12 Plätzen frei" line and
@@ -212,7 +215,8 @@ export function GuestSection({
         onShowMessage={setMessageGuest}
         onShowTime={setTimeGuest}
         onShowDeclined={setDeclinedGuest}
-        capacityText={maxGuests !== null && !loading ? capacityLabel(maxGuests, occupied) : null}
+        capacityText={maxGuests !== null && !loading && !readOnly ? capacityLabel(maxGuests, occupied) : null}
+        readOnly={readOnly}
       />
 
       {modal.isOpen ? (
