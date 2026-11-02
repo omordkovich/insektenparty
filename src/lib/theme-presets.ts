@@ -3,6 +3,7 @@ import type { EventConfig } from "@/lib/event-config";
 export type ThemeKey =
   | "natur"
   | "ballons"
+  | "foam"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -24,6 +25,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   orange: "Orange",
   gelb: "Gelb",
   ballons: "Ballons",
+  foam: "Foam",
   natur: "Natur",
 };
 
@@ -43,6 +45,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   orange: "event-theme-orange",
   gelb: "event-theme-gelb",
   ballons: "event-theme-ballons",
+  foam: "event-theme-foam",
   natur: "event-theme",
 };
 
@@ -77,6 +80,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1789993865/baloons-right.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741690/accent-1.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1789741691/accent-2.webp",
+  },
+  foam: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793648356/foam_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793648357/foam_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793648358/foam_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793648360/foam_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793648361/foam_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

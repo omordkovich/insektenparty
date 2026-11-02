@@ -160,6 +160,47 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
 }
 
+/* Foam theme: bubble-bath palette - light aqua water so the white foam side
+   graphics stand out, rubber-duck yellow as the honey accent and a deep
+   teal for text and buttons. */
+.event-theme-foam {
+  --bg-top: #c4eaf5;
+  --bg-mid: #e6f6fb;
+  --bg-bottom: #9ed6e8;
+  --leaf: #0e7490;
+  --leaf-dark: #164e63;
+  --honey: #fbbf24;
+  --honey-dark: #f59e0b;
+  --petal: #fb923c;
+  --ink: #0c3446;
+  --muted: #3d6677;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-solid: #f7fcfe;
+  --danger: #dc2626;
+  --danger-dark: #b91c1c;
+  --ring: #22a6c9;
+  --shadow: 0 18px 40px rgba(12, 52, 70, 0.14);
+  --on-honey: #422006;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #0e7490;
+  --button-primary-text: #ffffff;
+  --button-secondary: #0e7490;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+.event-theme-foam .parallax-background {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.55), transparent 30%),
+    radial-gradient(circle at 88% 12%, rgba(251, 191, 36, 0.16), transparent 26%),
+    radial-gradient(circle at 70% 80%, rgba(34, 166, 201, 0.18), transparent 34%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
