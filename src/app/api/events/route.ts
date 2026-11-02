@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createEventForOwner } from "@/services/event-service";
 import { createClient } from "@/lib/supabase/server";
-import { hasAcceptedTerms } from "@/lib/terms-consent";
+import { consentRequiredError } from "@/lib/terms-consent";
 
 export async function POST(request: Request) {
   try {
@@ -13,13 +13,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
     }
 
-    // Accounts created via Google's login tab have no consent yet (the start
-    // page asks for it); they must not be able to skip that dialog.
-    if (!hasAcceptedTerms(data.claims.user_metadata)) {
-      return NextResponse.json(
-        { error: "Bitte bestätige zuerst die AGB und dein Alter." },
-        { status: 403 },
-      );
+    // Accounts created via Google's login tab have no consent yet, older
+    // accounts may still have to agree to changed AGB (the start page asks
+    // for both); they must not be able to skip that dialog.
+    const consentError = consentRequiredError(data.claims.user_metadata);
+    if (consentError) {
+      return NextResponse.json({ error: consentError }, { status: 403 });
     }
 
     let body: unknown;

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { consentMetadata, hasAcceptedTerms } from "@/lib/terms-consent";
+import { consentUpdate } from "@/lib/terms-consent";
 
 // Records AGB/privacy/age consent for the signed-in user. Used by the
 // ConsentDialog for accounts created through Google's login tab, which skips
-// the checkboxes. Timestamp and versions are set here, not by the client.
+// the checkboxes, and for accounts that still have to agree to changed AGB.
+// Timestamp and versions are set here, not by the client.
 export async function POST() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
@@ -14,8 +15,9 @@ export async function POST() {
     return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
   }
 
-  if (!hasAcceptedTerms(claims.user_metadata)) {
-    const { error } = await supabase.auth.updateUser({ data: consentMetadata() });
+  const update = consentUpdate(claims.user_metadata);
+  if (update) {
+    const { error } = await supabase.auth.updateUser({ data: update });
     if (error) {
       return NextResponse.json(
         { error: "Die Zustimmung konnte nicht gespeichert werden. Bitte versuche es erneut." },

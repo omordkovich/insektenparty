@@ -8,6 +8,7 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({ auth: { getClaims, updateUser, refreshSession } }),
 }));
 
+import { TERMS_VERSION } from "@/lib/legal-info";
 import { POST } from "./route";
 
 describe("POST /auth/consent", () => {
@@ -41,15 +42,44 @@ describe("POST /auth/consent", () => {
     expect(refreshSession).toHaveBeenCalled();
   });
 
-  it("leaves an existing consent record untouched", async () => {
+  it("leaves a consent to the current AGB untouched", async () => {
     getClaims.mockResolvedValue({
-      data: { claims: { sub: "u1", user_metadata: { terms_accepted_at: "2026-09-30T10:00:00Z" } } },
+      data: {
+        claims: {
+          sub: "u1",
+          user_metadata: { terms_accepted_at: "2026-11-05T10:00:00Z", terms_version: TERMS_VERSION },
+        },
+      },
     });
 
     const response = await POST();
 
     expect(response.status).toBe(200);
     expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("renews a consent to older AGB without asking for the age again", async () => {
+    getClaims.mockResolvedValue({
+      data: {
+        claims: {
+          sub: "u1",
+          user_metadata: { terms_accepted_at: "2026-09-30T10:00:00Z", terms_version: "2026-09-30" },
+        },
+      },
+    });
+    updateUser.mockResolvedValue({ error: null });
+    refreshSession.mockResolvedValue({ error: null });
+
+    const response = await POST();
+
+    expect(response.status).toBe(200);
+    const { data } = updateUser.mock.calls[0][0];
+    expect(data).toMatchObject({
+      terms_version: TERMS_VERSION,
+      terms_first_accepted_at: "2026-09-30T10:00:00Z",
+    });
+    expect(data).not.toHaveProperty("min_age_confirmed");
+    expect(refreshSession).toHaveBeenCalled();
   });
 
   it("reports a failed update", async () => {

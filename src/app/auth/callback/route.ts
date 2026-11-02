@@ -2,10 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { isSafeRelativePath } from "@/lib/redirect";
 import { createClient } from "@/lib/supabase/server";
 import {
-  consentMetadata,
+  consentUpdate,
   GOOGLE_CONSENT_COOKIE,
   GOOGLE_CONSENT_COOKIE_PATH,
-  hasAcceptedTerms,
 } from "@/lib/terms-consent";
 
 // OAuth return point (Google). Exchanges the one-time `code` for a session.
@@ -43,9 +42,11 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.user) return failed();
 
-  // An account that already accepted keeps its original consent record.
-  if (consentGiven && !hasAcceptedTerms(data.user.user_metadata)) {
-    const { error: updateError } = await supabase.auth.updateUser({ data: consentMetadata() });
+  // An account that already accepted the current AGB keeps its consent
+  // record; one that accepted older AGB renews it (the first date is kept).
+  const update = consentGiven ? consentUpdate(data.user.user_metadata) : null;
+  if (update) {
+    const { error: updateError } = await supabase.auth.updateUser({ data: update });
     // The JWT in the session cookie still carries the old metadata; refresh it
     // so the server sees the consent on the very next request.
     if (!updateError) await supabase.auth.refreshSession();

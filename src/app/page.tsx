@@ -10,7 +10,7 @@ import { getAccountName, getSignInMethods } from "@/lib/account";
 import { todayInBerlin } from "@/lib/date-poll";
 import { lifecycleOf } from "@/lib/event-lifecycle";
 import { isDummyPaymentEnabled } from "@/lib/payments";
-import { hasAcceptedTerms } from "@/lib/terms-consent";
+import { termsConsentState } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
 import { getEventsByOwner } from "@/repositories/event-repository";
@@ -54,6 +54,7 @@ export default async function Home({ searchParams }: HomeProps) {
     : [];
 
   const entitlements = claims ? await getUserEntitlements(claims.sub) : null;
+  const consentState = claims ? termsConsentState(claims.user_metadata) : null;
 
   return (
     <>
@@ -93,7 +94,8 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {linkExpired ? <LinkExpiredDialog kind={linkExpired} /> : null}
       {authError === "1" ? <AuthErrorDialog /> : null}
-      {claims && !hasAcceptedTerms(claims.user_metadata) ? <ConsentDialog /> : null}
+      {consentState === "none" ? <ConsentDialog kind="first" /> : null}
+      {consentState === "outdated" ? <ConsentDialog kind="update" /> : null}
     </>
   );
 }

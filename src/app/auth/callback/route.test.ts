@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { TERMS_VERSION } from "@/lib/legal-info";
 import { GOOGLE_CONSENT_COOKIE } from "@/lib/terms-consent";
 
 const exchangeCodeForSession = vi.fn();
@@ -80,15 +81,39 @@ describe("GET /auth/callback", () => {
     expect(data).not.toHaveProperty("display_name");
   });
 
-  it("keeps the original consent record of an account that already accepted", async () => {
+  it("keeps the consent record of an account that already accepted the current AGB", async () => {
     exchangeCodeForSession.mockResolvedValue({
-      data: { user: { user_metadata: { terms_accepted_at: "2026-09-30T10:00:00.000Z" } } },
+      data: {
+        user: {
+          user_metadata: { terms_accepted_at: "2026-11-05T10:00:00.000Z", terms_version: TERMS_VERSION },
+        },
+      },
       error: null,
     });
 
     await call("code=abc", true);
 
     expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("renews an older consent but keeps its first acceptance", async () => {
+    exchangeCodeForSession.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: { terms_accepted_at: "2026-09-30T10:00:00.000Z", terms_version: "2026-09-30" },
+        },
+      },
+      error: null,
+    });
+
+    await call("code=abc", true);
+
+    expect(updateUser).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        terms_version: TERMS_VERSION,
+        terms_first_accepted_at: "2026-09-30T10:00:00.000Z",
+      }),
+    });
   });
 
   it("ignores a consent query parameter (only the cookie counts)", async () => {
