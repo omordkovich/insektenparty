@@ -342,6 +342,102 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
 }
 
+/* Teddy theme: a cozy nursery at bedtime. Colors come from the plush
+   toys - warm cream air like the pompom pillows, a soft powder blue from
+   the teddy's bow at the top, a sandy floor where the toy piles sit, caramel
+   fur for honey and a deeper bow blue for the buttons. */
+.event-theme-teddy {
+  --bg-top: #e2e9f1;
+  --bg-mid: #f8f2ea;
+  --bg-bottom: #ecdfcf;
+  --leaf: #7e512b;
+  --leaf-dark: #5a3a1e;
+  --honey: #d39a5c;
+  --honey-dark: #b97f42;
+  --petal: #c4b2d8;
+  --ink: #3e2e24;
+  --muted: #6c5c50;
+  --surface: rgba(255, 252, 248, 0.86);
+  --surface-solid: #fffcf8;
+  --danger: #a8322a;
+  --danger-dark: #84251f;
+  --ring: #6d8cb0;
+  --shadow: 0 18px 40px rgba(90, 64, 40, 0.14);
+  --on-honey: #3a2410;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #4f6f95;
+  --button-primary-text: #ffffff;
+  --button-secondary: #4f6f95;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* A warm night-light glow around the teddy logo, a pale lilac moon haze in
+   the upper right like the plush moon, tiny soft yellow stars and a warm
+   sandy light on the floor where the toy piles sit. */
+.event-theme-teddy .parallax-background {
+  background:
+    radial-gradient(circle, rgba(240, 210, 120, 0.4) 1.8px, transparent 2.4px) 0 0 / 64px 64px,
+    radial-gradient(circle, rgba(196, 178, 216, 0.4) 1.6px, transparent 2.2px) 32px 36px / 64px 64px,
+    radial-gradient(ellipse 260px 220px at 50% 150px, rgba(255, 236, 200, 0.6), transparent 72%),
+    radial-gradient(circle at 86% 10%, rgba(196, 178, 216, 0.3), transparent 26%),
+    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(220, 190, 150, 0.3), transparent 70%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
+/* Pirates theme: a sunny Caribbean treasure island in the golden hour.
+   Colors come from the island graphics, which are lit warm gold throughout -
+   a pale golden sky (lighter than the cream sails, so the ship and the dark
+   olive palms stand in front of it), warm sand at the bottom where the
+   islands sit, the treasure chest's rust-brown wood for buttons, doubloon
+   gold as honey and the turquoise lagoon as the one cool accent. */
+.event-theme-pirates {
+  --bg-top: #f6e8c8;
+  --bg-mid: #faf1de;
+  --bg-bottom: #efd9b0;
+  --leaf: #8e4418;
+  --leaf-dark: #5e2c0e;
+  --honey: #e0a83a;
+  --honey-dark: #c58e24;
+  --petal: #2aa79b;
+  --ink: #3a2814;
+  --muted: #6b5434;
+  --surface: rgba(255, 250, 240, 0.86);
+  --surface-solid: #fffaf0;
+  --danger: #a8322a;
+  --danger-dark: #84251f;
+  --ring: #a24a1e;
+  --shadow: 0 18px 40px rgba(110, 70, 20, 0.16);
+  --on-honey: #2a1804;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #a24a1e;
+  --button-primary-text: #fff7ec;
+  --button-secondary: #a24a1e;
+  --button-secondary-text: #fff7ec;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* The golden sun that lights the graphics, standing behind the palm tops on
+   the left, its warm light on the sails on the right, a sandy glow on the
+   ground where the islands sit and a turquoise shimmer of the lagoon below
+   the ship. */
+.event-theme-pirates .parallax-background {
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255, 214, 130, 0.55), transparent 34%),
+    radial-gradient(circle at 86% 26%, rgba(255, 226, 170, 0.35), transparent 30%),
+    radial-gradient(ellipse 80% 26% at 50% 100%, rgba(226, 186, 126, 0.4), transparent 72%),
+    radial-gradient(ellipse 30% 14% at 72% 88%, rgba(42, 167, 155, 0.16), transparent 75%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
 /* Halloween Clay theme: a plasticine graveyard at night. Colors are taken
    from the clay graphics themselves - dusty plum/slate night (darker than
    the #48-#78 purple-grey trees and graves, so they read as silhouettes),
@@ -766,6 +862,54 @@ body {
     /* bg-top is held over the logo's full height (header ends ~300px) so
        the disc's lower half doesn't stand out against a darker page. */
     linear-gradient(180deg, var(--bg-top) 0, var(--bg-top) 300px, var(--bg-mid) 65%, var(--bg-bottom));
+}
+
+/* Magic theme: a wizard school at dusk. Colors come from the castle
+   graphics - violet twilight sky (the spires and slate roofs read as
+   silhouettes against its lighter afterglow), warm amber candle light from
+   the windows and floating embers for buttons and accents, and the green
+   potion glow rising from the cauldron logo. */
+.event-theme-magic {
+  --bg-top: #352a4e;
+  --bg-mid: #1e1830;
+  --bg-bottom: #120e1a;
+  --leaf: #f2b866;
+  --leaf-dark: #fbe0b0;
+  --honey: #e8a042;
+  --honey-dark: #f4b862;
+  --petal: #5ee08a;
+  --ink: #f1ebf5;
+  --muted: #b8acc8;
+  --surface: rgba(34, 28, 48, 0.72);
+  --surface-solid: #221c30;
+  --danger: #ff7a6b;
+  --danger-dark: #e5574a;
+  --ring: #f2b866;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --on-honey: #2a1606;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #e8a042;
+  --button-primary-text: #2a1606;
+  --button-secondary: #e8a042;
+  --button-secondary-text: #2a1606;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Green potion vapour rising behind the cauldron (top center), a rose-violet
+   afterglow behind the spires at both edges and amber window light where the
+   castles stand. */
+.event-theme-magic .parallax-background {
+  background:
+    radial-gradient(ellipse 240px 190px at 50% 140px, rgba(80, 220, 130, 0.48), transparent 72%),
+    radial-gradient(ellipse 30% 26% at 6% 14%, rgba(190, 120, 170, 0.3), transparent 75%),
+    radial-gradient(ellipse 30% 26% at 94% 12%, rgba(190, 120, 170, 0.3), transparent 75%),
+    radial-gradient(circle at 12% 58%, rgba(240, 150, 60, 0.18), transparent 26%),
+    radial-gradient(circle at 88% 52%, rgba(240, 150, 60, 0.18), transparent 26%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 55%, var(--bg-bottom));
 }
 
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
@@ -1223,6 +1367,7 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-disco,
 .event-theme-newyear,
 .event-theme-penandpaper,
+.event-theme-magic,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;
