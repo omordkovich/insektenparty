@@ -7,6 +7,7 @@ export type ThemeKey =
   | "halloweenclay"
   | "halloweengraveyard"
   | "halloweenkids"
+  | "christmaskids"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -32,6 +33,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   halloweenclay: "Halloween Clay",
   halloweengraveyard: "Halloween Graveyard",
   halloweenkids: "Halloween Kids",
+  christmaskids: "Christmas Kids",
   natur: "Natur",
 };
 
@@ -55,6 +57,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   halloweenclay: "event-theme-halloweenclay",
   halloweengraveyard: "event-theme-halloweengraveyard",
   halloweenkids: "event-theme-halloweenkids",
+  christmaskids: "event-theme-christmaskids",
   natur: "event-theme",
 };
 
@@ -117,6 +120,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793700792/halloweenkids_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793700793/halloweenkids_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793700794/halloweenkids_accent_r.webp",
+  },
+  christmaskids: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793701693/christmaskids_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793701694/christmaskids_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793701696/christmaskids_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793701696/christmaskids_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793701697/christmaskids_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
