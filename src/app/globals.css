@@ -247,6 +247,54 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
 }
 
+/* Birthday Presents theme: a bright, cheerful birthday party. Colors come
+   from the graphics and the original logo's balloon scene - a pale balloon
+   mint at the top (the pink cake stands out against it) fading into warm
+   peach blush where the gift stacks stand, warm dark brown for text, the
+   coral of the gift paper for accents and buttons, gift yellow as honey
+   and the teal ribbons as petal. */
+.event-theme-birthdaypresents {
+  --bg-top: #e4f1f2;
+  --bg-mid: #fdf5f0;
+  --bg-bottom: #fbe1d6;
+  --leaf: #b43a28;
+  --leaf-dark: #6b2418;
+  --honey: #f2c14a;
+  --honey-dark: #d9a52c;
+  --petal: #48b8b8;
+  --ink: #3a2420;
+  --muted: #6e5550;
+  --surface: rgba(255, 255, 255, 0.84);
+  --surface-solid: #fffaf7;
+  --danger: #a3201a;
+  --danger-dark: #7f1813;
+  --ring: #d9503a;
+  --shadow: 0 18px 40px rgba(107, 36, 24, 0.14);
+  --on-honey: #3d2a05;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #bf412d;
+  --button-primary-text: #ffffff;
+  --button-secondary: #bf412d;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Warm party light behind the cake top center, the peach glow of the
+   balloon scene, and a sparse two-color confetti dot pattern (like the
+   polka-dot gift paper) drifting over everything. */
+.event-theme-birthdaypresents .parallax-background {
+  background:
+    radial-gradient(circle, rgba(240, 96, 72, 0.22) 2px, transparent 2.6px) 0 0 / 56px 56px,
+    radial-gradient(circle, rgba(72, 184, 184, 0.22) 2px, transparent 2.6px) 28px 28px / 56px 56px,
+    radial-gradient(ellipse 55% 38% at 50% 4%, rgba(255, 214, 170, 0.45), transparent 70%),
+    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(248, 176, 150, 0.25), transparent 70%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
 /* Halloween Clay theme: a plasticine graveyard at night. Colors are taken
    from the clay graphics themselves - dusty plum/slate night (darker than
    the #48-#78 purple-grey trees and graves, so they read as silhouettes),
@@ -572,6 +620,105 @@ body {
     radial-gradient(circle at 88% 40%, rgba(79, 227, 240, 0.18), transparent 28%),
     radial-gradient(ellipse 90% 30% at 50% 100%, rgba(168, 72, 240, 0.24), transparent 70%),
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+/* New Year theme: a New Year's Eve night with champagne and fireworks.
+   Colors come from the graphics - the warm charcoal night of the logo's
+   disc (the golden fireworks are light and need it dark; the logo blends
+   seamlessly into it), warm white for text, champagne gold for accents and
+   buttons, and the silver of streamers and ice bucket as petal. */
+.event-theme-newyear {
+  --bg-top: #181818;
+  --bg-mid: #121110;
+  --bg-bottom: #0c0b0a;
+  --leaf: #e6c27e;
+  --leaf-dark: #f6e4bd;
+  --honey: #d9b26a;
+  --honey-dark: #ecc985;
+  --petal: #c9c9cf;
+  --ink: #f7f1e6;
+  --muted: #b8afa0;
+  --surface: rgba(30, 28, 25, 0.72);
+  --surface-solid: #1d1b18;
+  --danger: #ff7a6b;
+  --danger-dark: #e5574a;
+  --ring: #e6c27e;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --on-honey: #1a1206;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #d9b26a;
+  --button-primary-text: #1a1206;
+  --button-secondary: #d9b26a;
+  --button-secondary-text: #1a1206;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Golden firework glow behind the bursts at the top of both side
+   graphics and the warm sparkler light low down where the champagne
+   glasses stand. No glow behind the logo: its dark disc matches bg-top
+   (#181818), so its firework seems to burst right in the night sky - a
+   glow there would outline the disc. */
+.event-theme-newyear .parallax-background {
+  background:
+    radial-gradient(circle at 14% 20%, rgba(240, 192, 120, 0.16), transparent 26%),
+    radial-gradient(circle at 84% 18%, rgba(240, 200, 140, 0.14), transparent 26%),
+    radial-gradient(ellipse 90% 26% at 50% 100%, rgba(240, 170, 90, 0.12), transparent 70%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+/* Pen & Paper theme: a candlelit tabletop game night. Colors come from the
+   graphics - the smoky warm grey-brown of the spellbook logo's disc at the
+   top, darkening towards the table so the stone of the miniature dioramas
+   stands out, parchment cream for text, ember amber for accents, the
+   blood-red d20 with its gold numbers for buttons, and the moss of the
+   miniature bases as petal. */
+.event-theme-penandpaper {
+  --bg-top: #4a3f3a;
+  --bg-mid: #2a2320;
+  --bg-bottom: #17120f;
+  --leaf: #e8a868;
+  --leaf-dark: #f7dcb0;
+  --honey: #d4a24c;
+  --honey-dark: #e6b866;
+  --petal: #7a8a48;
+  --ink: #f2e6cf;
+  --muted: #c2b29a;
+  --surface: rgba(36, 29, 26, 0.74);
+  --surface-solid: #2a221f;
+  --danger: #ff7a6b;
+  --danger-dark: #e5574a;
+  --ring: #e8a868;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --on-honey: #2a1606;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #9b1d20;
+  --button-primary-text: #f5d58a;
+  --button-secondary: #9b1d20;
+  --button-secondary-text: #f5d58a;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* The spellbook's ember glow: its disc is lit orange at the top edge, so a
+   matching warm glow sits right there and lets that edge fade into the
+   page instead of showing (the rest of the disc matches bg-top). Plus
+   candlelight on the tower diorama left and a cold grave mist behind the
+   bone dragon right. */
+.event-theme-penandpaper .parallax-background {
+  background:
+    radial-gradient(ellipse 22% 16% at 50% 6%, rgba(200, 120, 60, 0.42), transparent 75%),
+    radial-gradient(circle at 12% 60%, rgba(240, 170, 90, 0.14), transparent 26%),
+    radial-gradient(circle at 86% 34%, rgba(170, 170, 180, 0.1), transparent 28%),
+    /* bg-top is held over the logo's full height (header ends ~300px) so
+       the disc's lower half doesn't stand out against a darker page. */
+    linear-gradient(180deg, var(--bg-top) 0, var(--bg-top) 300px, var(--bg-mid) 65%, var(--bg-bottom));
 }
 
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
@@ -1027,6 +1174,8 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-christmassnow,
 .event-theme-artdeco,
 .event-theme-disco,
+.event-theme-newyear,
+.event-theme-penandpaper,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;

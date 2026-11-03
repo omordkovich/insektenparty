@@ -18,7 +18,12 @@ if (!srcDir || !name || !/^[a-z0-9]+$/.test(name)) {
 const outDir = path.join(path.dirname(path.resolve(srcDir)), "webp", name);
 fs.mkdirSync(outDir, { recursive: true });
 
-const pngs = fs.readdirSync(srcDir).filter((f) => f.toLowerCase().endsWith(".png"));
+// Only the theme slots (see SKILL.md "File-name mapping") - other PNGs in the
+// folder (drafts like logo_cake.png) are reported, not converted.
+const SLOTS = ["logo", "bg_l", "bg_r", "accent_l", "accent_r"];
+const allPngs = fs.readdirSync(srcDir).filter((f) => f.toLowerCase().endsWith(".png"));
+const pngs = allPngs.filter((f) => SLOTS.includes(path.basename(f, path.extname(f)).toLowerCase()));
+for (const f of allPngs.filter((f) => !pngs.includes(f))) console.log(`skipped ${f} (not a theme slot)`);
 if (pngs.length === 0) {
   console.error(`No PNGs in ${srcDir}`);
   process.exit(1);

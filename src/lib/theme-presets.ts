@@ -12,6 +12,9 @@ export type ThemeKey =
   | "artdeco"
   | "disco"
   | "hippie"
+  | "newyear"
+  | "birthdaypresents"
+  | "penandpaper"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -42,6 +45,9 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   artdeco: "Art Deco",
   disco: "Disco",
   hippie: "Hippie",
+  newyear: "New Year",
+  birthdaypresents: "Birthday Presents",
+  penandpaper: "Pen & Paper",
   natur: "Natur",
 };
 
@@ -70,6 +76,9 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   artdeco: "event-theme-artdeco",
   disco: "event-theme-disco",
   hippie: "event-theme-hippie",
+  newyear: "event-theme-newyear",
+  birthdaypresents: "event-theme-birthdaypresents",
+  penandpaper: "event-theme-penandpaper",
   natur: "event-theme",
 };
 
@@ -167,6 +176,27 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705864/hippie_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705865/hippie_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705866/hippie_accent_r.webp",
+  },
+  newyear: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793706939/newyear_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793706941/newyear_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793706943/newyear_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793706944/newyear_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793706945/newyear_accent_r.webp",
+  },
+  birthdaypresents: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793708373/birthdaypresents_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793708375/birthdaypresents_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793708376/birthdaypresents_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709089/birthdaypresents_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709091/birthdaypresents_accent_r.webp",
+  },
+  penandpaper: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709718/penandpaper_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709719/penandpaper_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709720/penandpaper_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709721/penandpaper_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709722/penandpaper_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
