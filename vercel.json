@@ -3,7 +3,7 @@
   "crons": [{ "path": "/api/cron/event-lifecycle", "schedule": "0 5 * * *" }],
   "redirects": [
     {
-      "source": "/:path((?!_next/).+)",
+      "source": "/:path((?!_next/|api/|auth/).+)",
       "has": [{ "type": "host", "value": "mordkovich.vercel.app" }],
       "missing": [{ "type": "header", "key": "rsc" }],
       "destination": "https://gastzilla.de/:path*",

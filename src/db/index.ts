@@ -4,8 +4,10 @@ import * as schema from "./schema";
 
 type Db = ReturnType<typeof drizzle<typeof schema>>;
 
-// In development the client is kept on globalThis so hot reloads don't open
-// a new connection pool each time. The connection string is stored with it:
+// The client is kept on globalThis so each server instance opens one
+// connection pool - not one per query (on Vercel those piled up until the
+// pooler refused new ones) and, in development, not one per hot reload.
+// The connection string is stored with it:
 // when .env.local changes (e.g. a new database password), Next reloads the
 // env but would otherwise keep using the old client - every request would
 // then fail with the stale password until the dev server is restarted.
@@ -36,11 +38,9 @@ function createDb(): Db {
 
   const db = globalForDb.drizzleDb ?? drizzle(client, { schema });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.postgresClient = client;
-    globalForDb.drizzleDb = db;
-    globalForDb.connectionString = connectionString;
-  }
+  globalForDb.postgresClient = client;
+  globalForDb.drizzleDb = db;
+  globalForDb.connectionString = connectionString;
 
   return db;
 }
