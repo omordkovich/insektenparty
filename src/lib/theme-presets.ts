@@ -14,6 +14,7 @@ export type ThemeKey =
   | "hippie"
   | "newyear"
   | "birthdaypresents"
+  | "birthdayprincess"
   | "penandpaper"
   | "schwarz"
   | "weiss"
@@ -47,6 +48,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   hippie: "Hippie",
   newyear: "New Year",
   birthdaypresents: "Birthday Presents",
+  birthdayprincess: "Birthday Princess",
   penandpaper: "Pen & Paper",
   natur: "Natur",
 };
@@ -78,6 +80,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   hippie: "event-theme-hippie",
   newyear: "event-theme-newyear",
   birthdaypresents: "event-theme-birthdaypresents",
+  birthdayprincess: "event-theme-birthdayprincess",
   penandpaper: "event-theme-penandpaper",
   natur: "event-theme",
 };
@@ -190,6 +193,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793708376/birthdaypresents_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709089/birthdaypresents_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709091/birthdaypresents_accent_r.webp",
+  },
+  birthdayprincess: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793717699/birthdayprincess_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793717700/birthdayprincess_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793717701/birthdayprincess_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793717702/birthdayprincess_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793717703/birthdayprincess_accent_r.webp",
   },
   penandpaper: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793709718/penandpaper_logo.webp",
