@@ -10,6 +10,8 @@ export type ThemeKey =
   | "christmaskids"
   | "christmassnow"
   | "artdeco"
+  | "disco"
+  | "hippie"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -38,6 +40,8 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   christmaskids: "Christmas Kids",
   christmassnow: "Christmas Snow",
   artdeco: "Art Deco",
+  disco: "Disco",
+  hippie: "Hippie",
   natur: "Natur",
 };
 
@@ -64,6 +68,8 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   christmaskids: "event-theme-christmaskids",
   christmassnow: "event-theme-christmassnow",
   artdeco: "event-theme-artdeco",
+  disco: "event-theme-disco",
+  hippie: "event-theme-hippie",
   natur: "event-theme",
 };
 
@@ -147,6 +153,20 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793704036/artdeco_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793704036/artdeco_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793704037/artdeco_accent_r.webp",
+  },
+  disco: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705250/disco_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705251/disco_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705252/disco_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705253/disco_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705254/disco_accent_r.webp",
+  },
+  hippie: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705862/hippie_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705863/hippie_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705864/hippie_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705865/hippie_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793705866/hippie_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
