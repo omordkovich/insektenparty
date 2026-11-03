@@ -201,6 +201,98 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-bottom));
 }
 
+/* Halloween Clay theme: a plasticine graveyard at night. Colors are taken
+   from the clay graphics themselves - dusty plum/slate night (darker than
+   the #48-#78 purple-grey trees and graves, so they read as silhouettes),
+   a moonlit haze behind the tree tops, terracotta pumpkin glow for accents
+   and buttons, and the ghosts' sage green as petal. */
+.event-theme-halloweenclay {
+  --bg-top: #261f32;
+  --bg-mid: #1b1624;
+  --bg-bottom: #120e18;
+  --leaf: #f0a46a;
+  --leaf-dark: #f9d2ae;
+  --honey: #e07b3c;
+  --honey-dark: #f09a5c;
+  --petal: #a8c4ae;
+  --ink: #f1eaf4;
+  --muted: #b8aac4;
+  --surface: rgba(42, 34, 54, 0.66);
+  --surface-solid: #262030;
+  --danger: #ff6b5e;
+  --danger-dark: #e04a3c;
+  --ring: #f0a46a;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --on-honey: #1f0e05;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #d96f33;
+  --button-primary-text: #1f0e05;
+  --button-secondary: #d96f33;
+  --button-secondary-text: #1f0e05;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Moon haze top center (rim-lights the tree branches), warm pumpkin glow
+   low on both sides where the clay pumpkins sit, a faint ghostly green. */
+.event-theme-halloweenclay .parallax-background {
+  background:
+    radial-gradient(ellipse 60% 38% at 50% 6%, rgba(190, 170, 214, 0.26), transparent 70%),
+    radial-gradient(circle at 10% 88%, rgba(224, 123, 60, 0.22), transparent 30%),
+    radial-gradient(circle at 92% 84%, rgba(224, 123, 60, 0.2), transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(168, 196, 174, 0.08), transparent 32%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 55%, var(--bg-bottom));
+}
+
+/* Halloween Graveyard theme: a realistic gothic graveyard at night. Colors
+   come from the graphics - cold mossy charcoal night (darker than the
+   #30-#60 stone of mausoleum and tree, so they read as silhouettes), pale
+   bone-colored text like weathered stone, the lantern / pumpkin fire amber
+   for accents and buttons, and the moss olive as petal. */
+.event-theme-halloweengraveyard {
+  --bg-top: #171a18;
+  --bg-mid: #101211;
+  --bg-bottom: #0a0b0a;
+  --leaf: #f0b067;
+  --leaf-dark: #f7d9a8;
+  --honey: #e08a35;
+  --honey-dark: #f0a65a;
+  --petal: #7a8450;
+  --ink: #ece8df;
+  --muted: #a9a59a;
+  --surface: rgba(30, 32, 31, 0.7);
+  --surface-solid: #1c1e1d;
+  --danger: #ff6b5e;
+  --danger-dark: #e04a3c;
+  --ring: #e8a04a;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --on-honey: #1a0d04;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #d9822b;
+  --button-primary-text: #1a0d04;
+  --button-secondary: #d9822b;
+  --button-secondary-text: #1a0d04;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Pale cold moon mist top center, the lantern hanging in the right tree,
+   the ember glow at the mausoleum door bottom left, and low ground fog. */
+.event-theme-halloweengraveyard .parallax-background {
+  background:
+    radial-gradient(ellipse 60% 36% at 50% 4%, rgba(176, 186, 172, 0.16), transparent 70%),
+    radial-gradient(circle at 74% 58%, rgba(240, 160, 70, 0.2), transparent 22%),
+    radial-gradient(circle at 14% 84%, rgba(220, 110, 50, 0.18), transparent 22%),
+    radial-gradient(ellipse 80% 22% at 50% 100%, rgba(150, 160, 145, 0.1), transparent 70%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 55%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
@@ -647,6 +739,8 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-schwarz,
 .event-theme-gruen,
 .event-theme-blau,
+.event-theme-halloweenclay,
+.event-theme-halloweengraveyard,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;
