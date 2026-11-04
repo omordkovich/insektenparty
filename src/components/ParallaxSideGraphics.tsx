@@ -8,6 +8,13 @@ type ParallaxSideGraphicsProps = {
   rightSrc?: string;
 };
 
+// All side graphics are made at 500 x 1024 px. The browser needs the real
+// aspect ratio up front: with a wrong one it reserves the wrong width while
+// the lazy image loads and the image jumps when it arrives (layout shift).
+// So a graphic with other dimensions has to be re-exported at 500 x 1024.
+const SIDE_GRAPHIC_WIDTH = 500;
+const SIDE_GRAPHIC_HEIGHT = 1024;
+
 // Share of the scroll distance the graphics "lag" behind the content (0 = no
 // parallax, 1 = they stand still on screen). At the very bottom of the page
 // they sit exactly at their CSS position (bottom: 0); the further up you
@@ -77,8 +84,8 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           ref={rightRef}
           src={rightSrc}
           alt=""
-          width={283}
-          height={1024}
+          width={SIDE_GRAPHIC_WIDTH}
+          height={SIDE_GRAPHIC_HEIGHT}
           aria-hidden="true"
           className="pointer-events-none absolute right-0 bottom-0 -z-10 hidden h-[min(1024px,95vh)] w-auto will-change-transform min-[600px]:block"
         />
@@ -88,8 +95,8 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           ref={leftRef}
           src={leftSrc}
           alt=""
-          width={434}
-          height={1024}
+          width={SIDE_GRAPHIC_WIDTH}
+          height={SIDE_GRAPHIC_HEIGHT}
           aria-hidden="true"
           className="pointer-events-none absolute bottom-0 left-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
         />
