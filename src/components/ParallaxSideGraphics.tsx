@@ -70,6 +70,8 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
         aria-hidden="true"
         className="parallax-background pointer-events-none absolute inset-0 -z-20 will-change-transform"
       />
+      {/* The right graphic is hidden on narrow screens (below 600px): it
+          would sit on top of the content there. */}
       {rightSrc ? (
         <Image
           ref={rightRef}
@@ -78,7 +80,7 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           width={283}
           height={1024}
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 bottom-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
+          className="pointer-events-none absolute right-0 bottom-0 -z-10 hidden h-[min(1024px,95vh)] w-auto will-change-transform min-[600px]:block"
         />
       ) : null}
       {leftSrc ? (
