@@ -18,7 +18,9 @@ export type ThemeKey =
   | "penandpaper"
   | "magic"
   | "pirates"
+  | "pirateskids"
   | "teddy"
+  | "cinema"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -55,7 +57,9 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   penandpaper: "Pen & Paper",
   magic: "Magic",
   pirates: "Pirates",
+  pirateskids: "Pirates Kids",
   teddy: "Teddy",
+  cinema: "Cinema",
   natur: "Natur",
 };
 
@@ -90,7 +94,9 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   penandpaper: "event-theme-penandpaper",
   magic: "event-theme-magic",
   pirates: "event-theme-pirates",
+  pirateskids: "event-theme-pirateskids",
   teddy: "event-theme-teddy",
+  cinema: "event-theme-cinema",
   natur: "event-theme",
 };
 
@@ -231,12 +237,26 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738284/pirates_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738285/pirates_accent_r.webp",
   },
+  pirateskids: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793785479/pirateskids_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793785480/pirateskids_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793785481/pirateskids_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793785482/pirateskids_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793785483/pirateskids_accent_r.webp",
+  },
   teddy: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738286/teddy_logo.webp",
     plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738287/teddy_bg_l.webp",
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738288/teddy_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738289/teddy_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793738290/teddy_accent_r.webp",
+  },
+  cinema: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786535/cinema_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786165/cinema_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786167/cinema_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786168/cinema_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786169/cinema_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
