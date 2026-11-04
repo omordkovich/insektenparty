@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 type ParallaxSideGraphicsProps = {
   leftSrc?: string;
@@ -24,10 +24,30 @@ const SIDE_GRAPHIC_HEIGHT = 1024;
 // the contact container) is not affected by the parallax at all.
 const PARALLAX_FACTOR = 0.4;
 
+// From this width on the right graphic is shown; below it, it would sit on
+// top of the content.
+const RIGHT_GRAPHIC_QUERY = "(min-width: 600px)";
+
+function subscribeRightGraphic(callback: () => void): () => void {
+  const query = window.matchMedia(RIGHT_GRAPHIC_QUERY);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+
 export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphicsProps) {
   const backgroundRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLImageElement>(null);
   const rightRef = useRef<HTMLImageElement>(null);
+  // The right graphic is not rendered at all on narrow screens instead of
+  // being hidden by CSS: a hidden lazy image has no box (0 x 0), which
+  // browsers flag ("lazy-loaded images should have explicit dimensions"), and
+  // an eager one would still be downloaded. False while rendering on the
+  // server and hydrating, so it appears right after hydration on wide screens.
+  const showRight = useSyncExternalStore(
+    subscribeRightGraphic,
+    () => window.matchMedia(RIGHT_GRAPHIC_QUERY).matches,
+    () => false,
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -68,7 +88,8 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
       window.removeEventListener("resize", measure);
       resizeObserver.disconnect();
     };
-  }, []);
+    // Runs again when the right graphic appears, so it gets its offset at once.
+  }, [showRight]);
 
   return (
     <>
@@ -77,17 +98,18 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
         aria-hidden="true"
         className="parallax-background pointer-events-none absolute inset-0 -z-20 will-change-transform"
       />
-      {/* The right graphic is hidden on narrow screens (below 600px): it
-          would sit on top of the content there. */}
-      {rightSrc ? (
+      {/* Both graphics are in view as soon as the page is, so they load
+          eagerly (the largest one is the page's LCP image). */}
+      {rightSrc && showRight ? (
         <Image
           ref={rightRef}
           src={rightSrc}
           alt=""
           width={SIDE_GRAPHIC_WIDTH}
           height={SIDE_GRAPHIC_HEIGHT}
+          loading="eager"
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 bottom-0 -z-10 hidden h-[min(1024px,95vh)] w-auto will-change-transform min-[600px]:block"
+          className="pointer-events-none absolute right-0 bottom-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
         />
       ) : null}
       {leftSrc ? (
@@ -97,6 +119,7 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           alt=""
           width={SIDE_GRAPHIC_WIDTH}
           height={SIDE_GRAPHIC_HEIGHT}
+          loading="eager"
           aria-hidden="true"
           className="pointer-events-none absolute bottom-0 left-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
         />

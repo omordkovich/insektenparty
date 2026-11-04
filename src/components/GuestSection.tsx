@@ -56,6 +56,9 @@ const ACTIVITY_EVENTS = ["pointerdown", "pointermove", "keydown", "scroll", "tou
 
 type GuestSectionProps = {
   apiBasePath: string;
+  /** The list as the server rendered it - shown at once, no loading state and
+   *  no first fetch (see the event page). Undefined: load it in the browser. */
+  initialGuests?: GuestDto[];
   defaultArrivalTime?: string;
   isOwner?: boolean;
   /** "Teilnehmerzahl begrenzen": max. people incl. companions; null = no limit. */
@@ -66,16 +69,18 @@ type GuestSectionProps = {
 
 export function GuestSection({
   apiBasePath,
+  initialGuests,
   defaultArrivalTime = "09:00",
   isOwner = false,
   maxGuests = null,
   readOnly = false,
 }: GuestSectionProps) {
-  const [guests, setGuests] = useState<GuestDto[]>([]);
+  const [startedWithGuests] = useState(initialGuests !== undefined);
+  const [guests, setGuests] = useState<GuestDto[]>(initialGuests ?? []);
   // Seats taken right now - for the "Noch 4 von 12 Plätzen frei" line and
   // the guest form.
   const occupied = occupiedSeats(guests);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!startedWithGuests);
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(closedModal);
   const [deleteGuest, setDeleteGuest] = useState<GuestDto | null>(null);
@@ -107,6 +112,9 @@ export function GuestSection({
   }, [apiBasePath]);
 
   useEffect(() => {
+    // Already rendered by the server; the poll below keeps it fresh.
+    if (startedWithGuests) return;
+
     let cancelled = false;
 
     void fetchGuests(apiBasePath)
@@ -131,7 +139,7 @@ export function GuestSection({
     return () => {
       cancelled = true;
     };
-  }, [apiBasePath]);
+  }, [apiBasePath, startedWithGuests]);
 
   // Background poll: silently re-fetches and swaps in the new list, without
   // touching the loading/error state, so a visitor who left the tab open

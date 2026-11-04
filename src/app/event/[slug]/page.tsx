@@ -22,10 +22,12 @@ import { buildEventShareUrl } from "@/lib/share";
 import { getPollOptions, getPollVotes } from "@/repositories/date-poll-repository";
 import { getEventByAddress } from "@/repositories/event-repository";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
+import type { GuestDto } from "@/lib/types";
 import { normalizeArrivalTime } from "@/lib/validation";
 import { getUserEntitlements } from "@/services/entitlement-service";
 import { getViewerAccess } from "@/services/event-access-service";
 import { getEventLifecycle } from "@/services/event-lifecycle-service";
+import { listGuestsForEvent } from "@/services/guest-service";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -129,6 +131,19 @@ export default async function EventPage({ params }: EventPageProps) {
       ? formatDateRangeLabel(event.eventDate, event.eventEndDate)
       : formatDateLabel(lifecycle?.stichtag ?? null);
 
+  // The guest list goes out with the page: loading it in the browser after
+  // the fact makes the page grow and pushes the footer down (a big layout
+  // shift). If it can't be read here, the browser loads it as before and
+  // shows the error in the list.
+  let initialGuests: GuestDto[] | undefined;
+  if (dateMode === "fixed") {
+    try {
+      initialGuests = await listGuestsForEvent(event.id);
+    } catch (error) {
+      console.error("Event page: guest list could not be loaded on the server:", error);
+    }
+  }
+
   return (
     <div className="relative flex min-h-dvh flex-col" style={{ isolation: "isolate" }}>
       <Header
@@ -168,6 +183,7 @@ export default async function EventPage({ params }: EventPageProps) {
         {dateMode === "fixed" ? (
           <GuestSection
             apiBasePath={`/api/events/${event.id}/guests`}
+            initialGuests={initialGuests}
             // The guest form starts with the event's start time.
             defaultArrivalTime={config.eventStartTime ?? config.defaultArrivalTime}
             isOwner={isOwner}

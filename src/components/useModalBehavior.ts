@@ -41,6 +41,17 @@ export function useModalBehavior({
     const token = Symbol("modal");
     openModals.push(token);
     const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    // Locking the scroll removes the page's scrollbar, which would widen the
+    // page by its width and shift everything sideways (a layout shift, e.g.
+    // when the cookie banner is hydrated). Padding of the same width keeps
+    // the layout where it was. Zero when there is no scrollbar, or when an
+    // earlier modal already locked the scroll.
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      const currentPadding = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
     document.body.classList.add("modal-open");
     document.body.style.overflow = "hidden";
     (initialFocusRef ?? internalCloseRef).current?.focus();
@@ -61,6 +72,7 @@ export function useModalBehavior({
       openModals.splice(openModals.indexOf(token), 1);
       if (openModals.length === 0) document.body.classList.remove("modal-open");
       document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
     };
   }, [initialFocusRef]);
 
