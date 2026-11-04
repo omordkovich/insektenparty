@@ -21,6 +21,7 @@ export type ThemeKey =
   | "pirateskids"
   | "teddy"
   | "cinema"
+  | "tarot"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -60,6 +61,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   pirateskids: "Pirates Kids",
   teddy: "Teddy",
   cinema: "Cinema",
+  tarot: "Tarot",
   natur: "Natur",
 };
 
@@ -97,6 +99,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   pirateskids: "event-theme-pirateskids",
   teddy: "event-theme-teddy",
   cinema: "event-theme-cinema",
+  tarot: "event-theme-tarot",
   natur: "event-theme",
 };
 
@@ -257,6 +260,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786167/cinema_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786168/cinema_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793786169/cinema_accent_r.webp",
+  },
+  tarot: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793800361/tarot_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793800362/tarot_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793800363/tarot_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793800364/tarot_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793800365/tarot_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

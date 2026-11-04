@@ -1009,6 +1009,56 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 40%, var(--bg-bottom));
 }
 
+/* Tarot theme: a fortune teller's parlour at night. Colors come from the
+   graphics - the indigo-violet nebula inside the crystal ball as the night
+   sky at the top, a deep plum-black room below where the dark wooden tables
+   stand, the brass of the candlesticks and the gold of the card backs as
+   buttons, amethyst lilac as accent text and the ball's turquoise swirl as
+   petal. */
+.event-theme-tarot {
+  --bg-top: #1e1a3c;
+  --bg-mid: #140f24;
+  --bg-bottom: #0c0812;
+  --leaf: #c9a8f0;
+  --leaf-dark: #dcc6f8;
+  --honey: #d4a84a;
+  --honey-dark: #bb8f34;
+  --petal: #5ed6d0;
+  --ink: #f1eaf7;
+  --muted: #bcaed2;
+  --surface: rgba(29, 23, 48, 0.86);
+  --surface-solid: #1d1730;
+  --danger: #ff8a8a;
+  --danger-dark: #ffa8a8;
+  --ring: #c9a8f0;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --on-honey: #1c1206;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #d4a84a;
+  --button-primary-text: #1c1206;
+  --button-secondary: #d4a84a;
+  --button-secondary-text: #1c1206;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* The parlour's light sources: the crystal ball's turquoise-violet glow
+   around the logo (top center), warm candlelight behind the candles on the
+   left table and the candelabra on the right - it also lifts the dark wood
+   and velvet off the night - and a faint amethyst haze on the floor. */
+.event-theme-tarot .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 210px at 50% 140px, rgba(94, 214, 208, 0.22), transparent 72%),
+    radial-gradient(ellipse 360px 300px at 50% 140px, rgba(140, 100, 220, 0.24), transparent 74%),
+    radial-gradient(ellipse 26% 34% at 12% 40%, rgba(255, 176, 90, 0.26), transparent 72%),
+    radial-gradient(ellipse 24% 34% at 90% 30%, rgba(255, 176, 90, 0.24), transparent 72%),
+    radial-gradient(ellipse 80% 22% at 50% 100%, rgba(120, 60, 160, 0.22), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
@@ -1466,6 +1516,7 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-penandpaper,
 .event-theme-magic,
 .event-theme-cinema,
+.event-theme-tarot,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;
