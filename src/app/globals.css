@@ -1288,6 +1288,114 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
 }
 
+/* Weltall theme: a watercolor space scene - a space station with an
+   astronaut on the left, a shuttle on the moon on the right. The logo is a
+   disc of deep navy night sky with a nebula, so --bg-top is that navy and
+   there is no glow behind the logo (its sky continues into the page's). The
+   page sinks into deeper space below. The white station, shuttle and moon
+   read as bright objects against it (12:1 and more). The nebula colors carry
+   the UI: its lilac for accent text, its orange (also the shuttle tank and
+   the helmet visors) for buttons with dark text, its teal as petal. */
+.event-theme-weltall {
+  --bg-top: #122a58;
+  --bg-mid: #0f1b3c;
+  --bg-bottom: #0a1026;
+  --leaf: #c9b0f2;
+  --leaf-dark: #ddccf8;
+  --honey: #f0a860;
+  --honey-dark: #d88e44;
+  --petal: #5ec8d8;
+  --ink: #eef0fa;
+  --muted: #b4bad6;
+  --surface: rgba(20, 30, 62, 0.86);
+  --surface-solid: #141e3e;
+  --danger: #ff8a8a;
+  --danger-dark: #ffaaaa;
+  --ring: #c9b0f2;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --on-honey: #2a1606;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #f0a860;
+  --button-primary-text: #2a1606;
+  --button-secondary: #f0a860;
+  --button-secondary-text: #2a1606;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Deep space with the watercolor nebula of the graphics drifting around
+   them: violet and orange clouds behind the station on the left, a faint
+   teal veil top right, pale moonlight around the moon bottom right.
+   Stars come in three unevenly spread layers so the sky never looks like a
+   grid:
+   - here: single stars over the whole sky (big odd tiles, white, pale gold
+     and lilac like the stars in the logo, the brightest with a soft halo),
+   - ::before: four small star clusters of different size and brightness,
+     denser stars visible only inside a few irregular patches,
+   - ::after: a faint, broken milky way of tiny stars - patches of varying
+     size along the diagonal from top left to bottom right. */
+.event-theme-weltall .parallax-background {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 1px, rgba(255, 255, 255, 0.2) 2px, transparent 3px) 67px 31px / 401px 373px,
+    radial-gradient(circle, rgba(255, 236, 196, 0.85) 0.9px, rgba(255, 236, 196, 0.16) 1.8px, transparent 2.8px) 241px 263px / 467px 433px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.7) 0.7px, transparent 1.2px) 13px 97px / 233px 211px,
+    radial-gradient(circle, rgba(216, 196, 244, 0.65) 0.6px, transparent 1.1px) 131px 163px / 311px 289px,
+    radial-gradient(circle, rgba(255, 236, 196, 0.55) 0.6px, transparent 1.1px) 197px 59px / 283px 263px,
+    radial-gradient(ellipse 28% 34% at 8% 46%, rgba(130, 90, 200, 0.26), transparent 72%),
+    radial-gradient(ellipse 22% 24% at 16% 28%, rgba(240, 150, 80, 0.16), transparent 72%),
+    radial-gradient(ellipse 26% 24% at 86% 16%, rgba(94, 200, 216, 0.1), transparent 72%),
+    radial-gradient(ellipse 30% 28% at 90% 82%, rgba(220, 210, 240, 0.12), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+.event-theme-weltall .parallax-background::before,
+.event-theme-weltall .parallax-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.event-theme-weltall .parallax-background::before {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0.7px, transparent 1.2px) 7px 19px / 79px 67px,
+    radial-gradient(circle, rgba(255, 236, 196, 0.75) 0.6px, transparent 1.1px) 53px 41px / 103px 89px,
+    radial-gradient(circle, rgba(216, 196, 244, 0.7) 0.6px, transparent 1.1px) 37px 7px / 113px 101px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0.9px, rgba(255, 255, 255, 0.16) 1.8px, transparent 2.6px) 23px 61px / 163px 149px;
+  -webkit-mask-image:
+    radial-gradient(ellipse 150px 110px at 33% 12%, #000, transparent 70%),
+    radial-gradient(ellipse 90px 130px at 77% 41%, #000, transparent 70%),
+    radial-gradient(ellipse 120px 70px at 61% 79%, rgba(0, 0, 0, 0.6), transparent 70%),
+    radial-gradient(ellipse 80px 60px at 18% 64%, rgba(0, 0, 0, 0.8), transparent 70%);
+  mask-image:
+    radial-gradient(ellipse 150px 110px at 33% 12%, #000, transparent 70%),
+    radial-gradient(ellipse 90px 130px at 77% 41%, #000, transparent 70%),
+    radial-gradient(ellipse 120px 70px at 61% 79%, rgba(0, 0, 0, 0.6), transparent 70%),
+    radial-gradient(ellipse 80px 60px at 18% 64%, rgba(0, 0, 0, 0.8), transparent 70%);
+}
+
+.event-theme-weltall .parallax-background::after {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0.5px, transparent 1px) 3px 11px / 47px 41px,
+    radial-gradient(circle, rgba(216, 196, 244, 0.45) 0.5px, transparent 1px) 31px 29px / 61px 53px,
+    radial-gradient(circle, rgba(255, 236, 196, 0.45) 0.5px, transparent 1px) 17px 5px / 73px 67px;
+  /* Not one even band but a broken chain of patches along the diagonal, so
+     the milky way thins out and breaks off like a real one. */
+  -webkit-mask-image:
+    radial-gradient(ellipse 200px 150px at 14% 18%, rgba(0, 0, 0, 0.7), transparent 70%),
+    radial-gradient(ellipse 150px 130px at 41% 44%, #000, transparent 70%),
+    radial-gradient(ellipse 90px 80px at 56% 57%, rgba(0, 0, 0, 0.5), transparent 70%),
+    radial-gradient(ellipse 180px 140px at 83% 88%, rgba(0, 0, 0, 0.8), transparent 70%);
+  mask-image:
+    radial-gradient(ellipse 200px 150px at 14% 18%, rgba(0, 0, 0, 0.7), transparent 70%),
+    radial-gradient(ellipse 150px 130px at 41% 44%, #000, transparent 70%),
+    radial-gradient(ellipse 90px 80px at 56% 57%, rgba(0, 0, 0, 0.5), transparent 70%),
+    radial-gradient(ellipse 180px 140px at 83% 88%, rgba(0, 0, 0, 0.8), transparent 70%);
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
@@ -1746,6 +1854,7 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-magic,
 .event-theme-cinema,
 .event-theme-tarot,
+.event-theme-weltall,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;

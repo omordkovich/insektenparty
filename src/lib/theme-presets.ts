@@ -25,6 +25,7 @@ export type ThemeKey =
   | "karnaval"
   | "pride"
   | "dinosaurier"
+  | "weltall"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -68,6 +69,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   karnaval: "Karnaval",
   pride: "Pride",
   dinosaurier: "Dinosaurier",
+  weltall: "Weltall",
   natur: "Natur",
 };
 
@@ -109,6 +111,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   karnaval: "event-theme-karnaval",
   pride: "event-theme-pride",
   dinosaurier: "event-theme-dinosaurier",
+  weltall: "event-theme-weltall",
   natur: "event-theme",
 };
 
@@ -297,6 +300,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871959/dinosaurier_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871960/dinosaurier_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871961/dinosaurier_accent_r.webp",
+  },
+  weltall: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874757/weltall_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874759/weltall_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874760/weltall_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874761/weltall_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874762/weltall_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
