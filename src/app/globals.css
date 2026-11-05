@@ -547,6 +547,124 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
 }
 
+/* Pride theme: a sunny Pride parade with rainbow flags. The graphics are
+   pure, glossy rainbow stripes, so the scene stays light and airy and lets
+   them carry the color - a clear daytime sky at the top, warm white in the
+   middle and a soft lilac at the bottom (the flag's violet stripe, faded).
+   The flag's violet is the button and accent text color, its yellow the
+   honey and its orange the petal. Violet-tinted ink. */
+.event-theme-pride {
+  --bg-top: #e4ecfb;
+  --bg-mid: #fffaf2;
+  --bg-bottom: #f1e8f7;
+  --leaf: #6a1b9a;
+  --leaf-dark: #4e1173;
+  --honey: #ffd21a;
+  --honey-dark: #f0b400;
+  --petal: #ff8c00;
+  --ink: #231a36;
+  --muted: #5a5070;
+  --surface: rgba(255, 253, 250, 0.88);
+  --surface-solid: #fffdfa;
+  --danger: #c4141f;
+  --danger-dark: #9a0f18;
+  --ring: #0050d8;
+  --shadow: 0 18px 40px rgba(60, 30, 90, 0.14);
+  --on-honey: #2a1a00;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #7418a0;
+  --button-primary-text: #ffffff;
+  --button-secondary: #7418a0;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Parade daylight: the flags' colors glow softly into the air around them -
+   a warm red/orange haze beside the flag pile on the left, a blue/violet
+   haze beside the one on the right, a sunny yellow light around the logo
+   (top center) and a lilac floor. A sunburst like Hippie's, but rising from
+   below the bottom edge (so the center point itself is never visible) and
+   fanning out upwards, each ray in the next flag
+   color (red, orange, yellow, green, blue, violet). */
+.event-theme-pride .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 228, 120, 0.38), transparent 72%),
+    repeating-conic-gradient(
+      from 0deg at 50% calc(100% + 260px),
+      rgba(228, 3, 3, 0.08) 0deg 6deg, transparent 6deg 12deg,
+      rgba(255, 140, 0, 0.1) 12deg 18deg, transparent 18deg 24deg,
+      rgba(255, 210, 26, 0.16) 24deg 30deg, transparent 30deg 36deg,
+      rgba(0, 128, 38, 0.08) 36deg 42deg, transparent 42deg 48deg,
+      rgba(0, 77, 255, 0.07) 48deg 54deg, transparent 54deg 60deg,
+      rgba(117, 7, 135, 0.08) 60deg 66deg, transparent 66deg 72deg
+    ),
+    radial-gradient(ellipse 30% 30% at 6% 22%, rgba(255, 120, 60, 0.18), transparent 75%),
+    radial-gradient(ellipse 30% 30% at 94% 40%, rgba(70, 90, 230, 0.14), transparent 75%),
+    radial-gradient(ellipse 34% 26% at 50% 62%, rgba(0, 150, 60, 0.06), transparent 75%),
+    radial-gradient(ellipse 80% 22% at 50% 100%, rgba(170, 90, 210, 0.16), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
+/* Dinosaurier theme: a primeval jungle in warm late-afternoon haze. The
+   graphics are dark olive ferns, conifers and brown dinosaurs, so the air
+   behind them is a light amber haze (they stand out as dark shapes, 7:1 and
+   more) - amber sky at the top, warm sunlit sand in the middle and a darker
+   olive-sand floor that blends into the shaded fern undergrowth at the
+   bottom of the side graphics (the footer sits on its own surface card, so
+   no text lies directly on it). The sky is a little lighter and
+   pinker than the sandstone fossil logo so the stone disc stays visible.
+   Fern green for accent text, the volcano's burnt lava orange for buttons,
+   amber as honey, the lighter fern green as petal, dark earth-brown ink. */
+.event-theme-dinosaurier {
+  --bg-top: #f2dcc0;
+  --bg-mid: #f8ecd8;
+  --bg-bottom: #8f8456;
+  --leaf: #3f5a1c;
+  --leaf-dark: #2c4012;
+  --honey: #e8963a;
+  --honey-dark: #cf7c22;
+  --petal: #7a8f32;
+  --ink: #2e2214;
+  --muted: #66553e;
+  --surface: rgba(255, 250, 240, 0.88);
+  --surface-solid: #fffaf0;
+  --danger: #a8301e;
+  --danger-dark: #84220f;
+  --ring: #a84a16;
+  --shadow: 0 18px 40px rgba(60, 40, 15, 0.16);
+  --on-honey: #2a1606;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #a84a16;
+  --button-primary-text: #fff8ee;
+  --button-secondary: #a84a16;
+  --button-secondary-text: #fff8ee;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: the erupting volcano glows orange-red behind the
+   jungle on the left (top left, where it sits in the graphic) with a grey
+   ash cloud above it, golden sunlight streams through the mist behind the
+   long-necked dinosaurs on the right, a soft warm sky around the fossil
+   logo and an olive-green jungle mist on the floor. */
+.event-theme-dinosaurier .parallax-background {
+  background:
+    radial-gradient(ellipse 22% 16% at 10% 4%, rgba(120, 104, 96, 0.16), transparent 75%),
+    radial-gradient(ellipse 26% 24% at 12% 20%, rgba(232, 96, 32, 0.24), transparent 75%),
+    radial-gradient(ellipse 30% 34% at 88% 34%, rgba(255, 196, 110, 0.4), transparent 75%),
+    radial-gradient(ellipse 240px 200px at 50% 140px, rgba(255, 236, 200, 0.5), transparent 72%),
+    radial-gradient(ellipse 34% 26% at 50% 62%, rgba(255, 214, 150, 0.14), transparent 75%),
+    radial-gradient(ellipse 90% 24% at 50% 100%, rgba(48, 52, 18, 0.4), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 62%, var(--bg-bottom));
+}
+
 /* Halloween Clay theme: a plasticine graveyard at night. Colors are taken
    from the clay graphics themselves - dusty plum/slate night (darker than
    the #48-#78 purple-grey trees and graves, so they read as silhouettes),

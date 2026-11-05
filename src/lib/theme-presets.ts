@@ -23,6 +23,8 @@ export type ThemeKey =
   | "cinema"
   | "tarot"
   | "karnaval"
+  | "pride"
+  | "dinosaurier"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -64,6 +66,8 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   cinema: "Cinema",
   tarot: "Tarot",
   karnaval: "Karnaval",
+  pride: "Pride",
+  dinosaurier: "Dinosaurier",
   natur: "Natur",
 };
 
@@ -103,6 +107,8 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   cinema: "event-theme-cinema",
   tarot: "event-theme-tarot",
   karnaval: "event-theme-karnaval",
+  pride: "event-theme-pride",
+  dinosaurier: "event-theme-dinosaurier",
   natur: "event-theme",
 };
 
@@ -277,6 +283,20 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793818300/karnaval_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793818302/karnaval_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793818303/karnaval_accent_r.webp",
+  },
+  pride: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793869242/pride_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793868193/pride_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793868194/pride_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793868195/pride_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793868196/pride_accent_r.webp",
+  },
+  dinosaurier: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871957/dinosaurier_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871958/dinosaurier_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871959/dinosaurier_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871960/dinosaurier_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793871961/dinosaurier_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

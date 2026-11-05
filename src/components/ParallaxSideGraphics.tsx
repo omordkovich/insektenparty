@@ -15,6 +15,15 @@ type ParallaxSideGraphicsProps = {
 const SIDE_GRAPHIC_WIDTH = 500;
 const SIDE_GRAPHIC_HEIGHT = 1024;
 
+// The graphics have a fixed height and their natural width, but Tailwind's
+// base styles cap every image at max-width: 100%. On narrow, tall screens
+// (e.g. 360 x 900: 855px high -> 417px wide) that cap squeezed the graphic
+// to the screen width and distorted it. object-cover keeps the proportions
+// and crops the overflow instead, anchored at the graphic's outer edge, so
+// the side that touches the screen edge stays complete.
+const SIDE_GRAPHIC_CLASS =
+  "pointer-events-none absolute bottom-0 -z-10 h-[min(1024px,95vh)] w-auto object-cover will-change-transform";
+
 // Share of the scroll distance the graphics "lag" behind the content (0 = no
 // parallax, 1 = they stand still on screen). At the very bottom of the page
 // they sit exactly at their CSS position (bottom: 0); the further up you
@@ -109,7 +118,7 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           height={SIDE_GRAPHIC_HEIGHT}
           loading="eager"
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 bottom-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
+          className={`${SIDE_GRAPHIC_CLASS} right-0 object-[right_bottom]`}
         />
       ) : null}
       {leftSrc ? (
@@ -121,7 +130,7 @@ export function ParallaxSideGraphics({ leftSrc, rightSrc }: ParallaxSideGraphics
           height={SIDE_GRAPHIC_HEIGHT}
           loading="eager"
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 -z-10 h-[min(1024px,95vh)] w-auto will-change-transform"
+          className={`${SIDE_GRAPHIC_CLASS} left-0 object-[left_bottom]`}
         />
       ) : null}
     </>
