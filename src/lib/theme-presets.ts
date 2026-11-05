@@ -26,6 +26,8 @@ export type ThemeKey =
   | "pride"
   | "dinosaurier"
   | "weltall"
+  | "einschulung"
+  | "ninja"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -70,6 +72,8 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   pride: "Pride",
   dinosaurier: "Dinosaurier",
   weltall: "Weltall",
+  einschulung: "Einschulung",
+  ninja: "Ninja",
   natur: "Natur",
 };
 
@@ -112,6 +116,8 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   pride: "event-theme-pride",
   dinosaurier: "event-theme-dinosaurier",
   weltall: "event-theme-weltall",
+  einschulung: "event-theme-einschulung",
+  ninja: "event-theme-ninja",
   natur: "event-theme",
 };
 
@@ -307,6 +313,20 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874760/weltall_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874761/weltall_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793874762/weltall_accent_r.webp",
+  },
+  einschulung: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793900837/einschulung_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793900839/einschulung_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793900840/einschulung_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793900841/einschulung_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793900842/einschulung_accent_r.webp",
+  },
+  ninja: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908641/ninja_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908642/ninja_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793909246/ninja_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908644/ninja_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908645/ninja_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

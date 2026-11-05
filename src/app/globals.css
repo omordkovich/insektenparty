@@ -1396,6 +1396,103 @@ body {
     radial-gradient(ellipse 180px 140px at 83% 88%, rgba(0, 0, 0, 0.8), transparent 70%);
 }
 
+/* Einschulung theme: a sunny watercolor meadow on the first day of school.
+   Light and warm like the graphics - soft morning sky at the top, creamy
+   paper in the middle and golden meadow grass at the bottom where the
+   animals sit. The orange of the logo's bow and the fox/robin carries the
+   buttons, the meadow green is the accent text, the blue tit's blue is
+   petal, the school cone's sunny yellow is honey. Warm brown ink. */
+.event-theme-einschulung {
+  --bg-top: #e6f0f0;
+  --bg-mid: #fdf6e6;
+  --bg-bottom: #f0e2b8;
+  --leaf: #4a6a1c;
+  --leaf-dark: #354e12;
+  --honey: #f0a848;
+  --honey-dark: #d98f2e;
+  --petal: #6aa0c8;
+  --ink: #33281a;
+  --muted: #6a5a42;
+  --surface: rgba(255, 251, 240, 0.88);
+  --surface-solid: #fffbf0;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #b8561c;
+  --shadow: 0 18px 40px rgba(80, 55, 20, 0.14);
+  --on-honey: #2e1c06;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #b8561c;
+  --button-primary-text: #ffffff;
+  --button-secondary: #b8561c;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: warm morning sun around the logo (top center), golden
+   light over the autumn-orange hill on the right, a soft green haze over the
+   meadow on the left and golden grass on the floor. */
+.event-theme-einschulung .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 232, 170, 0.45), transparent 72%),
+    radial-gradient(ellipse 28% 34% at 8% 60%, rgba(150, 180, 80, 0.16), transparent 75%),
+    radial-gradient(ellipse 28% 34% at 92% 50%, rgba(255, 170, 80, 0.2), transparent 75%),
+    radial-gradient(ellipse 90% 24% at 50% 100%, rgba(220, 180, 80, 0.22), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 45%, var(--bg-bottom));
+}
+
+/* Ninja theme (light, dusk in a Japanese garden). Pink blossom haze in the
+   sky, creamy paper in the middle, dusty earth at the bottom where the hill
+   and garden stand. The torii/lacquer red of the pagoda carries the buttons,
+   the lantern glow in the windows is honey, cherry blossom pink is petal and
+   the shuriken's iron gives the dark ink. */
+.event-theme-ninja {
+  --bg-top: #efdfe2;
+  --bg-mid: #faf3ee;
+  --bg-bottom: #dcc6b0;
+  --leaf: #8a2a2e;
+  --leaf-dark: #6a1e22;
+  --honey: #e8a25a;
+  --honey-dark: #cf8a40;
+  --petal: #d97b92;
+  --ink: #2a1c1a;
+  --muted: #6a5550;
+  --surface: rgba(255, 250, 245, 0.88);
+  --surface-solid: #fffaf5;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #a8262c;
+  --shadow: 0 18px 40px rgba(60, 30, 25, 0.16);
+  --on-honey: #2a1606;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #a8262c;
+  --button-primary-text: #ffffff;
+  --button-secondary: #a8262c;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: dusk glow around the logo (top center), blossom haze
+   behind the cherry trees on both sides, warm lantern light where the
+   pagoda's paper windows are (left) and the house on the right, dusty earth
+   on the floor. */
+.event-theme-ninja .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 220, 215, 0.5), transparent 72%),
+    radial-gradient(ellipse 26% 30% at 10% 48%, rgba(255, 170, 90, 0.2), transparent 75%),
+    radial-gradient(ellipse 26% 34% at 92% 30%, rgba(240, 140, 170, 0.22), transparent 75%),
+    radial-gradient(ellipse 24% 22% at 94% 62%, rgba(255, 170, 90, 0.16), transparent 75%),
+    radial-gradient(ellipse 90% 24% at 50% 100%, rgba(120, 80, 55, 0.2), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
