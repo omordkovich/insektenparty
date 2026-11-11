@@ -32,6 +32,7 @@ export type ThemeKey =
   | "toycars"
   | "hochzeit"
   | "brettspiele"
+  | "bowling"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -82,6 +83,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   toycars: "Toy Cars",
   hochzeit: "Hochzeit",
   brettspiele: "Brettspiele",
+  bowling: "Bowling",
   natur: "Natur",
 };
 
@@ -130,6 +132,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   toycars: "event-theme-toycars",
   hochzeit: "event-theme-hochzeit",
   brettspiele: "event-theme-brettspiele",
+  bowling: "event-theme-bowling",
   natur: "event-theme",
 };
 
@@ -341,11 +344,11 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908645/ninja_accent_r.webp",
   },
   fussball: {
-    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396566/fussball_logo.webp",
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419310/fussball_logo.webp",
     plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396567/fussball_bg_l.webp",
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396568/fussball_bg_r.webp",
-    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396569/fussball_accent_l.webp",
-    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396570/fussball_accent_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419311/fussball_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419313/fussball_accent_r.webp",
   },
   toycars: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396571/toycars_logo.webp",
@@ -367,6 +370,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396584/brettspiele_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396585/brettspiele_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396585/brettspiele_accent_r.webp",
+  },
+  bowling: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419920/bowling_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419922/bowling_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419923/bowling_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419924/bowling_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419925/bowling_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
