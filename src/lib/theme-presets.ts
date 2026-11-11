@@ -33,6 +33,7 @@ export type ThemeKey =
   | "hochzeit"
   | "brettspiele"
   | "bowling"
+  | "hawaii"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -84,6 +85,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   hochzeit: "Hochzeit",
   brettspiele: "Brettspiele",
   bowling: "Bowling",
+  hawaii: "Hawaii",
   natur: "Natur",
 };
 
@@ -133,6 +135,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   hochzeit: "event-theme-hochzeit",
   brettspiele: "event-theme-brettspiele",
   bowling: "event-theme-bowling",
+  hawaii: "event-theme-hawaii",
   natur: "event-theme",
 };
 
@@ -377,6 +380,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419923/bowling_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419924/bowling_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794419925/bowling_accent_r.webp",
+  },
+  hawaii: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425399/hawaii_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425400/hawaii_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425401/hawaii_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425402/hawaii_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425403/hawaii_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",
