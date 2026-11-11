@@ -28,6 +28,10 @@ export type ThemeKey =
   | "weltall"
   | "einschulung"
   | "ninja"
+  | "fussball"
+  | "toycars"
+  | "hochzeit"
+  | "brettspiele"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -74,6 +78,10 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   weltall: "Weltall",
   einschulung: "Einschulung",
   ninja: "Ninja",
+  fussball: "Fußball",
+  toycars: "Toy Cars",
+  hochzeit: "Hochzeit",
+  brettspiele: "Brettspiele",
   natur: "Natur",
 };
 
@@ -118,6 +126,10 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   weltall: "event-theme-weltall",
   einschulung: "event-theme-einschulung",
   ninja: "event-theme-ninja",
+  fussball: "event-theme-fussball",
+  toycars: "event-theme-toycars",
+  hochzeit: "event-theme-hochzeit",
+  brettspiele: "event-theme-brettspiele",
   natur: "event-theme",
 };
 
@@ -324,9 +336,37 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
   ninja: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908641/ninja_logo.webp",
     plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908642/ninja_bg_l.webp",
-    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793909246/ninja_bg_r.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1793957301/ninja_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908644/ninja_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1793908645/ninja_accent_r.webp",
+  },
+  fussball: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396566/fussball_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396567/fussball_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396568/fussball_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396569/fussball_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396570/fussball_accent_r.webp",
+  },
+  toycars: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396571/toycars_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396572/toycars_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396573/toycars_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396574/toycars_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396575/toycars_accent_r.webp",
+  },
+  hochzeit: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396576/hochzeit_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396577/hochzeit_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396578/hochzeit_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396579/hochzeit_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396580/hochzeit_accent_r.webp",
+  },
+  brettspiele: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396581/brettspiele_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396583/brettspiele_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396584/brettspiele_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396585/brettspiele_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794396585/brettspiele_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

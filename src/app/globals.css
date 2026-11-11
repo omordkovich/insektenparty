@@ -1493,6 +1493,191 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
 }
 
+/* Fußball theme (light, a sunny match day). Fresh sky blue at the top, soft
+   paper in the middle and turf green at the bottom where the grass sods
+   stand. The pitch green carries buttons and accent text, the trophy's gold
+   is honey, the blue jersey is petal. Dark navy ink like the kit bag. */
+.event-theme-fussball {
+  --bg-top: #d8e8f4;
+  --bg-mid: #f7f6ea;
+  --bg-bottom: #9fba6c;
+  --leaf: #2a6a26;
+  --leaf-dark: #1e5019;
+  --honey: #e0b030;
+  --honey-dark: #c4961c;
+  --petal: #3a6fc0;
+  --ink: #16202e;
+  --muted: #4f5b66;
+  --surface: rgba(253, 253, 246, 0.9);
+  --surface-solid: #fdfdf6;
+  --danger: #b0302a;
+  --danger-dark: #8a221e;
+  --ring: #2a6a26;
+  --shadow: 0 18px 40px rgba(20, 50, 30, 0.16);
+  --on-honey: #2a1e00;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #2a6a26;
+  --button-primary-text: #ffffff;
+  --button-secondary: #2a6a26;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: bright sun around the logo (top center), a cool blue
+   haze behind the players on the left, golden light around the trophy on the
+   right and turf green on the floor. */
+.event-theme-fussball .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 245, 200, 0.55), transparent 72%),
+    radial-gradient(ellipse 26% 30% at 10% 28%, rgba(90, 140, 220, 0.18), transparent 75%),
+    radial-gradient(ellipse 24% 30% at 92% 50%, rgba(240, 200, 80, 0.22), transparent 75%),
+    radial-gradient(ellipse 90% 22% at 50% 100%, rgba(70, 120, 40, 0.3), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 55%, var(--bg-bottom));
+}
+
+/* Toy Cars theme (light, a bright race-track playroom). Clear sky blue at the
+   top, warm cream in the middle and a sandy floor. The flame red of the
+   logo's car carries the buttons and accent text, the yellow track is honey,
+   the blue track is petal. */
+.event-theme-toycars {
+  --bg-top: #cfe6f8;
+  --bg-mid: #fff7e4;
+  --bg-bottom: #f7d9a0;
+  --leaf: #b8340c;
+  --leaf-dark: #922808;
+  --honey: #f5b82e;
+  --honey-dark: #dd9f14;
+  --petal: #2f7fd0;
+  --ink: #22211f;
+  --muted: #5c5650;
+  --surface: rgba(255, 251, 240, 0.9);
+  --surface-solid: #fffbf0;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #c4380e;
+  --shadow: 0 18px 40px rgba(90, 50, 20, 0.16);
+  --on-honey: #2a1a00;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #c4380e;
+  --button-primary-text: #ffffff;
+  --button-secondary: #c4380e;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: a warm flame glow behind the logo (top center), orange
+   light around the loops on the left, a blue haze above the tire tower on
+   the right and sand on the floor. */
+.event-theme-toycars .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 210, 140, 0.5), transparent 72%),
+    radial-gradient(ellipse 28% 34% at 8% 55%, rgba(255, 150, 70, 0.2), transparent 75%),
+    radial-gradient(ellipse 26% 34% at 92% 40%, rgba(70, 140, 230, 0.18), transparent 75%),
+    radial-gradient(ellipse 90% 22% at 50% 100%, rgba(230, 170, 80, 0.3), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+/* Hochzeit theme (light, pastel wedding). Blush at the top, ivory in the
+   middle and a soft rose-sand floor, like the flowers and the cream cake.
+   Dusty rose carries the buttons, eucalyptus green the accent text, peach is
+   honey and the blush rose is petal. Warm dark-plum ink. */
+.event-theme-hochzeit {
+  --bg-top: #f6e6ea;
+  --bg-mid: #fdf8f4;
+  --bg-bottom: #f0dcd2;
+  --leaf: #456457;
+  --leaf-dark: #324b40;
+  --honey: #eab08a;
+  --honey-dark: #d6966c;
+  --petal: #e6a0b0;
+  --ink: #3a2a2c;
+  --muted: #6e5a5c;
+  --surface: rgba(255, 251, 248, 0.9);
+  --surface-solid: #fffbf8;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #9c4660;
+  --shadow: 0 18px 40px rgba(90, 50, 55, 0.13);
+  --on-honey: #3a1e10;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #9c4660;
+  --button-primary-text: #ffffff;
+  --button-secondary: #9c4660;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: soft candle-white glow around the logo (top center),
+   a blush haze over the flowers on the left, peach light on the right and a
+   rose-sand floor. */
+.event-theme-hochzeit .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 240, 235, 0.6), transparent 72%),
+    radial-gradient(ellipse 28% 34% at 8% 62%, rgba(240, 170, 190, 0.2), transparent 75%),
+    radial-gradient(ellipse 28% 34% at 92% 42%, rgba(240, 180, 140, 0.2), transparent 75%),
+    radial-gradient(ellipse 90% 22% at 50% 100%, rgba(220, 170, 160, 0.22), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+/* Brettspiele theme (light, a game night at the table). Warm parchment
+   tones like the board's cream tiles: pale sand at the top, cream in the
+   middle, a wooden-table floor. The red pawn carries the buttons, the board
+   meadow green is the accent text, the yellow pawn is honey and the blue
+   pawn is petal. Warm brown ink. */
+.event-theme-brettspiele {
+  --bg-top: #f4ecd8;
+  --bg-mid: #fbf6e8;
+  --bg-bottom: #e8d8b8;
+  --leaf: #3a6a2c;
+  --leaf-dark: #2a5020;
+  --honey: #f0c040;
+  --honey-dark: #d6a526;
+  --petal: #2f6fb8;
+  --ink: #2c2418;
+  --muted: #665a44;
+  --surface: rgba(255, 252, 242, 0.9);
+  --surface-solid: #fffcf2;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #b01e1e;
+  --shadow: 0 18px 40px rgba(80, 60, 25, 0.15);
+  --on-honey: #2a1c00;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #b01e1e;
+  --button-primary-text: #ffffff;
+  --button-secondary: #b01e1e;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: lamp light over the table around the logo (top
+   center), a warm glow over the tile towers on the left, a soft green haze
+   over the board hill on the right and a wooden floor. */
+.event-theme-brettspiele .parallax-background {
+  background:
+    radial-gradient(ellipse 260px 220px at 50% 140px, rgba(255, 238, 190, 0.55), transparent 72%),
+    radial-gradient(ellipse 28% 34% at 8% 55%, rgba(240, 190, 100, 0.2), transparent 75%),
+    radial-gradient(ellipse 26% 36% at 92% 55%, rgba(130, 180, 100, 0.2), transparent 75%),
+    radial-gradient(ellipse 90% 22% at 50% 100%, rgba(150, 105, 55, 0.2), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
