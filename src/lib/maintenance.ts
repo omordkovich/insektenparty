@@ -19,6 +19,9 @@ const ALWAYS_REACHABLE = new Set([
   "/robots.txt",
   "/sitemap.xml",
   "/llms.txt",
+  // AI-agent discovery (src/lib/ard.ts) - must load even under construction.
+  "/.well-known/ard.json",
+  "/.well-known/ai-catalog.json",
   "/favicon.ico",
   "/opengraph-image",
 ]);

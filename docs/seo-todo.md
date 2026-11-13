@@ -24,6 +24,8 @@ Stand: 2026-11-02
 
 - [x] Free-Event & automatische Löschung (2026-11-02): Start-FAQ „Ist GASTZILLA kostenlos?“ (ein kostenloses Event pro Konto, einmalig, fester Termin ≤ 3 Monate; Terminabstimmung, offener Termin, Termin bis 12 Monate, ohne GASTZILLA-Hinweis = kostenpflichtige Extras) und neue Start-FAQ „Wie lange bleibt mein Event gespeichert?“; Hinweis in der Start-FAQ zur Terminabstimmung; Funktionsliste (Terminabstimmung als Extra, neue Zeile „Datensparsam …“); Startseiten-Hero; llms.txt „Preise“; `/vergleich` (Hinweis + FAQ „… Terminabstimmung kostenlos …“); Anlass-Seiten Terminabstimmung (Meta-Beschreibung ohne „kostenlos“, FAQ „Ist die Terminabstimmung kostenlos?“ statt der Uhrzeit-Frage), Hochzeit, Proben, Sport. Keine Preise genannt (Zahlung in Testphase). Für Preis-Fragen lieferte die Autovervollständigung keine Daten (Netz) → nach dem Livegang mit Search-Console-Anfragen nachschärfen
 
+- [x] KI-Agenten-Katalog (ARD): `/.well-known/ard.json` + `/.well-known/ai-catalog.json` mit `llms.txt` als Eintrag, auch im Wartungsmodus erreichbar (PageSpeed „Auffindbarkeit von KI-Agenten“) – weitere Einträge, sobald es WebMCP-/MCP-Werkzeuge gibt
+
 ## Du selbst (Dashboards & Konten)
 
 - [x] **Datenbank-Migration Event-Adressen, Schritt 1** – eingespielt am 2026-10-07

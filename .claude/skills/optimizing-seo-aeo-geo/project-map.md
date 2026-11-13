@@ -14,6 +14,7 @@
 | Visible "Aktualisiert am" date | `src/components/UpdatedDate.tsx` (occasion pages, /vergleich, /about; about date = `ABOUT_UPDATED` in `src/lib/site.ts`) |
 | Sitemap + lastModified dates | `src/app/sitemap.ts` (bump dates by hand) |
 | AI summary | `src/app/llms.txt/route.ts` |
+| AI-agent discovery manifest (ARD) at `/.well-known/ard.json` + predecessor `/.well-known/ai-catalog.json` (PageSpeed checks it) | `src/lib/ard.ts` (entries), `src/app/.well-known/*/route.ts`; both paths in `maintenance.ts` ALWAYS_REACHABLE |
 | robots | `src/app/robots.ts` |
 | Event pages (noindex) | `src/app/event/[slug]/layout.tsx` |
 | Maintenance (what stays reachable) | `src/lib/maintenance.ts` |
@@ -37,4 +38,4 @@ Occasion icons: monoline, single colour #2f7d4a, outline only, 256×256 transpar
 Generate several at once as a 3×3 sheet (same prompt style, white background) so stroke width matches; cut, key out white, recolour, centre with 20 px padding (sharp is installed). Check median stroke ≈ 8 px at 256 px - a single-icon generation usually comes out thinner and must be thickened. Shown via CSS mask (`OccasionIcon`), so colour comes from `--leaf`.
 
 ## AEO/GEO beyond the page
-`llms.txt` and JSON-LD describe content; off-site mentions (directories, blogs, forums) drive AI recommendations most. WebMCP and `/.well-known/ai-catalog.json` / `ard.json` only make sense once agent tools exist (tracked in `docs/seo-todo.md`).
+`llms.txt` and JSON-LD describe content; off-site mentions (directories, blogs, forums) drive AI recommendations most. The ARD manifest (`ard.json` / `ai-catalog.json`) currently lists only `llms.txt`; add an entry per real agent tool (WebMCP, MCP server) once one exists. Identifier format `urn:air:gastzilla.de:<name>`, 2–5 `representativeQueries`.
