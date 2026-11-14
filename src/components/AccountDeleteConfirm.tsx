@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./Button";
@@ -15,6 +16,7 @@ export function AccountDeleteConfirm({
   onCancelAction,
   onDeletingChangeAction,
 }: AccountDeleteConfirmProps) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export function AccountDeleteConfirm({
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(body?.error ?? "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+        setError(body?.error ?? t("etwasIstSchiefgelaufenBitte"));
         setDeleting(false);
         onDeletingChangeAction(false);
         return;
@@ -42,7 +44,7 @@ export function AccountDeleteConfirm({
       router.replace("/");
       router.refresh();
     } catch {
-      setError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setError(t("etwasIstSchiefgelaufenBitte"));
       setDeleting(false);
       onDeletingChangeAction(false);
     }
@@ -51,18 +53,17 @@ export function AccountDeleteConfirm({
   return (
     <div className="mt-4 space-y-4">
       <p className="font-bold text-danger">
-        Willst du dein Konto wirklich endgültig löschen?
+        {t("willstDuDeinKonto")}
       </p>
-      <p>Dabei wird alles gelöscht, was zu deinem Konto gehört:</p>
+      <p>{t("dabeiWirdAllesGeloscht")}</p>
       <ul className="list-disc space-y-1 pl-5 text-left">
-        <li>dein Login und deine Kontodaten</li>
-        <li>alle deine Events</li>
-        <li>alle Gästelisten und Einträge deiner Gäste</li>
-        <li>alle freigeschalteten Designs und Event-Plätze</li>
+        <li>{t("deinLoginUndDeine")}</li>
+        <li>{t("alleDeineEvents")}</li>
+        <li>{t("alleGastelistenUndEintrage")}</li>
+        <li>{t("alleFreigeschaltetenDesignsUnd")}</li>
       </ul>
       <p className="font-bold">
-        Das kann nicht rückgängig gemacht werden. Die Einladungslinks funktionieren danach nicht
-        mehr.
+        {t("dasKannNichtRuckgangig")}
       </p>
 
       {error ? (
@@ -73,10 +74,10 @@ export function AccountDeleteConfirm({
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onCancelAction} disabled={deleting}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-          {deleting ? "Wird gelöscht ..." : "Konto endgültig löschen"}
+          {deleting ? t("wirdGeloscht") : t("kontoEndgultigLoschen")}
         </Button>
       </div>
     </div>

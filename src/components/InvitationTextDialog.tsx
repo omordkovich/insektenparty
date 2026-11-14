@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import {
   buildInvitationText,
@@ -7,7 +8,7 @@ import {
   type InvitationFacts,
   type InvitationWording,
   parseStoredWording,
-  WORDING_DEFAULTS,
+  wordingDefaults,
   WORDING_MAX_LENGTH,
   type WordingKey,
   type WordingKind,
@@ -22,12 +23,13 @@ import { Modal } from "./Modal";
 
 type CopyState = "idle" | "copied" | "failed";
 
-const WORDING_LABELS: Record<WordingKey, string> = {
-  greeting: "Anrede",
-  intro: "Einleitung",
-  callToAction: "Aufforderung zum Eintragen",
-  closing: "Gruß",
-};
+// Message keys (namespace "event") of the editable lines' names.
+const WORDING_LABEL_KEYS = {
+  greeting: "wordingGreeting",
+  intro: "wordingIntro",
+  callToAction: "aufforderungZumEintragen",
+  closing: "gruss",
+} as const satisfies Record<WordingKey, string>;
 
 const WORDING_CHANGED_EVENT = "gastzilla:invitation-wording";
 
@@ -70,25 +72,11 @@ type InvitationTextDialogProps = {
   onCloseAction: () => void;
 };
 
-const KIND_TEXTS: Record<
-  WordingKind,
-  { heading: string; intro: string; copied: string; subject: (title: string) => string }
-> = {
-  invitation: {
-    heading: "Einladungstext",
-    subject: (title) => `Einladung: ${title}`,
-    intro:
-      "Nur für dich sichtbar. Passe die umrandeten Felder an und schick den Text per WhatsApp, E-Mail & Co. Titel, Datum, Ort und Link kommen automatisch aus deinem Event.",
-    copied: "Einladungstext kopiert",
-  },
-  dateFixed: {
-    heading: "Termin steht fest – Gäste informieren",
-    subject: (title) => `Termin steht fest: ${title}`,
-    intro:
-      "Schick deinen Gästen den festgelegten Termin. Passe die umrandeten Felder an – Titel, Datum, Ort und Link kommen automatisch aus deinem Event.",
-    copied: "Text kopiert",
-  },
-};
+// Message keys (namespace "event") per kind of text.
+const KIND_TEXT_KEYS = {
+  invitation: { heading: "invitationText", subject: "invitationSubject", intro: "nurFurDichSichtbar", copied: "invitationTextCopied" },
+  dateFixed: { heading: "terminStehtFestGaste", subject: "terminStehtFestTitle", intro: "schickDeinenGastenDen", copied: "textCopied" },
+} as const;
 
 // Owner-only overlay: an invitation text built from the event's facts and
 // link (fixed) with editable wording around them, saved in this browser
@@ -100,19 +88,27 @@ export function InvitationTextDialog({
   kind = "invitation",
   onCloseAction,
 }: InvitationTextDialogProps) {
+  const t = useTranslations("event");
   const titleId = useId();
-  const texts = KIND_TEXTS[kind];
+  const locale = useLocale();
+  const keys = KIND_TEXT_KEYS[kind];
+  const texts = {
+    heading: t(keys.heading),
+    intro: t(keys.intro),
+    copied: t(keys.copied),
+    subject: (title: string) => t(keys.subject, { title }),
+  };
   const storageKey = wordingStorageKey(eventId, kind);
   const stored = useSyncExternalStore(
     subscribe,
     () => readStored(storageKey),
     () => null,
   );
-  const wording = parseStoredWording(stored, WORDING_DEFAULTS[kind]);
+  const wording = parseStoredWording(stored, wordingDefaults(locale)[kind]);
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const fallbackRef = useRef<HTMLTextAreaElement>(null);
-  const text = buildInvitationText(facts, wording);
+  const text = buildInvitationText(facts, wording, locale);
 
   useEffect(() => {
     if (copyState === "failed") fallbackRef.current?.select();
@@ -154,7 +150,7 @@ export function InvitationTextDialog({
       {/* No own scroll area: the dialog itself scrolls (one scrollbar), and
           the length limits keep the text short. */}
       <div className="mt-4 space-y-1.5 p-1 text-left">
-        {invitationLines(facts).map((line, index) =>
+        {invitationLines(facts, locale).map((line, index) =>
           line.kind === "fixed" ? (
             <p key={`fixed-${index}`} className="break-words px-2 font-bold leading-snug text-muted">
               {line.text}
@@ -162,7 +158,7 @@ export function InvitationTextDialog({
           ) : (
             <div key={line.key}>
               <textarea
-                aria-label={`${WORDING_LABELS[line.key]} bearbeiten`}
+                aria-label={t("wordingEdit", { label: t(WORDING_LABEL_KEYS[line.key]) })}
                 value={wording[line.key]}
                 maxLength={WORDING_MAX_LENGTH[line.key]}
                 onChange={(event) => updateWording({ ...wording, [line.key]: event.target.value })}
@@ -178,15 +174,14 @@ export function InvitationTextDialog({
       {copyState === "failed" ? (
         <div className="mt-4">
           <p className="text-sm text-muted">
-            Kopieren wird von deinem Browser blockiert – der Text ist unten markiert, kopiere ihn von
-            Hand.
+            {t("kopierenWirdVonDeinem")}
           </p>
           <textarea
             ref={fallbackRef}
             readOnly
             value={text}
             rows={6}
-            aria-label={`${texts.heading} zum Kopieren`}
+            aria-label={t("headingZumKopieren", { heading: texts.heading })}
             className="mt-2 block w-full rounded-xl border border-leaf/30 bg-[var(--surface-solid)] px-3 py-2 text-sm text-muted"
           />
         </div>
@@ -194,17 +189,17 @@ export function InvitationTextDialog({
 
       <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={() => writeStored(storageKey, null)}>
-          Zurücksetzen
+          {t("zurucksetzen")}
         </Button>
         <Button variant="outline" onClick={onCloseAction}>
-          Schließen
+          {t("schliessen")}
         </Button>
         <Button variant="outline" onClick={handleShare} className="gap-2">
           <ShareIcon />
-          Teilen
+          {t("teilen")}
         </Button>
         <Button variant="primary" onClick={handleCopy}>
-          {copyState === "copied" ? "Kopiert!" : "Text kopieren"}
+          {copyState === "copied" ? t("kopiert") : t("copyText")}
         </Button>
       </div>
       {shareDialogOpen ? (

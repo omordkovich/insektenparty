@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { formatPollOptionLabel, type PollOption, type PollVoteDto } from "@/lib/date-poll";
@@ -17,9 +18,6 @@ type FixPollOptionDialogProps = {
   onCloseAction: () => void;
 };
 
-function count(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`;
-}
 
 // Owner: "Diesen Termin festlegen" - same as choosing the proposal under
 // "Fester Termin" in the event settings.
@@ -30,6 +28,8 @@ export function FixPollOptionDialog({
   announcement,
   onCloseAction,
 }: FixPollOptionDialogProps) {
+  const t = useTranslations("datePoll");
+  const locale = useLocale();
   const router = useRouter();
   const titleId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -62,12 +62,12 @@ export function FixPollOptionDialog({
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Der Termin konnte nicht festgelegt werden. Bitte versuche es erneut.");
+        setError(payload?.error ?? t("derTerminKonnteNicht"));
         return;
       }
-      setFixedFacts(fixedDateFacts(announcement, option));
+      setFixedFacts(fixedDateFacts(announcement, option, locale));
     } catch {
-      setError("Der Termin konnte nicht festgelegt werden. Bitte versuche es erneut.");
+      setError(t("derTerminKonnteNicht"));
     } finally {
       setSaving(false);
     }
@@ -96,16 +96,16 @@ export function FixPollOptionDialog({
       showCloseButton={false}
     >
       <h2 id={titleId} className="font-display text-2xl text-leaf-dark">
-        Termin festlegen?
+        {t("terminFestlegen")}
       </h2>
       <p className="mt-3 text-muted">
-        <strong className="text-ink">{formatPollOptionLabel(option)}</strong> wird der Termin deines
-        Events. {count(yes, "Zusage", "Zusagen")} und {count(no, "Absage", "Absagen")} werden in die
-        Gästeliste übernommen.
-        {unseen > 0
-          ? ` ${count(unseen, "Person hat", "Personen haben")} diesen Termin noch nicht gesehen und ${unseen === 1 ? "wird" : "werden"} nicht übernommen.`
-          : ""}{" "}
-        Die Abstimmung wird beendet.
+        {t.rich("fixSummary", {
+          option: formatPollOptionLabel(option, locale),
+          yes,
+          no,
+          unseen,
+          b: (chunks) => <strong className="text-ink">{chunks}</strong>,
+        })}
       </p>
 
       {error ? (
@@ -116,10 +116,10 @@ export function FixPollOptionDialog({
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button ref={cancelRef} variant="outline" onClick={onCloseAction} disabled={saving}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button variant="primary" onClick={handleFix} disabled={saving}>
-          {saving ? "Wird festgelegt ..." : "Termin festlegen"}
+          {saving ? t("fixing") : t("terminFestlegen2")}
         </Button>
       </div>
     </Modal>

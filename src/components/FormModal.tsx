@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { ReactNode, RefObject, SubmitEvent } from "react";
 import { CloseIcon } from "./Modal";
 import { useModalBehavior } from "./useModalBehavior";
@@ -25,6 +26,7 @@ export function FormModal({
   children,
   footer,
 }: FormModalProps) {
+  const tCommon = useTranslations("common");
   const internalCloseRef = useModalBehavior({ onCloseAction, closeDisabled, initialFocusRef });
 
   return (
@@ -32,7 +34,7 @@ export function FormModal({
       <button
         type="button"
         className="absolute inset-0 bg-black/55"
-        aria-label="Dialog schließen"
+        aria-label={tCommon("closeDialog")}
         onClick={() => !closeDisabled && onCloseAction()}
       />
       <div
@@ -48,7 +50,7 @@ export function FormModal({
               type="button"
               onClick={onCloseAction}
               disabled={closeDisabled}
-              aria-label="Schließen"
+              aria-label={tCommon("close")}
               className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
             >
               <CloseIcon />

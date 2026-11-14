@@ -1,16 +1,18 @@
 import { COMPARISON, comparisonBreadcrumbs } from "@/lib/comparison";
-import { FAQ, type FaqItem } from "@/lib/faq";
+import { LOCALES, type Locale } from "@/i18n/config";
+import { faqEntries, type FaqItem } from "@/lib/faq";
+import { localizedPath } from "@/lib/page-metadata";
 import { LEGAL_INFO } from "@/lib/legal-info";
-import { INSTAGRAM_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { INSTAGRAM_URL, SITE_DESCRIPTIONS, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   type Breadcrumb,
   hubBreadcrumbs,
   type Occasion,
   occasionBreadcrumbs,
   occasionPath,
-  OCCASIONS,
-  OCCASIONS_HUB,
-  OCCASIONS_PATH,
+  occasionsFor,
+  occasionsHub,
+  occasionsPath,
 } from "@/lib/occasions";
 
 // What GASTZILLA can do, in one line each - listed as featureList so
@@ -30,6 +32,40 @@ export const FEATURES = [
   "Datensparsam: Event, Gästeliste und Abstimmung werden 90 Tage nach dem Event automatisch gelöscht",
 ];
 
+// The same in English (start page /en). Keep both lists in step.
+const FEATURES_EN = [
+  "Online invitation page for a birthday, kids' party, wedding, barbecue or office party",
+  "Guests reply yes or no via a link – no account and no app",
+  "Date poll: 2–4 date options, guests vote via the link, the chosen date becomes the guest list with one click – with a ready-made date confirmation to share (paid extra)",
+  "Plus-ones, children, things to bring and messages right in the reply",
+  "Live guest list with an email for every yes and no",
+  "Optional password protection for the event page and guest list – guests can ask the host for the password",
+  "Share via WhatsApp, Signal, Telegram, email or link",
+  "Designs for every occasion: colour designs for free, plus paid premium designs",
+  "Ready-made invitation text and date confirmation with date, location and link – editable, copied with one click or shared via WhatsApp, email and more",
+  "Add the date to your own calendar",
+  "No ads, no tracking cookies, servers in the EU",
+  "Data-minimal: event, guest list and poll are deleted automatically 90 days after the event",
+];
+
+// The same in Russian (start page /ru). Keep all lists in step.
+const FEATURES_RU = [
+  "Страница-приглашение онлайн на день рождения, детский праздник, свадьбу, шашлыки или корпоратив",
+  "Гости отвечают «приду» или «не приду» по ссылке – без регистрации и без приложения",
+  "Выбор даты: 2–4 варианта, гости голосуют по ссылке, выбранная дата одним кликом превращается в список гостей – с готовым сообщением о дате (платная опция)",
+  "Сопровождающие, дети, что принести и сообщения – прямо в ответе гостя",
+  "Список гостей в реальном времени с письмом на e-mail при каждом ответе",
+  "Защита паролем для страницы мероприятия и списка гостей по желанию – гости могут запросить пароль у организатора",
+  "Отправка через WhatsApp, Signal, Telegram, e-mail или ссылкой",
+  "Оформление для любого повода: цветные дизайны бесплатно, а также платные премиум-дизайны",
+  "Готовый текст приглашения и сообщение о дате с датой, местом и ссылкой – можно изменить, скопировать одним кликом или отправить через WhatsApp, e-mail и другие сервисы",
+  "Добавление даты в свой календарь",
+  "Без рекламы, без отслеживающих cookie, серверы в ЕС",
+  "Минимум данных: мероприятие, список гостей и голосование удаляются автоматически через 90 дней после мероприятия",
+];
+
+const FEATURES_BY_LOCALE: Record<Locale, string[]> = { de: FEATURES, en: FEATURES_EN, ru: FEATURES_RU };
+
 // What GASTZILLA deliberately does not do - stated openly on /vergleich and
 // in llms.txt, so AI assistants don't recommend it for the wrong job.
 export const LIMITATIONS = [
@@ -45,11 +81,11 @@ const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 const APP_ID = `${SITE_URL}/#app`;
 
-function faqPage(items: FaqItem[], id: string) {
+function faqPage(items: FaqItem[], id: string, inLanguage: Locale = "de") {
   return {
     "@type": "FAQPage",
     "@id": id,
-    inLanguage: "de",
+    inLanguage,
     mainEntity: items.map((item) => ({
       "@type": "Question",
       name: item.question,
@@ -58,7 +94,9 @@ function faqPage(items: FaqItem[], id: string) {
   };
 }
 
-function breadcrumbList(items: Breadcrumb[], id: string) {
+// Breadcrumb paths are without locale prefix (as the visible links);
+// the schema needs the absolute URL in the page's language.
+function breadcrumbList(items: Breadcrumb[], id: string, locale: Locale = "de") {
   return {
     "@type": "BreadcrumbList",
     "@id": id,
@@ -66,7 +104,7 @@ function breadcrumbList(items: Breadcrumb[], id: string) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `${SITE_URL}${item.path}`,
+      item: `${SITE_URL}${localizedPath(item.path, locale)}`,
     })),
   };
 }
@@ -89,7 +127,8 @@ function organization() {
 // schema.org description of the site for the start page: who runs it
 // (Organization), the site itself (WebSite), the app (WebApplication) and
 // the visible FAQ (FAQPage), linked to each other via @id.
-export function siteStructuredData() {
+export function siteStructuredData(locale: Locale) {
+  const url = `${SITE_URL}${localizedPath("/", locale)}`;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -99,33 +138,35 @@ export function siteStructuredData() {
         "@id": WEBSITE_ID,
         name: SITE_NAME,
         url: SITE_URL,
-        inLanguage: "de",
+        inLanguage: [...LOCALES],
         publisher: { "@id": ORGANIZATION_ID },
       },
       {
         "@type": "WebApplication",
         "@id": APP_ID,
         name: SITE_NAME,
-        url: SITE_URL,
-        description: SITE_DESCRIPTION,
-        image: `${SITE_URL}/opengraph-image`,
+        url,
+        description: SITE_DESCRIPTIONS[locale],
+        image: `${SITE_URL}${localizedPath("/opengraph-image", locale)}`,
         applicationCategory: "LifestyleApplication",
         operatingSystem: "Web",
-        inLanguage: "de",
+        inLanguage: locale,
         isAccessibleForFree: true,
-        featureList: FEATURES,
+        featureList: FEATURES_BY_LOCALE[locale],
         offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
         publisher: { "@id": ORGANIZATION_ID },
       },
-      faqPage(FAQ, `${SITE_URL}/#faq`),
+      faqPage(faqEntries(locale), `${url}#faq`, locale),
     ],
   };
 }
 
-// One occasion page (/einladung/<slug>): the page itself, its breadcrumb
-// and its FAQ, tied to the site and the app described on the start page.
+// One occasion page (/einladung/<slug>, /en/invitations/<slug>): the page
+// itself, its breadcrumb and its FAQ, tied to the site and the app
+// described on the start page.
 export function occasionStructuredData(occasion: Occasion) {
-  const url = `${SITE_URL}${occasionPath(occasion)}`;
+  const { locale } = occasion;
+  const url = `${SITE_URL}${localizedPath(occasionPath(occasion), locale)}`;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -135,21 +176,23 @@ export function occasionStructuredData(occasion: Occasion) {
         url,
         name: occasion.metaTitle,
         description: occasion.description,
-        inLanguage: "de",
+        inLanguage: locale,
         dateModified: occasion.updated,
         isPartOf: { "@id": WEBSITE_ID },
         about: { "@id": APP_ID },
         breadcrumb: { "@id": `${url}#breadcrumb` },
       },
-      breadcrumbList(occasionBreadcrumbs(occasion), `${url}#breadcrumb`),
-      faqPage(occasion.faq, `${url}#faq`),
+      breadcrumbList(occasionBreadcrumbs(occasion), `${url}#breadcrumb`, locale),
+      faqPage(occasion.faq, `${url}#faq`, locale),
     ],
   };
 }
 
-// The overview page (/einladung): a collection of all occasion pages.
-export function occasionsHubStructuredData() {
-  const url = `${SITE_URL}${OCCASIONS_PATH}`;
+// The overview page (/einladung, /en/invitations): a collection of all
+// occasion pages of that language.
+export function occasionsHubStructuredData(locale: Locale) {
+  const url = `${SITE_URL}${localizedPath(occasionsPath(locale), locale)}`;
+  const hub = occasionsHub(locale);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -157,22 +200,22 @@ export function occasionsHubStructuredData() {
         "@type": "CollectionPage",
         "@id": `${url}#webpage`,
         url,
-        name: OCCASIONS_HUB.metaTitle,
-        description: OCCASIONS_HUB.description,
-        inLanguage: "de",
+        name: hub.metaTitle,
+        description: hub.description,
+        inLanguage: locale,
         isPartOf: { "@id": WEBSITE_ID },
         breadcrumb: { "@id": `${url}#breadcrumb` },
         mainEntity: {
           "@type": "ItemList",
-          itemListElement: OCCASIONS.map((occasion, index) => ({
+          itemListElement: occasionsFor(locale).map((occasion, index) => ({
             "@type": "ListItem",
             position: index + 1,
             name: occasion.name,
-            url: `${SITE_URL}${occasionPath(occasion)}`,
+            url: `${SITE_URL}${localizedPath(occasionPath(occasion), locale)}`,
           })),
         },
       },
-      breadcrumbList(hubBreadcrumbs(), `${url}#breadcrumb`),
+      breadcrumbList(hubBreadcrumbs(locale), `${url}#breadcrumb`, locale),
     ],
   };
 }

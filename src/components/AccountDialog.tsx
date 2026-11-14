@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import type { SignInMethods } from "@/lib/account";
 import { createClient } from "@/lib/supabase/client";
@@ -17,14 +18,16 @@ type AccountDialogProps = {
   onCloseAction: () => void;
 };
 
-const VIEW_TITLES: Record<AccountView, string> = {
-  overview: "Mein Konto",
-  name: "Anzeigename ändern",
-  password: "Passwort",
-  delete: "Konto löschen",
-};
+// Message keys (namespace "auth").
+const VIEW_TITLE_KEYS = {
+  overview: "myAccount",
+  name: "anzeigenameAndern",
+  password: "passwort",
+  delete: "kontoLoschen",
+} as const satisfies Record<AccountView, string>;
 
 export function AccountDialog({ email, name, methods, onCloseAction }: AccountDialogProps) {
+  const t = useTranslations("auth");
   const titleId = useId();
   const [view, setView] = useState<AccountView>("overview");
   const [notice, setNotice] = useState<string | null>(null);
@@ -35,36 +38,34 @@ export function AccountDialog({ email, name, methods, onCloseAction }: AccountDi
     setView(next);
   }
 
-  const passwordTitle = methods.hasPassword ? "Passwort ändern" : "Passwort festlegen";
+  const passwordTitle = methods.hasPassword ? t("passwortAndern") : t("passwortFestlegen");
 
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={deleting}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        {view === "password" ? passwordTitle : VIEW_TITLES[view]}
+        {view === "password" ? passwordTitle : t(VIEW_TITLE_KEYS[view])}
       </h2>
 
       {view === "overview" ? (
         <div className="mt-4 space-y-4">
           <div className="overflow-hidden rounded-2xl border border-leaf/20 bg-white">
             <Row
-              label="Anzeigename"
+              label={t("anzeigename")}
               value={name ?? "–"}
               onClick={methods.hasGoogle ? undefined : () => show("name")}
             />
-            <Row label="E-Mail" value={email} />
-            <Row label="Anmeldung" value={methods.hasGoogle ? "Google" : "E-Mail"} />
+            <Row label={t("email")} value={email} />
+            <Row label={t("signInMethod")} value={methods.hasGoogle ? "Google" : t("email")} />
             <Row
-              label="Passwort"
-              value={methods.hasPassword ? "••••••••" : "Nicht festgelegt"}
+              label={t("passwort")}
+              value={methods.hasPassword ? "••••••••" : t("notSet")}
               onClick={() => show("password")}
             />
           </div>
 
           {methods.hasGoogle ? (
             <p className="text-sm text-foreground/60">
-              Dein Anzeigename wird von deinem Google-Konto übernommen. Wenn du ihn ändern
-              möchtest, ändere den Namen in deinem Google-Konto; er wird beim nächsten Login
-              übernommen.
+              {t("googleNameNote")}
             </p>
           ) : null}
 
@@ -76,11 +77,11 @@ export function AccountDialog({ email, name, methods, onCloseAction }: AccountDi
 
           <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-between">
             <Button variant="outline-danger" onClick={() => show("delete")}>
-              Konto löschen
+              {t("kontoLoschen")}
             </Button>
             <form action="/auth/signout" method="post" className="flex">
               <Button variant="outline" type="submit" className="w-full">
-                Logout
+                {t("logout")}
               </Button>
             </form>
           </div>
@@ -91,7 +92,7 @@ export function AccountDialog({ email, name, methods, onCloseAction }: AccountDi
         <AccountNameForm
           currentName={name ?? ""}
           onDoneAction={() => {
-            setNotice("Anzeigename gespeichert.");
+            setNotice(t("nameSaved"));
             setView("overview");
           }}
           onCancelAction={() => show("overview")}
@@ -172,6 +173,7 @@ function PasswordView({
   methods: SignInMethods;
   onBackAction: () => void;
 }) {
+  const t = useTranslations("auth");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -191,7 +193,7 @@ function PasswordView({
       }
       setSent(true);
     } catch {
-      setError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setError(t("etwasIstSchiefgelaufenBitte"));
     } finally {
       setSending(false);
     }
@@ -201,17 +203,12 @@ function PasswordView({
     <div className="mt-4 space-y-4">
       {sent ? (
         <p>
-          Wir haben dir eine E-Mail an {email} geschickt. Über den Link darin kannst du ein neues
-          Passwort vergeben.
+          {t("passwordMailSent", { email })}
         </p>
       ) : (
         <>
           <p>
-            Wir schicken dir eine E-Mail mit einem Link, über den du{" "}
-            {methods.hasPassword ? "ein neues Passwort" : "ein Passwort"} festlegst.
-            {methods.hasPassword
-              ? ""
-              : " Du kannst dich danach zusätzlich zu Google auch mit E-Mail und Passwort anmelden."}
+            {methods.hasPassword ? t("passwordMailChange") : t("passwordMailSet")}
           </p>
           {error ? (
             <p className="text-sm text-danger" role="alert">
@@ -223,11 +220,11 @@ function PasswordView({
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onBackAction} disabled={sending}>
-          {sent ? "Zurück" : "Abbrechen"}
+          {sent ? t("zuruck") : t("abbrechen")}
         </Button>
         {sent ? null : (
           <Button variant="primary" onClick={handleSend} disabled={sending}>
-            {sending ? "Wird gesendet ..." : "E-Mail senden"}
+            {sending ? t("sending") : t("sendEmail")}
           </Button>
         )}
       </div>

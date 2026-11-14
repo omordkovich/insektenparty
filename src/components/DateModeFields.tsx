@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { DATE_MODES, POLL_MAX_OPTIONS, formatPollOptionLabel, sameProposal, type DateMode } from "@/lib/date-poll";
 import { emptyRow, type DateDraft, type DateSettings, type ProposalRow } from "@/lib/date-poll-form";
 import { Button } from "./Button";
@@ -18,11 +19,12 @@ type DateModeFieldsProps = {
   maxDate?: string;
 };
 
-const MODE_LABELS: Record<DateMode, string> = {
-  unknown: "Noch kein Termin bekannt",
-  poll: "Termin abstimmen lassen",
-  fixed: "Fester Termin",
-};
+// Message keys (namespace "eventDialog").
+const MODE_LABEL_KEYS = {
+  unknown: "nochKeinTerminBekannt",
+  poll: "terminAbstimmenLassen",
+  fixed: "festerTermin",
+} as const satisfies Record<DateMode, string>;
 
 const inputClass = "w-full min-w-0 rounded-xl border border-leaf/25 bg-surface px-2 py-2 text-sm";
 const boxClass = "mt-3 space-y-3 rounded-xl border border-leaf/15 bg-leaf/5 p-3";
@@ -39,6 +41,8 @@ export function DateModeFields({
   minDate,
   maxDate,
 }: DateModeFieldsProps) {
+  const locale = useLocale();
+  const t = useTranslations("eventDialog");
   const update = (changes: Partial<DateDraft>) => onChange({ ...draft, ...changes });
   const runningOptions = original?.mode === "poll" && !draft.restart ? original.options : null;
   const canAddRow = (runningOptions?.length ?? 0) + draft.rows.length < POLL_MAX_OPTIONS;
@@ -57,7 +61,7 @@ export function DateModeFields({
 
   return (
     <fieldset className="mt-4">
-      <legend className="sr-only">Termin-Art</legend>
+      <legend className="sr-only">{t("terminArt")}</legend>
       <div className="space-y-1">
         {DATE_MODES.map((mode) =>
           lockedModes.includes(mode) ? (
@@ -73,8 +77,8 @@ export function DateModeFields({
               <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-leaf/40 text-leaf-dark">
                 <LockIcon />
               </span>
-              {MODE_LABELS[mode]}
-              <span className="sr-only"> (gesperrt)</span>
+              {t(MODE_LABEL_KEYS[mode])}
+              <span className="sr-only"> {t("gesperrt")}</span>
             </button>
           ) : (
             <label key={mode} className="flex items-center gap-2 text-sm">
@@ -86,7 +90,7 @@ export function DateModeFields({
                 onChange={() => update({ mode })}
                 className="h-5 w-5"
               />
-              {MODE_LABELS[mode]}
+              {t(MODE_LABEL_KEYS[mode])}
             </label>
           ),
         )}
@@ -98,11 +102,11 @@ export function DateModeFields({
         <div className={boxClass}>
           {runningOptions ? (
             <div>
-              <p className="text-sm font-semibold text-leaf-dark">Laufende Abstimmung</p>
+              <p className="text-sm font-semibold text-leaf-dark">{t("laufendeAbstimmung")}</p>
               <ul className="mt-1 space-y-1 text-sm">
                 {runningOptions.map((option) => (
                   <li key={option.id} className="flex justify-between gap-2">
-                    <span>{formatPollOptionLabel(option)}</span>
+                    <span>{formatPollOptionLabel(option, locale)}</span>
                     <span className="font-bold text-leaf-dark">✓ {option.yesCount}</span>
                   </li>
                 ))}
@@ -114,7 +118,7 @@ export function DateModeFields({
             <div key={row.key} className="grid grid-cols-[1fr_1fr_auto] gap-2">
               <input
                 type="date"
-                aria-label="Datum"
+                aria-label={t("datum")}
                 value={row.date}
                 min={minDate}
                 max={maxDate}
@@ -125,14 +129,14 @@ export function DateModeFields({
               <Button
                 variant="outline-danger"
                 size="icon"
-                aria-label="Termin entfernen"
+                aria-label={t("terminEntfernen")}
                 disabled={disabled}
                 onClick={() => update({ rows: draft.rows.filter((other) => other.key !== row.key) })}
               >
                 <TrashIcon />
               </Button>
               <label className="flex items-center gap-1 text-xs">
-                <span className="shrink-0">von</span>
+                <span className="shrink-0">{t("von")}</span>
                 <input
                   type="time"
                   value={row.startTime}
@@ -142,7 +146,7 @@ export function DateModeFields({
                 />
               </label>
               <label className="flex items-center gap-1 text-xs">
-                <span className="shrink-0">bis</span>
+                <span className="shrink-0">{t("bis")}</span>
                 <input
                   type="time"
                   value={row.endTime}
@@ -161,7 +165,7 @@ export function DateModeFields({
                 disabled={disabled}
                 onClick={() => update({ rows: [...draft.rows, emptyRow()] })}
               >
-                + Termin hinzufügen
+                {t("terminHinzufugen")}
               </Button>
             ) : null}
             {runningOptions ? (
@@ -170,14 +174,14 @@ export function DateModeFields({
                 disabled={disabled}
                 onClick={() => update({ restart: true, rows: [emptyRow(), emptyRow()] })}
               >
-                Abstimmung neu machen
+                {t("abstimmungNeuMachen")}
               </Button>
             ) : null}
           </div>
           <p className="text-xs text-muted">
             {runningOptions
-              ? "Neue Termine kommen zur laufenden Abstimmung dazu, die Stimmen bleiben erhalten."
-              : "2 bis 4 Termine. Uhrzeit ist optional; liegt „bis“ vor „von“, geht der Termin bis nach Mitternacht."}
+              ? t("neueTermineKommenZur")
+              : t("n2Bis4Termine")}
           </p>
         </div>
       ) : null}
@@ -186,7 +190,7 @@ export function DateModeFields({
         <div className={boxClass}>
           {pollOptions.length > 0 ? (
             <div>
-              <p className="text-xs text-muted">Vorschlag aus der Abstimmung übernehmen:</p>
+              <p className="text-xs text-muted">{t("vorschlagAusDerAbstimmung")}</p>
               <div className="mt-1 flex flex-wrap gap-2">
                 {pollOptions.map((option) => (
                   <button
@@ -209,7 +213,7 @@ export function DateModeFields({
                         : "border-leaf/30 hover:bg-leaf/10"
                     }`}
                   >
-                    {formatPollOptionLabel(option)} (✓ {option.yesCount})
+                    {formatPollOptionLabel(option, locale)} (✓ {option.yesCount})
                   </button>
                 ))}
               </div>
@@ -217,7 +221,7 @@ export function DateModeFields({
           ) : null}
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col gap-1 text-xs">
-              <span>Datum</span>
+              <span>{t("datum")}</span>
               <input
                 type="date"
                 value={draft.fixed.date}
@@ -229,7 +233,7 @@ export function DateModeFields({
               />
             </label>
             <label className="flex flex-col gap-1 text-xs">
-              <span>bis Datum (optional)</span>
+              <span>{t("bisDatumOptional")}</span>
               <input
                 type="date"
                 value={draft.fixed.endDate}
@@ -241,7 +245,7 @@ export function DateModeFields({
               />
             </label>
             <label className="flex items-center gap-1 text-xs">
-              <span className="shrink-0">von</span>
+              <span className="shrink-0">{t("von")}</span>
               <input
                 type="time"
                 value={draft.fixed.startTime}
@@ -251,7 +255,7 @@ export function DateModeFields({
               />
             </label>
             <label className="flex items-center gap-1 text-xs">
-              <span className="shrink-0">bis</span>
+              <span className="shrink-0">{t("bis")}</span>
               <input
                 type="time"
                 value={draft.fixed.endTime}
@@ -262,12 +266,11 @@ export function DateModeFields({
             </label>
           </div>
           <p className="text-xs text-muted">
-            Uhrzeit ist optional. „bis Datum“ nur für Events über mehrere Tage; liegt „bis“ bei einem Tag
-            vor „von“, geht der Termin bis nach Mitternacht.
+            {t("fixedDateHint")}
           </p>
           {original?.mode === "poll" && original.voteCount > 0 && !matchesOption ? (
             <p className="text-xs text-muted">
-              Dieser Termin ist kein Vorschlag der Abstimmung – die Stimmen verfallen.
+              {t("dieserTerminIstKein")}
             </p>
           ) : null}
         </div>

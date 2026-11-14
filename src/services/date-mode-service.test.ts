@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 import type { PollOption, PollVote } from "@/lib/date-poll";
 
 vi.mock("@/repositories/event-repository", () => ({
@@ -12,7 +13,7 @@ vi.mock("@/repositories/date-poll-repository", () => ({
   applyDateModeChange: vi.fn(async () => true),
 }));
 vi.mock("@/services/event-lifecycle-service", () => ({
-  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  EVENT_OVER_ERROR: { key: "eventOver" },
   denyIfOver: vi.fn(async () => null),
 }));
 vi.mock("@/lib/date-poll", async (importOriginal) => ({
@@ -42,11 +43,11 @@ describe("changeDateMode", () => {
   });
 
   it("refuses once the event is over, without writing", async () => {
-    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: err("eventOver") });
     expect(await changeDateMode("event-1", "owner-1", { mode: "unknown", confirm: true })).toEqual({
       ok: false,
       status: 409,
-      error: "Dieses Event ist vorbei.",
+      error: err("eventOver"),
     });
     expect(repo.applyDateModeChange).not.toHaveBeenCalled();
   });
@@ -60,7 +61,7 @@ describe("changeDateMode", () => {
     expect(await changeDateMode("event-1", "owner-1", { mode: "unknown" })).toEqual({
       ok: false,
       status: 409,
-      error: "Bitte bestätige, dass dabei Daten gelöscht werden.",
+      error: err("dataLossConfirm"),
       confirm: { guests: 7, votes: 0 },
     });
     expect(repo.applyDateModeChange).not.toHaveBeenCalled();
@@ -84,7 +85,7 @@ describe("changeDateMode", () => {
     expect(await changeDateMode("event-1", "owner-1", { mode: "poll", proposals: [proposals[0]] })).toEqual({
       ok: false,
       status: 400,
-      error: "Bitte gib mindestens 2 Termine an.",
+      error: err("proposalsTooFew", { min: 2 }),
     });
   });
 
@@ -138,7 +139,7 @@ describe("changeDateMode", () => {
         expect(await changeDateMode("event-1", "owner-1", body)).toEqual({
           ok: false,
           status: 403,
-          error: "Abstimmung und offener Termin gibt es nur mit einem freigeschalteten Event.",
+          error: err("pollNeedsUnlock"),
         });
       }
       expect(repo.applyDateModeChange).not.toHaveBeenCalled();
@@ -150,7 +151,7 @@ describe("changeDateMode", () => {
       expect(await changeDateMode("event-1", "owner-1", outside)).toEqual({
         ok: false,
         status: 400,
-        error: "Das Datum darf höchstens 3 Monate nach dem Erstellen des Events liegen.",
+        error: err("dateWindow", { months: 3 }),
       });
       const multiDay = { mode: "fixed", date: "2026-08-30", endDate: "2026-09-02", startTime: null, endTime: null };
       expect(await changeDateMode("event-1", "owner-1", multiDay)).toMatchObject({ ok: false, status: 400 });
@@ -163,7 +164,7 @@ describe("changeDateMode", () => {
       expect(await changeDateMode("event-1", "owner-1", { mode: "fixed", date: "2026-06-30" })).toEqual({
         ok: false,
         status: 400,
-        error: "Das Datum liegt in der Vergangenheit.",
+        error: err("dateInPast"),
       });
     });
 
@@ -172,7 +173,7 @@ describe("changeDateMode", () => {
       expect(await changeDateMode("event-1", "owner-1", pollOn("2027-06-02"))).toEqual({
         ok: false,
         status: 400,
-        error: "Das Datum darf höchstens 12 Monate nach dem Erstellen des Events liegen.",
+        error: err("dateWindow", { months: 12 }),
       });
       expect(await changeDateMode("event-1", "owner-1", pollOn("2027-06-01"))).toEqual({ ok: true });
     });

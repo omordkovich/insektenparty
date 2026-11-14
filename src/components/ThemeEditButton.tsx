@@ -1,6 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
+import type { Locale } from "@/i18n/config";
 import type { UnlockContext } from "@/lib/products";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { GearIcon } from "./EditIcons";
@@ -13,6 +15,7 @@ type ThemeEditButtonProps = {
   unlockedThemes: ThemeKey[];
   accessPassword: string | null;
   maxGuests: number | null;
+  language: Locale;
   unlock: UnlockContext;
   className?: string;
 };
@@ -24,9 +27,11 @@ export function ThemeEditButton({
   unlockedThemes,
   accessPassword,
   maxGuests,
+  language,
   unlock,
   className = "",
 }: ThemeEditButtonProps) {
+  const t = useTranslations("eventDialog");
   const [open, setOpen] = useState(false);
 
   return (
@@ -34,8 +39,8 @@ export function ThemeEditButton({
       <button
         type="button"
         className={`${EDIT_ICON_BUTTON_CLASS} ${className}`}
-        aria-label="Event-Einstellungen"
-        title="Event-Einstellungen"
+        aria-label={t("eventEinstellungen")}
+        title={t("eventEinstellungen")}
         onClick={() => setOpen(true)}
       >
         <GearIcon />
@@ -43,7 +48,7 @@ export function ThemeEditButton({
       {open ? (
         <EventDialog
           mode="settings"
-          event={{ id: eventId, theme, accessPassword, maxGuests }}
+          event={{ id: eventId, theme, accessPassword, maxGuests, language }}
           unlockedThemes={unlockedThemes}
           unlock={unlock}
           onCloseAction={() => setOpen(false)}

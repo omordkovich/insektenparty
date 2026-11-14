@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+import { serverTranslator } from "@/i18n/translator";
 import { buildLifecycleMessage, type LifecycleMail } from "@/lib/lifecycle-mails";
 import { sendEmail } from "@/lib/email";
 import { buildEventShareUrl } from "@/lib/share";
@@ -6,32 +8,23 @@ import { getUserContact } from "@/repositories/user-repository";
 
 export type GuestChangeKind = "created" | "updated" | "declined" | "deleted";
 
-function buildMessage(
+export function buildGuestChangeMessage(
   kind: GuestChangeKind,
   guestName: string,
   eventTitle: string,
+  locale: Locale,
 ): { subject: string; text: string } {
+  const t = serverTranslator(locale, "mail");
+  const values = { name: guestName, title: eventTitle };
   switch (kind) {
     case "created":
-      return {
-        subject: `Neuer Gast bei deinem Event „${eventTitle}“`,
-        text: `„${guestName}“ hat sich bei Event „${eventTitle}“ als Gast eingetragen.`,
-      };
+      return { subject: t("guestCreatedSubject", values), text: t("guestCreatedText", values) };
     case "updated":
-      return {
-        subject: `Änderung an der Gästeliste von „${eventTitle}“`,
-        text: `„${guestName}“ hat den Eintrag bei Event „${eventTitle}“ geändert.`,
-      };
+      return { subject: t("guestUpdatedSubject", values), text: t("guestUpdatedText", values) };
     case "declined":
-      return {
-        subject: `Absage bei deinem Event „${eventTitle}“`,
-        text: `„${guestName}“ hat bei Event „${eventTitle}“ abgesagt.`,
-      };
+      return { subject: t("guestDeclinedSubject", values), text: t("guestDeclinedText", values) };
     case "deleted":
-      return {
-        subject: `Gast aus der Gästeliste von „${eventTitle}“ entfernt`,
-        text: `„${guestName}“ wurde aus der Gästeliste bei Event „${eventTitle}“ entfernt.`,
-      };
+      return { subject: t("guestDeletedSubject", values), text: t("guestDeletedText", values) };
   }
 }
 
@@ -42,23 +35,17 @@ export function buildPollVoteMessage(
   voterName: string,
   choice: string,
   eventTitle: string,
+  locale: Locale,
 ): { subject: string; text: string } {
+  const t = serverTranslator(locale, "mail");
+  const values = { name: voterName, title: eventTitle, choice };
   switch (kind) {
     case "created":
-      return {
-        subject: `Neue Stimme bei deinem Event „${eventTitle}“`,
-        text: `„${voterName}“ hat bei der Terminabstimmung für „${eventTitle}“ abgestimmt: ${choice}.`,
-      };
+      return { subject: t("voteCreatedSubject", values), text: t("voteCreatedText", values) };
     case "updated":
-      return {
-        subject: `Geänderte Stimme bei deinem Event „${eventTitle}“`,
-        text: `„${voterName}“ hat die Auswahl bei der Terminabstimmung für „${eventTitle}“ geändert: ${choice}.`,
-      };
+      return { subject: t("voteUpdatedSubject", values), text: t("voteUpdatedText", values) };
     case "deleted":
-      return {
-        subject: `Stimme bei deinem Event „${eventTitle}“ entfernt`,
-        text: `„${voterName}“ wurde aus der Terminabstimmung für „${eventTitle}“ entfernt.`,
-      };
+      return { subject: t("voteDeletedSubject", values), text: t("voteDeletedText", values) };
   }
 }
 
@@ -66,7 +53,7 @@ export function buildPollVoteMessage(
 // it, so every error is caught and logged rather than thrown.
 async function notifyOwner(
   eventId: string,
-  build: (eventTitle: string) => { subject: string; text: string },
+  build: (eventTitle: string, locale: Locale) => { subject: string; text: string },
 ): Promise<void> {
   try {
     const event = await getEventForNotification(eventId);
@@ -75,14 +62,15 @@ async function notifyOwner(
     const owner = await getUserContact(event.ownerId);
     if (!owner?.email) return;
 
-    const { subject, text } = build(event.title);
+    // The owner's account language, not the event's.
+    const { subject, text } = build(event.title, owner.locale);
     const link = buildEventShareUrl(event.slug);
 
     // "Event ansehen": during a poll the page shows the vote, not the list.
     await sendEmail({
       to: owner.email,
       subject,
-      text: `${text}\n\nEvent ansehen: ${link}`,
+      text: `${text}\n\n${serverTranslator(owner.locale, "mail")("viewEvent", { link })}`,
     });
   } catch (error) {
     console.error("notifyOwner failed:", error);
@@ -94,16 +82,19 @@ export async function notifyOwnerOfGuestChange(
   kind: GuestChangeKind,
   guestName: string,
 ): Promise<void> {
-  await notifyOwner(eventId, (eventTitle) => buildMessage(kind, guestName, eventTitle));
+  await notifyOwner(eventId, (eventTitle, locale) => buildGuestChangeMessage(kind, guestName, eventTitle, locale));
 }
 
 export async function notifyOwnerOfPollVote(
   eventId: string,
   kind: PollVoteChangeKind,
   voterName: string,
-  choice: string,
+  /** The chosen dates, written in the owner's language. */
+  describeChoice: (locale: Locale) => string,
 ): Promise<void> {
-  await notifyOwner(eventId, (eventTitle) => buildPollVoteMessage(kind, voterName, choice, eventTitle));
+  await notifyOwner(eventId, (eventTitle, locale) =>
+    buildPollVoteMessage(kind, voterName, describeChoice(locale), eventTitle, locale),
+  );
 }
 
 // Daily lifecycle mails (deletion notice, date and poll reminders). Unlike
@@ -119,7 +110,7 @@ export async function sendLifecycleMail(
   const owner = await getUserContact(event.ownerId);
   if (!owner?.email) return false;
 
-  const { subject, text } = buildLifecycleMessage(kind, event, date);
+  const { subject, text } = buildLifecycleMessage(kind, event, date, owner.locale);
   await sendEmail({ to: owner.email, subject, text });
   return true;
 }

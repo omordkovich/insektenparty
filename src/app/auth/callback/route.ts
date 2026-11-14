@@ -1,4 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE } from "@/i18n/config";
+import { cookieLocale } from "@/i18n/request-locale";
+import { getAccountLocale } from "@/lib/account";
 import { isSafeRelativePath } from "@/lib/redirect";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -44,7 +47,13 @@ export async function GET(request: NextRequest) {
 
   // An account that already accepted the current AGB keeps its consent
   // record; one that accepted older AGB renews it (the first date is kept).
-  const update = consentGiven ? consentUpdate(data.user.user_metadata) : null;
+  // Language: an account that has one brings it to this device; a new one
+  // (first Google sign-in) takes this device's choice.
+  const accountLocale = getAccountLocale(data.user.user_metadata);
+  const locale = accountLocale ?? cookieLocale(request);
+
+  const consent = consentGiven ? consentUpdate(data.user.user_metadata) : null;
+  const update = consent || !accountLocale ? { ...consent, ...(accountLocale ? {} : { locale }) } : null;
   if (update) {
     const { error: updateError } = await supabase.auth.updateUser({ data: update });
     // The JWT in the session cookie still carries the old metadata; refresh it
@@ -52,5 +61,7 @@ export async function GET(request: NextRequest) {
     if (!updateError) await supabase.auth.refreshSession();
   }
 
-  return respond(redirectTo);
+  const response = respond(redirectTo);
+  response.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: LOCALE_COOKIE_MAX_AGE, sameSite: "lax" });
+  return response;
 }

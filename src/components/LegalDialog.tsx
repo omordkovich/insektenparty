@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -21,6 +22,7 @@ type LegalDialogProps = {
 // event page it mounts inside the themed wrapper so it takes the event's
 // theme; elsewhere it falls back to <body> and stays neutral.
 export function LegalDialog({ title, onCloseAction, children }: LegalDialogProps) {
+  const tCommon = useTranslations("common");
   const titleId = useId();
   const internalCloseRef = useModalBehavior({ onCloseAction });
 
@@ -29,7 +31,7 @@ export function LegalDialog({ title, onCloseAction, children }: LegalDialogProps
       <button
         type="button"
         className="absolute inset-0 bg-black/55"
-        aria-label="Dialog schließen"
+        aria-label={tCommon("closeDialog")}
         onClick={onCloseAction}
       />
       <div
@@ -43,7 +45,7 @@ export function LegalDialog({ title, onCloseAction, children }: LegalDialogProps
             ref={internalCloseRef}
             type="button"
             onClick={onCloseAction}
-            aria-label="Schließen"
+            aria-label={tCommon("close")}
             className="absolute top-4 right-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10"
           >
             <CloseIcon />
@@ -64,7 +66,7 @@ export function LegalDialog({ title, onCloseAction, children }: LegalDialogProps
 
         <div className="flex shrink-0 flex-col-reverse gap-2 p-5 pt-3 sm:flex-row sm:justify-end sm:p-7 sm:pt-4">
           <Button variant="primary" onClick={onCloseAction}>
-            Schließen
+            {tCommon("close")}
           </Button>
         </div>
       </div>

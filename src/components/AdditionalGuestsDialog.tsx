@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId } from "react";
 import type { GuestDto } from "@/lib/types";
 import { Modal } from "./Modal";
@@ -10,12 +11,13 @@ type AdditionalGuestsDialogProps = {
 };
 
 export function AdditionalGuestsDialog({ guest, onCloseAction }: AdditionalGuestsDialogProps) {
+  const t = useTranslations("guest");
   const titleId = useId();
 
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        Zusätzliche Personen
+        {t("zusatzlichePersonen")}
       </h2>
 
       <ul className="mt-4 space-y-2">

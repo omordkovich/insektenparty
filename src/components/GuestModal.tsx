@@ -1,4 +1,5 @@
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import { useTranslations } from "next-intl";
 import { seatsLeftError, seatsOf } from "@/lib/guest-capacity";
 import type { GuestDto } from "@/lib/types";
 import {
@@ -13,6 +14,7 @@ import { CharCounter } from "./CharCounter";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
+import { useErrorText } from "./useErrorText";
 
 export type GuestModalMode = "create" | "edit";
 
@@ -125,6 +127,8 @@ export function GuestModal({
   onClose,
   onSaved,
 }: GuestModalProps) {
+  const t = useTranslations("guestForm");
+  const errorText = useErrorText();
   const titleId = useId();
   const nameId = useId();
   const additionalId = useId();
@@ -183,7 +187,7 @@ export function GuestModal({
     });
 
     if (!validation.ok) {
-      setFieldError(validation.error);
+      setFieldError(errorText(validation.error));
       return;
     }
 
@@ -191,12 +195,12 @@ export function GuestModal({
     // need free ones.
     const seats = seatsOf(validation.data);
     if (capacity && freeSeats !== null && seats > capacity.own && seats > freeSeats) {
-      setFieldError(seatsLeftError(freeSeats));
+      setFieldError(errorText(seatsLeftError(freeSeats)));
       return;
     }
 
     if (!isOwner && !recaptchaToken) {
-      setFieldError("Bitte bestätige, dass du kein Roboter bist.");
+      setFieldError(t("bitteBestatigeDassDu"));
       return;
     }
 
@@ -221,7 +225,7 @@ export function GuestModal({
           | null;
         setSubmitError(
           payload?.error ??
-            "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
+            t("derGastKonnteNicht"),
         );
         setRecaptchaReset((value) => value + 1);
         return;
@@ -231,7 +235,7 @@ export function GuestModal({
       onClose();
     } catch {
       setSubmitError(
-        "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        t("derGastKonnteNicht"),
       );
       setRecaptchaReset((value) => value + 1);
     } finally {
@@ -246,18 +250,18 @@ export function GuestModal({
       onCloseAction={requestClose}
       closeDisabled={saving}
       initialFocusRef={nameInputRef}
-      header={mode === "create" ? "Gast hinzufügen" : "Gast bearbeiten"}
+      header={mode === "create" ? t("gastHinzufugen") : t("gastBearbeiten")}
       footer={
         <>
           <Button variant="outline" onClick={requestClose} disabled={saving}>
-            Abbrechen
+            {t("abbrechen")}
           </Button>
           <Button
             variant="primary"
             type="submit"
             disabled={saving || (!isOwner && !recaptchaToken)}
           >
-            {saving ? "Wird gespeichert ..." : "Bestätigen"}
+            {saving ? t("saving") : t("bestatigen")}
           </Button>
         </>
       }
@@ -265,7 +269,7 @@ export function GuestModal({
       <div className="space-y-4">
         <div>
           <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-            Name
+            {t("name")}
           </label>
           <input
             ref={nameInputRef}
@@ -274,7 +278,7 @@ export function GuestModal({
             type="text"
             autoComplete="name"
             maxLength={NAME_MAX_LENGTH}
-            placeholder="Name des Gastes"
+            placeholder={t("nameDesGastes")}
             value={form.name}
             disabled={saving}
             onChange={(event) =>
@@ -296,13 +300,13 @@ export function GuestModal({
             }
             className="h-5 w-5 rounded border-leaf/40"
           />
-          Ich sage ab
+          {t("ichSageAb")}
         </label>
         {soldOut ? (
           <p className="-mt-2 text-sm text-muted" role="status">
             {isOwner
-              ? "Das Event ist ausgebucht. Für weitere Zusagen erhöhe die Teilnehmerzahl in den Event-Einstellungen (Zahnrad)."
-              : "Das Event ist ausgebucht – du kannst nur absagen oder eine Nachricht hinterlassen."}
+              ? t("dasEventIstAusgebucht")
+              : t("dasEventIstAusgebucht2")}
           </p>
         ) : null}
 
@@ -312,7 +316,7 @@ export function GuestModal({
         <fieldset disabled={form.declined} className="space-y-4 transition-opacity disabled:opacity-40">
           <div>
             <label htmlFor={additionalId} className="mb-1 block text-sm font-bold">
-              Zusätzliche Personen
+              {t("zusatzlichePersonen")}
             </label>
             <input
               id={additionalId}
@@ -341,14 +345,14 @@ export function GuestModal({
 
           {form.additionalGuestNames.length > 0 ? (
             <div className="space-y-2 rounded-xl border border-leaf/15 bg-leaf/5 p-3">
-              <p className="text-sm font-bold">Namen der zusätzlichen Personen</p>
+              <p className="text-sm font-bold">{t("namenDerZusatzlichenPersonen")}</p>
               {form.additionalGuestNames.map((additionalName, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <input
                     type="text"
                     maxLength={NAME_MAX_LENGTH}
-                    aria-label={`Name Gast ${index + 1}`}
-                    placeholder={`Gast_${index + 1}`}
+                    aria-label={t("nameGastIndex1", { index1: index + 1 })}
+                    placeholder={t("companionPlaceholder", { index1: index + 1 })}
                     value={additionalName}
                     disabled={saving}
                     onChange={(event) => {
@@ -364,7 +368,7 @@ export function GuestModal({
                   <Button
                     variant="outline-danger"
                     size="icon"
-                    aria-label={`${additionalName || `Gast ${index + 1}`} entfernen`}
+                    aria-label={t("removeCompanion", { name: additionalName || t("companionName", { index1: index + 1 }) })}
                     onClick={() =>
                       setForm((current) => ({
                         ...current,
@@ -384,7 +388,7 @@ export function GuestModal({
           ) : null}
 
           <fieldset>
-            <legend className="mb-1 block text-sm font-bold">Ankunftszeit</legend>
+            <legend className="mb-1 block text-sm font-bold">{t("ankunftszeit")}</legend>
             <label className="mb-2 flex items-center gap-2 text-sm">
               <input
                 name="arrivalUnknown"
@@ -396,7 +400,7 @@ export function GuestModal({
                 }
                 className="h-5 w-5 rounded border-leaf/40"
               />
-              Weiß ich noch nicht
+              {t("weissIchNochNicht")}
             </label>
             {/* Greyed out while the arrival is unknown; the times are kept for
                 unticking, but not saved. */}
@@ -404,7 +408,7 @@ export function GuestModal({
               className={`flex gap-2 transition-opacity ${form.arrivalUnknown ? "opacity-40" : ""}`}
             >
               <label className="flex flex-1 items-center gap-2 text-sm">
-                <span className="shrink-0">von</span>
+                <span className="shrink-0">{t("von")}</span>
                 <input
                   id={arrivalId}
                   name="arrivalTime"
@@ -421,7 +425,7 @@ export function GuestModal({
                 />
               </label>
               <label className="flex flex-1 items-center gap-2 text-sm">
-                <span className="shrink-0">bis</span>
+                <span className="shrink-0">{t("bis")}</span>
                 <input
                   name="arrivalEndTime"
                   type="time"
@@ -437,14 +441,14 @@ export function GuestModal({
                 />
               </label>
             </div>
-            <p className="mt-1 text-xs text-muted">Optional – auch „bis“ kannst du leer lassen.</p>
+            <p className="mt-1 text-xs text-muted">{t("optionalAuchBisKannst")}</p>
         </fieldset>
 
         <fieldset>
-          <legend className="mb-1 block text-sm font-bold">Ich bleibe bis:</legend>
+          <legend className="mb-1 block text-sm font-bold">{t("ichBleibeBis")}</legend>
           <div className="flex gap-2">
             <label className="flex flex-1 items-center gap-2 text-sm">
-              <span className="shrink-0">von</span>
+              <span className="shrink-0">{t("von")}</span>
               <input
                 name="departureTime"
                 type="time"
@@ -460,7 +464,7 @@ export function GuestModal({
               />
             </label>
             <label className="flex flex-1 items-center gap-2 text-sm">
-              <span className="shrink-0">bis</span>
+              <span className="shrink-0">{t("bis")}</span>
               <input
                 name="departureEndTime"
                 type="time"
@@ -476,7 +480,7 @@ export function GuestModal({
               />
             </label>
           </div>
-          <p className="mt-1 text-xs text-muted">Optional – falls du schon weißt, wann du gehst.</p>
+          <p className="mt-1 text-xs text-muted">{t("optionalFallsDuSchon")}</p>
         </fieldset>
 
         <div>
@@ -495,7 +499,7 @@ export function GuestModal({
               }
               className="h-5 w-5 rounded border-leaf/40"
             />
-            Ich bringe was mit
+            {t("ichBringeWasMit")}
           </label>
 
           {form.bringingSomething ? (
@@ -504,7 +508,7 @@ export function GuestModal({
               name="bringingDescription"
               type="text"
               maxLength={BRINGING_DESCRIPTION_MAX_LENGTH}
-              placeholder="Was bringst du mit?"
+              placeholder={t("wasBringstDuMit")}
               value={form.bringingDescription}
               disabled={saving}
               onChange={(event) =>
@@ -538,7 +542,7 @@ export function GuestModal({
               }
               className="h-5 w-5 rounded border-leaf/40"
             />
-            Nachricht hinzufügen
+            {t("nachrichtHinzufugen")}
           </label>
 
           {form.hasMessage ? (
@@ -547,7 +551,7 @@ export function GuestModal({
               name="message"
               rows={3}
               maxLength={MESSAGE_MAX_LENGTH}
-              placeholder="Deine Nachricht"
+              placeholder={t("deineNachricht")}
               value={form.message}
               disabled={saving}
               onChange={(event) =>
@@ -567,13 +571,13 @@ export function GuestModal({
         ) : null}
 
         <p className="text-xs text-muted">
-          Deine Angaben sind auf der Event-Seite für alle sichtbar, die den
-          Einladungslink kennen (bei passwortgeschützten Events: zusätzlich das
-          Passwort). Mehr dazu in der{" "}
-          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-            Datenschutzerklärung
-          </LegalLink>
-          .
+          {t.rich("visibilityNote", {
+            privacy: (chunks) => (
+              <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                {chunks}
+              </LegalLink>
+            ),
+          })}
         </p>
 
         {fieldError || submitError ? (

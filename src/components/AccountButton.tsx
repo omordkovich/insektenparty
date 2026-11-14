@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { SignInMethods } from "@/lib/account";
@@ -14,6 +15,7 @@ type AccountButtonProps = {
 };
 
 export function AccountButton({ email, name, methods }: AccountButtonProps) {
+  const t = useTranslations("auth");
   const [open, setOpen] = useState(false);
 
   return (
@@ -21,8 +23,8 @@ export function AccountButton({ email, name, methods }: AccountButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Mein Konto"
-        title="Mein Konto"
+        aria-label={t("myAccount")}
+        title={t("myAccount")}
         className="flex h-11 w-11 items-center justify-center rounded-full border border-leaf/30 bg-[var(--surface)] text-leaf-dark shadow-(--shadow) transition hover:bg-leaf/10"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">

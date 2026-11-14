@@ -1,13 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useId, useState, type SubmitEvent } from "react";
 import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { PasswordHint } from "./PasswordHint";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "./Button";
+import { useErrorText } from "./useErrorText";
 
 export function ResetPasswordForm() {
+  const t = useTranslations("auth");
+  const errorText = useErrorText();
   const passwordId = useId();
   const passwordConfirmId = useId();
   const passwordHintId = useId();
@@ -28,11 +32,11 @@ export function ResetPasswordForm() {
 
     const passwordError = validateNewPassword(password);
     if (passwordError) {
-      setFieldError(passwordError);
+      setFieldError(errorText(passwordError));
       return;
     }
     if (password !== passwordConfirm) {
-      setFieldError("Die Passwörter stimmen nicht überein.");
+      setFieldError(t("diePassworterStimmenNicht"));
       return;
     }
 
@@ -46,7 +50,7 @@ export function ResetPasswordForm() {
       }
       setDone(true);
     } catch {
-      setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setSubmitError(t("etwasIstSchiefgelaufenBitte"));
     } finally {
       setSaving(false);
     }
@@ -55,12 +59,12 @@ export function ResetPasswordForm() {
   if (done) {
     return (
       <div className="space-y-4 text-center">
-        <p>Dein Passwort wurde erfolgreich geändert.</p>
+        <p>{t("deinPasswortWurdeErfolgreich")}</p>
         <Link
           href="/"
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-leaf px-4 font-bold text-white transition hover:bg-leaf-dark"
         >
-          Zur Startseite
+          {t("zurStartseite")}
         </Link>
       </div>
     );
@@ -70,7 +74,7 @@ export function ResetPasswordForm() {
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div>
         <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
-          Neues Passwort
+          {t("neuesPasswort")}
         </label>
         <input
           id={passwordId}
@@ -89,7 +93,7 @@ export function ResetPasswordForm() {
 
       <div>
         <label htmlFor={passwordConfirmId} className="mb-1 block text-sm font-bold">
-          Neues Passwort wiederholen
+          {t("neuesPasswortWiederholen")}
         </label>
         <input
           id={passwordConfirmId}
@@ -111,7 +115,7 @@ export function ResetPasswordForm() {
       ) : null}
 
       <Button variant="primary" type="submit" className="w-full" disabled={saving}>
-        {saving ? "Wird gespeichert ..." : "Passwort speichern"}
+        {saving ? t("saving") : t("passwortSpeichern")}
       </Button>
     </form>
   );

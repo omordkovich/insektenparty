@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+import { err, type ErrorMessage } from "@/i18n/errors";
 import type { EventSchedule, GuestInput } from "@/lib/validation";
 
 // Terminabstimmung: an event's date is still open ("unknown"), being voted
@@ -29,7 +31,11 @@ export type VoteAnswer = "yes" | "no" | "unseen";
 export type PollVoteDto = PollVote & { answers: Record<string, VoteAnswer> };
 export type PollDto = { options: PollOption[]; votes: PollVoteDto[] };
 
-const WEEKDAYS = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
+const WEEKDAYS: Record<Locale, string[]> = {
+  de: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+};
 
 function utcDate(iso: string): Date {
   const [year, month, day] = iso.split("-").map(Number);
@@ -42,15 +48,30 @@ export function addDays(iso: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+const POLL_DAY: Record<Locale, (weekday: string, day: string, month: string) => string> = {
+  de: (weekday, day, month) => `${weekday} ${day}.${month}.`,
+  en: (weekday, day, month) => `${weekday} ${day}/${month}`,
+  ru: (weekday, day, month) => `${weekday} ${day}.${month}`,
+};
+const POLL_FROM: Record<Locale, string> = { de: "ab", en: "from", ru: "с" };
+const NONE_FIT: Record<Locale, string> = {
+  de: "Nichts davon passt",
+  en: "None of these work",
+  ru: "Ничего не подходит",
+};
+
 // "Sa. 11.07. · 15:00–18:00", without an end "Sa. 11.07. · ab 15:00",
 // without any time just "Sa. 11.07.".
-export function formatPollOptionLabel(proposal: Proposal): string {
+export function formatPollOptionLabel(proposal: Proposal, locale: Locale): string {
   const date = utcDate(proposal.date);
   const day = String(date.getUTCDate()).padStart(2, "0");
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const label = `${WEEKDAYS[date.getUTCDay()]} ${day}.${month}.`;
+  const weekday = WEEKDAYS[locale][date.getUTCDay()];
+  const label = POLL_DAY[locale](weekday, day, month);
   if (!proposal.startTime) return label;
-  const time = proposal.endTime ? `${proposal.startTime}–${proposal.endTime}` : `ab ${proposal.startTime}`;
+  const time = proposal.endTime
+    ? `${proposal.startTime}–${proposal.endTime}`
+    : `${POLL_FROM[locale]} ${proposal.startTime}`;
   return `${label} · ${time}`;
 }
 
@@ -99,11 +120,12 @@ export function leadingOptionIds(options: PollOption[], votes: PollVote[]): stri
 export function describeChoice(
   vote: { optionIds: string[]; noneFit: boolean },
   options: PollOption[],
+  locale: Locale,
 ): string {
-  if (vote.noneFit) return "Nichts davon passt";
+  if (vote.noneFit) return NONE_FIT[locale];
   return options
     .filter((option) => vote.optionIds.includes(option.id))
-    .map(formatPollOptionLabel)
+    .map((option) => formatPollOptionLabel(option, locale))
     .join(", ");
 }
 
@@ -166,7 +188,7 @@ export type DateModePlan = {
   lostVotes: number;
 };
 
-type PlanResult = { ok: true; plan: DateModePlan } | { ok: false; error: string };
+type PlanResult = { ok: true; plan: DateModePlan } | { ok: false; error: ErrorMessage };
 
 // What a change does: leaving "fixed" empties the guest list, leaving or
 // restarting a poll drops its votes, fixing a proposal transfers them.
@@ -184,7 +206,7 @@ export function planDateModeChange(state: DateModeState, request: DateModeReques
     clearPoll = fromPoll;
     votesLost = fromPoll;
   } else if (request.mode === "poll" && "addProposals" in request) {
-    if (!fromPoll) return { ok: false, error: "Es läuft keine Abstimmung." };
+    if (!fromPoll) return { ok: false, error: err("noPollRunning") };
     newOptions = request.addProposals;
   } else if (request.mode === "poll") {
     clearGuests = fromFixed;
@@ -195,7 +217,7 @@ export function planDateModeChange(state: DateModeState, request: DateModeReques
     const option = state.options.find((candidate) => candidate.id === request.fromOptionId);
     // Proposals are single-day: one with an end date is a different date.
     if (!fromPoll || !option || request.endDate !== null || !sameProposal(option, request)) {
-      return { ok: false, error: "Der gewählte Vorschlag passt nicht zum Termin." };
+      return { ok: false, error: err("proposalMismatch") };
     }
     clearPoll = true;
     transferOptionId = option.id;

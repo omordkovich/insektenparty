@@ -1,3 +1,4 @@
+import type { Locale } from "@/i18n/config";
 import type { EventConfig } from "@/lib/event-config";
 
 export type ThemeKey =
@@ -92,6 +93,81 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
 // Themes that must be unlocked per user (see user_entitlements, feature key
 // "theme:<key>"). Adding a paid theme later only needs a new entry here -
 // the DB check constraint only enforces the "theme:%" pattern.
+// English names for the themes whose label is German; all others are the
+// same in every language.
+const THEME_LABELS_EN: Partial<Record<ThemeKey, string>> = {
+  weiss: "White",
+  schwarz: "Black",
+  gruen: "Green",
+  blau: "Blue",
+  rot: "Red",
+  gelb: "Yellow",
+  ballons: "Balloons",
+  karnaval: "Carnival",
+  dinosaurier: "Dinosaurs",
+  weltall: "Space",
+  einschulung: "First day of school",
+  fussball: "Football",
+  hochzeit: "Wedding",
+  brettspiele: "Board games",
+  natur: "Nature",
+};
+
+const THEME_LABELS_RU: Record<ThemeKey, string> = {
+  weiss: "Белый",
+  schwarz: "Чёрный",
+  gruen: "Зелёный",
+  blau: "Синий",
+  rot: "Красный",
+  pink: "Розовый",
+  orange: "Оранжевый",
+  gelb: "Жёлтый",
+  ballons: "Воздушные шары",
+  foam: "Пенная вечеринка",
+  halloweenclay: "Хеллоуин: пластилин",
+  halloweengraveyard: "Хеллоуин: кладбище",
+  halloweenkids: "Хеллоуин для детей",
+  christmaskids: "Рождество для детей",
+  christmassnow: "Рождественский снег",
+  artdeco: "Ар-деко",
+  disco: "Диско",
+  hippie: "Хиппи",
+  newyear: "Новый год",
+  birthdaypresents: "Подарки",
+  birthdayprincess: "Принцесса",
+  penandpaper: "Ролевые игры",
+  magic: "Магия",
+  pirates: "Пираты",
+  pirateskids: "Пираты для детей",
+  teddy: "Мишка",
+  cinema: "Кино",
+  tarot: "Таро",
+  karnaval: "Карнавал",
+  pride: "Прайд",
+  dinosaurier: "Динозавры",
+  weltall: "Космос",
+  einschulung: "Первый день в школе",
+  ninja: "Ниндзя",
+  fussball: "Футбол",
+  toycars: "Машинки",
+  hochzeit: "Свадьба",
+  brettspiele: "Настольные игры",
+  bowling: "Боулинг",
+  hawaii: "Гавайи",
+  natur: "Природа",
+};
+
+// Theme names per language; a name missing there is the German one.
+const THEME_LABELS_BY_LOCALE: Record<Locale, Partial<Record<ThemeKey, string>>> = {
+  de: THEME_LABELS,
+  en: THEME_LABELS_EN,
+  ru: THEME_LABELS_RU,
+};
+
+export function themeLabel(theme: ThemeKey, locale: Locale): string {
+  return THEME_LABELS_BY_LOCALE[locale][theme] ?? THEME_LABELS[theme];
+}
+
 export const PREMIUM_THEMES: readonly ThemeKey[] = ["natur", "ballons"];
 
 // Maps to the CSS theme classes defined in globals.css.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import {
   addDays,
   describeChoice,
@@ -23,9 +24,11 @@ function vote(overrides: Partial<PollVote>): PollVote {
 
 describe("labels and dates", () => {
   it("formats a proposal compactly", () => {
-    expect(formatPollOptionLabel(optionA)).toBe("Sa. 11.07. · 15:00–18:00");
-    expect(formatPollOptionLabel({ ...optionA, endTime: null })).toBe("Sa. 11.07. · ab 15:00");
-    expect(formatPollOptionLabel({ ...optionA, startTime: null, endTime: null })).toBe("Sa. 11.07.");
+    expect(formatPollOptionLabel(optionA, "de")).toBe("Sa. 11.07. · 15:00–18:00");
+    expect(formatPollOptionLabel({ ...optionA, endTime: null }, "de")).toBe("Sa. 11.07. · ab 15:00");
+    expect(formatPollOptionLabel({ ...optionA, startTime: null, endTime: null }, "de")).toBe("Sa. 11.07.");
+    expect(formatPollOptionLabel(optionA, "en")).toBe("Sat 11/07 · 15:00–18:00");
+    expect(formatPollOptionLabel({ ...optionA, endTime: null }, "en")).toBe("Sat 11/07 · from 15:00");
   });
 
   it("adds days across month ends", () => {
@@ -43,10 +46,11 @@ describe("labels and dates", () => {
   });
 
   it("describes a choice for the owner's e-mail", () => {
-    expect(describeChoice(vote({ optionIds: ["a", "b"] }), [optionA, optionB])).toBe(
+    expect(describeChoice(vote({ optionIds: ["a", "b"] }), [optionA, optionB], "de")).toBe(
       "Sa. 11.07. · 15:00–18:00, So. 12.07. · 20:00–01:00",
     );
-    expect(describeChoice(vote({ noneFit: true }), [optionA])).toBe("Nichts davon passt");
+    expect(describeChoice(vote({ noneFit: true }), [optionA], "de")).toBe("Nichts davon passt");
+    expect(describeChoice(vote({ noneFit: true }), [optionA], "en")).toBe("None of these work");
   });
 });
 
@@ -112,7 +116,7 @@ describe("planDateModeChange", () => {
     expect(result.ok && needsConfirm(result.plan)).toBe(false);
     expect(planDateModeChange(unknown, { mode: "poll", addProposals: proposals })).toEqual({
       ok: false,
-      error: "Es läuft keine Abstimmung.",
+      error: err("noPollRunning"),
     });
   });
 
@@ -125,10 +129,10 @@ describe("planDateModeChange", () => {
     ).toMatchObject({ ok: true, plan: { clearPoll: true, transferOptionId: null, lostVotes: 6 } });
     expect(
       planDateModeChange(poll, { mode: "fixed", date: "2026-07-20", startTime: "15:00", endTime: null, endDate: null, fromOptionId: "a" }),
-    ).toEqual({ ok: false, error: "Der gewählte Vorschlag passt nicht zum Termin." });
+    ).toEqual({ ok: false, error: err("proposalMismatch") });
     expect(
       planDateModeChange(poll, { mode: "fixed", date: "2026-07-11", startTime: "15:00", endTime: "18:00", endDate: "2026-07-12", fromOptionId: "a" }),
-    ).toEqual({ ok: false, error: "Der gewählte Vorschlag passt nicht zum Termin." });
+    ).toEqual({ ok: false, error: err("proposalMismatch") });
   });
 
   it("loses nothing when moving forward from unknown or changing a fixed date", () => {

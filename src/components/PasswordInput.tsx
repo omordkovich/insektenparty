@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type InputHTMLAttributes } from "react";
 
 type PasswordInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "className">;
 
 // Password field with an eye button that reveals / hides what was typed.
 export function PasswordInput(props: PasswordInputProps) {
+  const tCommon = useTranslations("common");
   const [visible, setVisible] = useState(false);
 
   return (
@@ -19,9 +21,9 @@ export function PasswordInput(props: PasswordInputProps) {
         type="button"
         onClick={() => setVisible((current) => !current)}
         disabled={props.disabled}
-        aria-label={visible ? "Passwort verbergen" : "Passwort anzeigen"}
+        aria-label={visible ? tCommon("hidePassword") : tCommon("showPassword")}
         aria-pressed={visible}
-        title={visible ? "Passwort verbergen" : "Passwort anzeigen"}
+        title={visible ? tCommon("hidePassword") : tCommon("showPassword")}
         className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-muted transition hover:text-leaf-dark disabled:opacity-50"
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}

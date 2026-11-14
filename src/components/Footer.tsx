@@ -1,4 +1,5 @@
 import { BadgeRemoveButton } from "@/components/BadgeRemoveButton";
+import { useTranslations } from "next-intl";
 import { CopyPasswordButton } from "@/components/CopyPasswordButton";
 import { EditableField } from "@/components/EditableField";
 import { InvitationTextButton } from "@/components/InvitationTextButton";
@@ -44,25 +45,26 @@ export function Footer({
   removeBadge,
   readOnly = false,
 }: FooterProps) {
+  const t = useTranslations("event");
   const canEdit = isOwner && !readOnly;
   const contactFields: ContactField[] = [
     {
       fieldKey: "contactName",
       value: config.contact.name,
-      placeholder: "Dein Name",
-      ariaLabel: "Kontaktname bearbeiten",
+      placeholder: t("deinName"),
+      ariaLabel: t("contactNameEdit"),
     },
     {
       fieldKey: "contactPhone",
       value: config.contact.phone,
-      placeholder: "Telefonnummer",
-      ariaLabel: "Telefonnummer bearbeiten",
+      placeholder: t("phonePlaceholder"),
+      ariaLabel: t("phoneEdit"),
     },
     {
       fieldKey: "contactEmail",
       value: config.contact.email,
       placeholder: "E-Mail-Adresse",
-      ariaLabel: "E-Mail bearbeiten",
+      ariaLabel: t("emailEdit"),
       link: { href: `mailto:${config.contact.email}` },
     },
   ];
@@ -79,7 +81,7 @@ export function Footer({
       <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 text-center shadow-(--shadow) sm:p-8">
         {visibleFields.length > 0 ? (
           <>
-            <h2 className="font-display text-2xl text-leaf-dark">Kontakt</h2>
+            <h2 className="font-display text-2xl text-leaf-dark">{t("kontakt")}</h2>
             <div className="mt-3 text-muted">
               {visibleFields.map((field) => (
                 <div key={field.fieldKey}>
@@ -101,7 +103,7 @@ export function Footer({
         {isOwner && accessPassword ? (
           <p className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-leaf/10 px-3 py-1 text-xs font-bold text-leaf-dark">
             <LockIcon />
-            Passwortgeschützt
+            {t("passwortgeschutzt")}
           </p>
         ) : null}
         <MadeWithBadge

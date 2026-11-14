@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "./legal-info";
 
 // Proof of which AGB/privacy policy version was accepted, that the minimum
@@ -53,12 +54,12 @@ export function consentUpdate(userMetadata: unknown, now: Date = new Date()) {
 }
 
 // Error for API routes that need the current AGB (creating events, buying).
-export function consentRequiredError(userMetadata: unknown): string | null {
+export function consentRequiredError(userMetadata: unknown): ErrorMessage | null {
   switch (termsConsentState(userMetadata)) {
     case "none":
-      return "Bitte bestätige zuerst die AGB und dein Alter.";
+      return err("termsRequired");
     case "outdated":
-      return "Bitte stimme zuerst den geänderten AGB zu.";
+      return err("termsUpdated");
     case "current":
       return null;
   }

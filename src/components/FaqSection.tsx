@@ -1,14 +1,16 @@
+import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import type { FaqItem } from "@/lib/faq";
 import { cardClass } from "./card";
 
 // "Häufige Fragen" card. The answers are plain HTML (no client JS), so
 // crawlers read them even while collapsed. Pair with FAQPage schema.
-export function FaqSection({ items, children }: { items: FaqItem[]; children?: ReactNode }) {
+export async function FaqSection({ items, children }: { items: FaqItem[]; children?: ReactNode }) {
+  const t = await getTranslations("home");
   return (
     <section aria-labelledby="faq-title" className={cardClass}>
       <h2 id="faq-title" className="text-center font-display text-2xl text-leaf-dark sm:text-3xl">
-        Häufige Fragen
+        {t("faqTitle")}
       </h2>
       <div className="mt-6 space-y-2 text-left">
         {items.map((item) => (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useState, type ReactNode } from "react";
 import { CheckIcon, CloseIcon, PencilIcon } from "./EditIcons";
@@ -42,6 +43,7 @@ export function InlineEditShell({
   onSaveAction,
   editHint,
 }: InlineEditShellProps) {
+  const t = useTranslations("event");
   const hintId = useId();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -105,7 +107,7 @@ export function InlineEditShell({
           type="button"
           onClick={handleSave}
           disabled={saving}
-          aria-label="Speichern"
+          aria-label={t("speichern")}
           className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-leaf/30 text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
         >
           <CheckIcon />
@@ -114,7 +116,7 @@ export function InlineEditShell({
           type="button"
           onClick={() => setEditing(false)}
           disabled={saving}
-          aria-label="Abbrechen"
+          aria-label={t("abbrechen")}
           className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-danger/30 text-danger transition hover:bg-red-50 disabled:opacity-50"
         >
           <CloseIcon />

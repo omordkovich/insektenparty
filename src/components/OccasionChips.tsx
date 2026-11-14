@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { type Occasion, occasionPath } from "@/lib/occasions";
 
 // Occasion pages as round link chips (start page, "Weitere Anlässe").

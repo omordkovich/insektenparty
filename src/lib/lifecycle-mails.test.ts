@@ -117,7 +117,7 @@ describe("buildLifecycleMessage", () => {
   const event = { title: "Mias Party", slug: "mias-party-ab12" };
 
   it("builds the deletion notice", () => {
-    const { subject, text } = buildLifecycleMessage("deletion_notice", event, "2026-08-30");
+    const { subject, text } = buildLifecycleMessage("deletion_notice", event, "2026-08-30", "de");
     expect(subject).toBe("Dein Event „Mias Party“ wird am 30.08.2026 gelöscht");
     expect(text).toContain("30.08.2026");
     expect(text).toContain("Mias Party");
@@ -126,16 +126,30 @@ describe("buildLifecycleMessage", () => {
   });
 
   it("builds the date reminder", () => {
-    const { subject, text } = buildLifecycleMessage("date_reminder", event, "2026-07-01");
+    const { subject, text } = buildLifecycleMessage("date_reminder", event, "2026-07-01", "de");
     expect(subject).toBe("Setz einen Termin für „Mias Party“");
     expect(text).toContain("Ohne Termin läuft dein Event am 01.07.2026 ab.");
     expect(text).toContain("https://gastzilla.de/event/mias-party-ab12");
   });
 
   it("builds the poll reminder", () => {
-    const { subject, text } = buildLifecycleMessage("poll_reminder", event, "2026-03-10");
+    const { subject, text } = buildLifecycleMessage("poll_reminder", event, "2026-03-10", "de");
     expect(subject).toBe("Leg den Termin für „Mias Party“ fest");
     expect(text).toContain("Deine Abstimmung endet am 10.03.2026. Danach kannst du keinen Termin mehr festlegen.");
     expect(text).toContain("https://gastzilla.de/event/mias-party-ab12");
+  });
+});
+
+describe("buildLifecycleMessage in English", () => {
+  const event = { title: "Mia's party", slug: "mias-party-ab12" };
+
+  it("writes the reminders in English", () => {
+    expect(buildLifecycleMessage("date_reminder", event, "2026-07-01", "en").subject).toBe("Set a date for “Mia's party”");
+    expect(buildLifecycleMessage("deletion_notice", event, "2026-08-30", "en").subject).toBe(
+      "Your event “Mia's party” will be deleted on 30/08/2026",
+    );
+    expect(buildLifecycleMessage("poll_reminder", event, "2026-03-10", "en").text).toContain(
+      "Your poll ends on 10/03/2026.",
+    );
   });
 });

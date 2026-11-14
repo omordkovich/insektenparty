@@ -1,3 +1,4 @@
+import type { Locale } from "@/i18n/config";
 import { SITE_URL } from "@/lib/site";
 
 // Sharing an event page: the public URL plus one link per platform for
@@ -7,8 +8,15 @@ export function buildEventShareUrl(slug: string): string {
   return `${SITE_URL}/event/${encodeURIComponent(slug)}`;
 }
 
-export function buildShareText(title: string): string {
-  return `Du bist eingeladen: ${title}`;
+const SHARE_TEXT: Record<Locale, (title: string) => string> = {
+  de: (title) => `Du bist eingeladen: ${title}`,
+  en: (title) => `You're invited: ${title}`,
+  ru: (title) => `Приглашение: ${title}`,
+};
+const EMAIL_LABEL: Record<Locale, string> = { de: "E-Mail", en: "Email", ru: "E-mail" };
+
+export function buildShareText(title: string, locale: Locale): string {
+  return SHARE_TEXT[locale](title);
 }
 
 export type ShareLink = {
@@ -22,8 +30,8 @@ export type ShareLink = {
   copyFirst?: boolean;
 };
 
-export function buildShareLinks({ url, title }: { url: string; title: string }): ShareLink[] {
-  const text = buildShareText(title);
+export function buildShareLinks({ url, title, locale }: { url: string; title: string; locale: Locale }): ShareLink[] {
+  const text = buildShareText(title, locale);
   const u = encodeURIComponent(url);
   const t = encodeURIComponent(text);
 
@@ -37,7 +45,7 @@ export function buildShareLinks({ url, title }: { url: string; title: string }):
     { id: "telegram", label: "Telegram", href: `https://t.me/share/url?url=${u}&text=${t}`, newTab: true },
     {
       id: "email",
-      label: "E-Mail",
+      label: EMAIL_LABEL[locale],
       href: `mailto:?subject=${t}&body=${encodeURIComponent(`${text}\n\n${url}`)}`,
       newTab: false,
     },
@@ -63,10 +71,12 @@ export function buildMessageShareLinks({
   text,
   url,
   subject,
+  locale,
 }: {
   text: string;
   url: string;
   subject: string;
+  locale: Locale;
 }): ShareLink[] {
   const withoutLink = text
     .split("\n")
@@ -83,7 +93,7 @@ export function buildMessageShareLinks({
     },
     {
       id: "email",
-      label: "E-Mail",
+      label: EMAIL_LABEL[locale],
       href: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,
       newTab: false,
     },

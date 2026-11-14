@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CookieBanner } from "@/components/CookieBanner";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { formatDateRangeLabel } from "@/lib/calendar";
+import { HtmlShell } from "@/components/HtmlShell";
+import { DEFAULT_LOCALE, OG_LOCALE } from "@/i18n/config";
+import { eventLocale } from "@/i18n/request-locale";
 import { buildEventShareUrl } from "@/lib/share";
 import { THEME_CLASS_NAMES, type ThemeKey } from "@/lib/theme-presets";
 import { getEventByAddress } from "@/repositories/event-repository";
@@ -16,6 +20,7 @@ type EventLayoutProps = {
 // of children - plus addresses and phone numbers. They must never show up
 // in search results. Note: robots.txt must NOT disallow /event/, otherwise
 // crawlers can't fetch the page and never see this noindex.
+
 const NO_INDEX: Metadata["robots"] = {
   index: false,
   follow: false,
@@ -31,26 +36,28 @@ export async function generateMetadata({
   const event = await getEventByAddress(slug);
 
   if (!event) {
-    return { title: "Event nicht gefunden", robots: NO_INDEX };
+    return { title: (await getTranslations({ locale: DEFAULT_LOCALE, namespace: "meta" }))("eventNotFound"), robots: NO_INDEX };
   }
+  const locale = eventLocale(event);
+  const t = await getTranslations({ locale, namespace: "meta" });
 
   // Link previews are fetched anonymously, so an expired event reveals
   // nothing to anyone: no title, no date.
   if ((await getEventLifecycle(event.id))?.stage === "expired") {
-    const expiredDescription = "Diese Einladung ist abgelaufen.";
+    const expiredDescription = t("expiredDescription");
     return {
-      title: "Abgelaufene Einladung",
+      title: t("expiredTitle"),
       description: expiredDescription,
       robots: NO_INDEX,
       openGraph: {
         type: "website",
         siteName: "GASTZILLA",
-        locale: "de_DE",
-        title: "Abgelaufene Einladung",
+        locale: OG_LOCALE[locale],
+        title: t("expiredTitle"),
         description: expiredDescription,
         url: buildEventShareUrl(event.slug),
       },
-      twitter: { card: "summary_large_image", title: "Abgelaufene Einladung", description: expiredDescription },
+      twitter: { card: "summary_large_image", title: t("expiredTitle"), description: expiredDescription },
     };
   }
 
@@ -58,29 +65,32 @@ export async function generateMetadata({
   // show when an invitation link is shared - only what any link holder
   // sees anyway (title, date), never the guest list or contact details.
   // Password-protected: the preview names the event but nothing else.
+  const dateLabel = event.eventDate
+    ? formatDateRangeLabel(event.eventDate, event.eventEndDate, locale)
+    : event.dateLabel;
   const description = event.accessPassword
-    ? "Passwortgeschützte Einladung – öffne den Link und gib das Passwort ein."
+    ? t("protectedDescription")
     : event.dateMode === "unknown"
-      ? "Du bist eingeladen! Der Termin folgt."
+      ? t("unknownDescription")
       : event.dateMode === "poll"
-        ? "Du bist eingeladen! Stimme ab, wann es dir passt."
-        : event.dateLabel
-          ? `Du bist eingeladen – ${event.dateLabel}. Jetzt zusagen und Gästeliste ansehen.`
-          : "Du bist eingeladen! Jetzt zusagen und Gästeliste ansehen.";
+        ? t("pollDescription")
+        : dateLabel
+          ? t("dateDescription", { date: dateLabel })
+          : t("plainDescription");
 
   return {
-    title: `${event.title} - Einladung`,
+    title: t("eventTitle", { title: event.title }),
     description,
     robots: NO_INDEX,
     openGraph: {
       type: "website",
       siteName: "GASTZILLA",
-      locale: "de_DE",
-      title: `Einladung: ${event.title}`,
+      locale: OG_LOCALE[locale],
+      title: t("eventOgTitle", { title: event.title }),
       description,
       url: buildEventShareUrl(event.slug),
     },
-    twitter: { card: "summary_large_image", title: `Einladung: ${event.title}`, description },
+    twitter: { card: "summary_large_image", title: t("eventOgTitle", { title: event.title }), description },
   };
 }
 
@@ -93,14 +103,16 @@ export default async function EventLayout({ children, params }: EventLayoutProps
   }
 
   const themeClassName = THEME_CLASS_NAMES[event.theme as ThemeKey];
+  // Event pages speak the event's language, not the visitor's choice.
+  const locale = eventLocale(event);
+  setRequestLocale(locale);
 
-  // data-theme-root lets portalled dialogs (e.g. the privacy policy) mount
-  // inside the themed wrapper so they pick up the event's CSS variables. The
-  // cookie banner is rendered right here for the same reason.
+  // Own <html> (see app/layout.tsx). The theme wrapper inside it lets
+  // portalled dialogs (e.g. the privacy policy) and the cookie banner pick up
+  // the event's CSS variables.
   return (
-    <div className={themeClassName} data-theme-root>
+    <HtmlShell locale={locale} themeClassName={themeClassName}>
       {children}
-      <CookieBanner insideEvent />
-    </div>
+    </HtmlShell>
   );
 }

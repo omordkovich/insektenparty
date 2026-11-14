@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import { themeFeatureKey } from "@/lib/features";
 import { isDummyPaymentEnabled } from "@/lib/payments";
 import { PREMIUM_THEMES } from "@/lib/theme-presets";
@@ -15,12 +16,12 @@ import { denyIfOver } from "@/services/event-lifecycle-service";
 
 export type PurchaseResult =
   | { ok: true; data: { usedCredit: boolean } }
-  | { ok: false; status: number; error: string };
+  | { ok: false; status: number; error: ErrorMessage };
 
-const UNAVAILABLE_ERROR = "Käufe sind bald verfügbar.";
-const UNKNOWN_PRODUCT_ERROR = "Unbekanntes Produkt.";
-const NOT_FOUND_ERROR = "Event wurde nicht gefunden.";
-const ALREADY_UNLOCKED_ERROR = "Dieses Event ist schon freigeschaltet.";
+const UNAVAILABLE_ERROR = err("purchasesUnavailable");
+const UNKNOWN_PRODUCT_ERROR = err("unknownProduct");
+const NOT_FOUND_ERROR = err("eventNotFound");
+const ALREADY_UNLOCKED_ERROR = err("alreadyUnlocked");
 
 const bought: PurchaseResult = { ok: true, data: { usedCredit: false } };
 const unavailable: PurchaseResult = { ok: false, status: 403, error: UNAVAILABLE_ERROR };

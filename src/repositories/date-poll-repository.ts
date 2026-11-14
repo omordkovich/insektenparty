@@ -128,8 +128,8 @@ export async function applyDateModeChange(
         eventEndDate: schedule?.eventEndDate ?? null,
         eventStartTime: schedule?.eventStartTime ?? null,
         eventEndTime: schedule?.eventEndTime ?? null,
-        dateLabel: schedule ? formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate) : "",
-        timeLabel: schedule ? formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime) : "",
+        dateLabel: schedule ? formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate, "de") : "",
+        timeLabel: schedule ? formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime, "de") : "",
         // A new mode or date: a date reminder may be due again later.
         dateReminderSentAt: null,
         updatedAt: new Date(),

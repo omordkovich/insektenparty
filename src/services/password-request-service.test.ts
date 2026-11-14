@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 
 vi.mock("@/repositories/event-repository", () => ({ getEventAccessInfo: vi.fn() }));
 vi.mock("@/repositories/user-repository", () => ({ getUserContact: vi.fn() }));
@@ -7,7 +8,7 @@ vi.mock("@/lib/recaptcha", () => ({
   verifyRecaptchaToken: vi.fn(async () => ({ ok: true })),
 }));
 vi.mock("@/services/event-lifecycle-service", () => ({
-  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  EVENT_OVER_ERROR: { key: "eventOver" },
   denyIfOver: vi.fn(async () => null),
 }));
 vi.mock("@/lib/email", () => ({ sendEmail: vi.fn(async () => {}) }));
@@ -20,6 +21,27 @@ const { denyIfOver } = await import("@/services/event-lifecycle-service");
 
 const LINK = "https://gastzilla.de/event/fest-abc123";
 
+describe("buildPasswordRequestEmail in English", () => {
+  it("writes the request in English", () => {
+    const mail = buildPasswordRequestEmail(
+      { name: "Max", contact: { kind: "phone", phone: "0152 123456", channel: "other", channelOther: "Signal" }, message: "See you!" },
+      "Summer party",
+      LINK,
+      "en",
+    );
+    expect(mail.subject).toBe("Password request for “Summer party”");
+    expect(mail.text).toBe(
+      [
+        "“Max” would like the password for your event “Summer party” via Signal to 0152 123456.",
+        "",
+        "Message: See you!",
+        "",
+        `View event: ${LINK}`,
+      ].join("\n"),
+    );
+  });
+});
+
 describe("buildPasswordRequestEmail", () => {
   it("asks for an e-mail answer with Reply-To", () => {
     expect(
@@ -27,6 +49,7 @@ describe("buildPasswordRequestEmail", () => {
         { name: "Max", contact: { kind: "email", email: "max@example.de" }, message: "Bis bald!" },
         "Sommerfest",
         LINK,
+        "de",
       ),
     ).toEqual({
       subject: "Passwort-Anfrage für „Sommerfest“",
@@ -48,6 +71,7 @@ describe("buildPasswordRequestEmail", () => {
       { name: "Max", contact: { kind: "phone", phone: "0152 123456", channel: "whatsapp", channelOther: null }, message: null },
       "Sommerfest",
       LINK,
+      "de",
     );
     expect(whatsapp.replyTo).toBeUndefined();
     expect(whatsapp.text).toBe(
@@ -62,6 +86,7 @@ describe("buildPasswordRequestEmail", () => {
       { name: "Max", contact: { kind: "phone", phone: "0152 123456", channel: "other", channelOther: "Signal" }, message: null },
       "Sommerfest",
       LINK,
+      "de",
     );
     expect(other.text.split("\n")[0]).toBe(
       "„Max“ möchte das Passwort für dein Event „Sommerfest“ per Signal an 0152 123456.",
@@ -81,7 +106,7 @@ describe("requestEventPassword", () => {
       title: "Sommerfest",
       slug: "fest-abc123",
     });
-    vi.mocked(getUserContact).mockResolvedValue({ name: "Anna", email: "anna@example.de" });
+    vi.mocked(getUserContact).mockResolvedValue({ name: "Anna", email: "anna@example.de", locale: "de" });
   });
 
   it("mails the owner", async () => {
@@ -94,11 +119,11 @@ describe("requestEventPassword", () => {
   });
 
   it("refuses with 409 once the event is over, without mailing", async () => {
-    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: err("eventOver") });
     expect(await requestEventPassword("event-1", body)).toEqual({
       ok: false,
       status: 409,
-      error: "Dieses Event ist vorbei.",
+      error: err("eventOver"),
     });
     expect(sendEmail).not.toHaveBeenCalled();
   });
@@ -107,7 +132,7 @@ describe("requestEventPassword", () => {
     expect(await requestEventPassword("event-1", { ...body, contactKind: undefined })).toEqual({
       ok: false,
       status: 400,
-      error: "Bitte wähle, wie du das Passwort bekommen möchtest.",
+      error: err("contactKindRequired"),
     });
     expect(sendEmail).not.toHaveBeenCalled();
   });
@@ -126,7 +151,7 @@ describe("requestEventPassword", () => {
     expect(await requestEventPassword("event-1", body)).toEqual({
       ok: false,
       status: 503,
-      error: "Die Anfrage konnte nicht zugestellt werden.",
+      error: err("requestNotDelivered"),
     });
   });
 });

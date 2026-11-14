@@ -1,11 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import {
   NAME_MAX_LENGTH,
   PASSWORD_REQUEST_MESSAGE_MAX_LENGTH,
   PASSWORD_REQUEST_OTHER_MAX_LENGTH,
-  PHONE_CHANNEL_LABELS,
   PHONE_CHANNELS,
   validatePasswordRequest,
   type PhoneChannel,
@@ -15,6 +15,7 @@ import { CharCounter } from "./CharCounter";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
+import { useErrorText } from "./useErrorText";
 
 type PasswordRequestDialogProps = {
   eventId: string;
@@ -28,6 +29,8 @@ const inputClass = "w-full rounded-xl border border-leaf/25 bg-surface px-3 py-3
 // Locked event page: asks the owner for the password by e-mail. Only the
 // chosen contact way is shown and sent.
 export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordRequestDialogProps) {
+  const t = useTranslations("guestForm");
+  const errorText = useErrorText();
   const titleId = useId();
   const nameId = useId();
   const emailId = useId();
@@ -72,11 +75,11 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
     };
     const validation = validatePasswordRequest(body);
     if (!validation.ok) {
-      setError(validation.error);
+      setError(errorText(validation.error));
       return;
     }
     if (!recaptchaToken) {
-      setError("Bitte bestätige, dass du kein Roboter bist.");
+      setError(t("bitteBestatigeDassDu"));
       return;
     }
 
@@ -90,13 +93,13 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Die Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.");
+        setError(payload?.error ?? t("dieAnfrageKonnteNicht"));
         setRecaptchaReset((value) => value + 1);
         return;
       }
       setSent(true);
     } catch {
-      setError("Die Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.");
+      setError(t("dieAnfrageKonnteNicht"));
       setRecaptchaReset((value) => value + 1);
     } finally {
       setSaving(false);
@@ -110,19 +113,19 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
       onCloseAction={requestClose}
       closeDisabled={saving}
       initialFocusRef={sent ? undefined : nameInputRef}
-      header="Passwort anfragen"
+      header={t("passwortAnfragen")}
       footer={
         sent ? (
           <Button variant="primary" type="submit">
-            Schließen
+            {t("schliessen")}
           </Button>
         ) : (
           <>
             <Button variant="outline" onClick={requestClose} disabled={saving}>
-              Abbrechen
+              {t("abbrechen")}
             </Button>
             <Button variant="primary" type="submit" disabled={saving || !recaptchaToken}>
-              {saving ? "Wird gesendet ..." : "Anfrage senden"}
+              {saving ? t("sending") : t("sendRequest")}
             </Button>
           </>
         )
@@ -130,13 +133,13 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
     >
       {sent ? (
         <p role="status" className="text-muted">
-          Deine Anfrage wurde an den Gastgeber geschickt. Er meldet sich bei dir.
+          {t("deineAnfrageWurdeAn")}
         </p>
       ) : (
         <div className="space-y-4">
           <div>
             <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-              Name
+              {t("name")}
             </label>
             <input
               ref={nameInputRef}
@@ -153,7 +156,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
 
           <fieldset>
             <legend className="mb-1 block text-sm font-bold">
-              Wie soll dir der Gastgeber das Passwort schicken?
+              {t("wieSollDirDer")}
             </legend>
             <div className="flex gap-4">
               {(["email", "phone"] as const).map((kind) => (
@@ -175,7 +178,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
           {contactKind === "email" ? (
             <div>
               <label htmlFor={emailId} className="mb-1 block text-sm font-bold">
-                E-Mail-Adresse
+                {t("eMailAdresse")}
               </label>
               <input
                 id={emailId}
@@ -193,7 +196,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
             <>
               <div>
                 <label htmlFor={phoneId} className="mb-1 block text-sm font-bold">
-                  Telefonnummer
+                  {t("telefonnummer")}
                 </label>
                 <input
                   id={phoneId}
@@ -206,7 +209,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
                 />
               </div>
               <fieldset>
-                <legend className="mb-1 block text-sm font-bold">Per</legend>
+                <legend className="mb-1 block text-sm font-bold">{t("per")}</legend>
                 <div className="flex flex-wrap gap-x-4 gap-y-2">
                   {PHONE_CHANNELS.map((option) => (
                     <label key={option} className="flex items-center gap-2 text-sm">
@@ -218,7 +221,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
                         onChange={() => setChannel(option)}
                         className="h-5 w-5"
                       />
-                      {PHONE_CHANNEL_LABELS[option]}
+                      {t(`channels.${option}`)}
                     </label>
                   ))}
                 </div>
@@ -226,12 +229,12 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
               {channel === "other" ? (
                 <div>
                   <label htmlFor={otherId} className="mb-1 block text-sm font-bold">
-                    Wie genau?
+                    {t("wieGenau")}
                   </label>
                   <input
                     id={otherId}
                     type="text"
-                    placeholder="z. B. Signal oder Anruf"
+                    placeholder={t("zBSignalOder")}
                     maxLength={PASSWORD_REQUEST_OTHER_MAX_LENGTH}
                     value={channelOther}
                     disabled={saving}
@@ -245,7 +248,7 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
 
           <div>
             <label htmlFor={messageId} className="mb-1 block text-sm font-bold">
-              Nachricht <span className="font-normal text-muted">(optional)</span>
+              {t("nachricht")} <span className="font-normal text-muted">{t("optional")}</span>
             </label>
             <textarea
               id={messageId}
@@ -262,12 +265,13 @@ export function PasswordRequestDialog({ eventId, onCloseAction }: PasswordReques
           <RecaptchaCheckbox onTokenChange={setRecaptchaToken} resetSignal={recaptchaReset} />
 
           <p className="text-xs text-muted">
-            Deine Angaben schicken wir einmalig per E-Mail an den Gastgeber und speichern sie
-            nicht. Mehr dazu in der{" "}
-            <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-              Datenschutzerklärung
-            </LegalLink>
-            .
+            {t.rich("requestPrivacyNote", {
+              privacy: (chunks) => (
+                <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                  {chunks}
+                </LegalLink>
+              ),
+            })}
           </p>
 
           {error ? (

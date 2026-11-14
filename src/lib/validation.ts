@@ -1,10 +1,12 @@
+import { LOCALES, type Locale } from "@/i18n/config";
+import { err, type ErrorKey, type ErrorMessage } from "@/i18n/errors";
 import { z } from "zod";
 import { proposalSchedule, type Proposal } from "@/lib/date-poll";
 import { MAX_GUEST_CAPACITY } from "@/lib/guest-capacity";
 import { THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
 
 // All input validation, shared by the forms (browser) and the API routes
-// (server) so both always apply the same rules and German messages. Each
+// (server) so both always apply the same rules and messages. Each
 // validate* function returns { ok, value|data } or { ok: false, error } with
 // the first problem found - the forms show exactly one message at a time.
 
@@ -18,12 +20,27 @@ export const ARRIVAL_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EVENT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-const INVALID_EMAIL = "Bitte gib eine gültige E-Mail-Adresse ein.";
+const INVALID_EMAIL = msg("invalidEmail");
 
-export type FieldResult<T> = { ok: true; value: T } | { ok: false; error: string };
+export type FieldResult<T> = { ok: true; value: T } | { ok: false; error: ErrorMessage };
 
-function firstError(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Ungültige Eingabe.";
+// Zod messages carry an ErrorMessage as JSON (see msg); firstError turns the
+// first one back. Zod's own messages (no custom one set) count as "invalid".
+function msg(key: ErrorKey, values?: ErrorMessage["values"]): string {
+  return JSON.stringify(err(key, values));
+}
+
+function firstError(error: z.ZodError): ErrorMessage {
+  const raw = error.issues[0]?.message;
+  try {
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    if (parsed && typeof parsed === "object" && typeof (parsed as ErrorMessage).key === "string") {
+      return parsed as ErrorMessage;
+    }
+  } catch {
+    // not one of ours
+  }
+  return err("invalidInput");
 }
 
 function toFieldResult<T>(result: z.ZodSafeParseResult<T>): FieldResult<T> {
@@ -32,18 +49,24 @@ function toFieldResult<T>(result: z.ZodSafeParseResult<T>): FieldResult<T> {
 
 // --- Request bodies and themes ----------------------------------------------
 
-export const requestBodySchema = z.record(z.string(), z.unknown(), { error: "Ungültige Anfragedaten." });
+export const requestBodySchema = z.record(z.string(), z.unknown(), { error: msg("invalidRequest") });
 
 export function validateRequestBody(body: unknown): FieldResult<Record<string, unknown>> {
   return toFieldResult(requestBodySchema.safeParse(body));
 }
 
 export const themeSchema = z.enum(Object.keys(THEME_LABELS) as [ThemeKey, ...ThemeKey[]], {
-  error: "Ungültiges Theme.",
+  error: msg("invalidTheme"),
 });
 
 export function validateTheme(value: unknown): FieldResult<ThemeKey> {
   return toFieldResult(themeSchema.safeParse(value));
+}
+
+export const eventLanguageSchema = z.enum(LOCALES, { error: msg("invalidLanguage") });
+
+export function validateEventLanguage(value: unknown): FieldResult<Locale> {
+  return toFieldResult(eventLanguageSchema.safeParse(value));
 }
 
 // --- Names and e-mail -------------------------------------------------------
@@ -58,26 +81,26 @@ function nameSchema(label: { empty: string; required: string; tooShort: string; 
 }
 
 const guestNameSchema = nameSchema({
-  required: "Name ist erforderlich.",
-  empty: "Name darf nicht leer sein.",
-  tooShort: `Name muss mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
-  tooLong: `Name darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
+  required: msg("nameRequired"),
+  empty: msg("nameEmpty"),
+  tooShort: msg("nameTooShort", { min: NAME_MIN_LENGTH }),
+  tooLong: msg("nameTooLong", { max: NAME_MAX_LENGTH }),
 });
 
 const additionalGuestNameSchema = nameSchema({
-  required: "Namen der zusätzlichen Personen sind ungültig.",
-  empty: "Namen der zusätzlichen Personen dürfen nicht leer sein.",
-  tooShort: `Namen der zusätzlichen Personen müssen mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
-  tooLong: `Namen der zusätzlichen Personen dürfen höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
+  required: msg("companionNamesInvalid"),
+  empty: msg("companionNameEmpty"),
+  tooShort: msg("companionNameTooShort", { min: NAME_MIN_LENGTH }),
+  tooLong: msg("companionNameTooLong", { max: NAME_MAX_LENGTH }),
 });
 
 // Display name (registration form, "Mein Konto", ConsentDialog): same length
 // rules as a guest name.
 export const personNameSchema = nameSchema({
-  required: "Bitte gib einen Anzeigenamen ein.",
-  empty: "Bitte gib einen Anzeigenamen ein.",
-  tooShort: `Der Anzeigename muss mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
-  tooLong: `Der Anzeigename darf höchstens ${NAME_MAX_LENGTH} Zeichen lang sein.`,
+  required: msg("displayNameRequired"),
+  empty: msg("displayNameRequired"),
+  tooShort: msg("displayNameTooShort", { min: NAME_MIN_LENGTH }),
+  tooLong: msg("displayNameTooLong", { max: NAME_MAX_LENGTH }),
 });
 
 export function validatePersonName(value: unknown): FieldResult<string> {
@@ -85,9 +108,9 @@ export function validatePersonName(value: unknown): FieldResult<string> {
 }
 
 export const emailSchema = z
-  .string({ error: "E-Mail ist erforderlich." })
+  .string({ error: msg("emailRequired") })
   .trim()
-  .min(1, "E-Mail ist erforderlich.")
+  .min(1, msg("emailRequired"))
   .regex(EMAIL_PATTERN, INVALID_EMAIL);
 
 export function validateEmail(value: unknown): FieldResult<string> {
@@ -115,10 +138,10 @@ export type GuestInput = {
   declined: boolean;
 };
 
-export type ValidationResult = { ok: true; data: GuestInput } | { ok: false; error: string };
+export type ValidationResult = { ok: true; data: GuestInput } | { ok: false; error: ErrorMessage };
 
-const ADDITIONAL_NOT_A_NUMBER = "Zusätzliche Personen müssen eine Zahl sein.";
-const ADDITIONAL_NOT_WHOLE = "Zusätzliche Personen müssen eine ganze Zahl ab 0 sein.";
+const ADDITIONAL_NOT_A_NUMBER = msg("companionsNotANumber");
+const ADDITIONAL_NOT_WHOLE = msg("companionsNotWhole");
 
 // The form sends the count as a string, API clients may send a number.
 const additionalGuestsSchema = z
@@ -131,7 +154,7 @@ const additionalGuestsSchema = z
       .number({ error: ADDITIONAL_NOT_WHOLE })
       .int(ADDITIONAL_NOT_WHOLE)
       .min(0, ADDITIONAL_NOT_WHOLE)
-      .max(MAX_ADDITIONAL_GUESTS, `Zusätzliche Personen dürfen höchstens ${MAX_ADDITIONAL_GUESTS} sein.`),
+      .max(MAX_ADDITIONAL_GUESTS, msg("companionsTooMany", { max: MAX_ADDITIONAL_GUESTS })),
   );
 
 // Optional time: missing or empty means "not given". In a "von – bis"
@@ -145,29 +168,29 @@ function optionalTimeSchema(formatError: string) {
 }
 
 // The arrival is optional: guests who don't know it yet leave it empty.
-const arrivalTimeSchema = optionalTimeSchema("Ankunftszeit muss im Format HH:mm angegeben werden.");
-const arrivalEndTimeSchema = optionalTimeSchema("Das Ende der Ankunftszeit muss im Format HH:mm angegeben werden.");
-const DEPARTURE_FORMAT_ERROR = "„Ich bleibe bis“ muss im Format HH:mm angegeben werden.";
+const arrivalTimeSchema = optionalTimeSchema(msg("arrivalFormat"));
+const arrivalEndTimeSchema = optionalTimeSchema(msg("arrivalEndFormat"));
+const DEPARTURE_FORMAT_ERROR = msg("departureFormat");
 const departureTimeSchema = optionalTimeSchema(DEPARTURE_FORMAT_ERROR);
 
 const bringingDescriptionSchema = z
-  .string({ error: "Bitte gib an, was du mitbringst." })
+  .string({ error: msg("bringingRequired") })
   .trim()
-  .min(1, "Bitte gib an, was du mitbringst.")
-  .max(BRINGING_DESCRIPTION_MAX_LENGTH, `Die Angabe darf höchstens ${BRINGING_DESCRIPTION_MAX_LENGTH} Zeichen lang sein.`);
+  .min(1, msg("bringingRequired"))
+  .max(BRINGING_DESCRIPTION_MAX_LENGTH, msg("detailTooLong", { max: BRINGING_DESCRIPTION_MAX_LENGTH }));
 
 const messageSchema = z
-  .string({ error: "Bitte gib eine Nachricht ein." })
+  .string({ error: msg("messageRequired") })
   .trim()
-  .min(1, "Bitte gib eine Nachricht ein.")
-  .max(MESSAGE_MAX_LENGTH, `Die Nachricht darf höchstens ${MESSAGE_MAX_LENGTH} Zeichen lang sein.`);
+  .min(1, msg("messageRequired"))
+  .max(MESSAGE_MAX_LENGTH, msg("messageTooLong", { max: MESSAGE_MAX_LENGTH }));
 
 const guestBaseSchema = z.object(
   {
     name: guestNameSchema,
     additionalGuests: additionalGuestsSchema,
     additionalGuestNames: z.array(additionalGuestNameSchema, {
-      error: "Namen der zusätzlichen Personen sind ungültig.",
+      error: msg("companionNamesInvalid"),
     }),
     // Checked below: "Weiß ich noch nicht" greys them out and saves none.
     arrivalTime: z.unknown().optional(),
@@ -184,7 +207,7 @@ const guestBaseSchema = z.object(
     hasMessage: z.unknown().transform((value) => value === true),
     message: z.unknown(),
   },
-  { error: "Ungültige Anfragedaten." },
+  { error: msg("invalidRequest") },
 );
 
 // Text that is only required when its checkbox is ticked; null otherwise.
@@ -197,7 +220,7 @@ function optionalText(
   if (!enabled) return null;
   const result = schema.safeParse(value);
   if (!result.success) {
-    ctx.addIssue({ code: "custom", message: firstError(result.error) });
+    ctx.addIssue({ code: "custom", message: JSON.stringify(firstError(result.error)) });
     return z.NEVER;
   }
   return result.data;
@@ -207,7 +230,7 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
   if (guest.additionalGuestNames.length !== guest.additionalGuests) {
     ctx.addIssue({
       code: "custom",
-      message: "Anzahl der Namen muss der Anzahl zusätzlicher Personen entsprechen.",
+      message: msg("companionCountMismatch"),
     });
     return z.NEVER;
   }
@@ -217,32 +240,32 @@ export const guestInputSchema = guestBaseSchema.transform((guest, ctx): GuestInp
   if (!guest.arrivalUnknown) {
     const start = arrivalTimeSchema.safeParse(guest.arrivalTime);
     if (!start.success) {
-      ctx.addIssue({ code: "custom", message: firstError(start.error) });
+      ctx.addIssue({ code: "custom", message: JSON.stringify(firstError(start.error)) });
       return z.NEVER;
     }
     const end = arrivalEndTimeSchema.safeParse(guest.arrivalEndTime);
     if (!end.success) {
-      ctx.addIssue({ code: "custom", message: firstError(end.error) });
+      ctx.addIssue({ code: "custom", message: JSON.stringify(firstError(end.error)) });
       return z.NEVER;
     }
     arrivalTime = start.data;
     arrivalEndTime = end.data;
     if (arrivalEndTime && !arrivalTime) {
-      ctx.addIssue({ code: "custom", message: "Bitte gib bei der Ankunftszeit zuerst die „von“-Zeit an." });
+      ctx.addIssue({ code: "custom", message: msg("arrivalStartFirst") });
       return z.NEVER;
     }
     if (arrivalEndTime && arrivalEndTime === arrivalTime) {
-      ctx.addIssue({ code: "custom", message: "Das Ende der Ankunftszeit darf nicht gleich dem Beginn sein." });
+      ctx.addIssue({ code: "custom", message: msg("arrivalSameTimes") });
       return z.NEVER;
     }
   }
 
   if (guest.departureEndTime && !guest.departureTime) {
-    ctx.addIssue({ code: "custom", message: "Bitte gib bei „Ich bleibe bis“ zuerst die „von“-Zeit an." });
+    ctx.addIssue({ code: "custom", message: msg("departureStartFirst") });
     return z.NEVER;
   }
   if (guest.departureEndTime && guest.departureEndTime === guest.departureTime) {
-    ctx.addIssue({ code: "custom", message: "Bei „Ich bleibe bis“ dürfen „von“ und „bis“ nicht gleich sein." });
+    ctx.addIssue({ code: "custom", message: msg("departureSameTimes") });
     return z.NEVER;
   }
 
@@ -283,7 +306,7 @@ export const declinedGuestSchema = z
       hasMessage: z.unknown().transform((value) => value === true),
       message: z.unknown(),
     },
-    { error: "Ungültige Anfragedaten." },
+    { error: msg("invalidRequest") },
   )
   .transform((guest, ctx): GuestInput => {
     const message = optionalText(guest.hasMessage, guest.message, messageSchema, ctx);
@@ -324,10 +347,10 @@ export const EVENT_PASSWORD_MAX_LENGTH = 100;
 // Deliberately soft: a shared password the owner sends around with the
 // invitation link, not an account password (see lib/password.ts).
 const eventPasswordSchema = z
-  .string({ error: "Bitte gib ein Passwort ein." })
+  .string({ error: msg("eventPasswordRequired") })
   .trim()
-  .min(EVENT_PASSWORD_MIN_LENGTH, `Das Passwort muss mindestens ${EVENT_PASSWORD_MIN_LENGTH} Zeichen lang sein.`)
-  .max(EVENT_PASSWORD_MAX_LENGTH, `Das Passwort darf höchstens ${EVENT_PASSWORD_MAX_LENGTH} Zeichen lang sein.`);
+  .min(EVENT_PASSWORD_MIN_LENGTH, msg("eventPasswordTooShort", { min: EVENT_PASSWORD_MIN_LENGTH }))
+  .max(EVENT_PASSWORD_MAX_LENGTH, msg("eventPasswordTooLong", { max: EVENT_PASSWORD_MAX_LENGTH }));
 
 // Saving an event: null switches the protection off.
 export function validateAccessPassword(value: unknown): FieldResult<string | null> {
@@ -339,7 +362,7 @@ export function validateEventPasswordPair(password: string, repeat: string): Fie
   const result = toFieldResult(eventPasswordSchema.safeParse(password));
   if (!result.ok) return result;
   if (result.value !== repeat.trim()) {
-    return { ok: false, error: "Die Passwörter stimmen nicht überein." };
+    return { ok: false, error: err("passwordsDontMatch") };
   }
   return result;
 }
@@ -367,7 +390,7 @@ export type PasswordRequestInput = {
   message: string | null;
 };
 
-const INVALID_PHONE = "Bitte gib eine gültige Telefonnummer ein.";
+const INVALID_PHONE = msg("phoneInvalid");
 
 // Loose on purpose: digits plus the usual separators, 6-20 digits.
 const phoneSchema = z
@@ -380,17 +403,17 @@ const phoneSchema = z
   }, INVALID_PHONE);
 
 const channelOtherSchema = z
-  .string({ error: "Bitte gib an, wie du das Passwort bekommen möchtest." })
+  .string({ error: msg("passwordWayRequired") })
   .trim()
-  .min(1, "Bitte gib an, wie du das Passwort bekommen möchtest.")
-  .max(PASSWORD_REQUEST_OTHER_MAX_LENGTH, `Die Angabe darf höchstens ${PASSWORD_REQUEST_OTHER_MAX_LENGTH} Zeichen lang sein.`);
+  .min(1, msg("passwordWayRequired"))
+  .max(PASSWORD_REQUEST_OTHER_MAX_LENGTH, msg("detailTooLong", { max: PASSWORD_REQUEST_OTHER_MAX_LENGTH }));
 
 const requestMessageSchema = z.preprocess(
   (value) => (value === undefined || value === null || (typeof value === "string" && value.trim() === "") ? null : value),
   z
-    .string({ error: "Die Nachricht ist ungültig." })
+    .string({ error: msg("messageInvalid") })
     .trim()
-    .max(PASSWORD_REQUEST_MESSAGE_MAX_LENGTH, `Die Nachricht darf höchstens ${PASSWORD_REQUEST_MESSAGE_MAX_LENGTH} Zeichen lang sein.`)
+    .max(PASSWORD_REQUEST_MESSAGE_MAX_LENGTH, msg("messageTooLong", { max: PASSWORD_REQUEST_MESSAGE_MAX_LENGTH }))
     .nullable(),
 );
 
@@ -411,7 +434,7 @@ export const passwordRequestSchema = z
       channelOther: z.unknown().optional(),
       message: requestMessageSchema,
     },
-    { error: "Ungültige Anfragedaten." },
+    { error: msg("invalidRequest") },
   )
   .transform((request, ctx): PasswordRequestInput => {
     const fail = (message: string) => {
@@ -422,24 +445,24 @@ export const passwordRequestSchema = z
     let contact: PasswordRequestContact;
     if (request.contactKind === "email") {
       const email = emailSchema.safeParse(request.email);
-      if (!email.success) return fail(firstError(email.error));
+      if (!email.success) return fail(JSON.stringify(firstError(email.error)));
       contact = { kind: "email", email: email.data };
     } else if (request.contactKind === "phone") {
       const phone = phoneSchema.safeParse(request.phone);
-      if (!phone.success) return fail(firstError(phone.error));
+      if (!phone.success) return fail(JSON.stringify(firstError(phone.error)));
       const channel = request.channel;
       if (!isPhoneChannel(channel)) {
-        return fail("Bitte wähle, wie du das Passwort per Telefon bekommen möchtest.");
+        return fail(msg("phoneChannelRequired"));
       }
       let channelOther: string | null = null;
       if (channel === "other") {
         const other = channelOtherSchema.safeParse(request.channelOther);
-        if (!other.success) return fail(firstError(other.error));
+        if (!other.success) return fail(JSON.stringify(firstError(other.error)));
         channelOther = other.data;
       }
       contact = { kind: "phone", phone: phone.data, channel, channelOther };
     } else {
-      return fail("Bitte wähle, wie du das Passwort bekommen möchtest.");
+      return fail(msg("contactKindRequired"));
     }
 
     return { name: request.name, contact, message: request.message };
@@ -459,16 +482,16 @@ export const EVENT_GREETING_MAX_LENGTH = 1000;
 // rather than for a whole-event object - an empty value is always valid
 // (that's the "not filled in yet" placeholder state).
 export const EVENT_FIELDS = {
-  kicker: { label: "Überschrift", maxLength: EVENT_TEXT_MAX_LENGTH },
-  title: { label: "Titel", maxLength: EVENT_TEXT_MAX_LENGTH },
-  greeting: { label: "Begrüßungstext", maxLength: EVENT_GREETING_MAX_LENGTH },
-  dateLabel: { label: "Datum", maxLength: EVENT_TEXT_MAX_LENGTH },
-  timeLabel: { label: "Uhrzeit", maxLength: EVENT_TEXT_MAX_LENGTH },
-  locationLabel: { label: "Ort", maxLength: EVENT_TEXT_MAX_LENGTH },
-  contactName: { label: "Kontaktname", maxLength: EVENT_TEXT_MAX_LENGTH, kind: "personName" },
-  contactPhone: { label: "Telefonnummer", maxLength: EVENT_TEXT_MAX_LENGTH },
-  contactEmail: { label: "E-Mail", maxLength: EVENT_TEXT_MAX_LENGTH, kind: "email" },
-} as const satisfies Record<string, { label: string; maxLength: number; kind?: "personName" | "email" }>;
+  kicker: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  title: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  greeting: { maxLength: EVENT_GREETING_MAX_LENGTH },
+  dateLabel: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  timeLabel: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  locationLabel: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  contactName: { maxLength: EVENT_TEXT_MAX_LENGTH, kind: "personName" },
+  contactPhone: { maxLength: EVENT_TEXT_MAX_LENGTH },
+  contactEmail: { maxLength: EVENT_TEXT_MAX_LENGTH, kind: "email" },
+} as const satisfies Record<string, { maxLength: number; kind?: "personName" | "email" }>;
 
 export type EventFieldKey = keyof typeof EVENT_FIELDS;
 
@@ -479,11 +502,11 @@ export function isEventFieldKey(key: string): key is EventFieldKey {
 export type EventFieldValidationResult = FieldResult<string>;
 
 function eventFieldSchema(key: EventFieldKey) {
-  const field: { label: string; maxLength: number; kind?: "personName" | "email" } = EVENT_FIELDS[key];
+  const field: { maxLength: number; kind?: "personName" | "email" } = EVENT_FIELDS[key];
   const base = z
-    .string({ error: `${field.label} ist ungültig.` })
+    .string({ error: msg("fieldInvalid", { field: key }) })
     .trim()
-    .max(field.maxLength, `${field.label} darf höchstens ${field.maxLength} Zeichen lang sein.`);
+    .max(field.maxLength, msg("fieldTooLong", { field: key, max: field.maxLength }));
 
   if (field.kind === "email") {
     return base.refine((value) => value === "" || EMAIL_PATTERN.test(value), INVALID_EMAIL);
@@ -491,7 +514,7 @@ function eventFieldSchema(key: EventFieldKey) {
   if (field.kind === "personName") {
     return base.refine(
       (value) => value === "" || value.length >= NAME_MIN_LENGTH,
-      `${field.label} muss mindestens ${NAME_MIN_LENGTH} Zeichen lang sein.`,
+      msg("fieldTooShort", { field: key, min: NAME_MIN_LENGTH }),
     );
   }
   return base;
@@ -503,10 +526,10 @@ export function validateEventField(key: EventFieldKey, rawValue: unknown): Event
 
 // Creating an event: unlike the inline title field, a name is required.
 export const newEventTitleSchema = z
-  .string({ error: "Bitte gib einen Namen für dein Event ein." })
+  .string({ error: msg("eventNameRequired") })
   .trim()
-  .min(1, "Bitte gib einen Namen für dein Event ein.")
-  .max(EVENT_TEXT_MAX_LENGTH, `Name darf höchstens ${EVENT_TEXT_MAX_LENGTH} Zeichen lang sein.`);
+  .min(1, msg("eventNameRequired"))
+  .max(EVENT_TEXT_MAX_LENGTH, msg("nameTooLong", { max: EVENT_TEXT_MAX_LENGTH }));
 
 export function validateNewEventTitle(value: unknown): FieldResult<string> {
   return toFieldResult(newEventTitleSchema.safeParse(value));
@@ -514,8 +537,15 @@ export function validateNewEventTitle(value: unknown): FieldResult<string> {
 
 // Guest list display of a "von – bis" window (arrival, departure):
 // "zw. 09:30 und 10:30" with an end, "09:30" without.
-export function formatTimeWindow(start: string, end: string | null): string {
-  return end ? `zw. ${start} und ${end}` : start;
+const TIME_WINDOW: Record<Locale, (start: string, end: string) => string> = {
+  de: (start, end) => `zw. ${start} und ${end}`,
+  en: (start, end) => `between ${start} and ${end}`,
+  ru: (start, end) => `с ${start} до ${end}`,
+};
+
+export function formatTimeWindow(start: string, end: string | null, locale: Locale): string {
+  if (!end) return start;
+  return TIME_WINDOW[locale](start, end);
 }
 
 export function normalizeArrivalTime(value: string): string {
@@ -546,13 +576,13 @@ function nullableInput<T extends z.ZodType>(schema: T) {
 
 export const eventDateSchema = nullableInput(
   z
-    .string({ error: "Datum ist ungültig." })
-    .regex(EVENT_DATE_PATTERN, "Datum ist ungültig.")
-    .refine(isRealDate, "Datum ist ungültig."),
+    .string({ error: msg("fieldInvalid", { field: "dateLabel" }) })
+    .regex(EVENT_DATE_PATTERN, msg("fieldInvalid", { field: "dateLabel" }))
+    .refine(isRealDate, msg("fieldInvalid", { field: "dateLabel" })),
 );
 
 export const eventTimeSchema = nullableInput(
-  z.string({ error: "Uhrzeit ist ungültig." }).regex(ARRIVAL_TIME_PATTERN, "Uhrzeit ist ungültig."),
+  z.string({ error: msg("fieldInvalid", { field: "timeLabel" }) }).regex(ARRIVAL_TIME_PATTERN, msg("fieldInvalid", { field: "timeLabel" })),
 );
 
 export function validateEventDate(rawValue: unknown): NullableFieldValidationResult {
@@ -587,19 +617,19 @@ export const eventScheduleSchema = z
     const eventEndDate = schedule.eventEndDate === eventDate ? null : schedule.eventEndDate;
 
     if (eventEndDate && !eventDate) {
-      ctx.addIssue({ code: "custom", message: "Bitte zuerst ein Startdatum wählen." });
+      ctx.addIssue({ code: "custom", message: msg("startDateFirst") });
       return z.NEVER;
     }
     if (eventEndDate && eventDate && eventEndDate < eventDate) {
-      ctx.addIssue({ code: "custom", message: "Das Enddatum darf nicht vor dem Startdatum liegen." });
+      ctx.addIssue({ code: "custom", message: msg("endDateBeforeStart") });
       return z.NEVER;
     }
     if (eventEndTime && !eventStartTime) {
-      ctx.addIssue({ code: "custom", message: "Bitte zuerst eine Startzeit wählen." });
+      ctx.addIssue({ code: "custom", message: msg("startTimeFirst") });
       return z.NEVER;
     }
     if (eventEndTime && eventStartTime && !eventEndDate && eventEndTime <= eventStartTime) {
-      ctx.addIssue({ code: "custom", message: "Die Endzeit muss nach der Startzeit liegen." });
+      ctx.addIssue({ code: "custom", message: msg("endTimeBeforeStart") });
       return z.NEVER;
     }
 
@@ -612,8 +642,8 @@ export function validateEventSchedule(schedule: EventSchedule): FieldResult<Even
 
 // --- Date poll (Terminabstimmung) ------------------------------------------------------
 
-const PROPOSAL_DATE_ERROR = "Bitte gib für jeden Termin ein gültiges Datum an.";
-const END_WITHOUT_START_ERROR = "Bitte gib bei einem Termin mit „bis“ auch „von“ an.";
+const PROPOSAL_DATE_ERROR = msg("proposalDateInvalid");
+const END_WITHOUT_START_ERROR = err("proposalEndWithoutStart");
 
 const proposalSchema = z.object(
   {
@@ -622,10 +652,10 @@ const proposalSchema = z.object(
       .regex(EVENT_DATE_PATTERN, PROPOSAL_DATE_ERROR)
       .refine(isRealDate, PROPOSAL_DATE_ERROR),
     // The time is optional - a proposal may be just a day.
-    startTime: optionalTimeSchema("Die Startzeit eines Termins muss im Format HH:mm angegeben werden.").optional(),
-    endTime: optionalTimeSchema("Die Endzeit eines Termins muss im Format HH:mm angegeben werden.").optional(),
+    startTime: optionalTimeSchema(msg("proposalStartFormat")).optional(),
+    endTime: optionalTimeSchema(msg("proposalEndFormat")).optional(),
   },
-  { error: "Ungültiger Terminvorschlag." },
+  { error: msg("proposalInvalid") },
 );
 
 function parseProposal(raw: unknown): FieldResult<Proposal> {
@@ -647,15 +677,15 @@ export function validateProposals(
   raw: unknown,
   options: { today: string; min: number; max: number; existing?: Proposal[] },
 ): FieldResult<Proposal[]> {
-  if (!Array.isArray(raw)) return { ok: false, error: "Ungültige Terminvorschläge." };
+  if (!Array.isArray(raw)) return { ok: false, error: err("proposalsInvalid") };
   if (raw.length < options.min) {
     return {
       ok: false,
-      error: options.min === 1 ? "Bitte gib einen Termin an." : `Bitte gib mindestens ${options.min} Termine an.`,
+      error: err("proposalsTooFew", { min: options.min }),
     };
   }
   if (raw.length > options.max) {
-    return { ok: false, error: "Es sind höchstens 4 Termine möglich." };
+    return { ok: false, error: err("proposalsTooMany", { max: options.max }) };
   }
 
   const proposals: Proposal[] = [];
@@ -664,14 +694,14 @@ export function validateProposals(
     if (!result.ok) return result;
     const proposal = result.value;
     if (proposal.date < options.today) {
-      return { ok: false, error: "Ein Termin liegt in der Vergangenheit." };
+      return { ok: false, error: err("proposalInPast") };
     }
     if (proposal.startTime && proposal.endTime === proposal.startTime) {
-      return { ok: false, error: "Bei einem Termin dürfen „von“ und „bis“ nicht gleich sein." };
+      return { ok: false, error: err("proposalSameTimes") };
     }
     const taken = [...(options.existing ?? []), ...proposals];
     if (taken.some((other) => other.date === proposal.date && other.startTime === proposal.startTime)) {
-      return { ok: false, error: "Zwei Termine haben dasselbe Datum und dieselbe Startzeit." };
+      return { ok: false, error: err("proposalDuplicate") };
     }
     proposals.push(proposal);
   }
@@ -683,15 +713,15 @@ export function validateProposals(
 // end date equal to the start date means a single day). Neither day may lie
 // before `today`; with `latest` (the plan's window) neither may lie after it -
 // the service checks the window itself, the form may pass it too.
-export const DATE_IN_PAST_ERROR = "Das Datum liegt in der Vergangenheit.";
+export const DATE_IN_PAST_ERROR = err("dateInPast");
 
 export function validateFixedDate(
   raw: unknown,
-  options: { today: string; latest?: string; latestError?: string },
+  options: { today: string; latest?: string; latestError?: ErrorMessage },
 ): FieldResult<{ proposal: Proposal; endDate: string | null; schedule: EventSchedule }> {
   const value = (raw ?? {}) as { date?: unknown; endDate?: unknown; startTime?: unknown; endTime?: unknown };
   if (typeof value.date !== "string" || value.date.trim() === "") {
-    return { ok: false, error: "Bitte gib ein Datum ein." };
+    return { ok: false, error: err("dateRequired") };
   }
   const result = parseProposal({ date: value.date, startTime: value.startTime, endTime: value.endTime });
   if (!result.ok) return result;
@@ -700,7 +730,7 @@ export function validateFixedDate(
   let endDate: string | null = null;
   if (typeof value.endDate === "string" && value.endDate.trim() !== "" && value.endDate !== proposal.date) {
     if (!EVENT_DATE_PATTERN.test(value.endDate) || !isRealDate(value.endDate)) {
-      return { ok: false, error: "Das Enddatum ist ungültig." };
+      return { ok: false, error: err("endDateInvalid") };
     }
     endDate = value.endDate;
   }
@@ -708,11 +738,11 @@ export function validateFixedDate(
   const days = endDate ? [proposal.date, endDate] : [proposal.date];
   if (days.some((day) => day < options.today)) return { ok: false, error: DATE_IN_PAST_ERROR };
   if (options.latest !== undefined && days.some((day) => day > options.latest!)) {
-    return { ok: false, error: options.latestError ?? "Das Datum liegt zu weit in der Zukunft." };
+    return { ok: false, error: options.latestError ?? err("dateTooFar") };
   }
 
   if (!endDate && proposal.startTime && proposal.endTime === proposal.startTime) {
-    return { ok: false, error: "Die Endzeit muss nach der Startzeit liegen." };
+    return { ok: false, error: err("endTimeBeforeStart") };
   }
   const schedule = validateEventSchedule(
     endDate
@@ -727,13 +757,13 @@ export type PollVoteInput = { name: string; optionIds: string[]; noneFit: boolea
 const pollVoteSchema = z.object(
   {
     name: guestNameSchema,
-    optionIds: z.array(z.string(), { error: "Ungültige Terminauswahl." }).optional(),
+    optionIds: z.array(z.string(), { error: msg("voteSelectionInvalid") }).optional(),
     noneFit: z
       .unknown()
       .optional()
       .transform((value) => value === true),
   },
-  { error: "Ungültige Anfragedaten." },
+  { error: msg("invalidRequest") },
 );
 
 export function validatePollVote(body: unknown, allowedOptionIds: string[]): FieldResult<PollVoteInput> {
@@ -741,20 +771,20 @@ export function validatePollVote(body: unknown, allowedOptionIds: string[]): Fie
   if (!result.success) return { ok: false, error: firstError(result.error) };
   const optionIds = [...new Set(result.data.optionIds ?? [])];
   if (optionIds.some((id) => !allowedOptionIds.includes(id))) {
-    return { ok: false, error: "Ungültige Terminauswahl." };
+    return { ok: false, error: err("voteSelectionInvalid") };
   }
   if (result.data.noneFit && optionIds.length > 0) {
-    return { ok: false, error: "„Nichts davon passt“ kann nicht zusammen mit einem Termin gewählt werden." };
+    return { ok: false, error: err("voteNoneWithDate") };
   }
   if (!result.data.noneFit && optionIds.length === 0) {
-    return { ok: false, error: "Bitte wähle mindestens einen Termin oder „Nichts davon passt“." };
+    return { ok: false, error: err("voteEmpty") };
   }
   return { ok: true, value: { name: result.data.name, optionIds, noneFit: result.data.noneFit } };
 }
 
 // --- Seat limit ("Teilnehmerzahl begrenzen") ---------------------------------------
 
-const MAX_GUESTS_ERROR = `Die Teilnehmerzahl muss eine ganze Zahl zwischen 1 und ${MAX_GUEST_CAPACITY} sein.`;
+const MAX_GUESTS_ERROR = err("maxGuestsInvalid", { max: MAX_GUEST_CAPACITY });
 
 // null = no limit. The settings form sends the number as a string.
 export function validateMaxGuests(value: unknown): FieldResult<number | null> {

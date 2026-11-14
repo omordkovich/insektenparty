@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import type { GuestDto } from "@/lib/types";
 import { formatTimeWindow } from "@/lib/validation";
 import { Modal } from "./Modal";
@@ -9,21 +10,23 @@ type TimeDetailsDialogProps = {
 };
 
 export function TimeDetailsDialog({ guest, onCloseAction }: TimeDetailsDialogProps) {
+  const locale = useLocale();
+  const t = useTranslations("guest");
   const titleId = useId();
 
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        Zeiten von {guest.name}
+        {t("timesOf", { name: guest.name })}
       </h2>
 
       <dl className="mt-4 space-y-3">
-        <TimeRow icon={<DoorInIcon />} label="Ankunftszeit">
-          {guest.arrivalTime ? formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime) : "noch offen"}
+        <TimeRow icon={<DoorInIcon />} label={t("arrivalTime")}>
+          {guest.arrivalTime ? formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime, locale) : t("nochOffen")}
         </TimeRow>
         {guest.departureTime ? (
-          <TimeRow icon={<DoorOutIcon />} label="Bleibt bis">
-            {formatTimeWindow(guest.departureTime, guest.departureEndTime)}
+          <TimeRow icon={<DoorOutIcon />} label={t("bleibtBis")}>
+            {formatTimeWindow(guest.departureTime, guest.departureEndTime, locale)}
           </TimeRow>
         ) : null}
       </dl>

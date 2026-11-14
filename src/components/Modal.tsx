@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { ReactNode, RefObject } from "react";
 import { useModalBehavior } from "./useModalBehavior";
 
@@ -28,6 +29,7 @@ export function Modal({
   placement = "default",
   children,
 }: ModalProps) {
+  const tCommon = useTranslations("common");
   const internalCloseRef = useModalBehavior({ onCloseAction, closeDisabled, initialFocusRef });
   const alignClass =
     placement === "bottom"
@@ -42,7 +44,7 @@ export function Modal({
       <button
         type="button"
         className="absolute inset-0 bg-black/55"
-        aria-label="Dialog schließen"
+        aria-label={tCommon("closeDialog")}
         onClick={() => !closeDisabled && onCloseAction()}
       />
       <div
@@ -61,7 +63,7 @@ export function Modal({
               type="button"
               onClick={onCloseAction}
               disabled={closeDisabled}
-              aria-label="Schließen"
+              aria-label={tCommon("close")}
               className="absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full text-leaf-dark transition hover:bg-leaf/10 disabled:opacity-50"
             >
               <CloseIcon />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { capacityLabel, occupiedSeats, seatsOf } from "@/lib/guest-capacity";
@@ -37,7 +38,8 @@ async function fetchGuests(apiBasePath: string): Promise<GuestDto[]> {
       | { error?: string }
       | null;
     throw new Error(
-      payload?.error ?? "Die Gästeliste konnte nicht geladen werden.",
+      // Empty: the caller shows its own (translated) message.
+      payload?.error ?? "",
     );
   }
   return (await response.json()) as GuestDto[];
@@ -75,6 +77,8 @@ export function GuestSection({
   maxGuests = null,
   readOnly = false,
 }: GuestSectionProps) {
+  const locale = useLocale();
+  const t = useTranslations("guest");
   const [startedWithGuests] = useState(initialGuests !== undefined);
   const [guests, setGuests] = useState<GuestDto[]>(initialGuests ?? []);
   // Seats taken right now - for the "Noch 4 von 12 Plätzen frei" line and
@@ -102,14 +106,14 @@ export function GuestSection({
     } catch (err) {
       setGuests([]);
       setError(
-        err instanceof Error
+        err instanceof Error && err.message
           ? err.message
-          : "Die Gästeliste konnte nicht geladen werden.",
+          : t("dieGastelisteKonnteNicht"),
       );
     } finally {
       setLoading(false);
     }
-  }, [apiBasePath]);
+  }, [apiBasePath, t]);
 
   useEffect(() => {
     // Already rendered by the server; the poll below keeps it fresh.
@@ -127,9 +131,9 @@ export function GuestSection({
         if (cancelled) return;
         setGuests([]);
         setError(
-          err instanceof Error
+          err instanceof Error && err.message
             ? err.message
-            : "Die Gästeliste konnte nicht geladen werden.",
+            : t("dieGastelisteKonnteNicht"),
         );
       })
       .finally(() => {
@@ -139,7 +143,7 @@ export function GuestSection({
     return () => {
       cancelled = true;
     };
-  }, [apiBasePath, startedWithGuests]);
+  }, [apiBasePath, startedWithGuests, t]);
 
   // Background poll: silently re-fetches and swaps in the new list, without
   // touching the loading/error state, so a visitor who left the tab open
@@ -223,7 +227,7 @@ export function GuestSection({
         onShowMessage={setMessageGuest}
         onShowTime={setTimeGuest}
         onShowDeclined={setDeclinedGuest}
-        capacityText={maxGuests !== null && !loading && !readOnly ? capacityLabel(maxGuests, occupied) : null}
+        capacityText={maxGuests !== null && !loading && !readOnly ? capacityLabel(maxGuests, occupied, locale) : null}
         readOnly={readOnly}
       />
 

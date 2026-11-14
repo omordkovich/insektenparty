@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import { checkGuestCapacity } from "@/lib/guest-capacity";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import type { GuestDto } from "@/lib/types";
@@ -17,9 +18,9 @@ import { notifyOwnerOfGuestChange } from "@/services/notification-service";
 
 export type GuestServiceResult<T> =
   | { ok: true; data: T }
-  | { ok: false; status: number; error: string };
+  | { ok: false; status: number; error: ErrorMessage };
 
-export const DATE_NOT_FIXED_ERROR = "Der Termin steht noch nicht fest.";
+export const DATE_NOT_FIXED_ERROR = err("dateNotFixed");
 
 // Seat limit and entry cap, checked while the event row is locked (see
 // guest-repository). They apply to the owner too.
@@ -72,7 +73,7 @@ export async function createGuestForEvent(
 ): Promise<GuestServiceResult<GuestDto>> {
   const ownerId = await getEventOwnerId(eventId);
   if (ownerId === undefined) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("eventNotFound") };
   }
   const over = await denyIfOver(eventId);
   if (over) return over;
@@ -99,7 +100,7 @@ export async function createGuestForEvent(
   if (!result.ok) {
     return result.reason === "refused"
       ? { ok: false, status: 409, error: result.error }
-      : { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+      : { ok: false, status: 404, error: err("eventNotFound") };
   }
   const created = result.row;
 
@@ -144,7 +145,7 @@ export async function updateGuestForEvent(
   if (!result.ok) {
     return result.reason === "refused"
       ? { ok: false, status: 409, error: result.error }
-      : { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
+      : { ok: false, status: 404, error: err("guestNotFound") };
   }
   const updated = result.row;
 
@@ -175,7 +176,7 @@ export async function deleteGuestForEvent(
 
   const deleted = await deleteGuest(eventId, guestId);
   if (!deleted) {
-    return { ok: false, status: 404, error: "Gast wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("guestNotFound") };
   }
 
   if (!isOwnerRequest) {

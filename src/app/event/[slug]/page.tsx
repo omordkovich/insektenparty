@@ -1,4 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
+import { eventLocale } from "@/i18n/request-locale";
 import { DatePollSection } from "@/components/DatePollSection";
 import { DateUnknownNotice } from "@/components/DateUnknownNotice";
 import { EventExpiredPage } from "@/components/EventExpiredPage";
@@ -9,7 +11,7 @@ import { GuestSection } from "@/components/GuestSection";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ParallaxSideGraphics } from "@/components/ParallaxSideGraphics";
-import { formatDateLabel, formatDateRangeLabel, formatDottedDate } from "@/lib/calendar";
+import { formatDateLabel, formatDateRangeLabel, formatDottedDate, formatTimeLabel } from "@/lib/calendar";
 import { countYes, isDateMode, todayInBerlin } from "@/lib/date-poll";
 import type { DateSettings } from "@/lib/date-poll-form";
 import type { EventConfig } from "@/lib/event-config";
@@ -44,6 +46,9 @@ export default async function EventPage({ params }: EventPageProps) {
   if (event.slug !== slug) {
     permanentRedirect(`/event/${event.slug}`);
   }
+  // The event page always speaks the event's language (see layout.tsx).
+  const locale = eventLocale(event);
+  setRequestLocale(locale);
 
   const { isOwner, hasAccess } = await getViewerAccess(event);
   const lifecycle = await getEventLifecycle(event.id);
@@ -97,8 +102,10 @@ export default async function EventPage({ params }: EventPageProps) {
     kicker: event.kicker,
     title: event.title,
     greeting: event.greeting,
-    dateLabel: event.dateLabel,
-    timeLabel: event.timeLabel,
+    // Derived from the schedule in the event's language (the stored labels
+    // are German); events without a date keep what is stored.
+    dateLabel: event.eventDate ? formatDateRangeLabel(event.eventDate, event.eventEndDate, locale) : event.dateLabel,
+    timeLabel: event.eventDate ? formatTimeLabel(eventStartTime, eventEndTime, locale) : event.timeLabel,
     locationLabel: event.locationLabel,
     defaultArrivalTime: event.defaultArrivalTime,
     dateMode,
@@ -128,8 +135,8 @@ export default async function EventPage({ params }: EventPageProps) {
   // Guests are told when the party was, the owner when the event goes.
   const partyDateLabel =
     dateMode === "fixed" && event.eventDate
-      ? formatDateRangeLabel(event.eventDate, event.eventEndDate)
-      : formatDateLabel(lifecycle?.stichtag ?? null);
+      ? formatDateRangeLabel(event.eventDate, event.eventEndDate, locale)
+      : formatDateLabel(lifecycle?.stichtag ?? null, locale);
 
   // The guest list goes out with the page: loading it in the browser after
   // the fact makes the page grow and pushes the footer down (a big layout
@@ -158,6 +165,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 unlockedThemes,
                 accessPassword: ownerAccessPassword,
                 maxGuests: event.maxGuests,
+                language: locale,
                 unlock,
               }
             : undefined
@@ -166,7 +174,7 @@ export default async function EventPage({ params }: EventPageProps) {
       <main>
         {readOnly && lifecycle ? (
           isOwner ? (
-            <EventOverNotice isOwner deletionDateLabel={formatDottedDate(lifecycle.deletionDate)} />
+            <EventOverNotice isOwner deletionDateLabel={formatDottedDate(lifecycle.deletionDate, locale)} />
           ) : (
             <EventOverNotice isOwner={false} dateLabel={partyDateLabel} />
           )

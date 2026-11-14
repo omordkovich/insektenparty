@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { buildShareLinks, copyToClipboard, type ShareLink } from "@/lib/share";
 import { Button } from "./Button";
@@ -18,14 +19,16 @@ const platformClass =
 // desktop): one plain link per platform - nothing is loaded from those
 // platforms until the visitor clicks.
 export function ShareDialog({ url, title, onCloseAction }: ShareDialogProps) {
+  const t = useTranslations("event");
   const titleId = useId();
   const urlFieldId = useId();
   const [status, setStatus] = useState<string | null>(null);
-  const links = buildShareLinks({ url, title });
+  const locale = useLocale();
+  const links = buildShareLinks({ url, title, locale });
 
   async function handleCopy() {
     const ok = await copyToClipboard(url);
-    setStatus(ok ? "Link kopiert." : "Kopieren nicht möglich – bitte den Link oben markieren.");
+    setStatus(ok ? t("linkCopiedDot") : t("kopierenNichtMoglichBitte"));
   }
 
   async function handlePlatformClick(link: ShareLink) {
@@ -33,19 +36,19 @@ export function ShareDialog({ url, title, onCloseAction }: ShareDialogProps) {
     const ok = await copyToClipboard(url);
     setStatus(
       ok
-        ? `Link kopiert – füge ihn in ${link.label} ein (z. B. in eine Nachricht oder Story).`
-        : "Kopieren nicht möglich – bitte den Link oben markieren.",
+        ? t("linkKopiertFugeIhn", { label: link.label })
+        : t("kopierenNichtMoglichBitte"),
     );
   }
 
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction}>
       <h2 id={titleId} className="pr-10 font-display text-2xl text-leaf-dark">
-        Event teilen
+        {t("eventTeilen")}
       </h2>
 
       <label htmlFor={urlFieldId} className="mt-4 block text-sm font-bold">
-        Einladungslink
+        {t("einladungslink")}
       </label>
       <div className="mt-1 flex gap-2">
         <input
@@ -57,7 +60,7 @@ export function ShareDialog({ url, title, onCloseAction }: ShareDialogProps) {
           className="min-w-0 flex-1 rounded-xl border border-leaf/25 bg-surface px-3 py-2 text-sm"
         />
         <Button variant="primary" onClick={handleCopy}>
-          Kopieren
+          {t("kopieren")}
         </Button>
       </div>
 

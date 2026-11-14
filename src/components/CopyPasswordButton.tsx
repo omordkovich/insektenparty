@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { copyToClipboard } from "@/lib/share";
 import { Button } from "./Button";
@@ -14,6 +15,7 @@ type CopyPasswordButtonProps = {
 // Owner-only icon button next to "Link kopieren" on a password-protected
 // event: copies the event password, e.g. to send it after the link.
 export function CopyPasswordButton({ password, className = "" }: CopyPasswordButtonProps) {
+  const t = useTranslations("event");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export function CopyPasswordButton({ password, className = "" }: CopyPasswordBut
   async function handleCopy() {
     if (await copyToClipboard(password)) setCopied(true);
     // Clipboard blocked: show the password so it can be copied by hand.
-    else window.prompt("Passwort für die Event-Seite:", password);
+    else window.prompt(t("passwortFurDieEvent"), password);
   }
 
   return (
@@ -35,13 +37,13 @@ export function CopyPasswordButton({ password, className = "" }: CopyPasswordBut
         size="icon"
         className={className}
         onClick={handleCopy}
-        aria-label={copied ? "Passwort kopiert" : "Passwort kopieren"}
-        title={copied ? "Passwort kopiert" : "Passwort kopieren"}
+        aria-label={copied ? t("passwortKopiert") : t("passwortKopieren")}
+        title={copied ? t("passwortKopiert") : t("passwortKopieren")}
       >
         {copied ? <CheckIcon /> : <KeyIcon />}
       </Button>
       <span className="sr-only" role="status" aria-live="polite">
-        {copied ? "Passwort kopiert" : ""}
+        {copied ? t("passwortKopiert") : ""}
       </span>
     </>
   );

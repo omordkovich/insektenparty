@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import type { DateModeRequest } from "@/lib/date-poll";
 import {
   addMonths,
@@ -51,8 +52,8 @@ describe("plans", () => {
   });
 
   it("words the window error per plan", () => {
-    expect(dateWindowError("free")).toBe("Das Datum darf höchstens 3 Monate nach dem Erstellen des Events liegen.");
-    expect(dateWindowError("paid")).toBe("Das Datum darf höchstens 12 Monate nach dem Erstellen des Events liegen.");
+    expect(dateWindowError("free")).toEqual(err("dateWindow", { months: 3 }));
+    expect(dateWindowError("paid")).toEqual(err("dateWindow", { months: 12 }));
   });
 });
 
@@ -60,7 +61,7 @@ describe("checkPlanRules", () => {
   it("rejects a mode the plan does not include with 403", () => {
     const result = checkPlanRules("free", "2026-07-01", { mode: "poll", proposals: [] });
     expect(result?.status).toBe(403);
-    expect(result?.error).toBe("Abstimmung und offener Termin gibt es nur mit einem freigeschalteten Event.");
+    expect(result?.error).toEqual(err("pollNeedsUnlock"));
     expect(checkPlanRules("free", "2026-07-01", { mode: "unknown" })?.status).toBe(403);
   });
 
@@ -74,7 +75,7 @@ describe("checkPlanRules", () => {
   it("checks every poll proposal on a paid event", () => {
     const tooLate = checkPlanRules("paid", "2026-07-01", pollWith("2027-07-02"));
     expect(tooLate?.status).toBe(400);
-    expect(tooLate?.error).toContain("12 Monate");
+    expect(tooLate?.error).toEqual(err("dateWindow", { months: 12 }));
     expect(checkPlanRules("paid", "2026-07-01", pollWith("2026-08-01", "2027-07-01"))).toBeNull();
     expect(checkPlanRules("paid", "2026-07-01", pollWith("2026-08-01", "2027-07-02"))?.status).toBe(400);
   });

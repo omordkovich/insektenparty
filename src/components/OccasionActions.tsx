@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
-import { OCCASIONS_PATH } from "@/lib/occasions";
+import { occasionSectionPath } from "@/lib/occasion-slugs";
 import { AuthButtons } from "./AuthButtons";
 import { buttonClassName } from "./Button";
 
@@ -10,7 +11,10 @@ import { buttonClassName } from "./Button";
 // state is read in the browser: visitors get Login/Register, logged-in
 // users get a back link (default: the occasions overview) and a link to
 // their event list.
-export function OccasionActions({ backHref = OCCASIONS_PATH }: { backHref?: string }) {
+export function OccasionActions({ backHref }: { backHref?: string }) {
+  const t = useTranslations("occasions");
+  const tHome = useTranslations("home");
+  const locale = useLocale();
   // null = not known yet; the buttons stay invisible to avoid a flash.
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
@@ -36,11 +40,11 @@ export function OccasionActions({ backHref = OCCASIONS_PATH }: { backHref?: stri
   if (loggedIn) {
     return (
       <div className="flex flex-wrap justify-center gap-2">
-        <Link href={backHref} className={buttonClassName("outline")}>
-          Zurück
+        <Link href={backHref ?? occasionSectionPath(locale)} className={buttonClassName("outline")}>
+          {t("back")}
         </Link>
         <Link href="/" className={buttonClassName("primary")}>
-          Event erstellen
+          {t("createEvent")}
         </Link>
       </div>
     );
@@ -48,7 +52,7 @@ export function OccasionActions({ backHref = OCCASIONS_PATH }: { backHref?: stri
 
   return (
     <div className={loggedIn === null ? "invisible" : undefined}>
-      <AuthButtons registerLabel="Kostenlos starten" afterLoginHref="/" />
+      <AuthButtons registerLabel={tHome("startFree")} afterLoginHref="/" />
     </div>
   );
 }

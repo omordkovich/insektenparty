@@ -1,20 +1,7 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
-import { CookieBanner } from "@/components/CookieBanner";
-import { CONSENT_BANNER_SCRIPT } from "@/lib/cookie-consent";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import React from "react";
-
-const nunito = Nunito({
-  variable: "--font-nunito",
-  subsets: ["latin"],
-});
-
-const fredoka = Fredoka({
-  variable: "--font-fredoka",
-  subsets: ["latin"],
-});
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   // Resolves relative canonical/Open Graph URLs against the main domain.
@@ -24,22 +11,9 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    // suppressHydrationWarning: the inline script below may add an attribute
-    // to <html> before React hydrates.
-    <html lang="de" className={`${nunito.variable} ${fredoka.variable} h-full`} suppressHydrationWarning>
-      <body className="min-h-full antialiased">
-        {/* First in <body> (no own <head> needed): it runs while parsing,
-            before the cookie banner further down is painted. */}
-        <script dangerouslySetInnerHTML={{ __html: CONSENT_BANNER_SCRIPT }} />
-        {children}
-        <CookieBanner />
-      </body>
-    </html>
-  );
+// <html> is rendered one level down - by app/[locale]/layout.tsx for the
+// site and app/event/[slug]/layout.tsx for events (their language comes
+// from the event) - so each can set its own `lang`.
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }

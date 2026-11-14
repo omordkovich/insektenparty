@@ -1,4 +1,5 @@
 import { useId, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { GuestDto } from "@/lib/types";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
@@ -19,6 +20,7 @@ export function DeleteGuestDialog({
   onCloseAction,
   onDeletedAction,
 }: DeleteGuestDialogProps) {
+  const t = useTranslations("guest");
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -30,7 +32,7 @@ export function DeleteGuestDialog({
   async function handleDelete() {
     if (deleting) return;
     if (!isOwner && !recaptchaToken) {
-      setError("Bitte bestätige, dass du kein Roboter bist.");
+      setError(t("bitteBestatigeDassDu"));
       return;
     }
 
@@ -50,7 +52,7 @@ export function DeleteGuestDialog({
           | null;
         setError(
           payload?.error ??
-            "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
+            t("derGastKonnteNicht"),
         );
         setRecaptchaReset((value) => value + 1);
         return;
@@ -59,7 +61,7 @@ export function DeleteGuestDialog({
       await onDeletedAction();
       onCloseAction();
     } catch {
-      setError("Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.");
+      setError(t("derGastKonnteNicht"));
       setRecaptchaReset((value) => value + 1);
     } finally {
       setDeleting(false);
@@ -76,10 +78,10 @@ export function DeleteGuestDialog({
       showCloseButton={false}
     >
       <h2 id={titleId} className="font-display text-2xl text-leaf-dark">
-        Gast löschen?
+        {t("gastLoschen")}
       </h2>
       <p id={descriptionId} className="mt-3 text-muted">
-        Möchtest du „{guest.name}“ wirklich aus der Gästeliste entfernen?
+        {t("deleteGuestQuestion", { name: guest.name })}
       </p>
 
       {!isOwner ? (
@@ -96,14 +98,14 @@ export function DeleteGuestDialog({
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button ref={cancelRef} variant="outline" onClick={onCloseAction} disabled={deleting}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button
           variant="danger"
           onClick={handleDelete}
           disabled={deleting || (!isOwner && !recaptchaToken)}
         >
-          {deleting ? "Wird gelöscht ..." : "Löschen"}
+          {deleting ? t("wirdGeloscht") : t("loschen")}
         </Button>
       </div>
     </Modal>

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import {
   capacityLabel,
   checkGuestCapacity,
@@ -24,7 +25,7 @@ describe("checkGuestCapacity", () => {
   it("caps the number of entries for everyone, the owner included", () => {
     expect(
       checkGuestCapacity({ ...base, maxGuests: null, entryCount: MAX_GUEST_ENTRIES, next: declined }),
-    ).toEqual({ ok: false, error: "Die Gästeliste ist voll." });
+    ).toEqual({ ok: false, error: err("guestListFull") });
     expect(
       checkGuestCapacity({ ...base, maxGuests: null, entryCount: MAX_GUEST_ENTRIES, previous: coming(), next: coming(1) }),
     ).toEqual({ ok: true });
@@ -38,15 +39,15 @@ describe("checkGuestCapacity", () => {
   it("names the free seats when the request needs more", () => {
     expect(checkGuestCapacity({ ...base, next: coming(2) })).toEqual({
       ok: false,
-      error: "Es sind nur noch 2 Plätze frei.",
+      error: err("seatsLeft", { free: 2 }),
     });
     expect(checkGuestCapacity({ ...base, occupied: 9, next: coming(1) })).toEqual({
       ok: false,
-      error: "Es ist nur noch 1 Platz frei.",
+      error: err("seatsLeft", { free: 1 }),
     });
     expect(checkGuestCapacity({ ...base, occupied: 10, next: coming() })).toEqual({
       ok: false,
-      error: "Leider ausgebucht – es sind keine Plätze mehr frei.",
+      error: err("seatsLeft", { free: 0 }),
     });
   });
 
@@ -58,23 +59,25 @@ describe("checkGuestCapacity", () => {
     expect(checkGuestCapacity({ ...base, occupied: 10, previous: coming(1), next: coming(1) })).toEqual({ ok: true });
     expect(checkGuestCapacity({ ...base, occupied: 10, previous: coming(1), next: coming(2) })).toEqual({
       ok: false,
-      error: "Es sind nur noch 2 Plätze frei.",
+      error: err("seatsLeft", { free: 2 }),
     });
   });
 
   it("applies to everyone - the owner raises the limit to add more", () => {
     expect(checkGuestCapacity({ ...base, occupied: 10, next: coming(4) })).toEqual({
       ok: false,
-      error: "Leider ausgebucht – es sind keine Plätze mehr frei.",
+      error: err("seatsLeft", { free: 0 }),
     });
   });
 });
 
 describe("capacityLabel", () => {
   it("shows the free seats, or that the event is full", () => {
-    expect(capacityLabel(12, 8)).toBe("Noch 4 von 12 Plätzen frei");
-    expect(capacityLabel(12, 11)).toBe("Noch 1 von 12 Plätzen frei");
-    expect(capacityLabel(12, 12)).toBe("Ausgebucht (12 von 12 Plätzen belegt)");
-    expect(capacityLabel(12, 14)).toBe("Ausgebucht (14 von 12 Plätzen belegt)");
+    expect(capacityLabel(12, 8, "de")).toBe("Noch 4 von 12 Plätzen frei");
+    expect(capacityLabel(12, 11, "de")).toBe("Noch 1 von 12 Plätzen frei");
+    expect(capacityLabel(12, 12, "de")).toBe("Ausgebucht (12 von 12 Plätzen belegt)");
+    expect(capacityLabel(12, 14, "de")).toBe("Ausgebucht (14 von 12 Plätzen belegt)");
+    expect(capacityLabel(12, 8, "en")).toBe("4 of 12 places left");
+    expect(capacityLabel(12, 12, "en")).toBe("Fully booked (12 of 12 places taken)");
   });
 });

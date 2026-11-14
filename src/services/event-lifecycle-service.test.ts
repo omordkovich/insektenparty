@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 import type { LifecycleInput } from "@/lib/event-lifecycle";
 
 vi.mock("@/repositories/event-repository", () => ({ getLifecycleInput: vi.fn() }));
@@ -36,7 +37,7 @@ describe("denyIfOver", () => {
   it("refuses with 409 the day after the Stichtag", async () => {
     vi.mocked(getLifecycleInput).mockResolvedValue(fixed("2026-07-09"));
     expect(await denyIfOver("event-1")).toEqual({ ok: false, status: 409, error: EVENT_OVER_ERROR });
-    expect(EVENT_OVER_ERROR).toBe("Dieses Event ist vorbei.");
+    expect(EVENT_OVER_ERROR).toEqual(err("eventOver"));
   });
 
   it("refuses an expired event too", async () => {

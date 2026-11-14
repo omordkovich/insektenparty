@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { ReactNode } from "react";
 import { LegalLinks } from "./LegalLinks";
 import { ShareButtons } from "./ShareButtons";

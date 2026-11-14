@@ -1,6 +1,6 @@
 # SEO & KI-Sichtbarkeit – To-do
 
-Stand: 2026-11-02
+Stand: 2026-11-14
 
 ## Erledigt (im Code)
 
@@ -23,6 +23,8 @@ Stand: 2026-11-02
 - [x] Design-Formulierung (2026-10-22): überall „Designs für jeden Anlass – Farbdesigns kostenlos, dazu kostenpflichtige Premium-Designs“; keine einzelnen Design- oder Farbnamen und keine Anzahl mehr (Funktionsliste, Start-FAQ, llms.txt, `/vergleich`, Anlass-FAQ Karneval, Oktoberfest, Halloween, Mottoparty, Trauerfeier); „Keine Designs für bestimmte Anlässe“ aus „Was GASTZILLA nicht kann“ entfernt. **Live erst nach dem nächsten Deploy** – `gastzilla.de/llms.txt` zeigt bis dahin noch „Acht Farbdesigns …“
 
 - [x] Free-Event & automatische Löschung (2026-11-02): Start-FAQ „Ist GASTZILLA kostenlos?“ (ein kostenloses Event pro Konto, einmalig, fester Termin ≤ 3 Monate; Terminabstimmung, offener Termin, Termin bis 12 Monate, ohne GASTZILLA-Hinweis = kostenpflichtige Extras) und neue Start-FAQ „Wie lange bleibt mein Event gespeichert?“; Hinweis in der Start-FAQ zur Terminabstimmung; Funktionsliste (Terminabstimmung als Extra, neue Zeile „Datensparsam …“); Startseiten-Hero; llms.txt „Preise“; `/vergleich` (Hinweis + FAQ „… Terminabstimmung kostenlos …“); Anlass-Seiten Terminabstimmung (Meta-Beschreibung ohne „kostenlos“, FAQ „Ist die Terminabstimmung kostenlos?“ statt der Uhrzeit-Frage), Hochzeit, Proben, Sport. Keine Preise genannt (Zahlung in Testphase). Für Preis-Fragen lieferte die Autovervollständigung keine Daten (Netz) → nach dem Livegang mit Search-Console-Anfragen nachschärfen
+
+- [x] Anlass-Seiten auf Englisch (2026-11-14): alle 28 Anlässe unter `/en/invitations/<slug>` (Übersicht `/en/invitations`) mit englischen URLs (`src/lib/occasion-slugs.ts`), Texten in `src/lib/occasions-en.ts` (britisches Englisch, FAQ aus englischer Google-Autovervollständigung, `hl=en&gl=gb`), hreflang-Paaren de↔en (Seiten-Metadaten + Sitemap), Schema mit `inLanguage: en`, eigenem englischem Abschnitt in llms.txt; die Sprachauswahl springt auf denselben Anlass in der anderen Sprache. Die englische Vergleichsseite `/en/vergleich` bleibt deutsch (noindex) – die englische Anlass-Übersicht verlinkt sie deshalb nicht. **Neue Anlässe brauchen jetzt drei Einträge: `occasions.ts` (de), `occasions-en.ts` (en), `occasion-slugs.ts` (URLs)** – die Tests prüfen, dass beide Sprachen dieselben Anlässe haben
 
 - [x] KI-Agenten-Katalog (ARD): `/.well-known/ard.json` + `/.well-known/ai-catalog.json` mit `llms.txt` als Eintrag, auch im Wartungsmodus erreichbar (PageSpeed „Auffindbarkeit von KI-Agenten“) – weitere Einträge, sobald es WebMCP-/MCP-Werkzeuge gibt
 
@@ -50,6 +52,7 @@ Stand: 2026-11-02
 - [ ] „Über uns“: persönliche Geschichte ergänzen (warum gebaut, seit wann, für wen) – nur mit echten Angaben von dir
 - [ ] `/vergleich`: Angaben zu WhatsApp/Doodle jährlich prüfen (Stand-Hinweis auf der Seite), nach dem Livegang Suchanfragen aus der Search Console einarbeiten
 - [ ] Nach dem Livegang mit echten Daten: anonymisierte Kennzahlen (z. B. typische Zusagequote, wie früh eingeladen wird) als zitierbare Quelle – nur nach Datenschutz-Check, nie geschätzt
+- [ ] Englische Anlass-Seiten: Texte von einer englischsprachigen Person gegenlesen lassen; nach dem Livegang in der Search Console (Land UK/US) prüfen, für welche Begriffe sie erscheinen, und FAQ/Titel nachschärfen. Für „back to school party“, „school summer fair“, „theme party“, „christmas market trip“ und „board game night“ lieferte die englische Autovervollständigung kaum Fragen
 - [ ] Nach dem Livegang in der Search Console beobachten, ob `/einladung/terminabstimmung` für „Termin abstimmen“ / „Terminumfrage“ erscheint; ggf. Titel und FAQ an die echten Suchanfragen anpassen
 
 ## Außerhalb der Seite (für KI-Empfehlungen am wichtigsten)
@@ -60,3 +63,9 @@ KI-Assistenten empfehlen vor allem, was anderswo erwähnt wird.
 - [ ] Erwähnungen in Eltern-, Hochzeits- und Event-Blogs, Foren, Reddit (r/de, Eltern-Communities)
 - [ ] Weitere Social-Media-Profile anlegen; im Instagram-Profil gastzilla.de als Link eintragen (Verknüpfung in beide Richtungen)
 - [ ] Nach den ersten Nutzern: echte Bewertungen sammeln (z. B. Trustpilot) – **keine** erfundenen Bewertungen ins Schema
+
+## Russisch (2026-11-14)
+
+- [ ] Russische Texte von einer Muttersprachlerin / einem Muttersprachler gegenlesen lassen: `messages/ru.json`, `src/lib/occasions-ru.ts`, `src/components/legal/*Ru.tsx` (Rechtstexte: Übersetzung, verbindlich bleibt Deutsch).
+- [ ] Dünne Suchdaten (Google-Vorschläge hl=ru, gl=ru und gl=de lieferten dasselbe): Halloween, Spielverabredung, Gruppenreise, Kultur, Proben, Ausgehen, Sport, Brettspiele, Gaming, Terminabstimmung – FAQ dort aus allgemeinen Planungsfragen. Später mit Yandex Wordstat / Yandex-Suggest nachschärfen.
+- [ ] Slugs sind lateinisch transkribiert (`/ru/priglasheniya/svadba`). Nach dem Livegang nicht mehr ändern.

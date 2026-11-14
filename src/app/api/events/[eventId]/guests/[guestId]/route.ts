@@ -1,3 +1,5 @@
+import { apiErrors } from "@/i18n/api-errors";
+import { err } from "@/i18n/errors";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
@@ -9,10 +11,11 @@ type RouteContext = {
 };
 
 export async function PATCH(request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId, guestId } = await context.params;
     if (!isUuid(eventId) || !isUuid(guestId)) {
-      return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
+      return fail(err("invalidId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -22,7 +25,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
+      return fail(err("invalidRequest"), 400);
     }
 
     const supabase = await createClient();
@@ -32,26 +35,22 @@ export async function PATCH(request: Request, context: RouteContext) {
     const result = await updateGuestForEvent(eventId, guestId, body, requesterId);
 
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
 
     return NextResponse.json(result.data);
   } catch (error) {
     console.error("PATCH /api/events/[eventId]/guests/[guestId] failed:", error);
-    return NextResponse.json(
-      {
-        error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      },
-      { status: 500 },
-    );
+    return fail(err("guestSaveFailed"), 500);
   }
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId, guestId } = await context.params;
     if (!isUuid(eventId) || !isUuid(guestId)) {
-      return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
+      return fail(err("invalidId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -73,17 +72,12 @@ export async function DELETE(request: Request, context: RouteContext) {
     const result = await deleteGuestForEvent(eventId, guestId, body, requesterId);
 
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
 
     return NextResponse.json(result.data);
   } catch (error) {
     console.error("DELETE /api/events/[eventId]/guests/[guestId] failed:", error);
-    return NextResponse.json(
-      {
-        error: "Der Gast konnte nicht gelöscht werden. Bitte versuche es erneut.",
-      },
-      { status: 500 },
-    );
+    return fail(err("guestDeleteFailed"), 500);
   }
 }

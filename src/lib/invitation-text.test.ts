@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildInvitationText,
-  DATE_FIXED_WORDING,
-  DEFAULT_WORDING,
+  wordingDefaults,
   fixedDateFacts,
   type InvitationFacts,
   parseStoredWording,
@@ -23,7 +22,7 @@ const facts: InvitationFacts = {
 
 describe("buildInvitationText", () => {
   it("composes the default wording around the event facts", () => {
-    expect(buildInvitationText(facts, DEFAULT_WORDING)).toBe(
+    expect(buildInvitationText(facts, wordingDefaults("de").invitation, "de")).toBe(
       [
         "Hallo zusammen,",
         "ich lade euch herzlich ein:",
@@ -41,7 +40,8 @@ describe("buildInvitationText", () => {
   it("leaves out event facts that are not filled in", () => {
     const text = buildInvitationText(
       { ...facts, title: " ", timeLabel: "", location: "", contactName: "" },
-      DEFAULT_WORDING,
+      wordingDefaults("de").invitation,
+      "de",
     );
     expect(text).toBe(
       [
@@ -56,7 +56,7 @@ describe("buildInvitationText", () => {
   });
 
   it("shows only the time when there is no date", () => {
-    const text = buildInvitationText({ ...facts, dateLabel: "" }, DEFAULT_WORDING);
+    const text = buildInvitationText({ ...facts, dateLabel: "" }, wordingDefaults("de").invitation, "de");
     expect(text).toContain("Wann: 15:00 - 20:00 Uhr");
   });
 
@@ -66,7 +66,7 @@ describe("buildInvitationText", () => {
       intro: "",
       callToAction: "Hier eintragen:",
       closing: "Bis bald!\nEure Annas",
-    });
+    }, "de");
     expect(text.split("\n")).toEqual([
       "Liebe Nachbarn,",
       "Sommerfest bei Familie Müller",
@@ -82,20 +82,20 @@ describe("buildInvitationText", () => {
 
   it("always contains the invitation link", () => {
     const empty = { greeting: "", intro: "", callToAction: "", closing: "" };
-    expect(buildInvitationText(facts, empty)).toContain(facts.url);
+    expect(buildInvitationText(facts, empty, "de")).toContain(facts.url);
   });
 });
 
 describe("parseStoredWording", () => {
   it("falls back to the defaults for missing or broken data", () => {
-    expect(parseStoredWording(null)).toEqual(DEFAULT_WORDING);
-    expect(parseStoredWording("not json")).toEqual(DEFAULT_WORDING);
-    expect(parseStoredWording("[1,2]")).toEqual(DEFAULT_WORDING);
+    expect(parseStoredWording(null)).toEqual(wordingDefaults("de").invitation);
+    expect(parseStoredWording("not json")).toEqual(wordingDefaults("de").invitation);
+    expect(parseStoredWording("[1,2]")).toEqual(wordingDefaults("de").invitation);
   });
 
   it("keeps stored strings and fills the rest from the defaults", () => {
     expect(parseStoredWording(JSON.stringify({ greeting: "Moin,", intro: 42 }))).toEqual({
-      ...DEFAULT_WORDING,
+      ...wordingDefaults("de").invitation,
       greeting: "Moin,",
     });
   });
@@ -103,23 +103,23 @@ describe("parseStoredWording", () => {
 
 describe("invitation text for a password-protected event", () => {
   it("adds the password right after the link", () => {
-    const lines = buildInvitationText({ ...facts, password: "Sommer" }, DEFAULT_WORDING).split("\n");
+    const lines = buildInvitationText({ ...facts, password: "Sommer" }, wordingDefaults("de").invitation, "de").split("\n");
     const linkIndex = lines.indexOf("https://gastzilla.de/event/abc123");
     expect(lines[linkIndex + 1]).toBe("Passwort für die Event-Seite: Sommer");
   });
 
   it("has no password line for an open event", () => {
-    expect(buildInvitationText(facts, DEFAULT_WORDING)).not.toContain("Passwort");
+    expect(buildInvitationText(facts, wordingDefaults("de").invitation, "de")).not.toContain("Passwort");
   });
 });
 
 describe("invitation text while the date is open", () => {
   it("says the date follows", () => {
-    expect(buildInvitationText({ ...facts, dateMode: "unknown" }, DEFAULT_WORDING)).toContain("Wann: Termin folgt");
+    expect(buildInvitationText({ ...facts, dateMode: "unknown" }, wordingDefaults("de").invitation, "de")).toContain("Wann: Termin folgt");
   });
 
   it("asks to vote during a poll", () => {
-    const text = buildInvitationText({ ...facts, dateMode: "poll" }, DEFAULT_WORDING);
+    const text = buildInvitationText({ ...facts, dateMode: "poll" }, wordingDefaults("de").invitation, "de");
     expect(text).toContain("Wann: wird abgestimmt – bitte stimmt über den Link ab");
     expect(text).not.toContain("Samstag");
   });
@@ -135,19 +135,20 @@ describe("message after fixing the date", () => {
   };
 
   it("takes date and time from the chosen proposal", () => {
-    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: "18:00" })).toEqual({
+    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: "18:00" }, "de")).toEqual({
       ...base,
       dateMode: "fixed",
       dateLabel: "Samstag, 11. Juli 2026",
       timeLabel: "15:00 - 18:00 Uhr",
     });
-    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: null, endTime: null }).timeLabel).toBe("");
+    expect(fixedDateFacts(base, { date: "2026-07-11", startTime: null, endTime: null }, "de").timeLabel).toBe("");
   });
 
   it("tells the guests about the date and asks them to complete their entries", () => {
     const text = buildInvitationText(
-      fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: null }),
-      DATE_FIXED_WORDING,
+      fixedDateFacts(base, { date: "2026-07-11", startTime: "15:00", endTime: null }, "de"),
+      wordingDefaults("de").dateFixed,
+      "de",
     );
     expect(text).toBe(
       [
@@ -166,9 +167,9 @@ describe("message after fixing the date", () => {
 
   it("stores its wording separately and falls back to its own defaults", () => {
     expect(wordingStorageKey("e1", "dateFixed")).not.toBe(wordingStorageKey("e1"));
-    expect(parseStoredWording(null, DATE_FIXED_WORDING)).toEqual(DATE_FIXED_WORDING);
-    expect(parseStoredWording(JSON.stringify({ greeting: "Moin," }), DATE_FIXED_WORDING)).toEqual({
-      ...DATE_FIXED_WORDING,
+    expect(parseStoredWording(null, wordingDefaults("de").dateFixed)).toEqual(wordingDefaults("de").dateFixed);
+    expect(parseStoredWording(JSON.stringify({ greeting: "Moin," }), wordingDefaults("de").dateFixed)).toEqual({
+      ...wordingDefaults("de").dateFixed,
       greeting: "Moin,",
     });
   });
@@ -185,10 +186,29 @@ describe("wording length", () => {
   });
 
   it("leaves room for every default text", () => {
-    for (const defaults of [DEFAULT_WORDING, DATE_FIXED_WORDING]) {
+    for (const defaults of [wordingDefaults("de").invitation, wordingDefaults("de").dateFixed]) {
       for (const key of Object.keys(WORDING_MAX_LENGTH) as (keyof typeof WORDING_MAX_LENGTH)[]) {
         expect(defaults[key].length).toBeLessThanOrEqual(WORDING_MAX_LENGTH[key]);
       }
     }
+  });
+});
+
+describe("invitation text in English", () => {
+  it("has English default wording", () => {
+    expect(wordingDefaults("en").invitation.greeting).toBe("Hi everyone,");
+    expect(wordingDefaults("de").invitation.greeting).toBe("Hallo zusammen,");
+  });
+
+  it("labels the fixed facts in English", () => {
+    const text = buildInvitationText({ ...facts, password: "Summer" }, wordingDefaults("en").invitation, "en");
+    expect(text).toContain("When: Samstag, 12. Juli 2026, 15:00 - 20:00 Uhr");
+    expect(text).toContain(`Where: ${facts.location}`);
+    expect(text).toContain("Password for the event page: Summer");
+  });
+
+  it("says the date follows", () => {
+    const text = buildInvitationText({ ...facts, dateMode: "unknown" }, wordingDefaults("en").invitation, "en");
+    expect(text).toContain("When: date to follow");
   });
 });

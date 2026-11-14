@@ -6,6 +6,7 @@ const { getClaims, signOut, deleteUser } = vi.hoisted(() => ({
   deleteUser: vi.fn(),
 }));
 
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }), headers: async () => new Headers() }));
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({ auth: { getClaims, signOut } }),
 }));

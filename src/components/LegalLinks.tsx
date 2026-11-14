@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { LEGAL_DOCUMENTS, type LegalDocument } from "@/lib/legal-documents";
 import { INSTAGRAM_URL } from "@/lib/site";
 import { CookieSettingsLink } from "./CookieSettingsLink";
@@ -11,14 +12,15 @@ const linkClass = "text-sm text-muted underline underline-offset-2 hover:text-le
 // reachable from every page, with or without the "made with" badge above it.
 // Legal texts link to their own pages; "Cookies" is a settings dialog, not a
 // document, so it stays an overlay.
-export function LegalLinks({ className = "" }: { className?: string }) {
+export async function LegalLinks({ className = "" }: { className?: string }) {
+  const t = await getTranslations("legal");
   return (
     <nav
-      aria-label="Rechtliches und Informationen"
+      aria-label={t("navLabel")}
       className={`flex flex-wrap justify-center gap-x-4 gap-y-1 ${className}`}
     >
       <Link href="/about" className={linkClass}>
-        Über uns
+        {t("about")}
       </Link>
       <a href={INSTAGRAM_URL} target="_blank" rel="me noopener noreferrer" className={linkClass}>
         Instagram
@@ -26,7 +28,7 @@ export function LegalLinks({ className = "" }: { className?: string }) {
       <CookieSettingsLink />
       {PAGE_LINKS.map((doc) => (
         <Link key={doc} href={LEGAL_DOCUMENTS[doc].href} className={linkClass}>
-          {LEGAL_DOCUMENTS[doc].label}
+          {t(`labels.${doc}`)}
         </Link>
       ))}
     </nav>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
 import { EVENT_FIELDS, type EventFieldKey } from "@/lib/validation";
@@ -40,6 +41,7 @@ export function EditableField({
   calendarLinks,
   editHint,
 }: EditableFieldProps) {
+  const t = useTranslations("event");
   function renderDisplayValue(text: string) {
     if (calendarLinks) {
       return (
@@ -88,13 +90,13 @@ export function EditableField({
         const body = (await response.json().catch(() => null)) as
           | { error?: string }
           | null;
-        return { ok: false as const, error: body?.error ?? "Konnte nicht gespeichert werden." };
+        return { ok: false as const, error: body?.error ?? t("konnteNichtGespeichertWerden") };
       }
 
       setCurrentValue(newValue);
       return { ok: true as const };
     } catch {
-      return { ok: false as const, error: "Konnte nicht gespeichert werden." };
+      return { ok: false as const, error: t("konnteNichtGespeichertWerden") };
     }
   }
 

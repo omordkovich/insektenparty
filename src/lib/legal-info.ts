@@ -25,7 +25,10 @@ export const LEGAL_INFO = {
 export const MIN_REGISTRATION_AGE = 16;
 
 // Stand der AGB bzw. Datenschutzerklärung, wie er bei der Registrierung im
-// Konto gespeichert wird (Nachweis, welcher Fassung zugestimmt wurde).
-// Bei inhaltlichen Änderungen hochsetzen.
+// Konto gespeichert wird (Nachweis, welcher Fassung zugestimmt wurde), und
+// der Widerrufsbelehrung. Bei inhaltlichen Änderungen hochsetzen - die
+// Änderung selbst immer in allen Sprachen gleichzeitig (src/components/legal,
+// geprüft von legal-parity.test.ts).
 export const TERMS_VERSION = "2026-11-02";
-export const PRIVACY_VERSION = "2026-11-02";
+export const PRIVACY_VERSION = "2026-11-14";
+export const WITHDRAWAL_VERSION = "2026-09-29";

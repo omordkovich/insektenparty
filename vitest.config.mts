@@ -9,5 +9,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // next-intl imports "next/server" without a file extension, which plain
+    // Node ESM can't resolve - let Vite bundle it instead.
+    server: { deps: { inline: ["next-intl"] } },
   },
 });

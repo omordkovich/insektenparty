@@ -1,11 +1,12 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { PRODUCTS, formatPrice } from "@/lib/products";
-import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+import { THEME_ASSETS, themeLabel, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 import { themePortalTarget } from "./themePortalTarget";
@@ -60,27 +61,25 @@ type UnlockWay = {
   body: PurchaseBody | null;
 };
 
-const PAID_EVENT_FEATURES = [
-  "Alle Designs",
-  "Termin abstimmen lassen",
-  "Termin offen lassen",
-  "Datum bis 12 Monate im Voraus",
-];
+// Message keys (namespace "eventDialog").
+const PAID_EVENT_FEATURE_KEYS = ["allDesigns", "terminAbstimmenLassen", "terminOffenLassen", "datumBis12Monate"] as const;
 
-const FAILED_ERROR = "Das Freischalten hat nicht geklappt. Bitte versuche es erneut.";
-
-const TITLES: Record<UnlockDialogProps["kind"], string> = {
-  event: "Dieses Event freischalten",
-  credit: "Event freischalten",
-  theme: "Design freischalten",
-  no_badge: "Ohne GASTZILLA-Hinweis",
-};
+const TITLE_KEYS = {
+  event: "diesesEventFreischalten",
+  credit: "eventFreischalten",
+  theme: "unlockDesign",
+  no_badge: "noBadge",
+} as const satisfies Record<UnlockDialogProps["kind"], string>;
 
 // The "Freischalten" dialog behind every locked spot. Until real payments
 // exist the button is a dummy purchase (PAYMENTS_DUMMY); an unused event
 // credit is always spent first. Portalled to the themed page root so it
 // stacks above the dialog it was opened from.
 export function UnlockDialog(props: UnlockDialogProps) {
+  const t = useTranslations("eventDialog");
+  const locale = useLocale();
+  const PAID_EVENT_FEATURES = PAID_EVENT_FEATURE_KEYS.map((key) => t(key));
+  const FAILED_ERROR = t("dasFreischaltenHatNicht");
   const { kind, eventCredits, dummyPayments, onUnlockedAction, onCloseAction } = props;
   const router = useRouter();
   const titleId = useId();
@@ -108,14 +107,14 @@ export function UnlockDialog(props: UnlockDialogProps) {
           ? [
               {
                 scope: "theme",
-                heading: `Nur dieses Design – ${formatPrice(PRODUCTS.theme.priceCents)}`,
+                heading: t("onlyThisDesign", { price: formatPrice(PRODUCTS.theme.priceCents, locale) }),
                 priceCents: PRODUCTS.theme.priceCents,
                 usesCredit: false,
                 body: { product: "theme", theme: props.theme },
               },
               {
                 ...wholeEvent(props.eventId),
-                heading: `Ganzes Event freischalten – ${formatPrice(PRODUCTS.paid_event.priceCents)}, alle Designs inklusive`,
+                heading: t("ganzesEventFreischaltenPricecents", { priceCents: formatPrice(PRODUCTS.paid_event.priceCents, locale) }),
               },
             ]
           : [
@@ -163,29 +162,29 @@ export function UnlockDialog(props: UnlockDialogProps) {
     if (way.usesCredit) {
       return (
         <Button variant="primary" onClick={() => unlock(way)} disabled={busy} aria-describedby={describedBy}>
-          {busy ? "Wird freigeschaltet ..." : "Mit vorhandenem Event-Guthaben freischalten"}
+          {busy ? t("unlocking") : t("mitVorhandenemEventGuthaben")}
         </Button>
       );
     }
     if (dummyPayments) {
       return (
         <Button variant="primary" onClick={() => unlock(way)} disabled={busy} aria-describedby={describedBy}>
-          {busy ? "Wird freigeschaltet ..." : "Freischalten (Test, ohne Zahlung)"}
+          {busy ? t("unlocking") : "Freischalten (Test, ohne Zahlung)"}
         </Button>
       );
     }
-    return <p className="text-sm font-semibold text-muted">Bald verfügbar</p>;
+    return <p className="text-sm font-semibold text-muted">{t("baldVerfugbar")}</p>;
   }
 
   const creditNote =
     eventCredits === 1
-      ? "Du hast ein Event-Guthaben – es wird dafür verbraucht."
-      : `Du hast ${eventCredits} Event-Guthaben – eins davon wird dafür verbraucht.`;
+      ? t("duHastEinEvent")
+      : t("duHastEventcreditsEvent", { eventCredits });
 
   return createPortal(
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={busy}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        {TITLES[kind]}
+        {t(TITLE_KEYS[kind])}
       </h2>
 
       {props.kind === "theme" ? (
@@ -198,7 +197,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
               height={64}
               className="h-16 w-16 shrink-0 object-contain"
             />
-            <p className="font-semibold text-leaf-dark">{THEME_LABELS[props.theme]}</p>
+            <p className="font-semibold text-leaf-dark">{themeLabel(props.theme, locale)}</p>
           </div>
           <div className="mt-4 space-y-3">
             {ways.map((way, index) => (
@@ -209,7 +208,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
                 {way.scope === "event" ? (
                   <p className="mt-1 text-xs text-muted">{PAID_EVENT_FEATURES.join(" · ")}</p>
                 ) : (
-                  <p className="mt-1 text-xs text-muted">Für alle deine Events nutzbar.</p>
+                  <p className="mt-1 text-xs text-muted">{t("furAlleDeineEvents")}</p>
                 )}
                 {way.usesCredit ? <p className="mt-1 text-xs text-muted">{creditNote}</p> : null}
                 <div className="mt-3">{renderAction(way, `${wayId}-${index}`)}</div>
@@ -221,12 +220,11 @@ export function UnlockDialog(props: UnlockDialogProps) {
         <>
           {kind === "no_badge" ? (
             <p className="mt-4 text-sm">
-              Das Logo „made with Gastzilla“ unten auf deiner Event-Seite verschwindet – für alle
-              Besucher. Teilen-Buttons und die Links zu Impressum, Datenschutz und AGB bleiben.
+              {t("dasLogoMadeWith")}
             </p>
           ) : (
             <>
-              <p className="mt-4 text-sm">Ein freigeschaltetes Event kann mehr:</p>
+              <p className="mt-4 text-sm">{t("einFreigeschaltetesEventKann")}</p>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
                 {PAID_EVENT_FEATURES.map((feature) => (
                   <li key={feature}>{feature}</li>
@@ -235,14 +233,14 @@ export function UnlockDialog(props: UnlockDialogProps) {
             </>
           )}
           <p className="mt-4 text-lg font-bold text-leaf-dark">
-            {formatPrice(ways[0].priceCents)}
-            <span className="text-sm font-normal text-muted"> pro Event</span>
+            {formatPrice(ways[0].priceCents, locale)}
+            <span className="text-sm font-normal text-muted"> {t("proEvent")}</span>
           </p>
           {ways[0].usesCredit ? <p className="mt-1 text-sm text-muted">{creditNote}</p> : null}
         </>
       )}
 
-      <p className="mt-4 text-xs text-muted">Testphase – es wird nichts berechnet.</p>
+      <p className="mt-4 text-xs text-muted">{t("testphaseEsWirdNichts")}</p>
 
       {error ? (
         <p className="mt-4 text-sm text-danger" role="alert">
@@ -252,7 +250,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         <Button variant="outline" onClick={onCloseAction} disabled={busy}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         {props.kind === "theme" ? null : renderAction(ways[0])}
       </div>

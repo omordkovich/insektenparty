@@ -4,6 +4,7 @@ const getClaims = vi.fn();
 const updateUser = vi.fn();
 const refreshSession = vi.fn();
 
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }), headers: async () => new Headers() }));
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({ auth: { getClaims, updateUser, refreshSession } }),
 }));

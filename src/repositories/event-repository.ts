@@ -1,4 +1,6 @@
 import { and, desc, eq, max, min } from "drizzle-orm";
+import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
+import { eventLocale } from "@/i18n/request-locale";
 import { getDb } from "@/db";
 import { datePollOptions, events, userEntitlements } from "@/db/schema";
 import { isDateMode, todayInBerlin } from "@/lib/date-poll";
@@ -33,6 +35,16 @@ export async function getEventAddress(
     .from(events)
     .where(and(eq(events.id, id), eq(events.ownerId, ownerId)));
   return event;
+}
+
+// The event's language (see src/i18n/request-locale.ts); German when the
+// event doesn't exist or holds an unexpected value.
+export async function getEventLanguage(id: string): Promise<Locale> {
+  const [event] = await getDb()
+    .select({ language: events.language })
+    .from(events)
+    .where(eq(events.id, id));
+  return event ? eventLocale(event) : DEFAULT_LOCALE;
 }
 
 export async function eventExistsById(id: string): Promise<boolean> {
@@ -286,6 +298,7 @@ export async function createEvent(input: {
   accessPassword: string | null;
   dateMode: string;
   plan: EventPlan;
+  language: Locale;
 }): Promise<{ id: string; slug: string } | "no_quota"> {
   return getDb().transaction(async (tx) => {
     await lockUserLedger(tx, input.ownerId);
@@ -331,6 +344,7 @@ export async function createEvent(input: {
         accessPassword: input.accessPassword,
         dateMode: input.dateMode,
         plan: input.plan,
+        language: input.language,
       })
       .returning({ id: events.id, slug: events.slug });
 

@@ -1,10 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useState, type SubmitEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NAME_MAX_LENGTH, validatePersonName } from "@/lib/validation";
 import { Button } from "./Button";
+import { useErrorText } from "./useErrorText";
 
 type AccountNameFormProps = {
   currentName: string;
@@ -13,6 +15,8 @@ type AccountNameFormProps = {
 };
 
 export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: AccountNameFormProps) {
+  const t = useTranslations("auth");
+  const errorText = useErrorText();
   const router = useRouter();
   const nameId = useId();
   const [name, setName] = useState(currentName);
@@ -26,7 +30,7 @@ export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: A
     setError(null);
     const result = validatePersonName(name);
     if (!result.ok) {
-      setError(result.error);
+      setError(errorText(result.error));
       return;
     }
 
@@ -46,7 +50,7 @@ export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: A
       router.refresh();
       onDoneAction();
     } catch {
-      setError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setError(t("etwasIstSchiefgelaufenBitte"));
     } finally {
       setSaving(false);
     }
@@ -56,7 +60,7 @@ export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: A
     <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4">
       <div>
         <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-          Anzeigename
+          {t("anzeigename")}
         </label>
         <input
           id={nameId}
@@ -79,10 +83,10 @@ export function AccountNameForm({ currentName, onDoneAction, onCancelAction }: A
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onCancelAction} disabled={saving}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button variant="primary" type="submit" disabled={saving}>
-          {saving ? "Wird gespeichert ..." : "Speichern"}
+          {saving ? t("saving") : t("speichern")}
         </Button>
       </div>
     </form>

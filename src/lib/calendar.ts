@@ -1,3 +1,5 @@
+import { INTL_FORMAT_LOCALE, type Locale } from "@/i18n/config";
+
 function toIcsDateTime(date: string, time: string): string {
   const [year, month, day] = date.split("-");
   const [hour, minute] = time.split(":");
@@ -71,7 +73,20 @@ export function buildMapsLink(location: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 }
 
-const dateLabelFormatter = new Intl.DateTimeFormat("de-DE", {
+// Formatters per language, built once.
+function formatterCache(options: Intl.DateTimeFormatOptions) {
+  const cache = new Map<Locale, Intl.DateTimeFormat>();
+  return (locale: Locale) => {
+    let formatter = cache.get(locale);
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat(INTL_FORMAT_LOCALE[locale], options);
+      cache.set(locale, formatter);
+    }
+    return formatter;
+  };
+}
+
+const dateLabelFormatter = formatterCache({
   weekday: "long",
   day: "numeric",
   month: "long",
@@ -80,21 +95,27 @@ const dateLabelFormatter = new Intl.DateTimeFormat("de-DE", {
 });
 
 // Formats an ISO date (YYYY-MM-DD) into the human-readable label shown on
-// the event page, e.g. "Sonntag, 13. September 2026". Parsed and formatted
-// in UTC throughout so the result never shifts by a day depending on the
-// server's local timezone.
-export function formatDateLabel(date: string | null): string {
+// the event page, e.g. "Sonntag, 13. September 2026" / "Sunday, 13
+// September 2026". Parsed and formatted in UTC throughout so the result
+// never shifts by a day depending on the server's local timezone.
+export function formatDateLabel(date: string | null, locale: Locale): string {
   if (!date) return "";
-  return dateLabelFormatter.format(new Date(`${date}T00:00:00Z`));
+  return dateLabelFormatter(locale).format(new Date(`${date}T00:00:00Z`));
 }
 
-// An ISO date (YYYY-MM-DD) as "TT.MM.JJJJ", e.g. "05.12.2026".
-export function formatDottedDate(date: string): string {
+const DOTTED_DATE: Record<Locale, (day: string, month: string, year: string) => string> = {
+  de: (day, month, year) => `${day}.${month}.${year}`,
+  en: (day, month, year) => `${day}/${month}/${year}`,
+  ru: (day, month, year) => `${day}.${month}.${year}`,
+};
+
+// An ISO date (YYYY-MM-DD) as "05.12.2026" (German) or "05/12/2026" (English).
+export function formatDottedDate(date: string, locale: Locale): string {
   const [year, month, day] = date.split("-");
-  return `${day}.${month}.${year}`;
+  return DOTTED_DATE[locale](day, month, year);
 }
 
-const shortDateFormatter = new Intl.DateTimeFormat("de-DE", {
+const shortDateFormatter = formatterCache({
   weekday: "short",
   day: "numeric",
   month: "long",
@@ -102,48 +123,58 @@ const shortDateFormatter = new Intl.DateTimeFormat("de-DE", {
   timeZone: "UTC",
 });
 
-function dateParts(date: string) {
-  const parts = shortDateFormatter.formatToParts(new Date(`${date}T00:00:00Z`));
+// German writes the day with a dot ("4."), English without ("4").
+const DAY_SUFFIX: Record<Locale, string> = { de: ".", en: "", ru: "" };
+
+function dateParts(date: string, locale: Locale) {
+  const parts = shortDateFormatter(locale).formatToParts(new Date(`${date}T00:00:00Z`));
   const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
-  return { weekday: get("weekday"), day: get("day"), month: get("month"), year: get("year") };
+  const day = `${get("day")}${DAY_SUFFIX[locale]}`;
+  return { weekday: get("weekday"), day, month: get("month"), year: get("year") };
 }
 
 // Label for the event's date: a single day as before ("Freitag, 4. September
 // 2026"); a range compactly, naming month/year only where they differ:
-// "Fr. 4. – So. 6. September 2026", "Fr. 30. Oktober – So. 1. November 2026".
-export function formatDateRangeLabel(start: string | null, end: string | null): string {
+// "Fr. 4. – So. 6. September 2026", "Fri 30 October – Sun 1 November 2026".
+export function formatDateRangeLabel(start: string | null, end: string | null, locale: Locale): string {
   if (!start) return "";
-  if (!end || end === start) return formatDateLabel(start);
+  if (!end || end === start) return formatDateLabel(start, locale);
 
-  const a = dateParts(start);
-  const b = dateParts(end);
-  const endText = `${b.weekday} ${b.day}. ${b.month} ${b.year}`;
+  const a = dateParts(start, locale);
+  const b = dateParts(end, locale);
+  const endText = `${b.weekday} ${b.day} ${b.month} ${b.year}`;
 
-  if (a.year !== b.year) return `${a.weekday} ${a.day}. ${a.month} ${a.year} – ${endText}`;
-  if (a.month !== b.month) return `${a.weekday} ${a.day}. ${a.month} – ${endText}`;
-  return `${a.weekday} ${a.day}. – ${endText}`;
+  if (a.year !== b.year) return `${a.weekday} ${a.day} ${a.month} ${a.year} – ${endText}`;
+  if (a.month !== b.month) return `${a.weekday} ${a.day} ${a.month} – ${endText}`;
+  return `${a.weekday} ${a.day} – ${endText}`;
 }
 
-const createdDateFormatter = new Intl.DateTimeFormat("de-DE", {
+const createdDateFormatter = formatterCache({
   day: "numeric",
   month: "long",
   year: "numeric",
   timeZone: "Europe/Berlin",
 });
 
-// Formats a stored timestamp (e.g. an event's created_at) as a German date,
-// e.g. "4. September 2026". Unlike formatDateLabel this is a real instant,
-// so it is shown in German local time - late-evening UTC timestamps would
-// otherwise land on the previous day.
-export function formatCreatedDate(date: Date): string {
-  return createdDateFormatter.format(date);
+// Formats a stored timestamp (e.g. an event's created_at) as a date, e.g.
+// "4. September 2026" / "4 September 2026". Unlike formatDateLabel this is a
+// real instant, so it is shown in German local time - late-evening UTC
+// timestamps would otherwise land on the previous day.
+export function formatCreatedDate(date: Date, locale: Locale): string {
+  return createdDateFormatter(locale).format(date);
 }
 
+const TIME_LABEL: Record<Locale, { range: (start: string, end: string) => string; from: (start: string) => string }> = {
+  de: { range: (start, end) => `${start} - ${end} Uhr`, from: (start) => `ab ${start} Uhr` },
+  en: { range: (start, end) => `${start} – ${end}`, from: (start) => `from ${start}` },
+  ru: { range: (start, end) => `${start}–${end}`, from: (start) => `с ${start}` },
+};
+
 // Formats the event's start/end times into the human-readable label shown
-// on the event page, e.g. "09:30 - 12:00 Uhr" or "ab 09:30 Uhr" when no end
-// time is set.
-export function formatTimeLabel(startTime: string | null, endTime: string | null): string {
+// on the event page, e.g. "09:30 - 12:00 Uhr" / "09:30 – 12:00", or "ab
+// 09:30 Uhr" / "from 09:30" when no end time is set.
+export function formatTimeLabel(startTime: string | null, endTime: string | null, locale: Locale): string {
   if (!startTime) return "";
-  if (!endTime) return `ab ${startTime} Uhr`;
-  return `${startTime} - ${endTime} Uhr`;
+  const label = TIME_LABEL[locale];
+  return endTime ? label.range(startTime, endTime) : label.from(startTime);
 }

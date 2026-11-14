@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useId, useRef } from "react";
 import { saveConsent } from "@/lib/cookie-consent";
@@ -21,10 +22,14 @@ type CookieBannerProps = {
 // equally prominent. It is part of the server HTML - hidden by CSS until
 // the inline CONSENT_BANNER_SCRIPT finds no stored choice - so it paints
 // with the page instead of after hydration. Once the stored choice is
-// known on the client, it is removed for visitors who already decided.
+// known on the client, it is removed for visitors who already decided -
+// and shown by itself for those who didn't, without the script's <html>
+// attribute: a client-side switch between the site and an event page
+// rebuilds <html>, which drops that attribute and doesn't rerun the script.
 export function CookieBanner({ insideEvent = false }: CookieBannerProps) {
   const { loaded, consent } = useCookieConsent();
   const pathname = usePathname();
+  const t = useTranslations("cookies");
   const titleId = useId();
   const descriptionId = useId();
   const declineRef = useRef<HTMLButtonElement>(null);
@@ -33,7 +38,7 @@ export function CookieBanner({ insideEvent = false }: CookieBannerProps) {
   if (loaded && consent !== null) return null;
 
   return (
-    <div className="cookie-banner">
+    <div className={loaded ? "contents" : "cookie-banner"}>
       <Modal
         titleId={titleId}
         descriptionId={descriptionId}
@@ -44,33 +49,27 @@ export function CookieBanner({ insideEvent = false }: CookieBannerProps) {
         placement="bottom"
       >
         <h2 id={titleId} className="font-display text-2xl text-leaf-dark">
-          Cookies 🍪
+          {t("title")}
         </h2>
         <div id={descriptionId} className="mt-3 space-y-2 text-sm text-muted">
+          <p>{t("bannerText")}</p>
           <p>
-            Wir verwenden notwendige Cookies, damit du angemeldet bleiben kannst.
-            Zum Schutz unserer Formulare vor Spam möchten wir außerdem Google
-            reCAPTCHA einsetzen. Dabei werden Daten an Google übertragen und
-            Cookies von Google gesetzt.
-          </p>
-          <p>
-            Ohne Zustimmung kannst du die Seite ansehen, Anmelde- und
-            Gästeformulare benötigen aber reCAPTCHA. Du kannst deine Auswahl
-            jederzeit über „Cookies“ unten auf der Seite ändern. Mehr dazu in
-            unserer{" "}
-            <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-              Datenschutzerklärung
-            </LegalLink>
-            .
+            {t.rich("bannerChoice", {
+              privacy: (chunks) => (
+                <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                  {chunks}
+                </LegalLink>
+              ),
+            })}
           </p>
         </div>
 
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button ref={declineRef} variant="secondary" onClick={() => saveConsent(false)}>
-            Nur notwendige
+            {t("necessaryOnly")}
           </Button>
           <Button variant="primary" onClick={() => saveConsent(true)}>
-            Alle akzeptieren
+            {t("acceptAll")}
           </Button>
         </div>
       </Modal>

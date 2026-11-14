@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 import type { PollOption } from "@/lib/date-poll";
 
 vi.mock("@/repositories/event-repository", () => ({ getEventOwnerId: vi.fn(async () => "owner-1") }));
@@ -20,7 +21,7 @@ vi.mock("@/lib/recaptcha", () => ({
   verifyRecaptchaToken: vi.fn(async () => ({ ok: true })),
 }));
 vi.mock("@/services/event-lifecycle-service", () => ({
-  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  EVENT_OVER_ERROR: { key: "eventOver" },
   denyIfOver: vi.fn(async () => null),
 }));
 vi.mock("@/services/notification-service", async (importOriginal) => ({
@@ -51,7 +52,10 @@ describe("poll votes", () => {
     const result = await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] });
     expect(result).toMatchObject({ ok: true, data: { name: "Anna", optionIds: ["a"] } });
     expect(verifyRecaptchaToken).toHaveBeenCalled();
-    expect(notifications.notifyOwnerOfPollVote).toHaveBeenCalledWith("event-1", "created", "Anna", "Sa. 11.07. · ab 15:00");
+    expect(notifications.notifyOwnerOfPollVote).toHaveBeenCalledWith("event-1", "created", "Anna", expect.any(Function));
+    const describe = vi.mocked(notifications.notifyOwnerOfPollVote).mock.calls[0][3];
+    expect(describe("de")).toBe("Sa. 11.07. · ab 15:00");
+    expect(describe("en")).toBe("Sat 11/07 · from 15:00");
   });
 
   it("skips bot check and e-mail for the owner", async () => {
@@ -65,7 +69,7 @@ describe("poll votes", () => {
     expect(await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] })).toEqual({
       ok: false,
       status: 409,
-      error: "Die Abstimmung ist voll.",
+      error: err("pollFull"),
     });
   });
 
@@ -74,15 +78,15 @@ describe("poll votes", () => {
     expect(await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] })).toEqual({
       ok: false,
       status: 409,
-      error: "Die Abstimmung ist beendet.",
+      error: err("pollClosed"),
     });
     expect(await service.getPollForEvent("event-1")).toMatchObject({ ok: false, status: 409 });
   });
 
   it("refuses every write once the event is over, without writing", async () => {
-    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: err("eventOver") });
     try {
-      const over = { ok: false, status: 409, error: "Dieses Event ist vorbei." };
+      const over = { ok: false, status: 409, error: err("eventOver") };
       expect(await service.createPollVoteForEvent("event-1", { name: "Anna", optionIds: ["a"] })).toEqual(over);
       expect(await service.updatePollVoteForEvent("event-1", "v1", { name: "Anna", optionIds: ["a"] })).toEqual(over);
       expect(await service.deletePollVoteForEvent("event-1", "v1", {})).toEqual(over);
@@ -108,7 +112,7 @@ describe("poll votes", () => {
 
 describe("buildPollVoteMessage", () => {
   it("names voter, event and choice", () => {
-    expect(notifications.buildPollVoteMessage("created", "Anna", "Nichts davon passt", "Fest")).toEqual({
+    expect(notifications.buildPollVoteMessage("created", "Anna", "Nichts davon passt", "Fest", "de")).toEqual({
       subject: "Neue Stimme bei deinem Event „Fest“",
       text: "„Anna“ hat bei der Terminabstimmung für „Fest“ abgestimmt: Nichts davon passt.",
     });

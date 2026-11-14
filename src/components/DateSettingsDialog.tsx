@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale , useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { todayInBerlin, type DateMode } from "@/lib/date-poll";
@@ -12,6 +13,7 @@ import { DateModeFields } from "./DateModeFields";
 import { InvitationTextDialog } from "./InvitationTextDialog";
 import { Modal } from "./Modal";
 import { UnlockDialog } from "./UnlockDialog";
+import { useErrorText } from "./useErrorText";
 
 type DateSettingsDialogProps = {
   eventId: string;
@@ -32,6 +34,9 @@ export function DateSettingsDialog({
   unlock,
   onCloseAction,
 }: DateSettingsDialogProps) {
+  const t = useTranslations("eventDialog");
+  const locale = useLocale();
+  const errorText = useErrorText();
   const router = useRouter();
   const titleId = useId();
   const [today] = useState(todayInBerlin);
@@ -55,7 +60,7 @@ export function DateSettingsDialog({
 
     const result = buildDateModeRequest(original, draft, todayInBerlin(), dateWindow);
     if (!result.ok) {
-      setError(result.error);
+      setError(errorText(result.error));
       return;
     }
     if (!result.request) {
@@ -78,20 +83,20 @@ export function DateSettingsDialog({
         if (payload?.needsConfirm) {
           setConfirmLoss({ guests: payload.guests ?? 0, votes: payload.votes ?? 0 });
         } else {
-          setError(payload?.error ?? "Der Termin konnte nicht gespeichert werden. Bitte versuche es erneut.");
+          setError(payload?.error ?? t("derTerminKonnteNicht"));
         }
         return;
       }
       const request = result.request;
       if (request.mode === "fixed" && request.fromOptionId) {
-        setFixedFacts(fixedDateFacts(announcement, request));
+        setFixedFacts(fixedDateFacts(announcement, request, locale));
         return;
       }
       // Date, guest list and poll are all server-rendered parts of the page.
       router.refresh();
       onCloseAction();
     } catch {
-      setError("Der Termin konnte nicht gespeichert werden. Bitte versuche es erneut.");
+      setError(t("derTerminKonnteNicht"));
     } finally {
       setSaving(false);
     }
@@ -114,7 +119,7 @@ export function DateSettingsDialog({
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={saving}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        Termin
+        {t("termin")}
       </h2>
 
       <DateModeFields
@@ -134,20 +139,20 @@ export function DateSettingsDialog({
 
       {confirmLoss ? (
         <div role="alert" className="mt-4 rounded-xl border border-danger/40 bg-danger/5 p-3 text-sm">
-          <p className="font-bold text-danger">Dabei wird gelöscht:</p>
+          <p className="font-bold text-danger">{t("dabeiWirdGeloscht")}</p>
           <ul className="mt-1 list-disc pl-5">
             {confirmLoss.guests > 0 ? (
               <li>
-                die Gästeliste mit {confirmLoss.guests} {confirmLoss.guests === 1 ? "Eintrag" : "Einträgen"}
+                {t("lossGuests", { count: confirmLoss.guests })}
               </li>
             ) : null}
             {confirmLoss.votes > 0 ? (
               <li>
-                {confirmLoss.votes} {confirmLoss.votes === 1 ? "Stimme" : "Stimmen"} der Terminabstimmung
+                {t("lossVotes", { count: confirmLoss.votes })}
               </li>
             ) : null}
           </ul>
-          <p className="mt-1">Das lässt sich nicht rückgängig machen.</p>
+          <p className="mt-1">{t("dasLasstSichNicht")}</p>
         </div>
       ) : null}
 
@@ -156,9 +161,9 @@ export function DateSettingsDialog({
           <p className="text-sm text-danger" role="alert">
             {error}
           </p>
-          {plan === "free" && error === dateWindowError("free") ? (
+          {plan === "free" && error === errorText(dateWindowError("free")) ? (
             <Button variant="outline" className="mt-2" onClick={() => setUnlockFor({ mode: null })} disabled={saving}>
-              Mehr Zeit? Event freischalten
+              {t("mehrZeitEventFreischalten")}
             </Button>
           ) : null}
         </div>
@@ -166,14 +171,14 @@ export function DateSettingsDialog({
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onCloseAction} disabled={saving}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button
           variant={confirmLoss ? "danger" : "primary"}
           onClick={() => handleSave(confirmLoss !== null)}
           disabled={saving}
         >
-          {saving ? "Wird gespeichert ..." : confirmLoss ? "Löschen und speichern" : "Speichern"}
+          {saving ? t("saving") : confirmLoss ? t("loschenUndSpeichern") : t("speichern")}
         </Button>
       </div>
 

@@ -1,4 +1,5 @@
 import type { GuestDto } from "@/lib/types";
+import { useTranslations } from "next-intl";
 import { Button } from "./Button";
 import { GuestItem } from "./GuestItem";
 
@@ -37,6 +38,7 @@ export function GuestList({
   actionsDisabled = false,
   readOnly = false,
 }: GuestListProps) {
+  const t = useTranslations("guest");
   return (
     <section className="page-shell py-6" aria-labelledby="guest-heading">
       <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
@@ -44,7 +46,7 @@ export function GuestList({
           id="guest-heading"
           className="text-center font-display text-3xl text-leaf-dark sm:text-4xl"
         >
-          Wer kommt zum Event?
+          {t("werKommtZumEvent")}
         </h2>
         {capacityText ? (
           <p className="mt-2 text-center text-sm font-semibold text-muted" role="status">
@@ -54,7 +56,7 @@ export function GuestList({
 
         {loading ? (
           <p className="mt-8 text-center text-muted" role="status">
-            Gästeliste wird geladen ...
+            {t("gastelisteWirdGeladen")}
           </p>
         ) : null}
 
@@ -67,13 +69,13 @@ export function GuestList({
         {!loading && !error && guests.length === 0 ? (
           <div className="mt-8 text-center">
             <p className="text-lg text-muted">
-              {readOnly ? "Es hat sich niemand eingetragen." : "Noch hat sich niemand eingetragen."}
+              {readOnly ? t("nobodySignedUp") : t("nobodySignedUpYet")}
             </p>
             {readOnly ? null : (
               <>
-                <p className="mt-1 text-xl font-bold text-leaf-dark">Sei der Erste!</p>
+                <p className="mt-1 text-xl font-bold text-leaf-dark">{t("seiDerErste")}</p>
                 <Button variant="primary" size="lg" onClick={onAdd} className="mt-6">
-                  + Gast hinzufügen
+                  {t("gastHinzufugen")}
                 </Button>
               </>
             )}
@@ -86,12 +88,12 @@ export function GuestList({
               <table className="w-full border-collapse text-left">
                 <thead className="hidden sm:table-header-group">
                   <tr className="border-b border-leaf/20 text-sm font-bold text-leaf-dark">
-                    <th className="px-2 py-2 font-bold">Name:</th>
+                    <th className="px-2 py-2 font-bold">{t("name")}</th>
                     <th className="px-2 py-2" aria-hidden="true" />
-                    <th className="px-2 py-2 font-bold">Ankunftszeit</th>
-                    <th className="px-2 py-2 font-bold">Bleibt bis</th>
-                    <th className="px-2 py-2 font-bold">Ich bringe was mit</th>
-                    <th className="px-2 py-2 font-bold">Nachricht</th>
+                    <th className="px-2 py-2 font-bold">{t("arrivalTime")}</th>
+                    <th className="px-2 py-2 font-bold">{t("bleibtBis")}</th>
+                    <th className="px-2 py-2 font-bold">{t("ichBringeWasMit")}</th>
+                    <th className="px-2 py-2 font-bold">{t("nachricht")}</th>
                     <th className="px-2 py-2" aria-hidden="true" />
                   </tr>
                 </thead>
@@ -117,7 +119,7 @@ export function GuestList({
             {readOnly ? null : (
               <div className="mt-6 flex justify-center">
                 <Button variant="secondary" size="lg" onClick={onAdd} disabled={actionsDisabled}>
-                  + Gast hinzufügen
+                  {t("gastHinzufugen")}
                 </Button>
               </div>
             )}

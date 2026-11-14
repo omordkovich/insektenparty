@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import {
   POLL_MAX_OPTIONS,
   POLL_MIN_OPTIONS,
@@ -28,7 +29,7 @@ import { denyIfOver } from "@/services/event-lifecycle-service";
 
 export type DateModeResult =
   | { ok: true }
-  | { ok: false; status: number; error: string; confirm?: { guests: number; votes: number } };
+  | { ok: false; status: number; error: ErrorMessage; confirm?: { guests: number; votes: number } };
 
 type ParsedDateMode = { request: DateModeRequest; schedule: EventSchedule | null };
 
@@ -40,7 +41,7 @@ export function parseDateModeRequest(
 ): FieldResult<ParsedDateMode> {
   const value = (body ?? {}) as Record<string, unknown>;
   if (!isDateMode(value.mode)) {
-    return { ok: false, error: "Bitte wähle, wie der Termin festgelegt wird." };
+    return { ok: false, error: err("dateModeRequired") };
   }
   if (value.mode === "unknown") {
     return { ok: true, value: { request: { mode: "unknown" }, schedule: null } };
@@ -80,7 +81,7 @@ export async function changeDateMode(eventId: string, ownerId: string, body: unk
   const info = await getEventPlanInfo(eventId);
   const mode = await getEventDateMode(eventId);
   if (!info || info.ownerId !== ownerId || !mode) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("eventNotFound") };
   }
   const over = await denyIfOver(eventId);
   if (over) return over;
@@ -107,7 +108,7 @@ export async function changeDateMode(eventId: string, ownerId: string, body: unk
     return {
       ok: false,
       status: 409,
-      error: "Bitte bestätige, dass dabei Daten gelöscht werden.",
+      error: err("dataLossConfirm"),
       confirm: { guests: plan.lostGuests, votes: plan.lostVotes },
     };
   }
@@ -119,5 +120,5 @@ export async function changeDateMode(eventId: string, ownerId: string, body: unk
     plan,
     transferGuests: option ? transferredGuests(option, votes) : [],
   });
-  return saved ? { ok: true } : { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+  return saved ? { ok: true } : { ok: false, status: 404, error: err("eventNotFound") };
 }

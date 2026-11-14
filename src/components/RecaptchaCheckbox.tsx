@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { createPortal } from "react-dom";
 import { Button } from "./Button";
 import { CookieSettingsDialog } from "./CookieSettingsDialog";
@@ -6,8 +7,8 @@ import { themePortalTarget } from "./themePortalTarget";
 import { useCookieConsent } from "./useCookieConsent";
 
 const SCRIPT_ID = "google-recaptcha-v2";
-const SCRIPT_SRC =
-  "https://www.google.com/recaptcha/api.js?render=explicit&hl=de";
+// The widget's language ("I'm not a robot") follows the page.
+const scriptSrc = (locale: string) => `https://www.google.com/recaptcha/api.js?render=explicit&hl=${locale}`;
 
 type Grecaptcha = {
   ready: (callback: () => void) => void;
@@ -29,7 +30,7 @@ declare global {
   }
 }
 
-function loadRecaptchaScript(): Promise<Grecaptcha> {
+function loadRecaptchaScript(locale: string): Promise<Grecaptcha> {
   if (window.grecaptcha) {
     return Promise.resolve(window.grecaptcha);
   }
@@ -39,25 +40,25 @@ function loadRecaptchaScript(): Promise<Grecaptcha> {
     if (existing) {
       existing.addEventListener("load", () => {
         if (window.grecaptcha) resolve(window.grecaptcha);
-        else reject(new Error("reCAPTCHA konnte nicht geladen werden."));
+        else reject(new Error("reCAPTCHA could not be loaded."));
       });
       existing.addEventListener("error", () =>
-        reject(new Error("reCAPTCHA konnte nicht geladen werden.")),
+        reject(new Error("reCAPTCHA could not be loaded.")),
       );
       return;
     }
 
     const script = document.createElement("script");
     script.id = SCRIPT_ID;
-    script.src = SCRIPT_SRC;
+    script.src = scriptSrc(locale);
     script.async = true;
     script.defer = true;
     script.onload = () => {
       if (window.grecaptcha) resolve(window.grecaptcha);
-      else reject(new Error("reCAPTCHA konnte nicht geladen werden."));
+      else reject(new Error("reCAPTCHA could not be loaded."));
     };
     script.onerror = () =>
-      reject(new Error("reCAPTCHA konnte nicht geladen werden."));
+      reject(new Error("reCAPTCHA could not be loaded."));
     document.head.appendChild(script);
   });
 }
@@ -71,6 +72,8 @@ export function RecaptchaCheckbox({
   onTokenChange,
   resetSignal,
 }: RecaptchaCheckboxProps) {
+  const t = useTranslations("auth");
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<number | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
@@ -93,7 +96,7 @@ export function RecaptchaCheckbox({
 
     let cancelled = false;
 
-    void loadRecaptchaScript()
+    void loadRecaptchaScript(locale)
       .then(
         (grecaptcha) =>
           new Promise<void>((resolve) => {
@@ -119,7 +122,7 @@ export function RecaptchaCheckbox({
     return () => {
       cancelled = true;
     };
-  }, [siteKey, consentGiven]);
+  }, [siteKey, consentGiven, locale]);
 
   useEffect(() => {
     if (resetSignal === 0) return;
@@ -131,7 +134,7 @@ export function RecaptchaCheckbox({
   if (!siteKey) {
     return (
       <p className="text-sm text-danger" role="alert">
-        reCAPTCHA ist nicht konfiguriert.
+        {t("recaptchaIstNichtKonfiguriert")}
       </p>
     );
   }
@@ -140,11 +143,10 @@ export function RecaptchaCheckbox({
     return (
       <div className="rounded-2xl border border-leaf/20 p-4">
         <p id={labelId} className="text-sm font-bold">
-          Sicherheitsprüfung
+          {t("sicherheitsprufung")}
         </p>
         <p className="mt-2 text-sm text-muted">
-          Für die Sicherheitsprüfung wird Google reCAPTCHA benötigt. Dabei
-          werden Daten an Google übertragen und Cookies von Google gesetzt.
+          {t("furDieSicherheitsprufungWird")}
         </p>
         <Button
           variant="outline"
@@ -152,7 +154,7 @@ export function RecaptchaCheckbox({
           aria-describedby={labelId}
           onClick={() => setSettingsOpen(true)}
         >
-          reCAPTCHA zulassen
+          {t("recaptchaZulassen")}
         </Button>
         {/* The visitor confirms the choice themselves in the cookie settings
             instead of a one-click opt-in. Portalled out of the surrounding
@@ -171,7 +173,7 @@ export function RecaptchaCheckbox({
   return (
     <div>
       <p id={labelId} className="mb-2 text-sm font-bold">
-        Sicherheitsprüfung
+        {t("sicherheitsprufung")}
       </p>
       <div
         ref={containerRef}

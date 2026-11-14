@@ -1,3 +1,5 @@
+import { apiErrors } from "@/i18n/api-errors";
+import { err } from "@/i18n/errors";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
@@ -17,10 +19,11 @@ async function readBody(request: Request): Promise<unknown | null> {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId, voteId } = await context.params;
     if (!isUuid(eventId) || !isUuid(voteId)) {
-      return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
+      return fail(err("invalidId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -28,7 +31,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const body = await readBody(request);
     if (body === null) {
-      return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
+      return fail(err("invalidRequest"), 400);
     }
 
     const supabase = await createClient();
@@ -36,23 +39,21 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const result = await updatePollVoteForEvent(eventId, voteId, body, data?.claims?.sub);
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
     return NextResponse.json(result.data);
   } catch (error) {
     console.error("PATCH /api/events/[eventId]/poll-votes/[voteId] failed:", error);
-    return NextResponse.json(
-      { error: "Deine Stimme konnte nicht gespeichert werden. Bitte versuche es erneut." },
-      { status: 500 },
-    );
+    return fail(err("voteSaveFailed"), 500);
   }
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId, voteId } = await context.params;
     if (!isUuid(eventId) || !isUuid(voteId)) {
-      return NextResponse.json({ error: "Ungültige ID." }, { status: 400 });
+      return fail(err("invalidId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -64,14 +65,11 @@ export async function DELETE(request: Request, context: RouteContext) {
     const body = (await readBody(request)) ?? {};
     const result = await deletePollVoteForEvent(eventId, voteId, body, data?.claims?.sub);
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
     return NextResponse.json(result.data);
   } catch (error) {
     console.error("DELETE /api/events/[eventId]/poll-votes/[voteId] failed:", error);
-    return NextResponse.json(
-      { error: "Die Stimme konnte nicht gelöscht werden. Bitte versuche es erneut." },
-      { status: 500 },
-    );
+    return fail(err("voteDeleteFailed"), 500);
   }
 }

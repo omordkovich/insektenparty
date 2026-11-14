@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useId, useState } from "react";
 import type { EventPlan } from "@/lib/event-plan";
@@ -20,6 +21,7 @@ type CreateEventButtonProps = {
 };
 
 export function CreateEventButton({ entitlements, limitReached, dummyPayments }: CreateEventButtonProps) {
+  const t = useTranslations("home");
   const [view, setView] = useState<"unlock" | "create" | null>(null);
   // A credit was just bought here: the new event is a paid one, even before
   // the refreshed entitlements arrive.
@@ -42,15 +44,15 @@ export function CreateEventButton({ entitlements, limitReached, dummyPayments }:
             onClick={() => setView("unlock")}
           >
             <LockIcon />
-            Event erstellen
+            {t("createEvent")}
           </Button>
           <p id={hintId} className="text-sm text-muted">
-            Dein kostenloses Event hast du schon genutzt. Weitere Events kannst du freischalten.
+            {t("freeEventUsed")}
           </p>
         </div>
       ) : (
         <Button variant="primary" size="lg" onClick={() => setView("create")}>
-          + Event erstellen
+          {t("createEventPlus")}
         </Button>
       )}
       {view === "unlock" ? (

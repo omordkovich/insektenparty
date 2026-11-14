@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useState, type SubmitEvent } from "react";
 import { TERMS_VERSION } from "@/lib/legal-info";
@@ -7,13 +8,13 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "./Button";
 import {
   CONSENT_AGE_ERROR,
+  CONSENT_AGE_VALUES,
   CONSENT_TERMS_ERROR,
   ConsentCheckboxes,
 } from "./ConsentCheckboxes";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 
-const UPDATED_TERMS_ERROR = "Bitte stimme den geänderten AGB zu.";
 
 // "2026-11-02" -> "02.11.2026"
 const TERMS_DATE = TERMS_VERSION.split("-").reverse().join(".");
@@ -27,6 +28,8 @@ const TERMS_DATE = TERMS_VERSION.split("-").reverse().join(".");
 // It can't be closed: the only ways out are accepting or logging out.
 export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
   const router = useRouter();
+  const t = useTranslations("consent");
+  const tCommon = useTranslations("common");
   const titleId = useId();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [confirmedAge, setConfirmedAge] = useState(false);
@@ -38,11 +41,11 @@ export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
     if (saving) return;
 
     if (!acceptedTerms) {
-      setError(kind === "update" ? UPDATED_TERMS_ERROR : CONSENT_TERMS_ERROR);
+      setError(t(kind === "update" ? "updatedTermsError" : CONSENT_TERMS_ERROR));
       return;
     }
     if (kind === "first" && !confirmedAge) {
-      setError(CONSENT_AGE_ERROR);
+      setError(t(CONSENT_AGE_ERROR, CONSENT_AGE_VALUES));
       return;
     }
 
@@ -52,12 +55,12 @@ export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
       const response = await fetch("/auth/consent", { method: "POST" });
       if (!response.ok) {
         const body = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(body?.error ?? "Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+        setError(body?.error ?? tCommon("genericError"));
         return;
       }
       router.refresh();
     } catch {
-      setError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setError(tCommon("genericError"));
     } finally {
       setSaving(false);
     }
@@ -79,14 +82,14 @@ export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
       onSubmitAction={handleSubmit}
       onCloseAction={() => {}}
       closeDisabled
-      header={kind === "update" ? "Wir haben unsere AGB geändert" : "Fast geschafft"}
+      header={kind === "update" ? t("updateTitle") : t("firstTitle")}
       footer={
         <>
           <Button variant="outline" onClick={handleLogout} disabled={saving}>
-            Abbrechen und ausloggen
+            {t("cancelAndLogout")}
           </Button>
           <Button variant="primary" type="submit" disabled={saving}>
-            {saving ? "Wird gesendet ..." : kind === "update" ? "Zustimmen" : "Bestätigen"}
+            {saving ? tCommon("sending") : kind === "update" ? t("agree") : t("confirm")}
           </Button>
         </>
       }
@@ -95,9 +98,7 @@ export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
         {kind === "update" ? (
           <>
             <p>
-              Unsere AGB haben einen neuen Stand ({TERMS_DATE}). Damit du weiter Events anlegen
-              und Erweiterungen kaufen kannst, brauchen wir deine Zustimmung. Deine bestehenden
-              Events und bereits gekaufte Erweiterungen bleiben, wie sie sind.
+              {t("updateText", { date: TERMS_DATE })}
             </p>
 
             <label className="flex items-start gap-2 text-left text-sm">
@@ -111,19 +112,20 @@ export function ConsentDialog({ kind }: { kind: "first" | "update" }) {
                 className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
               />
               <span>
-                Ich stimme den geänderten{" "}
-                <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
-                  AGB
-                </LegalLink>{" "}
-                zu.
+                {t.rich("updateCheckbox", {
+                  terms: (chunks) => (
+                    <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
+                      {chunks}
+                    </LegalLink>
+                  ),
+                })}
               </span>
             </label>
           </>
         ) : (
           <>
             <p>
-              Dein Konto wurde über Google angelegt. Bevor du loslegen kannst, brauchen wir noch
-              deine Zustimmung:
+              {t("googleText")}
             </p>
 
             <ConsentCheckboxes
