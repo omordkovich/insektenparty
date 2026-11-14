@@ -1,3 +1,5 @@
+import { isLocale, type Locale } from "@/i18n/config";
+
 // The display name is the user metadata's `name`: what the user entered at
 // signup, or - for Google accounts - the name of the Google account (Google
 // refreshes it on every login, so it is changed there, not in this app).
@@ -7,6 +9,14 @@ export function getAccountName(userMetadata: unknown): string | null {
 
   const value = (userMetadata as Record<string, unknown>).name;
   return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
+// The account's language (user metadata `locale`, set at signup and by the
+// language menu) - used for mails and to restore the choice on login.
+export function getAccountLocale(userMetadata: unknown): Locale | null {
+  if (typeof userMetadata !== "object" || userMetadata === null) return null;
+  const value = (userMetadata as Record<string, unknown>).locale;
+  return isLocale(value) ? value : null;
 }
 
 export type SignInMethods = {

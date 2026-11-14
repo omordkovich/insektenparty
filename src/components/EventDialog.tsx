@@ -1,14 +1,16 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
+import { LOCALE_NAMES, LOCALES, type Locale } from "@/i18n/config";
 import { todayInBerlin, type DateMode, type DateModeRequest } from "@/lib/date-poll";
 import { buildDateModeRequest, dateWindowOf, initialDateDraft, type DateDraft } from "@/lib/date-poll-form";
 import { dateWindowError, latestAllowedDate, type EventPlan } from "@/lib/event-plan";
 import { isThemeSelectable, unlockedThemesFor } from "@/lib/features";
 import type { UnlockContext } from "@/lib/products";
-import { THEME_ASSETS, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+import { THEME_ASSETS, THEME_LABELS, themeLabel, type ThemeKey } from "@/lib/theme-presets";
 import { MAX_GUEST_CAPACITY } from "@/lib/guest-capacity";
 import {
   EVENT_TEXT_MAX_LENGTH,
@@ -23,6 +25,7 @@ import { EventPasswordFields } from "./EventPasswordFields";
 import { LegalLink } from "./LegalLink";
 import { Modal } from "./Modal";
 import { UnlockDialog, type UnlockScope } from "./UnlockDialog";
+import { useErrorText } from "./useErrorText";
 
 const THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
 
@@ -39,7 +42,13 @@ type EventDialogProps = (
       // Owner's event page: design and password protection - the title is
       // edited inline on the page itself.
       mode: "settings";
-      event: { id: string; theme: ThemeKey; accessPassword: string | null; maxGuests: number | null };
+      event: {
+        id: string;
+        theme: ThemeKey;
+        accessPassword: string | null;
+        maxGuests: number | null;
+        language: Locale;
+      };
       /** The designs this event may use (all of them for a paid event). */
       unlockedThemes: ThemeKey[];
     }
@@ -53,12 +62,19 @@ type EventDialogProps = (
 type UnlockTarget = { kind: "theme"; theme: ThemeKey } | { kind: "credit"; mode: DateMode | null };
 
 export function EventDialog(props: EventDialogProps) {
+  const t = useTranslations("eventDialog");
+  const errorText = useErrorText();
   const { mode, onCloseAction } = props;
   const router = useRouter();
   const titleId = useId();
   const nameFieldId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
 
+  const siteLocale = useLocale();
+  const locale = siteLocale;
+  const languageGroupId = useId();
+  const originalLanguage = mode === "settings" ? props.event.language : undefined;
+  const [language, setLanguage] = useState<Locale>(originalLanguage ?? siteLocale);
   const [name, setName] = useState("");
   const [theme, setTheme] = useState<ThemeKey>(mode === "settings" ? props.event.theme : THEME_KEYS[0]);
   const [saving, setSaving] = useState(false);
@@ -111,7 +127,7 @@ export function EventDialog(props: EventDialogProps) {
     if (mode === "create") {
       const titleResult = validateNewEventTitle(name);
       if (!titleResult.ok) {
-        setError(titleResult.error);
+        setError(errorText(titleResult.error));
         nameInputRef.current?.focus();
         return;
       }
@@ -123,7 +139,7 @@ export function EventDialog(props: EventDialogProps) {
     if (withDateBlock) {
       const dateResult = buildDateModeRequest(null, dateDraft, todayInBerlin(), dateWindow);
       if (!dateResult.ok) {
-        setError(dateResult.error);
+        setError(errorText(dateResult.error));
         return;
       }
       if (dateResult.request) date = dateResult.request;
@@ -133,7 +149,7 @@ export function EventDialog(props: EventDialogProps) {
     if (isProtected) {
       const passwordResult = validateEventPasswordPair(password, passwordRepeat);
       if (!passwordResult.ok) {
-        setError(passwordResult.error);
+        setError(errorText(passwordResult.error));
         return;
       }
       accessPassword = passwordResult.value;
@@ -143,16 +159,22 @@ export function EventDialog(props: EventDialogProps) {
     if (mode === "settings" && limitGuests) {
       const capacityResult = validateMaxGuests(maxGuestsInput);
       if (!capacityResult.ok) {
-        setError(capacityResult.error);
+        setError(errorText(capacityResult.error));
         return;
       }
       maxGuests = capacityResult.value;
     }
 
     // Settings: only send what changed; nothing changed = just close.
-    const changes: { theme?: ThemeKey; accessPassword?: string | null; maxGuests?: number | null } = {};
+    const changes: {
+      theme?: ThemeKey;
+      accessPassword?: string | null;
+      maxGuests?: number | null;
+      language?: Locale;
+    } = {};
     if (mode === "settings") {
       if (theme !== originalTheme) changes.theme = theme;
+      if (language !== originalLanguage) changes.language = language;
       if (accessPassword !== originalPassword) changes.accessPassword = accessPassword;
       if (maxGuests !== originalMaxGuests) changes.maxGuests = maxGuests;
       if (Object.keys(changes).length === 0) {
@@ -177,6 +199,7 @@ export function EventDialog(props: EventDialogProps) {
             accessPassword,
             date,
             paid: createPlan === "paid",
+            language,
           }),
         });
 
@@ -185,7 +208,7 @@ export function EventDialog(props: EventDialogProps) {
             | { error?: string }
             | null;
           setError(
-            payload?.error ?? "Das Event konnte nicht erstellt werden. Bitte versuche es erneut.",
+            payload?.error ?? t("dasEventKonnteNicht2"),
           );
           setSaving(false);
           return;
@@ -207,7 +230,7 @@ export function EventDialog(props: EventDialogProps) {
           | { error?: string }
           | null;
         setError(
-          payload?.error ?? "Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+          payload?.error ?? t("dieEinstellungenKonntenNicht"),
         );
         setSaving(false);
         return;
@@ -220,8 +243,8 @@ export function EventDialog(props: EventDialogProps) {
     } catch {
       setError(
         mode === "create"
-          ? "Das Event konnte nicht erstellt werden. Bitte versuche es erneut."
-          : "Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+          ? t("dasEventKonnteNicht2")
+          : t("dieEinstellungenKonntenNicht"),
       );
       setSaving(false);
     }
@@ -230,13 +253,13 @@ export function EventDialog(props: EventDialogProps) {
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction} closeDisabled={saving}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        {mode === "create" ? "Event erstellen" : "Event-Einstellungen"}
+        {mode === "create" ? t("eventErstellen") : t("eventEinstellungen")}
       </h2>
 
       {mode === "create" ? (
         <>
           <label htmlFor={nameFieldId} className="mt-5 block text-sm font-semibold text-leaf-dark">
-            Name
+            {t("name")}
           </label>
           <input
             ref={nameInputRef}
@@ -244,7 +267,7 @@ export function EventDialog(props: EventDialogProps) {
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="z. B. Geburtstagsfeier 2026"
+            placeholder={t("namePlaceholder")}
             disabled={saving}
             maxLength={EVENT_TEXT_MAX_LENGTH}
             className="mt-1 w-full rounded-xl border border-leaf/25 bg-white px-3 py-2 text-zinc-800"
@@ -252,7 +275,30 @@ export function EventDialog(props: EventDialogProps) {
         </>
       ) : null}
 
-      <p className="mt-5 text-sm font-semibold text-leaf-dark">Design</p>
+      <p id={languageGroupId} className="mt-5 text-sm font-semibold text-leaf-dark">
+        {t("language")}
+      </p>
+      <div role="radiogroup" aria-labelledby={languageGroupId} className="mt-2 flex flex-wrap gap-2">
+        {LOCALES.map((option) => (
+          <button
+            key={option}
+            type="button"
+            role="radio"
+            aria-checked={language === option}
+            lang={option}
+            onClick={() => setLanguage(option)}
+            disabled={saving}
+            className={`min-h-11 rounded-xl border-2 px-4 text-sm font-semibold transition ${
+              language === option ? "border-leaf bg-leaf/10 text-leaf-dark" : "border-leaf/20 text-zinc-700 hover:bg-leaf/5"
+            }`}
+          >
+            {LOCALE_NAMES[option]}
+          </button>
+        ))}
+      </div>
+      <p className="mt-1 text-xs text-muted">{t("languageHint")}</p>
+
+      <p className="mt-5 text-sm font-semibold text-leaf-dark">{t("design")}</p>
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {THEME_KEYS.map((key) => {
           const selectable = isThemeSelectable(unlockedThemes, key, originalTheme);
@@ -287,8 +333,8 @@ export function EventDialog(props: EventDialogProps) {
                 className="h-12 w-12 object-contain"
               />
               <span className="text-[11px] leading-tight text-muted">
-                {THEME_LABELS[key]}
-                {selectable ? null : <span className="sr-only"> (gesperrt)</span>}
+                {themeLabel(key, locale)}
+                {selectable ? null : <span className="sr-only"> {t("gesperrt")}</span>}
               </span>
             </button>
           );
@@ -297,10 +343,10 @@ export function EventDialog(props: EventDialogProps) {
 
       {withDateBlock ? (
         <div className="mt-5">
-          <p className="text-sm font-semibold text-leaf-dark">Termin</p>
+          <p className="text-sm font-semibold text-leaf-dark">{t("termin")}</p>
           {createPlan === "free" ? (
             <p className="mt-1 text-xs text-muted">
-              Dein kostenloses Event braucht ein festes Datum, höchstens 3 Monate im Voraus.
+              {t("deinKostenlosesEventBraucht")}
             </p>
           ) : null}
           <DateModeFields
@@ -345,13 +391,13 @@ export function EventDialog(props: EventDialogProps) {
               }}
               className="h-5 w-5 rounded border-leaf/40"
             />
-            Teilnehmerzahl begrenzen
+            {t("teilnehmerzahlBegrenzen")}
           </label>
           {limitGuests ? (
             <div className="mt-2">
               <div className="flex items-center gap-2 text-sm">
                 <label htmlFor={maxGuestsId} className="shrink-0">
-                  max.
+                  {t("max")}
                 </label>
                 <input
                   id={maxGuestsId}
@@ -365,11 +411,10 @@ export function EventDialog(props: EventDialogProps) {
                   onChange={(event) => setMaxGuestsInput(event.target.value)}
                   className="w-24 rounded-xl border border-leaf/25 bg-surface px-3 py-2"
                 />
-                <span>Personen</span>
+                <span>{t("personen")}</span>
               </div>
               <p className="mt-1 text-xs text-muted">
-                Begleitpersonen zählen mit, Absagen nicht. Ist alles belegt, sind nur noch Absagen
-                möglich – auch für dich. Für mehr Zusagen erhöhst du die Zahl hier.
+                {t("begleitpersonenZahlenMitAbsagen")}
               </p>
             </div>
           ) : null}
@@ -378,13 +423,13 @@ export function EventDialog(props: EventDialogProps) {
 
       {mode === "create" ? (
         <p className="mt-4 text-xs text-muted">
-          Die Event-Seite ist für alle sichtbar, die den Einladungslink kennen
-          (mit Passwortschutz: zusätzlich das Passwort) – auch die
-          Kontaktangaben, die du dort einträgst. Mehr dazu in der{" "}
-          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-            Datenschutzerklärung
-          </LegalLink>
-          .
+          {t.rich("createPrivacyNote", {
+            privacy: (chunks) => (
+              <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                {chunks}
+              </LegalLink>
+            ),
+          })}
         </p>
       ) : null}
 
@@ -393,14 +438,14 @@ export function EventDialog(props: EventDialogProps) {
           <p className="text-sm text-danger" role="alert">
             {error}
           </p>
-          {createPlan === "free" && error === dateWindowError("free") ? (
+          {createPlan === "free" && error === errorText(dateWindowError("free")) ? (
             <Button
               variant="outline"
               className="mt-2"
               onClick={() => setUnlockTarget({ kind: "credit", mode: null })}
               disabled={saving}
             >
-              Mehr Zeit? Event freischalten
+              {t("mehrZeitEventFreischalten")}
             </Button>
           ) : null}
         </div>
@@ -408,10 +453,10 @@ export function EventDialog(props: EventDialogProps) {
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onCloseAction} disabled={saving}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button variant="primary" onClick={handleSubmit} disabled={saving}>
-          {saving ? "Wird gespeichert ..." : "Bestätigen"}
+          {saving ? t("saving") : t("bestatigen")}
         </Button>
       </div>
 

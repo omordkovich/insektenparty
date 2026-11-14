@@ -1,3 +1,6 @@
+import type { Locale } from "@/i18n/config";
+import { serverTranslator } from "@/i18n/translator";
+import { localizedPath } from "@/lib/page-metadata";
 import { addDays } from "@/lib/date-poll";
 import { formatDottedDate } from "@/lib/calendar";
 import {
@@ -60,29 +63,19 @@ export function buildLifecycleMessage(
   kind: LifecycleMail,
   event: { title: string; slug: string },
   date: string,
+  locale: Locale,
 ): { subject: string; text: string } {
-  const link = buildEventShareUrl(event.slug);
+  const t = serverTranslator(locale, "mail");
+  const values = { title: event.title, date: formatDottedDate(date, locale), link: buildEventShareUrl(event.slug) };
   switch (kind) {
     case "deletion_notice":
       return {
-        subject: `Dein Event „${event.title}“ wird am ${formatDottedDate(date)} gelöscht`,
-        text:
-          `Dein Event „${event.title}“ wird am ${formatDottedDate(date)} gelöscht, ` +
-          `inklusive Gästeliste und Abstimmung.\n\n` +
-          `Zu deinen Events: ${SITE_URL}/\n\n` +
-          `Nächste Party? Weiteres Event freischalten`,
+        subject: t("deletionSubject", values),
+        text: t("deletionText", { ...values, home: `${SITE_URL}${localizedPath("/", locale)}` }),
       };
     case "date_reminder":
-      return {
-        subject: `Setz einen Termin für „${event.title}“`,
-        text: `Ohne Termin läuft dein Event am ${formatDottedDate(date)} ab.\n\nEvent ansehen: ${link}`,
-      };
+      return { subject: t("dateReminderSubject", values), text: t("dateReminderText", values) };
     case "poll_reminder":
-      return {
-        subject: `Leg den Termin für „${event.title}“ fest`,
-        text:
-          `Deine Abstimmung endet am ${formatDottedDate(date)}. ` +
-          `Danach kannst du keinen Termin mehr festlegen.\n\nEvent ansehen: ${link}`,
-      };
+      return { subject: t("pollReminderSubject", values), text: t("pollReminderText", values) };
   }
 }

@@ -1,3 +1,4 @@
+import { splitLocalePrefix } from "@/i18n/locale-path";
 import { INSTAGRAM_URL, SITE_URL } from "@/lib/site";
 
 // "Under construction" mode for the public domain, switched on with the env
@@ -29,7 +30,10 @@ const ALWAYS_REACHABLE = new Set([
 // "/p" is the old event prefix - kept so its redirect still works.
 const ALWAYS_REACHABLE_SECTIONS = ["/event", "/p", "/api", "/auth"];
 
-function isAlwaysReachable(pathname: string): boolean {
+function isAlwaysReachable(rawPathname: string): boolean {
+  // The other languages' versions (/en/impressum …) follow their German
+  // counterparts.
+  const pathname = splitLocalePrefix(rawPathname).path;
   return (
     ALWAYS_REACHABLE.has(pathname) ||
     ALWAYS_REACHABLE_SECTIONS.some((section) => pathname === section || pathname.startsWith(`${section}/`))

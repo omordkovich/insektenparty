@@ -1,7 +1,13 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import type { ErrorMessage } from "@/i18n/errors";
+import { rememberLocale } from "@/i18n/locale-cookie";
+import { splitLocalePrefix } from "@/i18n/locale-path";
+import { languageSwitchHref } from "@/i18n/switch-url";
+import { getAccountLocale } from "@/lib/account";
 import { PASSWORD_MIN_LENGTH, validateNewPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -14,6 +20,7 @@ import { NAME_MAX_LENGTH, validateEmail, validatePersonName } from "@/lib/valida
 import { Button } from "./Button";
 import {
   CONSENT_AGE_ERROR,
+  CONSENT_AGE_VALUES,
   CONSENT_TERMS_ERROR,
   ConsentCheckboxes,
 } from "./ConsentCheckboxes";
@@ -22,6 +29,7 @@ import { GoogleIcon } from "./GoogleIcon";
 import { PasswordHint } from "./PasswordHint";
 import { PasswordInput } from "./PasswordInput";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
+import { useErrorText } from "./useErrorText";
 
 export type AuthDialogMode = "login" | "register" | "reset";
 
@@ -58,7 +66,12 @@ export function AuthDialog({
   onCloseAction,
   afterLoginHref,
 }: AuthDialogProps) {
+  const t = useTranslations("auth");
+  const errorText = useErrorText();
+  const passwordText = (error: ErrorMessage | null) => (error ? errorText(error) : null);
   const router = useRouter();
+  const locale = useLocale();
+  const tConsent = useTranslations("consent");
   const titleId = useId();
   const nameId = useId();
   const emailId = useId();
@@ -104,11 +117,11 @@ export function AuthDialog({
     // that never consented is asked on the start page.)
     if (mode === "register") {
       if (!form.acceptedTerms) {
-        setFieldError(CONSENT_TERMS_ERROR);
+        setFieldError(tConsent(CONSENT_TERMS_ERROR));
         return;
       }
       if (!form.confirmedAge) {
-        setFieldError(CONSENT_AGE_ERROR);
+        setFieldError(tConsent(CONSENT_AGE_ERROR, CONSENT_AGE_VALUES));
         return;
       }
     }
@@ -123,6 +136,8 @@ export function AuthDialog({
 
     setSaving(true);
     try {
+      // Google sign-up: the callback takes this language for the new account.
+      rememberLocale(locale);
       const { error } = await createClient().auth.signInWithOAuth({
         provider: "google",
         // Exactly the URL on Supabase's redirect allow-list: no query string.
@@ -134,7 +149,7 @@ export function AuthDialog({
       }
       // On success the browser navigates to Google; keep the dialog locked.
     } catch {
-      setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setSubmitError(t("etwasIstSchiefgelaufenBitte"));
       setSaving(false);
     }
   }
@@ -153,7 +168,7 @@ export function AuthDialog({
     if (mode === "register") {
       const nameResult = validatePersonName(form.name);
       if (!nameResult.ok) {
-        setFieldError(nameResult.error);
+        setFieldError(errorText(nameResult.error));
         setNameInvalid(true);
         nameInputRef.current?.focus();
         return;
@@ -163,7 +178,7 @@ export function AuthDialog({
 
     const emailResult = validateEmail(form.email);
     if (!emailResult.ok) {
-      setFieldError(emailResult.error);
+      setFieldError(errorText(emailResult.error));
       return;
     }
     const email = emailResult.value;
@@ -183,7 +198,7 @@ export function AuthDialog({
         // here (to avoid leaking that), so this message is shown either way.
         setResetSent(true);
       } catch {
-        setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+        setSubmitError(t("etwasIstSchiefgelaufenBitte"));
       } finally {
         setSaving(false);
       }
@@ -194,10 +209,10 @@ export function AuthDialog({
     // accounts with older, shorter passwords can still sign in.
     const passwordError =
       mode === "register"
-        ? validateNewPassword(form.password)
+        ? passwordText(validateNewPassword(form.password))
         : form.password
           ? null
-          : "Bitte gib dein Passwort ein.";
+          : t("bitteGibDeinPasswort");
     if (passwordError) {
       setFieldError(passwordError);
       return;
@@ -205,19 +220,19 @@ export function AuthDialog({
 
     if (mode === "register") {
       if (form.password !== form.passwordConfirm) {
-        setFieldError("Die Passwörter stimmen nicht überein.");
+        setFieldError(t("diePassworterStimmenNicht"));
         return;
       }
       if (!form.acceptedTerms) {
-        setFieldError(CONSENT_TERMS_ERROR);
+        setFieldError(tConsent(CONSENT_TERMS_ERROR));
         return;
       }
       if (!form.confirmedAge) {
-        setFieldError(CONSENT_AGE_ERROR);
+        setFieldError(tConsent(CONSENT_AGE_ERROR, CONSENT_AGE_VALUES));
         return;
       }
       if (!recaptchaToken) {
-        setFieldError("Bitte bestätige, dass du kein Roboter bist.");
+        setFieldError(t("bitteBestatigeDassDu"));
         return;
       }
     }
@@ -227,12 +242,24 @@ export function AuthDialog({
       const supabase = createClient();
 
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password: form.password,
         });
         if (error) {
           setSubmitError(error.message);
+          return;
+        }
+        // The account's language wins over this device's choice. A full
+        // navigation lets the proxy move the page to that language.
+        const accountLocale = getAccountLocale(data.user?.user_metadata);
+        if (accountLocale && accountLocale !== locale) {
+          rememberLocale(accountLocale);
+          // The same page in the account's language (query string dropped,
+          // as before: e.g. ?link_expired= would show its notice again).
+          window.location.assign(
+            afterLoginHref ?? languageSwitchHref(splitLocalePrefix(window.location.pathname).path, "", accountLocale),
+          );
           return;
         }
         if (afterLoginHref) router.push(afterLoginHref);
@@ -247,6 +274,7 @@ export function AuthDialog({
         options: {
           data: {
             name,
+            locale,
             ...consentMetadata(),
           },
         },
@@ -262,7 +290,7 @@ export function AuthDialog({
       // empty identities array instead. That's the only way to detect it.
       if (data.user && data.user.identities?.length === 0) {
         setSubmitError(
-          "Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich stattdessen an.",
+          t("dieseEMailAdresse"),
         );
         setRecaptchaReset((value) => value + 1);
         return;
@@ -270,7 +298,7 @@ export function AuthDialog({
 
       setConfirmationSent(true);
     } catch {
-      setSubmitError("Etwas ist schiefgelaufen. Bitte versuche es erneut.");
+      setSubmitError(t("etwasIstSchiefgelaufenBitte"));
       setRecaptchaReset((value) => value + 1);
     } finally {
       setSaving(false);
@@ -285,12 +313,12 @@ export function AuthDialog({
       closeDisabled={saving}
       initialFocusRef={emailInputRef}
       header={
-        mode === "login" ? "Login" : mode === "register" ? "Registrieren" : "Passwort zurücksetzen"
+        mode === "login" ? t("login") : mode === "register" ? t("register") : t("passwortZurucksetzen")
       }
       footer={
         <>
           <Button variant="outline" onClick={onCloseAction} disabled={saving}>
-            {confirmationSent || resetSent ? "Schließen" : "Abbrechen"}
+            {confirmationSent || resetSent ? t("schliessen") : t("abbrechen")}
           </Button>
           {confirmationSent || resetSent ? null : (
             <Button
@@ -299,12 +327,12 @@ export function AuthDialog({
               disabled={saving || (mode === "register" && !recaptchaToken)}
             >
               {saving
-                ? "Wird gesendet ..."
+                ? t("sending")
                 : mode === "login"
-                  ? "Einloggen"
+                  ? t("logIn")
                   : mode === "register"
-                    ? "Registrieren"
-                    : "Passwort zurücksetzen"}
+                    ? t("register")
+                    : t("passwortZurucksetzen")}
             </Button>
           )}
         </>
@@ -313,15 +341,15 @@ export function AuthDialog({
       {confirmationSent || resetSent ? (
         <p>
           {confirmationSent
-            ? "Fast geschafft! Wir haben dir eine E-Mail geschickt — bitte klicke auf den Bestätigungslink, um dein Konto zu aktivieren."
-            : "Falls diese E-Mail-Adresse bei uns registriert ist, haben wir dir eine E-Mail mit einem Link zum Zurücksetzen deines Passworts geschickt."}
+            ? t("fastGeschafftWirHaben")
+            : t("fallsDieseEMail")}
         </p>
       ) : (
         <div className="space-y-4">
           {mode === "register" ? (
             <div>
               <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-                Anzeigename
+                {t("anzeigename")}
               </label>
               <input
                 ref={nameInputRef}
@@ -330,7 +358,7 @@ export function AuthDialog({
                 type="text"
                 autoComplete="nickname"
                 maxLength={NAME_MAX_LENGTH}
-                placeholder="Dein Anzeigename"
+                placeholder={t("displayNamePlaceholder")}
                 value={form.name}
                 disabled={saving}
                 aria-invalid={nameInvalid}
@@ -347,7 +375,7 @@ export function AuthDialog({
 
           <div>
             <label htmlFor={emailId} className="mb-1 block text-sm font-bold">
-              E-Mail
+              {t("eMail")}
             </label>
             <input
               ref={emailInputRef}
@@ -355,7 +383,7 @@ export function AuthDialog({
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="name@beispiel.de"
+              placeholder={t("emailPlaceholder")}
               value={form.email}
               disabled={saving}
               onChange={(event) =>
@@ -368,7 +396,7 @@ export function AuthDialog({
           {mode !== "reset" ? (
             <div>
               <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
-                Passwort
+                {t("passwort")}
               </label>
               <PasswordInput
                 id={passwordId}
@@ -398,7 +426,7 @@ export function AuthDialog({
                   htmlFor={passwordConfirmId}
                   className="mb-1 block text-sm font-bold"
                 >
-                  Passwort wiederholen
+                  {t("passwortWiederholen")}
                 </label>
                 <PasswordInput
                   id={passwordConfirmId}
@@ -439,7 +467,7 @@ export function AuthDialog({
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-sm text-foreground/60">
                 <span className="h-px flex-1 bg-leaf/20" />
-                oder
+                {t("oder")}
                 <span className="h-px flex-1 bg-leaf/20" />
               </div>
               <Button
@@ -449,7 +477,7 @@ export function AuthDialog({
                 disabled={saving}
               >
                 <GoogleIcon />
-                Mit Google fortfahren
+                {t("mitGoogleFortfahren")}
               </Button>
             </div>
           ) : null}
@@ -467,7 +495,7 @@ export function AuthDialog({
               disabled={saving}
               className="text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
             >
-              Zurück zum Login
+              {t("zuruckZumLogin")}
             </button>
           ) : (
             <div className="space-y-2">
@@ -478,8 +506,8 @@ export function AuthDialog({
                 className="block text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
               >
                 {mode === "login"
-                  ? "Noch kein Konto? Registrieren"
-                  : "Schon ein Konto? Einloggen"}
+                  ? t("nochKeinKontoRegistrieren")
+                  : t("schonEinKontoEinloggen")}
               </button>
 
               {mode === "login" ? (
@@ -489,7 +517,7 @@ export function AuthDialog({
                   disabled={saving}
                   className="block text-sm text-leaf underline decoration-leaf/40 underline-offset-4 hover:text-leaf-dark disabled:opacity-50"
                 >
-                  Passwort vergessen?
+                  {t("passwortVergessen")}
                 </button>
               ) : null}
             </div>
@@ -499,3 +527,5 @@ export function AuthDialog({
     </FormModal>
   );
 }
+
+

@@ -1,3 +1,5 @@
+import { apiErrors } from "@/i18n/api-errors";
+import { err } from "@/i18n/errors";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -8,12 +10,13 @@ import { deleteUser } from "@/repositories/user-repository";
 // with `confirm: true`: a plain cross-site form post can't send that, which
 // doubles as CSRF protection.
 export async function POST(request: Request) {
+  const fail = apiErrors();
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
 
   if (!userId) {
-    return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
+    return fail(err("signInRequired"), 401);
   }
 
   let body: unknown;
@@ -23,17 +26,14 @@ export async function POST(request: Request) {
     body = null;
   }
   if ((body as { confirm?: unknown } | null)?.confirm !== true) {
-    return NextResponse.json({ error: "Bitte bestätige das Löschen." }, { status: 400 });
+    return fail(err("deleteConfirmRequired"), 400);
   }
 
   try {
     await deleteUser(userId);
   } catch (error) {
     console.error("POST /auth/delete-account failed:", error);
-    return NextResponse.json(
-      { error: "Das Konto konnte nicht gelöscht werden. Bitte versuche es erneut." },
-      { status: 500 },
-    );
+    return fail(err("accountDeleteFailed"), 500);
   }
 
   // Clears the session cookies. The user no longer exists, so Supabase may

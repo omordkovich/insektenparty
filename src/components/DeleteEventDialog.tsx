@@ -1,4 +1,5 @@
 import { useId, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 
@@ -13,6 +14,7 @@ export function DeleteEventDialog({
   onCloseAction,
   onDeletedAction,
 }: DeleteEventDialogProps) {
+  const t = useTranslations("eventDialog");
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -36,7 +38,7 @@ export function DeleteEventDialog({
           | null;
         setError(
           payload?.error ??
-            "Das Event konnte nicht gelöscht werden. Bitte versuche es erneut.",
+            t("dasEventKonnteNicht"),
         );
         return;
       }
@@ -44,7 +46,7 @@ export function DeleteEventDialog({
       await onDeletedAction();
       onCloseAction();
     } catch {
-      setError("Das Event konnte nicht gelöscht werden. Bitte versuche es erneut.");
+      setError(t("dasEventKonnteNicht"));
     } finally {
       setDeleting(false);
     }
@@ -60,10 +62,10 @@ export function DeleteEventDialog({
       showCloseButton={false}
     >
       <h2 id={titleId} className="font-display text-2xl text-leaf-dark">
-        Wirklich löschen?
+        {t("wirklichLoschen")}
       </h2>
       <p id={descriptionId} className="mt-3 text-muted">
-        Möchtest du „{event.title}“ und die komplette Gästeliste dazu wirklich löschen?
+        {t("deleteEventQuestion", { title: event.title })}
       </p>
 
       {error ? (
@@ -74,10 +76,10 @@ export function DeleteEventDialog({
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button ref={cancelRef} variant="outline" onClick={onCloseAction} disabled={deleting}>
-          Abbrechen
+          {t("abbrechen")}
         </Button>
         <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-          {deleting ? "Wird gelöscht ..." : "Löschen"}
+          {deleting ? t("wirdGeloscht") : t("loschen")}
         </Button>
       </div>
     </Modal>

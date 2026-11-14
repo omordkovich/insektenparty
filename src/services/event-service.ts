@@ -1,3 +1,5 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
+import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
 import { todayInBerlin } from "@/lib/date-poll";
 import { checkPlanRules, dateWindowError, latestAllowedDate } from "@/lib/event-plan";
@@ -10,6 +12,7 @@ import {
   validateMaxGuests,
   validateEventDate,
   validateEventField,
+  validateEventLanguage,
   validateEventSchedule,
   validateEventTime,
   validateNewEventTitle,
@@ -34,10 +37,10 @@ import { canUseTheme, nextEventPlan, unlockedThemesFor } from "@/lib/features";
 import { getUserEntitlements } from "@/services/entitlement-service";
 import { denyIfOver } from "@/services/event-lifecycle-service";
 
-const NO_QUOTA_ERROR = "Du hast kein freies Event mehr.";
-const THEME_LOCKED_ERROR = "Dieses Design ist noch nicht freigeschaltet.";
-const NOT_FOUND_ERROR = "Event wurde nicht gefunden.";
-const DATE_IN_PAST_ERROR = "Das Datum liegt in der Vergangenheit.";
+const NO_QUOTA_ERROR = err("noQuota");
+const THEME_LOCKED_ERROR = err("themeLocked");
+const NOT_FOUND_ERROR = err("eventNotFound");
+const DATE_IN_PAST_ERROR = err("dateInPast");
 
 // A taken address only happens on a (very unlikely) suffix collision, so a
 // few fresh suffixes are plenty; more failures mean something else is wrong.
@@ -70,11 +73,18 @@ function isOneFreeEventViolation(error: unknown): boolean {
 
 export type EventServiceResult<T> =
   | { ok: true; data: T }
-  | { ok: false; status: number; error: string };
+  | { ok: false; status: number; error: ErrorMessage };
 
 export async function createEventForOwner(
   ownerId: string,
-  input: { theme: unknown; title: unknown; accessPassword?: unknown; date?: unknown; paid?: unknown },
+  input: {
+    theme: unknown;
+    title: unknown;
+    accessPassword?: unknown;
+    date?: unknown;
+    paid?: unknown;
+    language?: unknown;
+  },
 ): Promise<EventServiceResult<{ slug: string }>> {
   const themeValidation = validateTheme(input.theme);
   if (!themeValidation.ok) {
@@ -90,6 +100,11 @@ export async function createEventForOwner(
   const passwordValidation = validateAccessPassword(input.accessPassword ?? null);
   if (!passwordValidation.ok) {
     return { ok: false, status: 400, error: passwordValidation.error };
+  }
+
+  const languageValidation = validateEventLanguage(input.language ?? DEFAULT_LOCALE);
+  if (!languageValidation.ok) {
+    return { ok: false, status: 400, error: languageValidation.error };
   }
 
   // The event starts without a date; the chosen mode is applied right after
@@ -133,6 +148,7 @@ export async function createEventForOwner(
         accessPassword: passwordValidation.value,
         dateMode: "unknown",
         plan,
+        language: languageValidation.value,
       });
     } catch (error) {
       if (isOneFreeEventViolation(error)) created = "no_quota";
@@ -172,6 +188,7 @@ export async function updateEventForOwner(
 
   const updates: Partial<Record<EventFieldKey, string>> = {};
   let themeUpdate: ThemeKey | undefined;
+  let languageUpdate: Locale | undefined;
   // undefined = not part of this request; null = protection switched off.
   let passwordUpdate: string | null | undefined;
   // undefined = not part of this request; null = no seat limit.
@@ -195,6 +212,14 @@ export async function updateEventForOwner(
         return { ok: false, status: 400, error: validation.error };
       }
       passwordUpdate = validation.value;
+      continue;
+    }
+    if (key === "language") {
+      const validation = validateEventLanguage(rawValue);
+      if (!validation.ok) {
+        return { ok: false, status: 400, error: validation.error };
+      }
+      languageUpdate = validation.value;
       continue;
     }
     if (key === "theme") {
@@ -235,19 +260,19 @@ export async function updateEventForOwner(
   // resulting schedule.
   // While the date is open or being voted on, it is set in the dialog.
   if (Object.keys(scheduleChanges).length > 0 && (await getEventDateMode(id)) !== "fixed") {
-    return { ok: false, status: 409, error: "Datum und Uhrzeit legst du in den Event-Einstellungen fest." };
+    return { ok: false, status: 409, error: err("dateTimeInSettings") };
   }
   // A fixed event keeps a date; "no date yet" is a different mode that is
   // switched in the dialog (it has other plan rules and another Stichtag).
   if (scheduleChanges.eventDate === null) {
-    return { ok: false, status: 400, error: "Bitte gib ein Datum ein." };
+    return { ok: false, status: 400, error: err("dateRequired") };
   }
 
   let schedule: EventSchedule | undefined;
   if (Object.keys(scheduleChanges).length > 0) {
     const stored = await getEventSchedule(id, ownerId);
     if (!stored) {
-      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+      return { ok: false, status: 404, error: err("eventNotFound") };
     }
     const validation = validateEventSchedule({
       eventDate: stored.eventDate,
@@ -281,18 +306,19 @@ export async function updateEventForOwner(
         return { ok: false, status: 400, error: dateWindowError(info.plan) };
       }
     }
-    updates.dateLabel = formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate);
-    updates.timeLabel = formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime);
+    updates.dateLabel = formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate, "de");
+    updates.timeLabel = formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime, "de");
   }
 
   const hasAnyUpdate =
     Object.keys(updates).length > 0 ||
     themeUpdate !== undefined ||
+    languageUpdate !== undefined ||
     passwordUpdate !== undefined ||
     capacityUpdate !== undefined;
 
   if (!hasAnyUpdate) {
-    return { ok: false, status: 400, error: "Kein gültiges Feld angegeben." };
+    return { ok: false, status: 400, error: err("noValidField") };
   }
 
   // Only a theme that actually changes is checked, so grandfathered events
@@ -300,7 +326,7 @@ export async function updateEventForOwner(
   if (themeUpdate !== undefined) {
     const currentTheme = await getEventTheme(id, ownerId);
     if (currentTheme === undefined) {
-      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+      return { ok: false, status: 404, error: err("eventNotFound") };
     }
     if (themeUpdate !== currentTheme) {
       const info = await getEventPlanInfo(id);
@@ -321,7 +347,7 @@ export async function updateEventForOwner(
   if (updates.title !== undefined) {
     const current = await getEventAddress(id, ownerId);
     if (!current) {
-      return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+      return { ok: false, status: 404, error: err("eventNotFound") };
     }
     const key = current.slugKey ?? slugKeyOf(current.slug);
     // Events from before slug_name existed get the current name once.
@@ -337,13 +363,14 @@ export async function updateEventForOwner(
     ...updates,
     ...(addressUpdate ?? {}),
     ...(themeUpdate ? { theme: themeUpdate } : {}),
+    ...(languageUpdate ? { language: languageUpdate } : {}),
     ...(schedule ?? {}),
     ...(passwordUpdate !== undefined ? { accessPassword: passwordUpdate } : {}),
     ...(capacityUpdate !== undefined ? { maxGuests: capacityUpdate } : {}),
   });
 
   if (!updated) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("eventNotFound") };
   }
 
   return { ok: true, data: updated };
@@ -355,7 +382,7 @@ export async function deleteEventForOwner(
 ): Promise<EventServiceResult<{ ok: true }>> {
   const deleted = await deleteEvent(id, ownerId);
   if (!deleted) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("eventNotFound") };
   }
   return { ok: true, data: { ok: true } };
 }

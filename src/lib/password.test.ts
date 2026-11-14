@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import { PASSWORD_MIN_LENGTH, PASSWORD_SYMBOLS, validateNewPassword } from "@/lib/password";
 
 describe("validateNewPassword", () => {
@@ -8,23 +9,23 @@ describe("validateNewPassword", () => {
 
   it("requires the minimum length", () => {
     expect(PASSWORD_MIN_LENGTH).toBe(10);
-    expect(validateNewPassword("Abcdef12!")).toMatch(/mindestens 10 Zeichen/);
+    expect(validateNewPassword("Abcdef12!")).toEqual(err("passwordTooShort", { min: 10 }));
   });
 
   it("requires a lowercase letter", () => {
-    expect(validateNewPassword("GASTZILLA2026!")).toMatch(/Kleinbuchstaben/);
+    expect(validateNewPassword("GASTZILLA2026!")).toEqual(err("passwordNeedsLower"));
   });
 
   it("requires an uppercase letter", () => {
-    expect(validateNewPassword("gastzilla2026!")).toMatch(/Großbuchstaben/);
+    expect(validateNewPassword("gastzilla2026!")).toEqual(err("passwordNeedsUpper"));
   });
 
   it("requires a digit", () => {
-    expect(validateNewPassword("Gastzillaparty!")).toMatch(/Ziffer/);
+    expect(validateNewPassword("Gastzillaparty!")).toEqual(err("passwordNeedsDigit"));
   });
 
   it("requires a symbol", () => {
-    expect(validateNewPassword("Gastzilla2026")).toMatch(/Sonderzeichen/);
+    expect(validateNewPassword("Gastzilla2026")).toEqual(err("passwordNeedsSymbol"));
   });
 
   it("accepts every symbol Supabase counts", () => {
@@ -37,13 +38,13 @@ describe("validateNewPassword", () => {
 
   it("does not count spaces, umlauts or other letters/signs as a symbol (Supabase would reject it)", () => {
     for (const notSymbol of [" ", "ä", "ß", "€", "§"]) {
-      expect(validateNewPassword(`Gastzilla2026${notSymbol}`)).toMatch(/Sonderzeichen/);
+      expect(validateNewPassword(`Gastzilla2026${notSymbol}`)).toEqual(err("passwordNeedsSymbol"));
     }
   });
 
   it("checks letters like Supabase does (A–Z only, umlauts allowed but not counted)", () => {
     expect(validateNewPassword("Größenwahn2026!")).toBeNull();
     // Only uppercase letter is an umlaut - Supabase would reject it.
-    expect(validateNewPassword("größenwahn2026Ä!")).toMatch(/Großbuchstaben/);
+    expect(validateNewPassword("größenwahn2026Ä!")).toEqual(err("passwordNeedsUpper"));
   });
 });

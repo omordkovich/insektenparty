@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import type { DateMode, DateModeRequest } from "@/lib/date-poll";
 
 // A free event keeps to a short date window and a fixed date; a paid event
@@ -30,8 +31,8 @@ export function canUseDateMode(plan: EventPlan, mode: DateMode): boolean {
   return plan === "paid" || mode === "fixed";
 }
 
-export function dateWindowError(plan: EventPlan): string {
-  return `Das Datum darf höchstens ${DATE_WINDOW_MONTHS[plan]} Monate nach dem Erstellen des Events liegen.`;
+export function dateWindowError(plan: EventPlan): ErrorMessage {
+  return err("dateWindow", { months: DATE_WINDOW_MONTHS[plan] });
 }
 
 // What a plan forbids in a date change: a mode it does not include (403)
@@ -40,9 +41,9 @@ export function checkPlanRules(
   plan: EventPlan,
   createdOn: string,
   request: DateModeRequest,
-): { status: 400 | 403; error: string } | null {
+): { status: 400 | 403; error: ErrorMessage } | null {
   if (!canUseDateMode(plan, request.mode)) {
-    return { status: 403, error: "Abstimmung und offener Termin gibt es nur mit einem freigeschalteten Event." };
+    return { status: 403, error: err("pollNeedsUnlock") };
   }
   let dates: string[] = [];
   if (request.mode === "fixed") {

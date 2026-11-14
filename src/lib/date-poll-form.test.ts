@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import { buildDateModeRequest, dateWindowOf, initialDateDraft, type DateSettings } from "@/lib/date-poll-form";
 
 const today = "2026-07-01";
@@ -29,7 +30,7 @@ describe("buildDateModeRequest", () => {
   it("requires a choice when creating", () => {
     expect(buildDateModeRequest(null, initialDateDraft(null), today)).toEqual({
       ok: false,
-      error: "Bitte wähle, wie der Termin festgelegt wird.",
+      error: err("dateModeRequired"),
     });
   });
 
@@ -91,7 +92,7 @@ describe("buildDateModeRequest", () => {
     draft.fixed = { ...draft.fixed, date: "2026-06-30" };
     expect(buildDateModeRequest(fixed, draft, today)).toEqual({
       ok: false,
-      error: "Das Datum liegt in der Vergangenheit.",
+      error: err("dateInPast"),
     });
     // The event itself is over: saving something else must not trip over its date.
     expect(buildDateModeRequest(fixed, initialDateDraft(fixed), "2026-08-01")).toEqual({ ok: true, request: null });
@@ -104,12 +105,12 @@ describe("buildDateModeRequest", () => {
 
   describe("with the plan's date window", () => {
     const freeWindow = dateWindowOf("free", "2026-09-01");
-    const windowError = "Das Datum darf höchstens 3 Monate nach dem Erstellen des Events liegen.";
+    const windowError = err("dateWindow", { months: 3 });
 
     it("builds the window from the plan", () => {
       expect(freeWindow).toEqual({ latest: "2026-09-01", error: windowError });
-      expect(dateWindowOf("paid", "2027-06-01").error).toBe(
-        "Das Datum darf höchstens 12 Monate nach dem Erstellen des Events liegen.",
+      expect(dateWindowOf("paid", "2027-06-01").error).toEqual(
+        err("dateWindow", { months: 12 }),
       );
     });
 
@@ -144,7 +145,7 @@ describe("buildDateModeRequest", () => {
       draft.rows[1] = { ...draft.rows[1], date: "2027-01-01" };
       expect(buildDateModeRequest(null, draft, today, paidWindow)).toEqual({
         ok: false,
-        error: "Das Datum darf höchstens 12 Monate nach dem Erstellen des Events liegen.",
+        error: err("dateWindow", { months: 12 }),
       });
 
       const adding = initialDateDraft(poll);

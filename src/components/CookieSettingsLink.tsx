@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { CookieSettingsDialog } from "./CookieSettingsDialog";
 
 export function CookieSettingsLink() {
+  const t = useTranslations("cookies");
   const [open, setOpen] = useState(false);
 
   return (
@@ -17,7 +19,7 @@ export function CookieSettingsLink() {
         }}
         className="text-sm text-muted underline underline-offset-2 hover:text-leaf-dark"
       >
-        Cookies
+        {t("link")}
       </a>
       {open ? <CookieSettingsDialog onCloseAction={() => setOpen(false)} /> : null}
     </>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { Button } from "./Button";
@@ -15,6 +16,7 @@ type LinkExpiredDialogProps = {
 // (?link_expired=signup|recovery). Closing it drops the query parameter so a
 // reload doesn't show it again.
 export function LinkExpiredDialog({ kind }: LinkExpiredDialogProps) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const titleId = useId();
 
@@ -25,30 +27,27 @@ export function LinkExpiredDialog({ kind }: LinkExpiredDialogProps) {
   return (
     <Modal titleId={titleId} onCloseAction={close}>
       <h2 id={titleId} className="pr-8 font-display text-2xl text-leaf-dark">
-        Der Link funktioniert nicht mehr
+        {t("derLinkFunktioniertNicht")}
       </h2>
 
       {kind === "signup" ? (
         <div className="mt-4 space-y-3">
           <p>
-            Bestätigungslinks sind 1 Stunde gültig. Danach wird die unbestätigte Registrierung
-            automatisch gelöscht, oder der Link wurde schon verwendet.
+            {t("bestatigungslinksSind1Stunde")}
           </p>
           <p>
-            Hast du deine E-Mail-Adresse schon bestätigt, kannst du dich einfach anmelden.
-            Sonst registriere dich bitte erneut.
+            {t("hastDuDeineE")}
           </p>
         </div>
       ) : (
         <p className="mt-4">
-          Der Link zum Zurücksetzen des Passworts ist abgelaufen oder wurde schon verwendet.
-          Bitte fordere über „Passwort vergessen“ einen neuen an.
+          {t("derLinkZumZurucksetzen")}
         </p>
       )}
 
       <div className="mt-6 flex justify-end">
         <Button variant="primary" onClick={close}>
-          Schließen
+          {t("schliessen")}
         </Button>
       </div>
     </Modal>

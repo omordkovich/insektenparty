@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useId, useState, type SubmitEvent } from "react";
@@ -22,6 +23,8 @@ type EventLockedPageProps = {
 // Shown instead of a password-protected event to everyone who is neither
 // its signed-in owner nor has unlocked it. Only the title is revealed.
 export function EventLockedPage({ eventId, title }: EventLockedPageProps) {
+  const t = useTranslations("event");
+  const tErrors = useTranslations("errors");
   const router = useRouter();
   const passwordId = useId();
   const [password, setPassword] = useState("");
@@ -34,7 +37,7 @@ export function EventLockedPage({ eventId, title }: EventLockedPageProps) {
     event.preventDefault();
     if (saving) return;
     if (!password.trim()) {
-      setError("Bitte gib das Passwort ein.");
+      setError(t("passwordRequired"));
       return;
     }
 
@@ -48,13 +51,13 @@ export function EventLockedPage({ eventId, title }: EventLockedPageProps) {
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Das Event konnte nicht geöffnet werden. Bitte versuche es erneut.");
+        setError(payload?.error ?? tErrors("eventOpenFailed"));
         return;
       }
       // The cookie is set - render the page again, now with the event.
       router.refresh();
     } catch {
-      setError("Das Event konnte nicht geöffnet werden. Bitte versuche es erneut.");
+      setError(tErrors("eventOpenFailed"));
     } finally {
       setSaving(false);
     }
@@ -62,18 +65,17 @@ export function EventLockedPage({ eventId, title }: EventLockedPageProps) {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader languageSwitcher={false} />
       <main className="flex flex-col items-center px-4 pt-4 pb-16">
         <div className={`${cardClass} w-full max-w-md text-center`}>
-          <h1 className="font-display text-3xl leading-tight text-leaf-dark">Einladung: {title}</h1>
+          <h1 className="font-display text-3xl leading-tight text-leaf-dark">{t("lockedTitle", { title })}</h1>
           <p className="mt-3 text-muted">
-            Dieses Event ist passwortgeschützt. Gib das Passwort ein, das du vom Gastgeber
-            bekommen hast.
+            {t("lockedText")}
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-6 text-left">
             <label htmlFor={passwordId} className="mb-1 block text-sm font-bold">
-              Passwort
+              {t("passwordLabel")}
             </label>
             <PasswordInput
               id={passwordId}
@@ -88,22 +90,22 @@ export function EventLockedPage({ eventId, title }: EventLockedPageProps) {
               </p>
             ) : null}
             <Button type="submit" variant="primary" className="mt-4 w-full" disabled={saving}>
-              {saving ? "Wird geprüft ..." : "Event öffnen"}
+              {saving ? t("checking") : t("open")}
             </Button>
           </form>
 
           <Button variant="outline" className="mt-3 w-full" onClick={() => setRequestOpen(true)}>
-            Passwort anfragen
+            {t("requestPassword")}
           </Button>
 
           <p className="mt-6 text-sm text-muted">
-            Du bist der Gastgeber?{" "}
+            {t("hostQuestion")}{" "}
             <button
               type="button"
               onClick={() => setLoginOpen(true)}
               className="underline underline-offset-2 hover:text-leaf-dark"
             >
-              Anmelden
+              {t("signIn")}
             </button>
           </p>
         </div>

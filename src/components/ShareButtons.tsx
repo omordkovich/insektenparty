@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState, type ReactNode } from "react";
 import { buildShareText, copyToClipboard } from "@/lib/share";
 import { Button } from "./Button";
@@ -28,6 +29,8 @@ export function ShareButtons({ children, ...props }: ShareProps & { children?: R
 }
 
 export function ShareButton({ url, title, className = "" }: ShareProps) {
+  const t = useTranslations("event");
+  const locale = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   async function handleShare() {
@@ -36,7 +39,7 @@ export function ShareButton({ url, title, className = "" }: ShareProps) {
     // without it get our own platform list instead.
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title, text: buildShareText(title), url });
+        await navigator.share({ title, text: buildShareText(title, locale), url });
         return;
       } catch (error) {
         // The visitor closed the share sheet - nothing to do.
@@ -53,8 +56,8 @@ export function ShareButton({ url, title, className = "" }: ShareProps) {
         size="icon"
         className={className}
         onClick={handleShare}
-        aria-label={`${title || "Event"} teilen`}
-        title="Teilen"
+        aria-label={t("shareTitle", { title: title || t("event") })}
+        title={t("teilen")}
       >
         <ShareIcon />
       </Button>
@@ -66,6 +69,7 @@ export function ShareButton({ url, title, className = "" }: ShareProps) {
 }
 
 export function CopyLinkButton({ url, title, className = "" }: ShareProps) {
+  const t = useTranslations("event");
   const [copied, setCopied] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -87,13 +91,13 @@ export function CopyLinkButton({ url, title, className = "" }: ShareProps) {
         size="icon"
         className={className}
         onClick={handleCopy}
-        aria-label={copied ? "Link kopiert" : "Link kopieren"}
-        title={copied ? "Link kopiert" : "Link kopieren"}
+        aria-label={copied ? t("linkCopied") : t("copyLink")}
+        title={copied ? t("linkCopied") : t("copyLink")}
       >
         {copied ? <CheckIcon /> : <CopyIcon />}
       </Button>
       <span className="sr-only" role="status" aria-live="polite">
-        {copied ? "Link kopiert" : ""}
+        {copied ? t("linkCopied") : ""}
       </span>
       {dialogOpen ? (
         <ShareDialog url={url} title={title} onCloseAction={() => setDialogOpen(false)} />

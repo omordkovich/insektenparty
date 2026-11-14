@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { COMPARISON } from "@/lib/comparison";
-import { FAQ } from "@/lib/faq";
-import { getOccasionBySlug, OCCASIONS } from "@/lib/occasions";
+import { FAQ, faqEntries } from "@/lib/faq";
+import { getOccasionBySlug, occasionsFor } from "@/lib/occasions";
 import {
   aboutStructuredData,
   comparisonStructuredData,
@@ -20,23 +20,40 @@ function byType(data: { "@graph": object[] }, type: string): Node {
 
 describe("siteStructuredData", () => {
   it("describes organization, website, app and FAQ", () => {
-    const types = (siteStructuredData()["@graph"] as Node[]).map((n) => n["@type"]);
+    const types = (siteStructuredData("de")["@graph"] as Node[]).map((n) => n["@type"]);
     expect(types).toEqual(["Organization", "WebSite", "WebApplication", "FAQPage"]);
   });
 
   it("links the organization to its Instagram profile", () => {
-    const organization = byType(siteStructuredData(), "Organization");
+    const organization = byType(siteStructuredData("de"), "Organization");
     expect(organization.sameAs).toEqual(["https://www.instagram.com/gastzilla/"]);
   });
 
   it("lists every start page question", () => {
-    const faq = byType(siteStructuredData(), "FAQPage");
+    const faq = byType(siteStructuredData("de"), "FAQPage");
     expect((faq.mainEntity as unknown[]).length).toBe(FAQ.length);
   });
 });
 
+describe("siteStructuredData – English", () => {
+  const data = siteStructuredData("en");
+
+  it("marks the start page as English and points at /en", () => {
+    expect(byType(data, "WebApplication")).toMatchObject({ inLanguage: "en", url: "https://gastzilla.de/en" });
+    expect(byType(data, "FAQPage")).toMatchObject({ inLanguage: "en", "@id": "https://gastzilla.de/en#faq" });
+  });
+
+  it("uses the English questions and features", () => {
+    const faq = byType(data, "FAQPage");
+    const questions = (faq.mainEntity as { name: string }[]).map((q) => q.name);
+    expect(questions).toEqual(faqEntries("en").map((item) => item.question));
+    expect(questions).not.toEqual(FAQ.map((item) => item.question));
+    expect(faqEntries("en").length).toBe(FAQ.length);
+  });
+});
+
 describe("occasionStructuredData", () => {
-  const occasion = getOccasionBySlug("kindergeburtstag")!;
+  const occasion = getOccasionBySlug("kindergeburtstag", "de")!;
   const data = occasionStructuredData(occasion);
 
   it("describes the page as part of the site", () => {
@@ -73,16 +90,49 @@ describe("occasionStructuredData", () => {
   });
 });
 
+describe("occasionStructuredData – English", () => {
+  const occasion = getOccasionBySlug("kids-birthday-party", "en")!;
+  const data = occasionStructuredData(occasion);
+
+  it("marks the page and its FAQ as English under /en/invitations", () => {
+    expect(byType(data, "WebPage")).toMatchObject({
+      url: "https://gastzilla.de/en/invitations/kids-birthday-party",
+      inLanguage: "en",
+    });
+    expect(byType(data, "FAQPage")).toMatchObject({ inLanguage: "en" });
+  });
+
+  it("has an English breadcrumb with /en URLs", () => {
+    expect(byType(data, "BreadcrumbList").itemListElement).toEqual([
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://gastzilla.de/en" },
+      { "@type": "ListItem", position: 2, name: "Occasions", item: "https://gastzilla.de/en/invitations" },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: occasion.name,
+        item: "https://gastzilla.de/en/invitations/kids-birthday-party",
+      },
+    ]);
+  });
+});
+
 describe("occasionsHubStructuredData", () => {
-  const data = occasionsHubStructuredData();
+  const data = occasionsHubStructuredData("de");
 
   it("lists every occasion page", () => {
     const page = byType(data, "CollectionPage");
     expect(page.url).toBe("https://gastzilla.de/einladung");
     const list = page.mainEntity as { itemListElement: { url: string }[] };
     expect(list.itemListElement.map((item) => item.url)).toEqual(
-      OCCASIONS.map((o) => `https://gastzilla.de/einladung/${o.slug}`),
+      occasionsFor("de").map((o) => `https://gastzilla.de/einladung/${o.slug}`),
     );
+  });
+
+  it("lists the English pages under /en/invitations", () => {
+    const page = byType(occasionsHubStructuredData("en"), "CollectionPage");
+    expect(page).toMatchObject({ url: "https://gastzilla.de/en/invitations", inLanguage: "en" });
+    const list = page.mainEntity as { itemListElement: { url: string }[] };
+    expect(list.itemListElement[0].url).toBe("https://gastzilla.de/en/invitations/kids-birthday-party");
   });
 
   it("has a two-step breadcrumb", () => {

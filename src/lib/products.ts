@@ -1,3 +1,4 @@
+import type { Locale } from "@/i18n/config";
 // Product catalog with prices in cents. Shown in the UI and later mapped to
 // Stripe lookup keys; until then purchases are dummy purchases.
 
@@ -9,11 +10,17 @@ export const PRODUCTS = {
 
 export type ProductKey = keyof typeof PRODUCTS;
 
+const PRICE_FORMAT: Record<Locale, (euros: number, cents: string) => string> = {
+  de: (euros, cents) => `${euros},${cents} €`,
+  en: (euros, cents) => `€${euros}.${cents}`,
+  ru: (euros, cents) => `${euros},${cents} €`,
+};
+
 // 299 -> "2,99 €"
-export function formatPrice(cents: number): string {
+export function formatPrice(cents: number, locale: Locale): string {
   const euros = Math.floor(cents / 100);
   const rest = String(cents % 100).padStart(2, "0");
-  return `${euros},${rest} €`;
+  return PRICE_FORMAT[locale](euros, rest);
 }
 
 // What a page hands down to every "Freischalten" dialog: unused event

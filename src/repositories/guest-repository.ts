@@ -1,3 +1,4 @@
+import type { ErrorMessage } from "@/i18n/errors";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { events, guests } from "@/db/schema";
@@ -23,11 +24,11 @@ export type CapacitySnapshot = {
 };
 
 /** Returns an error message to refuse the change, or null to go ahead. */
-export type CapacityGuard = (snapshot: CapacitySnapshot) => string | null;
+export type CapacityGuard = (snapshot: CapacitySnapshot) => ErrorMessage | null;
 
 export type GuestWriteResult =
   | { ok: true; row: GuestRow }
-  | { ok: false; reason: "refused"; error: string }
+  | { ok: false; reason: "refused"; error: ErrorMessage }
   | { ok: false; reason: "notFound" };
 
 function guestValues(input: GuestInput) {

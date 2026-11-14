@@ -1,17 +1,21 @@
+import { LOCALES, type Locale } from "@/i18n/config";
 import { occasionIconUrl } from "@/lib/occasion-icons";
+import { OCCASION_SECTION, OCCASION_SLUGS } from "@/lib/occasion-slugs";
+import { OCCASIONS_EN, OCCASIONS_HUB_EN } from "@/lib/occasions-en";
+import { OCCASIONS_HUB_RU, OCCASIONS_RU } from "@/lib/occasions-ru";
 import type { FaqItem } from "@/lib/faq";
 
-// Info pages per occasion (/einladung/<slug>) - for search engines and AI
-// assistants, nothing in the app depends on them. One entry here is all a
-// new page needs: the page itself, the overview, the start page section,
-// the sitemap and llms.txt are all built from this list.
+// Info pages per occasion (/einladung/<slug>, English /en/invitations/<slug>)
+// - for search engines and AI assistants, nothing in the app depends on
+// them. One entry per language is all a new page needs: the page itself,
+// the overview, the start page section, the sitemap and llms.txt are all
+// built from these lists. German lives below, English in occasions-en.ts,
+// URLs in occasion-slugs.ts.
 // Only describe what GASTZILLA really does - no invented designs or numbers.
-export type Occasion = {
+export type OccasionContent = {
   // Language-independent key; links the language versions of an occasion
-  // once there are more languages. Never changes.
+  // (slugs, icon). Never changes.
   id: string;
-  // German URL part, /einladung/<slug>.
-  slug: string;
   // Short name for chips and breadcrumbs.
   name: string;
   // H1, contains the search term.
@@ -33,11 +37,18 @@ export type Occasion = {
   updated: string;
 };
 
+// An occasion page in one language.
+export type Occasion = OccasionContent & {
+  locale: Locale;
+  // URL part, <section>/<slug> (see occasion-slugs.ts).
+  slug: string;
+};
+
+export type OccasionsHub = { title: string; metaTitle: string; description: string; intro: string };
+
 export type Breadcrumb = { name: string; path: string };
 
-export const OCCASIONS_PATH = "/einladung";
-
-export const OCCASIONS_HUB = {
+const OCCASIONS_HUB_DE: OccasionsHub = {
   title: "Online-Einladungen für jeden Anlass",
   metaTitle: "Online-Einladungen für jeden Anlass – GASTZILLA",
   description:
@@ -46,10 +57,9 @@ export const OCCASIONS_HUB = {
     "Egal, was du feierst: Mit GASTZILLA bekommt jeder Anlass seine eigene Einladungsseite im passenden Design. Deine Gäste sagen per Link zu oder ab – ohne Konto, ohne App und ohne Zusagen-Chaos im Gruppenchat. Steht der Termin noch nicht fest, stimmen sie vorher einfach darüber ab.",
 };
 
-export const OCCASIONS: Occasion[] = [
+const OCCASIONS_DE: OccasionContent[] = [
   {
     id: "kids-birthday",
-    slug: "kindergeburtstag",
     name: "Kindergeburtstag",
     title: "Einladung zum Kindergeburtstag online erstellen",
     metaTitle: "Einladung zum Kindergeburtstag online erstellen – GASTZILLA",
@@ -114,7 +124,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "kids-playdate",
-    slug: "spielverabredung",
     name: "Spielverabredung",
     title: "Spielverabredung für Kinder per Link organisieren",
     metaTitle: "Spielverabredung für Kinder organisieren – GASTZILLA",
@@ -179,7 +188,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "school-start",
-    slug: "einschulung",
     name: "Einschulung & Schulstart",
     title: "Einladung zur Einschulung online erstellen",
     metaTitle: "Einladung zur Einschulung online erstellen – GASTZILLA",
@@ -244,7 +252,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "school-events",
-    slug: "kita-schulfeste",
     name: "Kita- & Schulfeste",
     title: "Kita- und Schulfeste organisieren – Anmeldung per Link",
     metaTitle: "Kita- & Schulfeste organisieren – GASTZILLA",
@@ -309,7 +316,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "graduation",
-    slug: "abifeier",
     name: "Abifeier & Abiball",
     title: "Abifeier, Abiball oder Abigag – gemeinsam planen per Link",
     metaTitle: "Abifeier, Abiball & Abigag planen – GASTZILLA",
@@ -374,7 +380,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "birthday",
-    slug: "geburtstag",
     name: "Geburtstag",
     title: "Geburtstagseinladung online erstellen",
     metaTitle: "Geburtstagseinladung online erstellen – GASTZILLA",
@@ -439,7 +444,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "wedding",
-    slug: "hochzeit",
     name: "Hochzeit",
     title: "Hochzeitseinladung online erstellen – mit Gästeliste",
     metaTitle: "Hochzeitseinladung online erstellen – GASTZILLA",
@@ -504,7 +508,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "bachelor-party",
-    slug: "junggesellenabschied",
     name: "Junggesellenabschied",
     title: "Junggesellenabschied planen – Einladung per Link",
     metaTitle: "Junggesellenabschied planen – Einladung per Link – GASTZILLA",
@@ -569,7 +572,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "baby-shower",
-    slug: "babyparty",
     name: "Babyparty & Gender Reveal",
     title: "Babyparty oder Gender Reveal Party – Einladung online erstellen",
     metaTitle: "Babyparty & Gender Reveal planen – GASTZILLA",
@@ -630,7 +632,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "christening",
-    slug: "taufe-kommunion",
     name: "Taufe & Kommunion",
     title: "Taufe, Kommunion oder Konfirmation – Einladung online erstellen",
     metaTitle: "Taufe, Kommunion & Konfirmation planen – GASTZILLA",
@@ -695,7 +696,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "funeral",
-    slug: "trauerfeier",
     name: "Trauerfeier & Beerdigung",
     title: "Trauerfeier, Beerdigung oder Gedenkfeier – Einladung online erstellen",
     metaTitle: "Einladung zur Trauerfeier & Beerdigung online – GASTZILLA",
@@ -758,7 +758,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "company-party",
-    slug: "firmenfeier",
     name: "Firmenfeier",
     title: "Einladung zur Firmenfeier online erstellen",
     metaTitle: "Einladung zur Firmenfeier online erstellen – GASTZILLA",
@@ -823,7 +822,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "barbecue",
-    slug: "grillparty",
     name: "Grillparty & Gartenfest",
     title: "Einladung zur Grillparty online erstellen",
     metaTitle: "Einladung zur Grillparty online erstellen – GASTZILLA",
@@ -883,7 +881,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "carnival-party",
-    slug: "karneval",
     name: "Karneval",
     title: "Karnevalsparty oder Karnevalssitzung – Einladung online erstellen",
     metaTitle: "Karnevalsparty & Karnevalssitzung planen – GASTZILLA",
@@ -942,7 +939,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "oktoberfest",
-    slug: "oktoberfest",
     name: "Oktoberfest",
     title: "Oktoberfest-Party oder Wiesn-Besuch – Einladung online erstellen",
     metaTitle: "Oktoberfest-Party & Wiesn-Besuch planen – GASTZILLA",
@@ -1003,7 +999,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "halloween-party",
-    slug: "halloweenparty",
     name: "Halloweenparty",
     title: "Einladung zur Halloweenparty online erstellen",
     metaTitle: "Einladung zur Halloweenparty online erstellen – GASTZILLA",
@@ -1063,7 +1058,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "advent-party",
-    slug: "advent-weihnachtsmarkt",
     name: "Advent & Weihnachtsmarkt",
     title: "Adventsfeier, Glühweinabend oder Weihnachtsmarkt – per Link einladen",
     metaTitle: "Adventsfeier & Weihnachtsmarkt gemeinsam planen – GASTZILLA",
@@ -1123,7 +1117,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "family-celebration",
-    slug: "familienfest",
     name: "Familienfest & Feiertage",
     title: "Familienfest oder Feiertag – Einladung online erstellen",
     metaTitle: "Familienfest & Feiertage gemeinsam planen – GASTZILLA",
@@ -1188,7 +1181,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "new-years-eve",
-    slug: "silvester",
     name: "Silvester",
     title: "Einladung zur Silvesterparty online erstellen",
     metaTitle: "Einladung zur Silvesterparty online erstellen – GASTZILLA",
@@ -1249,7 +1241,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "theme-party",
-    slug: "mottoparty",
     name: "Mottoparty",
     title: "Einladung zur Mottoparty online erstellen",
     metaTitle: "Einladung zur Mottoparty online erstellen – GASTZILLA",
@@ -1305,7 +1296,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "group-travel",
-    slug: "gruppenreise",
     name: "Gruppenreise & Vereinsfahrt",
     title: "Gruppenreise oder Vereinsfahrt organisieren – Anmeldung per Link",
     metaTitle: "Gruppenreise & Vereinsfahrt organisieren – GASTZILLA",
@@ -1370,7 +1360,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "culture-outing",
-    slug: "kultur",
     name: "Kultur",
     title: "Kino, Theater, Oper oder Museum – gemeinsamen Besuch per Link planen",
     metaTitle: "Kino, Theater, Oper & Museum gemeinsam planen – GASTZILLA",
@@ -1431,7 +1420,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "rehearsal",
-    slug: "probe",
     name: "Proben & Auftritte",
     title: "Bandprobe, Chorprobe oder Auftritt – Zusagen per Link sammeln",
     metaTitle: "Bandprobe, Chorprobe & Auftritt planen – GASTZILLA",
@@ -1491,7 +1479,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "going-out",
-    slug: "ausgehen",
     name: "Ausgehen",
     title: "Restaurant, Bar, Club oder Escape Room – gemeinsam ausgehen per Link planen",
     metaTitle: "Restaurant, Bar, Club & Escape Room planen – GASTZILLA",
@@ -1552,7 +1539,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "sports-together",
-    slug: "sport",
     name: "Sport zusammen",
     title: "Gemeinsam Sport machen – Laufen, Klettern, Fußball & Co. per Link organisieren",
     metaTitle: "Gemeinsam Sport machen – Laufen, Klettern & Co. – GASTZILLA",
@@ -1616,7 +1602,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "tabletop-night",
-    slug: "tabletop",
     name: "Tabletop & Brettspiele",
     title: "Tabletop- und Brettspielabend per Link organisieren",
     metaTitle: "Tabletop- und Brettspielabend organisieren – GASTZILLA",
@@ -1681,7 +1666,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "gaming-night",
-    slug: "gaming",
     name: "Gaming & LAN-Party",
     title: "Gamingabend oder LAN-Party per Link organisieren",
     metaTitle: "Gamingabend oder LAN-Party organisieren – GASTZILLA",
@@ -1746,7 +1730,6 @@ export const OCCASIONS: Occasion[] = [
   },
   {
     id: "date-poll",
-    slug: "terminabstimmung",
     name: "Termin abstimmen",
     title: "Termin abstimmen und einladen – Terminumfrage per Link",
     metaTitle: "Termin abstimmen: Terminumfrage & Einladung per Link – GASTZILLA",
@@ -1809,8 +1792,57 @@ export const OCCASIONS: Occasion[] = [
   },
 ];
 
+function withLanguage(list: OccasionContent[], locale: Locale): Occasion[] {
+  return list.map((occasion) => ({ ...occasion, locale, slug: OCCASION_SLUGS[occasion.id][locale] }));
+}
+
+const OCCASIONS_BY_LOCALE: Record<Locale, Occasion[]> = {
+  de: withLanguage(OCCASIONS_DE, "de"),
+  en: withLanguage(OCCASIONS_EN, "en"),
+  ru: withLanguage(OCCASIONS_RU, "ru"),
+};
+
+const HUB_BY_LOCALE: Record<Locale, OccasionsHub> = { de: OCCASIONS_HUB_DE, en: OCCASIONS_HUB_EN, ru: OCCASIONS_HUB_RU };
+
+const BREADCRUMB_NAMES: Record<Locale, { home: string; hub: string }> = {
+  de: { home: "Startseite", hub: "Anlässe" },
+  en: { home: "Home", hub: "Occasions" },
+  ru: { home: "Главная", hub: "Поводы" },
+};
+
+export function occasionsFor(locale: Locale): Occasion[] {
+  return OCCASIONS_BY_LOCALE[locale];
+}
+
+export function occasionsHub(locale: Locale): OccasionsHub {
+  return HUB_BY_LOCALE[locale];
+}
+
+// Overview page of a language, without locale prefix ("/invitations").
+export function occasionsPath(locale: Locale): string {
+  return OCCASION_SECTION[locale];
+}
+
+// Static params of the occasion routes (src/app/[locale]/[section]): every
+// language's overview and pages under that language's own section name.
+export function occasionRouteParams() {
+  const hubs = LOCALES.map((locale) => ({ locale, section: OCCASION_SECTION[locale].slice(1) }));
+  const pages = hubs.flatMap((hub) => occasionsFor(hub.locale).map((occasion) => ({ ...hub, slug: occasion.slug })));
+  return { hubs, pages };
+}
+
+// Path of an occasion page in its language, without locale prefix
+// (next-intl's Link adds it; for absolute URLs use localizedPath).
 export function occasionPath(occasion: Occasion): string {
-  return `${OCCASIONS_PATH}/${occasion.slug}`;
+  return `${OCCASION_SECTION[occasion.locale]}/${occasion.slug}`;
+}
+
+// The same occasion in every language (hreflang, sitemap).
+export function occasionAlternates(id: string): Record<Locale, string> {
+  const slugs = OCCASION_SLUGS[id];
+  return Object.fromEntries(
+    (Object.keys(slugs) as Locale[]).map((locale) => [locale, `${OCCASION_SECTION[locale]}/${slugs[locale]}`]),
+  ) as Record<Locale, string>;
 }
 
 // Monoline icon per occasion, hosted on Cloudinary (see occasion-icons.ts).
@@ -1819,23 +1851,29 @@ export function occasionIconPath(occasion: Occasion): string {
   return occasionIconUrl(occasion.id);
 }
 
-export function getOccasionBySlug(slug: string): Occasion | undefined {
-  return OCCASIONS.find((occasion) => occasion.slug === slug);
+export function getOccasionBySlug(slug: string, locale: Locale): Occasion | undefined {
+  return occasionsFor(locale).find((occasion) => occasion.slug === slug);
+}
+
+export function getOccasion(id: string, locale: Locale): Occasion | undefined {
+  return occasionsFor(locale).find((occasion) => occasion.id === id);
 }
 
 // Shared by the visible breadcrumb navigation and the BreadcrumbList schema.
-export function hubBreadcrumbs(): Breadcrumb[] {
+// Paths without locale prefix.
+export function hubBreadcrumbs(locale: Locale): Breadcrumb[] {
+  const names = BREADCRUMB_NAMES[locale];
   return [
-    { name: "Startseite", path: "/" },
-    { name: "Anlässe", path: OCCASIONS_PATH },
+    { name: names.home, path: "/" },
+    { name: names.hub, path: OCCASION_SECTION[locale] },
   ];
 }
 
 export function occasionBreadcrumbs(occasion: Occasion): Breadcrumb[] {
-  return [...hubBreadcrumbs(), { name: occasion.name, path: occasionPath(occasion) }];
+  return [...hubBreadcrumbs(occasion.locale), { name: occasion.name, path: occasionPath(occasion) }];
 }
 
 // The overview page changes whenever one of its occasions does.
-export function latestOccasionUpdate(): string {
-  return OCCASIONS.map((occasion) => occasion.updated).sort().at(-1) ?? "";
+export function latestOccasionUpdate(locale: Locale): string {
+  return occasionsFor(locale).map((occasion) => occasion.updated).sort().at(-1) ?? "";
 }

@@ -1,11 +1,13 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import type { Breadcrumb } from "@/lib/occasions";
 
 // Visible breadcrumb trail; the same items go into the BreadcrumbList
 // schema. The last item is the current page and is not a link.
 export function Breadcrumbs({ items }: { items: Breadcrumb[] }) {
+  const t = useTranslations("occasions");
   return (
-    <nav aria-label="Brotkrumen" className="text-sm text-muted">
+    <nav aria-label={t("breadcrumbs")} className="text-sm text-muted">
       <ol className="flex flex-wrap justify-center gap-x-1">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1;

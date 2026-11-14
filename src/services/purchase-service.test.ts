@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 
 vi.mock("@/repositories/purchase-repository", () => ({
   DUMMY_SOURCE: "dummy",
@@ -26,10 +27,10 @@ const { denyIfOver } = await import("@/services/event-lifecycle-service");
 const { getUserEntitlements } = await import("@/services/entitlement-service");
 
 const EVENT_ID = "0b5c1f0e-6a43-4a35-9d3b-2f8f6f1d3c11";
-const UNAVAILABLE = { ok: false, status: 403, error: "Käufe sind bald verfügbar." };
-const NOT_FOUND = { ok: false, status: 404, error: "Event wurde nicht gefunden." };
-const OVER = { ok: false, status: 409, error: "Dieses Event ist vorbei." } as const;
-const ALREADY_UNLOCKED = { ok: false, status: 409, error: "Dieses Event ist schon freigeschaltet." };
+const UNAVAILABLE = { ok: false, status: 403, error: err("purchasesUnavailable") };
+const NOT_FOUND = { ok: false, status: 404, error: err("eventNotFound") };
+const OVER = { ok: false, status: 409, error: err("eventOver") } as const;
+const ALREADY_UNLOCKED = { ok: false, status: 409, error: err("alreadyUnlocked") };
 const OK = { ok: true, data: { usedCredit: false } };
 
 beforeEach(() => {
@@ -56,12 +57,12 @@ describe("purchase - request", () => {
     expect(await purchase("user-1", "paid_event")).toEqual({
       ok: false,
       status: 400,
-      error: "Ungültige Anfragedaten.",
+      error: err("invalidRequest"),
     });
   });
 
   it.each([{}, { product: "nope" }, { product: 5 }])("rejects an unknown product %j", async (body) => {
-    expect(await purchase("user-1", body)).toEqual({ ok: false, status: 400, error: "Unbekanntes Produkt." });
+    expect(await purchase("user-1", body)).toEqual({ ok: false, status: 400, error: err("unknownProduct") });
   });
 });
 
@@ -111,7 +112,7 @@ describe("purchase - theme", () => {
     expect(await purchase("user-1", { product: "theme", theme: "gibts-nicht" })).toEqual({
       ok: false,
       status: 400,
-      error: "Ungültiges Theme.",
+      error: err("invalidTheme"),
     });
   });
 

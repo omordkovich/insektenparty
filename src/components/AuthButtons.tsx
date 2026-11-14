@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { AuthDialogMode } from "./AuthDialog";
 import { Button } from "./Button";
@@ -15,17 +16,18 @@ type AuthButtonsProps = {
   afterLoginHref?: string;
 };
 
-export function AuthButtons({ registerLabel = "Registrieren", afterLoginHref }: AuthButtonsProps) {
+export function AuthButtons({ registerLabel, afterLoginHref }: AuthButtonsProps) {
+  const t = useTranslations("auth");
   const [authMode, setAuthMode] = useState<AuthDialogMode | null>(null);
 
   return (
     <>
       <div className="flex flex-wrap justify-center gap-2">
         <Button variant="outline" onClick={() => setAuthMode("login")}>
-          Login
+          {t("login")}
         </Button>
         <Button variant="primary" onClick={() => setAuthMode("register")}>
-          {registerLabel}
+          {registerLabel ?? t("register")}
         </Button>
       </div>
 

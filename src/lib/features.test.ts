@@ -171,9 +171,10 @@ describe("isThemeSelectable", () => {
 
 describe("products", () => {
   it("formats cents as German euro price", () => {
-    expect(formatPrice(299)).toBe("2,99 €");
-    expect(formatPrice(99)).toBe("0,99 €");
-    expect(formatPrice(500)).toBe("5,00 €");
+    expect(formatPrice(299, "de")).toBe("2,99 €");
+    expect(formatPrice(299, "en")).toBe("€2.99");
+    expect(formatPrice(99, "de")).toBe("0,99 €");
+    expect(formatPrice(500, "de")).toBe("5,00 €");
   });
 
   it("lists the catalog prices", () => {

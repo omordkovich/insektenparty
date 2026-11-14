@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { err, type ErrorMessage } from "@/i18n/errors";
 
 // Rules for new passwords (registration, password reset). Must match the
 // Supabase setting under Authentication → Sign In / Providers → Email:
@@ -16,15 +16,12 @@ export const PASSWORD_SYMBOLS = "!@#$%^&*()_+-=[]{};':\"\\|<>?,./`~";
 
 const SYMBOL = /[!@#$%^&*()_+\-=[\]{};':"\\|<>?,./`~]/;
 
-export const newPasswordSchema = z
-  .string()
-  .min(PASSWORD_MIN_LENGTH, `Das Passwort muss mindestens ${PASSWORD_MIN_LENGTH} Zeichen lang sein.`)
-  .regex(/[a-z]/, "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.")
-  .regex(/[A-Z]/, "Das Passwort muss mindestens einen Großbuchstaben enthalten.")
-  .regex(/[0-9]/, "Das Passwort muss mindestens eine Ziffer enthalten.")
-  .regex(SYMBOL, "Das Passwort muss mindestens ein Sonderzeichen enthalten, z. B. ! ? # $ %.");
-
-export function validateNewPassword(password: string): string | null {
-  const result = newPasswordSchema.safeParse(password);
-  return result.success ? null : (result.error.issues[0]?.message ?? "Ungültiges Passwort.");
+// The first broken rule, as a key into messages.errors (null = fine).
+export function validateNewPassword(password: string): ErrorMessage | null {
+  if (password.length < PASSWORD_MIN_LENGTH) return err("passwordTooShort", { min: PASSWORD_MIN_LENGTH });
+  if (!/[a-z]/.test(password)) return err("passwordNeedsLower");
+  if (!/[A-Z]/.test(password)) return err("passwordNeedsUpper");
+  if (!/[0-9]/.test(password)) return err("passwordNeedsDigit");
+  if (!SYMBOL.test(password)) return err("passwordNeedsSymbol");
+  return null;
 }

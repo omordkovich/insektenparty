@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import {
   POLL_MAX_OPTIONS,
   POLL_MIN_OPTIONS,
@@ -30,7 +31,7 @@ export type DateSettings = {
 };
 
 /** The plan's date window: no new day after `latest`, else `error`. */
-export type DateWindow = { latest: string; error: string };
+export type DateWindow = { latest: string; error: ErrorMessage };
 
 export function dateWindowOf(plan: EventPlan, maxDate: string): DateWindow {
   return { latest: maxDate, error: dateWindowError(plan) };
@@ -70,7 +71,7 @@ export function initialDateDraft(original: DateSettings | null): DateDraft {
   };
 }
 
-type BuildResult = { ok: true; request: DateModeRequest | null } | { ok: false; error: string };
+type BuildResult = { ok: true; request: DateModeRequest | null } | { ok: false; error: ErrorMessage };
 
 export function buildDateModeRequest(
   original: DateSettings | null,
@@ -78,7 +79,7 @@ export function buildDateModeRequest(
   today: string,
   dateWindow?: DateWindow,
 ): BuildResult {
-  if (!draft.mode) return { ok: false, error: "Bitte wähle, wie der Termin festgelegt wird." };
+  if (!draft.mode) return { ok: false, error: err("dateModeRequired") };
 
   if (draft.mode === "unknown") {
     return { ok: true, request: original?.mode === "unknown" ? null : { mode: "unknown" } };
@@ -148,7 +149,7 @@ export function buildDateModeRequest(
 }
 
 // A proposal after the window's last day: its error, else null.
-function windowError(proposals: { date: string }[], dateWindow: DateWindow | undefined): string | null {
+function windowError(proposals: { date: string }[], dateWindow: DateWindow | undefined): ErrorMessage | null {
   if (!dateWindow) return null;
   return proposals.some((proposal) => proposal.date > dateWindow.latest) ? dateWindow.error : null;
 }

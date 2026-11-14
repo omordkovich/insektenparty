@@ -1,8 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+// `createResponse` builds the response this request gets (a plain
+// NextResponse.next or next-intl's rewrite). It is called again once the
+// session cookies are refreshed, so the new cookies reach both the browser
+// and the server components.
+export async function updateSession(
+  request: NextRequest,
+  createResponse: () => NextResponse,
+): Promise<NextResponse> {
+  let supabaseResponse = createResponse();
+  // A redirect (e.g. "/" → "/en") renders nothing - the follow-up request
+  // refreshes the session.
+  if (supabaseResponse.status >= 300 && supabaseResponse.status < 400) {
+    return supabaseResponse;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,7 +28,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = createResponse();
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );

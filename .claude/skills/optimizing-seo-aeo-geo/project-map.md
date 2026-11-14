@@ -4,8 +4,8 @@
 
 | Concern | File |
 |---|---|
-| Occasion pages (data for page, hub, chips, sitemap, llms.txt, JSON-LD, OG) | `src/lib/occasions.ts` (+ `occasions.test.ts` enforces limits) |
-| Occasion page / hub / OG image | `src/app/einladung/[anlass]/page.tsx`, `src/app/einladung/page.tsx`, `.../opengraph-image.tsx` |
+| Occasion pages (data for page, hub, sitemap, llms.txt, JSON-LD, OG) | German `src/lib/occasions.ts`, English `src/lib/occasions-en.ts`, Russian `src/lib/occasions-ru.ts` (same ids, same order; Russian FAQ research: `scripts/suggest_ru.py`), URLs per language `src/lib/occasion-slugs.ts` (`/einladung/<slug>`, `/en/invitations/<slug>`, `/ru/priglasheniya/<slug>`); `occasions.test.ts` enforces limits and that both languages match |
+| Occasion page / hub / OG image | Shared views + metadata `src/components/OccasionPages.tsx`; one generic route for every language `src/app/[locale]/[section]/...` (+ `[slug]/opengraph-image.tsx`); the section name per language comes from `OCCASION_SECTION` |
 | Start page copy, benefits, chips | `src/components/LandingContent.tsx`, `src/components/HowItWorks.tsx` |
 | Start page FAQ (also schema + llms.txt) | `src/lib/faq.ts` |
 | Title/description/canonical/OG helper | `src/lib/page-metadata.ts` (`pageMetadata()`) |

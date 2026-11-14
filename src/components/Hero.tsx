@@ -1,4 +1,5 @@
 import { AddToCalendarLink } from "@/components/AddToCalendarLink";
+import { useTranslations } from "next-intl";
 import { DateEditButton } from "@/components/DateEditButton";
 import { EditableField } from "@/components/EditableField";
 import { buildCalendarLink, buildGoogleCalendarLink, buildMapsLink } from "@/lib/calendar";
@@ -22,6 +23,7 @@ type HeroProps = {
 };
 
 export function Hero({ config, eventId, isOwner, dateSettings, announcement, unlock, readOnly = false }: HeroProps) {
+  const t = useTranslations("event");
   const canEdit = isOwner && !readOnly;
   const dateFixed = config.dateMode === "fixed";
   const hasEventDateTime =
@@ -51,9 +53,9 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement, unl
             eventId={eventId}
             fieldKey="kicker"
             value={config.kicker}
-            placeholder="Überschrift"
+            placeholder={t("uberschrift")}
             isOwner={canEdit}
-            ariaLabel="Überschrift bearbeiten"
+            ariaLabel={t("uberschriftBearbeiten")}
             className="text-sm font-semibold uppercase tracking-[0.2em] text-honey-dark"
           />
         </p>
@@ -62,10 +64,10 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement, unl
             eventId={eventId}
             fieldKey="title"
             value={config.title}
-            placeholder="Titel deines Events"
+            placeholder={t("titlePlaceholder")}
             isOwner={canEdit}
-            ariaLabel="Titel bearbeiten"
-            editHint="Mit dem Titel ändert sich auch der Einladungslink. Bereits verschickte Links funktionieren weiter."
+            ariaLabel={t("titleEdit")}
+            editHint={t("mitDemTitelAndert")}
             className="font-display text-[clamp(1.5rem,9vw,3rem)] leading-none text-leaf-dark sm:text-6xl md:text-7xl"
           />
         </h1>
@@ -74,19 +76,19 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement, unl
             eventId={eventId}
             fieldKey="greeting"
             value={config.greeting}
-            placeholder="Begrüßungstext für deine Gäste"
+            placeholder={t("begrussungstextFurDeineGaste")}
             isOwner={canEdit}
             as="textarea"
-            ariaLabel="Begrüßungstext bearbeiten"
+            ariaLabel={t("begrussungstextBearbeiten")}
             className="text-lg text-muted sm:text-xl"
           />
         </p>
 
         <dl className="mx-auto mt-8 grid max-w-xl gap-3 text-left sm:grid-cols-3 sm:text-center">
           <div>
-            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Datum</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">{t("datum")}</dt>
             <dd className="mt-1 font-semibold">
-              {/* Date and time are set in the owner's "Termin" window. */}
+              {/* Date and time are set in the owner's t("termin") window. */}
               <span className="inline-flex items-center gap-2">
                 {dateFixed && config.dateLabel ? (
                   icsLink && googleCalendarLink ? (
@@ -101,10 +103,10 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement, unl
                     config.dateLabel
                   )
                 ) : dateFixed ? (
-                  dateSettings && !readOnly ? <span className="opacity-40">Datum festlegen</span> : null
+                  dateSettings && !readOnly ? <span className="opacity-40">{t("datumFestlegen")}</span> : null
                 ) : (
                   <span className="text-muted">
-                    {config.dateMode === "poll" ? "Wird abgestimmt" : "Termin folgt"}
+                    {config.dateMode === "poll" ? t("beingVoted") : t("terminFolgt")}
                   </span>
                 )}
                 {dateSettings && announcement && unlock && !readOnly ? (
@@ -119,21 +121,21 @@ export function Hero({ config, eventId, isOwner, dateSettings, announcement, unl
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Uhrzeit</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">{t("uhrzeit")}</dt>
             <dd className="mt-1 font-semibold">
               {dateFixed ? config.timeLabel : <span className="text-muted">–</span>}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">Ort</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-leaf">{t("ort")}</dt>
             <dd className="mt-1 font-semibold">
               <EditableField
                 eventId={eventId}
                 fieldKey="locationLabel"
                 value={config.locationLabel}
-                placeholder="Adresse oder Ort des Events"
+                placeholder={t("adresseOderOrtDes")}
                 isOwner={canEdit}
-                ariaLabel="Ort bearbeiten"
+                ariaLabel={t("ortBearbeiten")}
                 className="font-semibold"
                 link={{ href: buildMapsLink(config.locationLabel), external: true }}
               />

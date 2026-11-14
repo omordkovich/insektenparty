@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { INTL_FORMAT_LOCALE, type Locale } from "@/i18n/config";
 import { LEGAL_INFO } from "@/lib/legal-info";
 
 // Shared building blocks for the legal texts (Impressum, Datenschutz, AGB,
@@ -46,7 +47,9 @@ export function EmailLink() {
   );
 }
 
-export function PostalAddress() {
+const COUNTRY: Record<Locale, string> = { de: LEGAL_INFO.country, en: "Germany", ru: "Германия" };
+
+export function PostalAddress({ locale }: { locale: Locale }) {
   return (
     <>
       {LEGAL_INFO.name}
@@ -55,11 +58,24 @@ export function PostalAddress() {
       <br />
       {LEGAL_INFO.city}
       <br />
-      {LEGAL_INFO.country}
+      {COUNTRY[locale]}
     </>
   );
 }
 
-export function LastUpdated({ date }: { date: string }) {
-  return <p className="mt-6">Stand: {date}</p>;
+const LAST_UPDATED_LABEL: Record<Locale, string> = { de: "Stand", en: "Last updated", ru: "Обновлено" };
+
+// "Stand: November 2026" from a version date (src/lib/legal-info.ts), so
+// every language shows the same date.
+export function LastUpdated({ date, locale }: { date: string; locale: Locale }) {
+  const month = new Intl.DateTimeFormat(INTL_FORMAT_LOCALE[locale], {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+  return (
+    <p className="mt-6" data-updated={date}>
+      {LAST_UPDATED_LABEL[locale]}: {month}
+    </p>
+  );
 }

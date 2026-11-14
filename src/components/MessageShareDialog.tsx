@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 import { buildMessageShareLinks } from "@/lib/share";
 import { Modal } from "./Modal";
@@ -17,15 +18,17 @@ const platformClass =
 // Fallback for browsers without the native share sheet: sends the whole
 // message (not just the link) to the platforms that take free text.
 export function MessageShareDialog({ text, url, subject, onCloseAction }: MessageShareDialogProps) {
+  const t = useTranslations("event");
   const titleId = useId();
-  const links = buildMessageShareLinks({ text, url, subject });
+  const locale = useLocale();
+  const links = buildMessageShareLinks({ text, url, subject, locale });
 
   return (
     <Modal titleId={titleId} onCloseAction={onCloseAction}>
       <h2 id={titleId} className="pr-10 font-display text-2xl text-leaf-dark">
-        Text teilen
+        {t("textTeilen")}
       </h2>
-      <p className="mt-2 text-sm text-muted">Wähle, wie du den Text verschicken möchtest.</p>
+      <p className="mt-2 text-sm text-muted">{t("wahleWieDuDen")}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">
         {links.map((link) => (
           <a

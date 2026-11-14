@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -36,6 +37,8 @@ type DatePollSectionProps = {
 
 // Status "Termin abstimmen lassen": instead of the guest list.
 export function DatePollSection({ eventId, isOwner, announcement, readOnly = false }: DatePollSectionProps) {
+  const locale = useLocale();
+  const t = useTranslations("datePoll");
   const apiBasePath = `/api/events/${eventId}/poll-votes`;
   const [poll, setPoll] = useState<PollDto | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,15 +51,15 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
       const response = await fetch(apiBasePath, { cache: "no-store" });
       const payload = (await response.json().catch(() => null)) as (PollDto & { error?: string }) | null;
       if (!response.ok || !payload) {
-        setError(payload?.error ?? "Die Abstimmung konnte nicht geladen werden.");
+        setError(payload?.error ?? t("dieAbstimmungKonnteNicht"));
         return;
       }
       setPoll(payload);
       setError(null);
     } catch {
-      setError("Die Abstimmung konnte nicht geladen werden.");
+      setError(t("dieAbstimmungKonnteNicht"));
     }
-  }, [apiBasePath]);
+  }, [apiBasePath, t]);
 
   useEffect(() => {
     // Fetching on mount; setState only happens after the request resolves.
@@ -77,7 +80,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
           variant="outline"
           size="icon"
           className="bg-surface"
-          aria-label={`Stimme von ${vote.name} ändern`}
+          aria-label={t("stimmeVonNameAndern", { name: vote.name })}
           onClick={() => setVoteModal({ vote })}
         >
           <PencilIcon />
@@ -85,7 +88,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
         <Button
           variant="outline-danger"
           size="icon"
-          aria-label={`Stimme von ${vote.name} löschen`}
+          aria-label={t("stimmeVonNameLoschen", { name: vote.name })}
           onClick={() => setDeleteVote(vote)}
         >
           <TrashIcon />
@@ -98,12 +101,12 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
     <section className="page-shell py-6" aria-labelledby="poll-heading">
       <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
         <h2 id="poll-heading" className="text-center font-display text-3xl text-leaf-dark sm:text-4xl">
-          Wann passt es dir?
+          {t("wannPasstEsDir")}
         </h2>
         <p className="mt-2 text-center text-muted">
           {readOnly
-            ? "Die Abstimmung ist beendet."
-            : "Hake an, welche Termine dir passen. Der Gastgeber legt danach den Termin fest."}
+            ? t("dieAbstimmungIstBeendet")
+            : t("hakeAnWelcheTermine")}
         </p>
 
         {error ? (
@@ -113,7 +116,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
         ) : null}
         {!poll && !error ? (
           <p className="mt-8 text-center text-muted" role="status">
-            Abstimmung wird geladen ...
+            {t("abstimmungWirdGeladen")}
           </p>
         ) : null}
 
@@ -124,20 +127,20 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
               <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-leaf/20 text-sm text-leaf-dark">
-                    <th className="px-2 py-2 font-bold">Name</th>
+                    <th className="px-2 py-2 font-bold">{t("name")}</th>
                     {options.map((option) => (
                       <th
                         key={option.id}
                         className={`px-2 py-2 text-center font-bold ${leading.includes(option.id) ? "rounded-t-xl bg-leaf/10" : ""}`}
                       >
-                        <span className="block whitespace-nowrap">{formatPollOptionLabel(option)}</span>
+                        <span className="block whitespace-nowrap">{formatPollOptionLabel(option, locale)}</span>
                         {isOwner && !readOnly ? (
                           <button
                             type="button"
                             onClick={() => setFixOption(option)}
                             className="mt-1 text-xs font-semibold text-leaf underline underline-offset-2 hover:text-leaf-dark"
                           >
-                            Diesen Termin festlegen
+                            {t("diesenTerminFestlegen")}
                           </button>
                         ) : null}
                       </th>
@@ -151,7 +154,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
                       <td className="px-2 py-3">
                         <span className="font-bold text-leaf-dark">{vote.name}</span>
                         {vote.noneFit ? (
-                          <span className="block text-xs text-muted">Nichts davon passt</span>
+                          <span className="block text-xs text-muted">{t("nichtsDavonPasst")}</span>
                         ) : null}
                       </td>
                       {options.map((option) => (
@@ -168,7 +171,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
                 </tbody>
                 <tfoot>
                   <tr className="text-sm font-bold text-leaf-dark">
-                    <td className="px-2 py-2">Passt</td>
+                    <td className="px-2 py-2">{t("passt")}</td>
                     {options.map((option) => (
                       <td
                         key={option.id}
@@ -195,7 +198,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
                     className={`rounded-2xl border p-4 ${leading.includes(option.id) ? "border-leaf bg-leaf/10" : "border-leaf/15 bg-surface/80"}`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-leaf-dark">{formatPollOptionLabel(option)}</span>
+                      <span className="font-bold text-leaf-dark">{formatPollOptionLabel(option, locale)}</span>
                       <span className="shrink-0 font-bold text-leaf">✓ {names.length}</span>
                     </div>
                     {names.length > 0 ? <p className="mt-1 text-sm text-muted">{names.join(", ")}</p> : null}
@@ -205,7 +208,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
                         className="mt-3 w-full bg-surface"
                         onClick={() => setFixOption(option)}
                       >
-                        Diesen Termin festlegen
+                        {t("diesenTerminFestlegen")}
                       </Button>
                     ) : null}
                   </div>
@@ -213,7 +216,7 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
               })}
               {noneFitNames.length > 0 ? (
                 <p className="text-sm text-muted">
-                  <span className="font-bold">Nichts davon passt:</span> {noneFitNames.join(", ")}
+                  <span className="font-bold">{t("nichtsDavonPasst2")}</span> {noneFitNames.join(", ")}
                 </p>
               ) : null}
               {votes.length > 0 ? (
@@ -232,13 +235,13 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
             </div>
 
             {votes.length === 0 ? (
-              <p className="mt-6 text-center text-muted">Noch hat niemand abgestimmt.</p>
+              <p className="mt-6 text-center text-muted">{t("nochHatNiemandAbgestimmt")}</p>
             ) : null}
 
             {readOnly ? null : (
               <div className="mt-6 flex justify-center">
                 <Button variant="primary" size="lg" onClick={() => setVoteModal({ vote: null })}>
-                  Abstimmen
+                  {t("abstimmen")}
                 </Button>
               </div>
             )}
@@ -282,9 +285,10 @@ export function DatePollSection({ eventId, isOwner, announcement, readOnly = fal
 }
 
 function AnswerMark({ answer }: { answer: VoteAnswer | undefined }) {
+  const t = useTranslations("datePoll");
   if (answer === "yes") {
     return (
-      <span className="text-lg font-bold text-leaf" role="img" aria-label="passt">
+      <span className="text-lg font-bold text-leaf" role="img" aria-label={t("works")}>
         ✓
       </span>
     );
@@ -294,15 +298,15 @@ function AnswerMark({ answer }: { answer: VoteAnswer | undefined }) {
       <span
         className="font-bold text-muted"
         role="img"
-        aria-label="noch nicht abgestimmt"
-        title="Hat diesen Termin noch nicht gesehen"
+        aria-label={t("nochNichtAbgestimmt")}
+        title={t("hatDiesenTerminNoch")}
       >
         ?
       </span>
     );
   }
   return (
-    <span className="text-muted/50" role="img" aria-label="passt nicht">
+    <span className="text-muted/50" role="img" aria-label={t("passtNicht")}>
       –
     </span>
   );

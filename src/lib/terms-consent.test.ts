@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { err } from "@/i18n/errors";
 import { MIN_REGISTRATION_AGE, PRIVACY_VERSION, TERMS_VERSION } from "./legal-info";
 import {
   consentMetadata,
@@ -88,11 +89,11 @@ describe("consentUpdate", () => {
 
 describe("consentRequiredError", () => {
   it("asks for AGB and age when there is no consent yet", () => {
-    expect(consentRequiredError({})).toBe("Bitte bestätige zuerst die AGB und dein Alter.");
+    expect(consentRequiredError({})).toEqual(err("termsRequired"));
   });
 
   it("asks for the changed AGB when an older version was accepted", () => {
-    expect(consentRequiredError(OUTDATED)).toBe("Bitte stimme zuerst den geänderten AGB zu.");
+    expect(consentRequiredError(OUTDATED)).toEqual(err("termsUpdated"));
   });
 
   it("is null when the current version is accepted", () => {

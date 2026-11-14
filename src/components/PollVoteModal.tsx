@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import { formatPollOptionLabel, type PollOption, type PollVoteDto } from "@/lib/date-poll";
 import { NAME_MAX_LENGTH, validatePollVote } from "@/lib/validation";
@@ -7,6 +8,7 @@ import { Button } from "./Button";
 import { FormModal } from "./FormModal";
 import { LegalLink } from "./LegalLink";
 import { RecaptchaCheckbox } from "./RecaptchaCheckbox";
+import { useErrorText } from "./useErrorText";
 
 type PollVoteModalProps = {
   options: PollOption[];
@@ -26,6 +28,9 @@ export function PollVoteModal({
   onCloseAction,
   onSavedAction,
 }: PollVoteModalProps) {
+  const locale = useLocale();
+  const t = useTranslations("datePoll");
+  const errorText = useErrorText();
   const titleId = useId();
   const nameId = useId();
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -55,11 +60,11 @@ export function PollVoteModal({
       options.map((option) => option.id),
     );
     if (!validation.ok) {
-      setError(validation.error);
+      setError(errorText(validation.error));
       return;
     }
     if (!isOwner && !recaptchaToken) {
-      setError("Bitte bestätige, dass du kein Roboter bist.");
+      setError(t("bitteBestatigeDassDu"));
       return;
     }
 
@@ -73,14 +78,14 @@ export function PollVoteModal({
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Deine Stimme konnte nicht gespeichert werden. Bitte versuche es erneut.");
+        setError(payload?.error ?? t("deineStimmeKonnteNicht"));
         setRecaptchaReset((value) => value + 1);
         return;
       }
       await onSavedAction();
       onCloseAction();
     } catch {
-      setError("Deine Stimme konnte nicht gespeichert werden. Bitte versuche es erneut.");
+      setError(t("deineStimmeKonnteNicht"));
       setRecaptchaReset((value) => value + 1);
     } finally {
       setSaving(false);
@@ -94,14 +99,14 @@ export function PollVoteModal({
       onCloseAction={requestClose}
       closeDisabled={saving}
       initialFocusRef={nameInputRef}
-      header={vote ? "Stimme ändern" : "Abstimmen"}
+      header={vote ? t("stimmeAndern") : "Abstimmen"}
       footer={
         <>
           <Button variant="outline" onClick={requestClose} disabled={saving}>
-            Abbrechen
+            {t("abbrechen")}
           </Button>
           <Button variant="primary" type="submit" disabled={saving || (!isOwner && !recaptchaToken)}>
-            {saving ? "Wird gespeichert ..." : "Auswahl bestätigen"}
+            {saving ? t("saving") : t("auswahlBestatigen")}
           </Button>
         </>
       }
@@ -109,7 +114,7 @@ export function PollVoteModal({
       <div className="space-y-4">
         <div>
           <label htmlFor={nameId} className="mb-1 block text-sm font-bold">
-            Name
+            {t("name")}
           </label>
           <input
             ref={nameInputRef}
@@ -125,7 +130,7 @@ export function PollVoteModal({
         </div>
 
         <fieldset>
-          <legend className="mb-1 block text-sm font-bold">Welche Termine passen dir?</legend>
+          <legend className="mb-1 block text-sm font-bold">{t("welcheTerminePassenDir")}</legend>
           <div className="space-y-2">
             {options.map((option) => (
               <label key={option.id} className="flex items-center gap-2 text-sm">
@@ -136,7 +141,7 @@ export function PollVoteModal({
                   onChange={(event) => toggleOption(option.id, event.target.checked)}
                   className="h-5 w-5"
                 />
-                {formatPollOptionLabel(option)}
+                {formatPollOptionLabel(option, locale)}
               </label>
             ))}
             <hr className="border-leaf/15" />
@@ -151,7 +156,7 @@ export function PollVoteModal({
                 }}
                 className="h-5 w-5"
               />
-              Nichts davon passt
+              {t("nichtsDavonPasst")}
             </label>
           </div>
         </fieldset>
@@ -161,12 +166,13 @@ export function PollVoteModal({
         ) : null}
 
         <p className="text-xs text-muted">
-          Deine Auswahl ist auf der Event-Seite für alle sichtbar, die den Einladungslink kennen.
-          Mehr dazu in der{" "}
-          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-            Datenschutzerklärung
-          </LegalLink>
-          .
+          {t.rich("visibilityNote", {
+            privacy: (chunks) => (
+              <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                {chunks}
+              </LegalLink>
+            ),
+          })}
         </p>
 
         {error ? (

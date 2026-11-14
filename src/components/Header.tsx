@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Locale } from "@/i18n/config";
 import type { EventConfig } from "@/lib/event-config";
 import type { UnlockContext } from "@/lib/products";
 import type { ThemeKey } from "@/lib/theme-presets";
@@ -16,6 +17,7 @@ type HeaderProps = {
     unlockedThemes: ThemeKey[];
     accessPassword: string | null;
     maxGuests: number | null;
+    language: Locale;
     unlock: UnlockContext;
   };
   /** The event is over: no settings gear, whatever `themeEdit` says. */
@@ -81,6 +83,7 @@ export function Header({ config, logoHref, themeEdit, readOnly = false }: Header
             unlockedThemes={themeEdit.unlockedThemes}
             accessPassword={themeEdit.accessPassword}
             maxGuests={themeEdit.maxGuests}
+            language={themeEdit.language}
             unlock={themeEdit.unlock}
             className="absolute bottom-2 left-full ml-3"
           />

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 
 // The repository talks to the database; replaced by an in-memory stand-in.
 const stored = {
@@ -18,7 +19,7 @@ vi.mock("@/repositories/event-repository", () => ({
   getEventAddress: vi.fn(async () => ({ slug: "anna-sommerfest-k7q2xm", slugKey: "k7q2xm", slugName: "anna" })),
 }));
 vi.mock("@/services/event-lifecycle-service", () => ({
-  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  EVENT_OVER_ERROR: { key: "eventOver" },
   denyIfOver: vi.fn(async () => null),
 }));
 vi.mock("@/services/entitlement-service", () => ({ getUserEntitlements: vi.fn() }));
@@ -46,9 +47,9 @@ function update(body: Record<string, unknown>) {
 
 describe("updateEventForOwner – event over", () => {
   it("refuses every change with 409 and writes nothing", async () => {
-    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(denyIfOver).mockResolvedValueOnce({ ok: false, status: 409, error: err("eventOver") });
     vi.mocked(updateEvent).mockClear();
-    expect(await update({ title: "Neu" })).toEqual({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    expect(await update({ title: "Neu" })).toEqual({ ok: false, status: 409, error: err("eventOver") });
     expect(updateEvent).not.toHaveBeenCalled();
   });
 });
@@ -81,7 +82,7 @@ describe("updateEventForOwner – date and time", () => {
     expect(await update({ eventDate: "2026-09-04", eventEndDate: "2026-09-01" })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Enddatum darf nicht vor dem Startdatum liegen.",
+      error: err("endDateBeforeStart"),
     });
     expect(updateEvent).not.toHaveBeenCalled();
   });
@@ -90,7 +91,7 @@ describe("updateEventForOwner – date and time", () => {
     expect(await update({ eventStartTime: "20:00", eventEndTime: "02:00" })).toEqual({
       ok: false,
       status: 400,
-      error: "Die Endzeit muss nach der Startzeit liegen.",
+      error: err("endTimeBeforeStart"),
     });
 
     stored.eventEndDate = "2026-09-05";
@@ -105,7 +106,7 @@ describe("updateEventForOwner – date and time", () => {
     expect(await update({ eventDate: "2026-09-04", eventEndDate: null })).toEqual({
       ok: false,
       status: 400,
-      error: "Die Endzeit muss nach der Startzeit liegen.",
+      error: err("endTimeBeforeStart"),
     });
   });
 
@@ -120,9 +121,9 @@ describe("updateEventForOwner – date and time", () => {
     expect(await update({ contactEmail: "kein-at.de" })).toEqual({
       ok: false,
       status: 400,
-      error: "Bitte gib eine gültige E-Mail-Adresse ein.",
+      error: err("invalidEmail"),
     });
-    expect(await update({ theme: "neon" })).toEqual({ ok: false, status: 400, error: "Ungültiges Theme." });
+    expect(await update({ theme: "neon" })).toEqual({ ok: false, status: 400, error: err("invalidTheme") });
   });
 });
 
@@ -184,7 +185,7 @@ describe("createEventForOwner – event address", () => {
     expect(await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: FIXED })).toEqual({
       ok: false,
       status: 403,
-      error: "Du hast kein freies Event mehr.",
+      error: err("noQuota"),
     });
     expect(vi.mocked(createEvent).mock.calls.length).toBe(1);
   });
@@ -274,7 +275,7 @@ describe("event password", () => {
   it("rejects a too short password when creating", async () => {
     expect(
       await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: FIXED, accessPassword: "abc" }),
-    ).toEqual({ ok: false, status: 400, error: "Das Passwort muss mindestens 4 Zeichen lang sein." });
+    ).toEqual({ ok: false, status: 400, error: err("eventPasswordTooShort", { min: 4 }) });
     expect(createEvent).not.toHaveBeenCalled();
   });
 
@@ -284,7 +285,7 @@ describe("event password", () => {
     expect(await update({ accessPassword: "ab" })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+      error: err("eventPasswordTooShort", { min: 4 }),
     });
   });
 });
@@ -302,7 +303,7 @@ describe("createEventForOwner – date mode", () => {
     expect(await createEventForOwner("owner-id", { theme: "weiss", title: "Fest" })).toEqual({
       ok: false,
       status: 400,
-      error: "Bitte wähle, wie der Termin festgelegt wird.",
+      error: err("dateModeRequired"),
     });
   });
 
@@ -335,14 +336,14 @@ describe("updateEventForOwner – date only when fixed", () => {
     expect(await update({ eventDate: "2026-09-04" })).toEqual({
       ok: false,
       status: 409,
-      error: "Datum und Uhrzeit legst du in den Event-Einstellungen fest.",
+      error: err("dateTimeInSettings"),
     });
   });
 
   it("does not let a fixed event's date be cleared", async () => {
     vi.mocked(updateEvent).mockClear();
     for (const body of [{ eventDate: null, eventEndDate: null }, { eventDate: null }, { eventDate: "" }]) {
-      expect(await update(body)).toEqual({ ok: false, status: 400, error: "Bitte gib ein Datum ein." });
+      expect(await update(body)).toEqual({ ok: false, status: 400, error: err("dateRequired") });
     }
     expect(updateEvent).not.toHaveBeenCalled();
   });
@@ -365,7 +366,7 @@ describe("updateEventForOwner – plan rules", () => {
     expect(await update({ eventDate: "2026-10-02" })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Datum darf höchstens 3 Monate nach dem Erstellen des Events liegen.",
+      error: err("dateWindow", { months: 3 }),
     });
     expect(await update({ eventEndDate: "2026-10-02" })).toMatchObject({ ok: false, status: 400 });
     expect(updateEvent).not.toHaveBeenCalled();
@@ -378,7 +379,7 @@ describe("updateEventForOwner – plan rules", () => {
     expect(await update({ eventDate: "2027-07-02" })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Datum darf höchstens 12 Monate nach dem Erstellen des Events liegen.",
+      error: err("dateWindow", { months: 12 }),
     });
   });
 
@@ -386,7 +387,7 @@ describe("updateEventForOwner – plan rules", () => {
     expect(await update({ eventDate: "2026-06-30" })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Datum liegt in der Vergangenheit.",
+      error: err("dateInPast"),
     });
     expect(updateEvent).not.toHaveBeenCalled();
   });
@@ -406,7 +407,7 @@ describe("updateEventForOwner – plan rules", () => {
     expect(await update({ eventDate: "2026-09-05" })).toEqual({
       ok: false,
       status: 404,
-      error: "Event wurde nicht gefunden.",
+      error: err("eventNotFound"),
     });
     vi.mocked(getEventPlanInfo).mockResolvedValue(undefined);
     expect(await update({ theme: "ballons" })).toMatchObject({ ok: false, status: 404 });
@@ -420,7 +421,7 @@ describe("updateEventForOwner – plan rules", () => {
     expect(await update({ theme: "ballons" })).toEqual({
       ok: false,
       status: 403,
-      error: "Dieses Design ist noch nicht freigeschaltet.",
+      error: err("themeLocked"),
     });
   });
 
@@ -437,7 +438,7 @@ describe("seat limit in the settings", () => {
     expect(await update({ maxGuests: 0 })).toEqual({
       ok: false,
       status: 400,
-      error: "Die Teilnehmerzahl muss eine ganze Zahl zwischen 1 und 300 sein.",
+      error: err("maxGuestsInvalid", { max: 300 }),
     });
   });
 });
@@ -469,7 +470,7 @@ describe("createEventForOwner – plan and quota", () => {
     expect(await create({ date: { mode: "unknown" } })).toEqual({
       ok: false,
       status: 403,
-      error: "Abstimmung und offener Termin gibt es nur mit einem freigeschalteten Event.",
+      error: err("pollNeedsUnlock"),
     });
     expect(createEvent).not.toHaveBeenCalled();
   });
@@ -479,7 +480,7 @@ describe("createEventForOwner – plan and quota", () => {
     expect(await create({ date: fixedOn("2026-10-02") })).toEqual({
       ok: false,
       status: 400,
-      error: "Das Datum darf höchstens 3 Monate nach dem Erstellen des Events liegen.",
+      error: err("dateWindow", { months: 3 }),
     });
     expect(createEvent).not.toHaveBeenCalled();
 
@@ -501,14 +502,14 @@ describe("createEventForOwner – plan and quota", () => {
 
   it("refuses without free event or credit", async () => {
     entitlements(false, 0);
-    expect(await create({ date: FIXED })).toEqual({ ok: false, status: 403, error: "Du hast kein freies Event mehr." });
+    expect(await create({ date: FIXED })).toEqual({ ok: false, status: 403, error: err("noQuota") });
     expect(createEvent).not.toHaveBeenCalled();
   });
 
   it("refuses when the quota was used up in the meantime", async () => {
     entitlements(true, 0);
     vi.mocked(createEvent).mockResolvedValue("no_quota");
-    expect(await create({ date: FIXED })).toEqual({ ok: false, status: 403, error: "Du hast kein freies Event mehr." });
+    expect(await create({ date: FIXED })).toEqual({ ok: false, status: 403, error: err("noQuota") });
     const { applyDateModeChange } = await import("@/repositories/date-poll-repository");
     expect(applyDateModeChange).not.toHaveBeenCalled();
   });
@@ -523,8 +524,52 @@ describe("createEventForOwner – plan and quota", () => {
     expect(await create({ theme: "natur", date: FIXED })).toEqual({
       ok: false,
       status: 403,
-      error: "Dieses Design ist noch nicht freigeschaltet.",
+      error: err("themeLocked"),
     });
     expect(createEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe("createEventForOwner – language", () => {
+  beforeEach(() => {
+    vi.mocked(createEvent).mockReset();
+    vi.mocked(createEvent).mockImplementation(async (input) => ({ id: "event-id", slug: input.slug }));
+    vi.mocked(getUserEntitlements).mockResolvedValue({
+      unlockedThemes: ["weiss"],
+      freeEventAvailable: true,
+      eventCredits: 0,
+    });
+  });
+
+  it("stores the chosen language", async () => {
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Summer party", date: FIXED, language: "en" });
+    expect(vi.mocked(createEvent).mock.calls[0][0]).toMatchObject({ language: "en" });
+  });
+
+  it("defaults to German", async () => {
+    await createEventForOwner("owner-id", { theme: "weiss", title: "Sommerfest", date: FIXED });
+    expect(vi.mocked(createEvent).mock.calls[0][0]).toMatchObject({ language: "de" });
+  });
+
+  it("rejects an unsupported language", async () => {
+    const result = await createEventForOwner("owner-id", { theme: "weiss", title: "Fête", date: FIXED, language: "fr" });
+    expect(result).toMatchObject({ ok: false, status: 400 });
+    expect(createEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateEventForOwner – language", () => {
+  beforeEach(() => {
+    vi.mocked(updateEvent).mockClear();
+  });
+
+  it("changes the language", async () => {
+    await update({ language: "en" });
+    expect(vi.mocked(updateEvent).mock.calls[0][2]).toMatchObject({ language: "en" });
+  });
+
+  it("rejects an unsupported language", async () => {
+    expect(await update({ language: "fr" })).toMatchObject({ ok: false, status: 400 });
+    expect(updateEvent).not.toHaveBeenCalled();
   });
 });

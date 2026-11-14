@@ -46,6 +46,9 @@ export const events = pgTable("events", {
   maxGuests: integer("max_guests"),
   // "free" | "paid" (see lib/event-plan.ts); the check lives in the migration.
   plan: text("plan").notNull().default("free"),
+  // "de" | "en" | "ru" (see src/i18n/config.ts): the language of the event page;
+  // the check lives in the migration.
+  language: text("language").notNull().default("de"),
   // Expiry mails already sent (null = not yet), see lib/event-lifecycle.ts.
   deletionNoticeSentAt: timestamp("deletion_notice_sent_at", {
     withTimezone: true,

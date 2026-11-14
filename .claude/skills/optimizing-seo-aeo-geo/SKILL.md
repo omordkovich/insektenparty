@@ -6,7 +6,7 @@ description: Use when working on GASTZILLA (this repo) pages, texts or metadata 
 # SEO / AEO / GEO for GASTZILLA
 
 ## Overview
-Every public text must (1) match a real search intent, (2) answer it directly, (3) only claim what the app really does. Technical plumbing (sitemap, llms.txt, JSON-LD, hub, chips) is data-driven from `src/lib/occasions.ts` - content quality is where work goes wrong.
+Every public text must (1) match a real search intent, (2) answer it directly, (3) only claim what the app really does. Technical plumbing (sitemap, llms.txt, JSON-LD, hub, chips, hreflang) is data-driven from `src/lib/occasions.ts` (German), `src/lib/occasions-en.ts` (English) and `src/lib/occasion-slugs.ts` (URLs per language) - content quality is where work goes wrong. A new occasion needs all three; English copy is written for English searches (British spelling), not translated word for word.
 
 Where things live and the verified feature list: `project-map.md` (read it before writing copy).
 
@@ -15,6 +15,7 @@ Where things live and the verified feature list: `project-map.md` (read it befor
 1. **Intent check** - Which searches should this page win? Does an existing occasion already target them? Overlap → extend the existing page instead (avoid cannibalization). Distinct intent (other audience, season, moment) → own page.
 2. **Research real questions** - never invent FAQ questions:
    `python -X utf8 .claude/skills/optimizing-seo-aeo-geo/scripts/suggest.py "schützenfest" "schützenball einladung"`
+   English pages: `python -X utf8 .claude/skills/optimizing-seo-aeo-geo/scripts/suggest_en.py "hen party" "stag do"` (results are noisy - filter for planning/invitation questions)
    Pick questions about planning/inviting that GASTZILLA can answer. Skip law, tax, fixed dates, celebrities. Use the searchers' phrasing ("Wie früh lädt man … ein?"). Little data (only place names) → keep sensible questions, note it in `docs/seo-todo.md`.
 3. **Write answer-first copy (AEO/GEO)** - first sentence of every answer answers the question; then one sentence linking to the GASTZILLA feature. Concrete nouns (Schultüte, Wiesn-Tisch), no fluff. Hedge rules of thumb ("üblich", "meist", "Faustregel") - no invented statistics.
 4. **Truth check** - every feature claim must be in the verified list in `project-map.md`. Not available (tickets, payment, reservations, seat plans, recurring events, guest reminders, occasion-specific designs) → say so honestly in an FAQ instead of hinting.

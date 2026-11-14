@@ -3,6 +3,7 @@
 // the event and stay fixed; the wording around them is the owner's to edit
 // and only lives in their browser. Kept free of React so it can be tested.
 
+import type { Locale } from "@/i18n/config";
 import { formatDateRangeLabel, formatTimeLabel } from "@/lib/calendar";
 import { proposalSchedule, type DateMode, type Proposal } from "@/lib/date-poll";
 
@@ -41,25 +42,83 @@ export const WORDING_MAX_LENGTH: Record<WordingKey, number> = {
 // message after a date poll ("the date is fixed, complete your entries").
 export type WordingKind = "invitation" | "dateFixed";
 
-// Deliberately neutral - it has to fit a wedding as well as a football match.
-export const DEFAULT_WORDING: InvitationWording = {
-  greeting: "Hallo zusammen,",
-  intro: "ich lade euch herzlich ein:",
-  callToAction: "Bitte sagt über diesen Link zu und tragt euch ein:",
-  closing: "Ich freue mich auf euch!",
+// Deliberately neutral - it has to fit a wedding as well as a football
+// match. One set per language; the event's language picks it.
+const WORDING: Record<Locale, Record<WordingKind, InvitationWording>> = {
+  de: {
+    invitation: {
+      greeting: "Hallo zusammen,",
+      intro: "ich lade euch herzlich ein:",
+      callToAction: "Bitte sagt über diesen Link zu und tragt euch ein:",
+      closing: "Ich freue mich auf euch!",
+    },
+    dateFixed: {
+      greeting: "Hallo zusammen,",
+      intro: "nach der Abstimmung haben wir uns gemeinsam für diesen Termin entschieden:",
+      callToAction:
+        "Bitte vervollständigt eure Angaben in der Gästeliste – z. B. Ankunftszeit, Begleitung oder Mitbringsel:",
+      closing: "Ich freue mich auf euch!",
+    },
+  },
+  en: {
+    invitation: {
+      greeting: "Hi everyone,",
+      intro: "you're warmly invited:",
+      callToAction: "Please reply and add yourself via this link:",
+      closing: "Looking forward to seeing you!",
+    },
+    dateFixed: {
+      greeting: "Hi everyone,",
+      intro: "after the vote, we've picked this date together:",
+      callToAction:
+        "Please complete your details on the guest list – e.g. arrival time, plus-ones or things to bring:",
+      closing: "Looking forward to seeing you!",
+    },
+  },
+  ru: {
+    invitation: {
+      greeting: "Всем привет!",
+      intro: "Приглашаю вас:",
+      callToAction: "Пожалуйста, ответьте и запишитесь по этой ссылке:",
+      closing: "Жду вас!",
+    },
+    dateFixed: {
+      greeting: "Всем привет!",
+      intro: "По итогам голосования мы вместе выбрали дату:",
+      callToAction:
+        "Пожалуйста, дополните свои данные в списке гостей – например, время прихода, сопровождающих или что вы принесёте:",
+      closing: "Жду вас!",
+    },
+  },
 };
 
-export const DATE_FIXED_WORDING: InvitationWording = {
-  greeting: "Hallo zusammen,",
-  intro: "nach der Abstimmung haben wir uns gemeinsam für diesen Termin entschieden:",
-  callToAction:
-    "Bitte vervollständigt eure Angaben in der Gästeliste – z. B. Ankunftszeit, Begleitung oder Mitbringsel:",
-  closing: "Ich freue mich auf euch!",
-};
+export function wordingDefaults(locale: Locale): Record<WordingKind, InvitationWording> {
+  return WORDING[locale];
+}
 
-export const WORDING_DEFAULTS: Record<WordingKind, InvitationWording> = {
-  invitation: DEFAULT_WORDING,
-  dateFixed: DATE_FIXED_WORDING,
+// The fixed labels around the event facts.
+const LABELS: Record<Locale, { when: string; where: string; password: string; dateFollows: string; voting: string }> = {
+  de: {
+    when: "Wann",
+    where: "Wo",
+    password: "Passwort für die Event-Seite",
+    dateFollows: "Termin folgt",
+    voting: "wird abgestimmt – bitte stimmt über den Link ab",
+  },
+  en: {
+    when: "When",
+    where: "Where",
+    password: "Password for the event page",
+    dateFollows: "date to follow",
+    voting: "being voted on – please vote via the link",
+  },
+  ru: {
+    when: "Когда",
+    where: "Где",
+    password: "Пароль для страницы мероприятия",
+    dateFollows: "дата будет позже",
+    voting: "идёт голосование – проголосуйте по ссылке",
+  },
 };
 
 // Everything about the event except its date - what the owner's page passes
@@ -68,13 +127,13 @@ export type InvitationBase = Omit<InvitationFacts, "dateLabel" | "timeLabel" | "
 
 // The event facts right after fixing a poll proposal - the page still shows
 // the poll then, so date and time are taken from the proposal itself.
-export function fixedDateFacts(base: InvitationBase, proposal: Proposal): InvitationFacts {
+export function fixedDateFacts(base: InvitationBase, proposal: Proposal, locale: Locale): InvitationFacts {
   const schedule = proposalSchedule(proposal);
   return {
     ...base,
     dateMode: "fixed",
-    dateLabel: formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate),
-    timeLabel: formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime),
+    dateLabel: formatDateRangeLabel(schedule.eventDate, schedule.eventEndDate, locale),
+    timeLabel: formatTimeLabel(schedule.eventStartTime, schedule.eventEndTime, locale),
   };
 }
 
@@ -84,12 +143,13 @@ export type InvitationLine =
 
 // The text's structure: editable wording around the fixed event facts.
 // Facts that are not filled in are left out entirely; the link never is.
-export function invitationLines(facts: InvitationFacts): InvitationLine[] {
+export function invitationLines(facts: InvitationFacts, locale: Locale): InvitationLine[] {
+  const labels = LABELS[locale];
   const when =
     facts.dateMode === "unknown"
-      ? "Termin folgt"
+      ? labels.dateFollows
       : facts.dateMode === "poll"
-        ? "wird abgestimmt – bitte stimmt über den Link ab"
+        ? labels.voting
         : [facts.dateLabel, facts.timeLabel]
             .map((part) => part.trim())
             .filter(Boolean)
@@ -102,18 +162,18 @@ export function invitationLines(facts: InvitationFacts): InvitationLine[] {
     { kind: "editable", key: "greeting" },
     { kind: "editable", key: "intro" },
     ...fixed(facts.title),
-    ...(when ? fixed(`Wann: ${when}`) : []),
-    ...(facts.location.trim() ? fixed(`Wo: ${facts.location.trim()}`) : []),
+    ...(when ? fixed(`${labels.when}: ${when}`) : []),
+    ...(facts.location.trim() ? fixed(`${labels.where}: ${facts.location.trim()}`) : []),
     { kind: "editable", key: "callToAction" },
     { kind: "fixed", text: facts.url },
-    ...(facts.password ? fixed(`Passwort für die Event-Seite: ${facts.password}`) : []),
+    ...(facts.password ? fixed(`${labels.password}: ${facts.password}`) : []),
     { kind: "editable", key: "closing" },
     ...fixed(facts.contactName),
   ];
 }
 
-export function buildInvitationText(facts: InvitationFacts, wording: InvitationWording): string {
-  return invitationLines(facts)
+export function buildInvitationText(facts: InvitationFacts, wording: InvitationWording, locale: Locale): string {
+  return invitationLines(facts, locale)
     .map((line) => (line.kind === "fixed" ? line.text : wording[line.key].trim()))
     .filter(Boolean)
     .join("\n");
@@ -123,7 +183,7 @@ export function buildInvitationText(facts: InvitationFacts, wording: InvitationW
 // back to the defaults, so a stale or hand-edited entry can't break the page.
 export function parseStoredWording(
   raw: string | null,
-  defaults: InvitationWording = DEFAULT_WORDING,
+  defaults: InvitationWording = WORDING.de.invitation,
 ): InvitationWording {
   if (!raw) return defaults;
   try {

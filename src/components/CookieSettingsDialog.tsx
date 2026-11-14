@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { saveConsent } from "@/lib/cookie-consent";
 import { Button } from "./Button";
@@ -12,6 +13,8 @@ type CookieSettingsDialogProps = {
 };
 
 export function CookieSettingsDialog({ onCloseAction }: CookieSettingsDialogProps) {
+  const t = useTranslations("cookies");
+  const tCommon = useTranslations("common");
   const { consent } = useCookieConsent();
   const titleId = useId();
   const descriptionId = useId();
@@ -39,15 +42,16 @@ export function CookieSettingsDialog({ onCloseAction }: CookieSettingsDialogProp
       placement="sheet"
     >
       <h2 id={titleId} className="pr-10 font-display text-2xl text-leaf-dark">
-        Cookie-Einstellungen
+        {t("settingsTitle")}
       </h2>
       <p id={descriptionId} className="mt-3 text-sm text-muted">
-        Hier kannst du festlegen, welche Dienste wir verwenden dürfen. Deine
-        Auswahl wird in deinem Browser gespeichert. Details findest du in der{" "}
-        <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-          Datenschutzerklärung
-        </LegalLink>
-        .
+        {t.rich("settingsIntro", {
+          privacy: (chunks) => (
+            <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+              {chunks}
+            </LegalLink>
+          ),
+        })}
       </p>
 
       <div className="mt-5 space-y-3">
@@ -59,10 +63,10 @@ export function CookieSettingsDialog({ onCloseAction }: CookieSettingsDialogProp
               disabled
               className="h-5 w-5 rounded border-leaf/40"
             />
-            Notwendig (immer aktiv)
+            {t("necessaryTitle")}
           </label>
           <p className="mt-2 text-sm text-muted">
-            Halten deine Anmeldung aufrecht und speichern diese Cookie-Auswahl.
+            {t("necessaryText")}
           </p>
         </div>
 
@@ -78,20 +82,17 @@ export function CookieSettingsDialog({ onCloseAction }: CookieSettingsDialogProp
             Google reCAPTCHA
           </label>
           <p className="mt-2 text-sm text-muted">
-            Schützt Anmeldung und Gästeliste vor Spam. Anbieter: Google Ireland
-            Ltd. Dabei werden Daten (u. a. IP-Adresse) an Google übertragen und
-            Cookies von Google gesetzt. Ohne reCAPTCHA sind diese Formulare
-            nicht nutzbar.
+            {t("recaptchaText")}
           </p>
         </div>
       </div>
 
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="outline" onClick={onCloseAction}>
-          Abbrechen
+          {tCommon("cancel")}
         </Button>
         <Button variant="primary" onClick={handleSave}>
-          Auswahl speichern
+          {t("save")}
         </Button>
       </div>
     </Modal>

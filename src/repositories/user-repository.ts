@@ -1,7 +1,8 @@
 import { sql } from "drizzle-orm";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
 import { getDb } from "@/db";
 
-type AuthUserRow = { name: string | null; email: string | null };
+type AuthUserRow = { name: string | null; email: string | null; locale?: string | null };
 
 // The display name is the metadata's `name` (same as getAccountName in
 // lib/account.ts); blank counts as missing.
@@ -26,12 +27,16 @@ export async function deleteUser(userId: string): Promise<void> {
   await getDb().execute(sql`delete from auth.users where id = ${userId}`);
 }
 
-export type UserContact = { name: string | null; email: string | null };
+// `locale`: the account language (user metadata, see lib/account.ts) - the
+// language of the mails we send the owner. German when not set.
+export type UserContact = { name: string | null; email: string | null; locale: Locale };
 
 export async function getUserContact(userId: string): Promise<UserContact | null> {
   const rows = (await getDb().execute(
-    sql`select ${nameColumn}, email from auth.users where id = ${userId}`,
+    sql`select ${nameColumn}, email, raw_user_meta_data ->> 'locale' as locale from auth.users where id = ${userId}`,
   )) as unknown as AuthUserRow[];
 
-  return rows[0] ?? null;
+  const row = rows[0];
+  if (!row) return null;
+  return { name: row.name, email: row.email, locale: isLocale(row.locale) ? row.locale : DEFAULT_LOCALE };
 }

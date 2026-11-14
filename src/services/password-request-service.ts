@@ -1,8 +1,10 @@
+import type { Locale } from "@/i18n/config";
+import { err } from "@/i18n/errors";
+import { serverTranslator } from "@/i18n/translator";
 import { sendEmail } from "@/lib/email";
 import { getRecaptchaToken, verifyRecaptchaToken } from "@/lib/recaptcha";
 import { buildEventShareUrl } from "@/lib/share";
 import {
-  PHONE_CHANNEL_LABELS,
   validatePasswordRequest,
   type PasswordRequestInput,
 } from "@/lib/validation";
@@ -18,22 +20,28 @@ export function buildPasswordRequestEmail(
   request: PasswordRequestInput,
   eventTitle: string,
   link: string,
+  locale: Locale,
 ): { subject: string; text: string; replyTo?: string } {
+  const t = serverTranslator(locale, "mail");
+  const channels = serverTranslator(locale, "guestForm");
   const { contact } = request;
   const via =
     contact.kind === "email"
-      ? `per E-Mail an ${contact.email}`
-      : `per ${contact.channel === "other" ? contact.channelOther : PHONE_CHANNEL_LABELS[contact.channel]} an ${contact.phone}`;
+      ? t("viaEmail", { email: contact.email })
+      : t("viaPhone", {
+          channel: contact.channel === "other" ? (contact.channelOther ?? "") : channels(`channels.${contact.channel}`),
+          phone: contact.phone,
+        });
 
-  const lines = [`„${request.name}“ möchte das Passwort für dein Event „${eventTitle}“ ${via}.`];
-  if (request.message) lines.push("", `Nachricht: ${request.message}`);
+  const lines = [t("passwordRequestLine", { name: request.name, title: eventTitle, via })];
+  if (request.message) lines.push("", t("messageLine", { message: request.message }));
   if (contact.kind === "email") {
-    lines.push("", `Antworte einfach auf diese E-Mail, um ${request.name} das Passwort zu schicken.`);
+    lines.push("", t("replyHint", { name: request.name }));
   }
-  lines.push("", `Event ansehen: ${link}`);
+  lines.push("", t("viewEvent", { link }));
 
   return {
-    subject: `Passwort-Anfrage für „${eventTitle}“`,
+    subject: t("passwordRequestSubject", { title: eventTitle }),
     text: lines.join("\n"),
     ...(contact.kind === "email" ? { replyTo: contact.email } : {}),
   };
@@ -45,7 +53,7 @@ export async function requestEventPassword(
 ): Promise<EventAccessResult<{ ok: true }>> {
   const event = await getEventAccessInfo(eventId);
   if (!event) {
-    return { ok: false, status: 404, error: "Event wurde nicht gefunden." };
+    return { ok: false, status: 404, error: err("eventNotFound") };
   }
   const over = await denyIfOver(eventId);
   if (over) return over;
@@ -53,7 +61,7 @@ export async function requestEventPassword(
     return {
       ok: false,
       status: 409,
-      error: "Dieses Event ist nicht mehr passwortgeschützt. Bitte lade die Seite neu.",
+      error: err("noLongerProtected"),
     };
   }
 
@@ -69,10 +77,11 @@ export async function requestEventPassword(
 
   const owner = event.ownerId ? await getUserContact(event.ownerId) : null;
   if (!owner?.email) {
-    return { ok: false, status: 503, error: "Die Anfrage konnte nicht zugestellt werden." };
+    return { ok: false, status: 503, error: err("requestNotDelivered") };
   }
 
-  const email = buildPasswordRequestEmail(validation.value, event.title, buildEventShareUrl(event.slug));
+  // In the owner's account language - the mail goes to them.
+  const email = buildPasswordRequestEmail(validation.value, event.title, buildEventShareUrl(event.slug), owner.locale);
   await sendEmail({ to: owner.email, ...email });
   return { ok: true, data: { ok: true } };
 }

@@ -2,9 +2,58 @@ import { COMPARISON } from "@/lib/comparison";
 import { FAQ } from "@/lib/faq";
 import { LEGAL_DOCUMENTS } from "@/lib/legal-documents";
 import { LEGAL_INFO } from "@/lib/legal-info";
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, SITE_DESCRIPTION, SITE_DESCRIPTIONS, SITE_NAME, SITE_URL } from "@/lib/site";
 import { FEATURES, LIMITATIONS } from "@/lib/structured-data";
-import { OCCASIONS, OCCASIONS_HUB, OCCASIONS_PATH, occasionPath } from "@/lib/occasions";
+import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/i18n/config";
+import { localizedPath } from "@/lib/page-metadata";
+import { occasionPath, occasionsFor, occasionsHub, occasionsPath } from "@/lib/occasions";
+
+// "- [title](url): teaser" for the overview and every occasion page of a language.
+function occasionLinks(locale: Locale, hubNote: string): string {
+  const url = (path: string) => `${SITE_URL}${localizedPath(path, locale)}`;
+  return [
+    `- [${occasionsHub(locale).title}](${url(occasionsPath(locale))}): ${hubNote}`,
+    ...occasionsFor(locale).map((occasion) => `- [${occasion.title}](${url(occasionPath(occasion))}): ${occasion.teaser}`),
+  ].join("\n");
+}
+
+// The file is German; every other language gets a short section of its
+// own, written in that language.
+const LANGUAGE_SECTION: Record<Exclude<Locale, "de">, { heading: string; startPage: string; legalNote: string; hubNote: string }> = {
+  en: {
+    heading: "In English",
+    startPage: "Start page",
+    legalNote: "Legal texts (translations – the German versions are binding):",
+    hubNote: "Overview of all occasion pages",
+  },
+  ru: {
+    heading: "На русском",
+    startPage: "Главная страница",
+    legalNote: "Юридические тексты (переводы – обязательной является немецкая версия):",
+    hubNote: "Обзор всех страниц с поводами",
+  },
+};
+
+function languageSections(): string {
+  return LOCALES.filter((locale): locale is Exclude<Locale, "de"> => locale !== DEFAULT_LOCALE)
+    .map((locale) => {
+      const section = LANGUAGE_SECTION[locale];
+      const home = `${SITE_URL}/${locale}`;
+      const legal = Object.values(LEGAL_DOCUMENTS)
+        .map((doc) => `- [${doc.title[locale]}](${SITE_URL}${localizedPath(doc.href, locale)}): ${doc.description[locale]}`)
+        .join("\n");
+      return `## ${section.heading}
+
+${SITE_DESCRIPTIONS[locale]} ${section.startPage}: [${home}](${home}).
+
+${occasionLinks(locale, section.hubNote)}
+
+${section.legalNote}
+
+${legal}`;
+    })
+    .join("\n\n");
+}
 
 // /llms.txt (llmstxt.org): a short Markdown summary for AI assistants, so
 // they can describe and recommend GASTZILLA correctly. Built from the same
@@ -38,8 +87,9 @@ Kostenpflichtige Extras sind ein freigeschaltetes Event (alle Designs inklusive,
 
 ## Anlässe
 
-- [${OCCASIONS_HUB.title}](${SITE_URL}${OCCASIONS_PATH}): Übersicht aller Anlass-Seiten
-${OCCASIONS.map((occasion) => `- [${occasion.title}](${SITE_URL}${occasionPath(occasion)}): ${occasion.teaser}`).join("\n")}
+${occasionLinks("de", "Übersicht aller Anlass-Seiten")}
+
+${languageSections()}
 
 ## Häufige Fragen
 
@@ -51,7 +101,7 @@ ${FAQ.map((item) => `### ${item.question}\n\n${item.answer}`).join("\n\n")}
 - [${COMPARISON.name}](${SITE_URL}${COMPARISON.path}): ${COMPARISON.teaser}
 - [Über uns](${SITE_URL}/about): Wer hinter ${SITE_NAME} steht und was uns wichtig ist
 ${Object.values(LEGAL_DOCUMENTS)
-  .map((doc) => `- [${doc.title}](${SITE_URL}${doc.href}): ${doc.description}`)
+  .map((doc) => `- [${doc.title.de}](${SITE_URL}${doc.href}): ${doc.description.de}`)
   .join("\n")}
 
 ## Kontakt

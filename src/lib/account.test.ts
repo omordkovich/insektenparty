@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAccountName, getSignInMethods } from "./account";
+import { getAccountLocale, getAccountName, getSignInMethods } from "./account";
 
 describe("getAccountName", () => {
   it("is the name from the user metadata", () => {
@@ -47,5 +47,18 @@ describe("getSignInMethods", () => {
       hasPassword: true,
     });
     expect(getSignInMethods({ providers: "nope" }).hasGoogle).toBe(false);
+  });
+});
+
+describe("getAccountLocale", () => {
+  it("returns a supported language from the metadata", () => {
+    expect(getAccountLocale({ locale: "en" })).toBe("en");
+    expect(getAccountLocale({ locale: "de" })).toBe("de");
+  });
+
+  it("returns null for missing or unsupported values", () => {
+    expect(getAccountLocale({ locale: "fr" })).toBeNull();
+    expect(getAccountLocale({})).toBeNull();
+    expect(getAccountLocale(null)).toBeNull();
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { DateSettings } from "@/lib/date-poll-form";
@@ -21,6 +22,7 @@ type DateEditButtonProps = {
 // of the hero card, whose fade-in transform would otherwise trap the
 // fixed-position overlay inside the card.
 export function DateEditButton({ eventId, dateSettings, announcement, unlock }: DateEditButtonProps) {
+  const t = useTranslations("event");
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,8 +30,8 @@ export function DateEditButton({ eventId, dateSettings, announcement, unlock }: 
       <button
         type="button"
         className={EDIT_ICON_BUTTON_CLASS}
-        aria-label="Termin bearbeiten"
-        title="Termin bearbeiten"
+        aria-label={t("terminBearbeiten")}
+        title={t("terminBearbeiten")}
         onClick={() => setOpen(true)}
       >
         <PencilIcon />

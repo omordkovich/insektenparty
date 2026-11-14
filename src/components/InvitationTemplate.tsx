@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { Button } from "./Button";
 import { cardClass } from "./card";
@@ -10,6 +11,7 @@ type CopyState = "idle" | "copied" | "failed";
 // server-rendered (crawlers read it as page content); only the copy button
 // needs the client.
 export function InvitationTemplate({ name, lines }: { name: string; lines: string[] }) {
+  const t = useTranslations("occasions");
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const textRef = useRef<HTMLPreElement>(null);
   const text = lines.join("\n");
@@ -31,16 +33,10 @@ export function InvitationTemplate({ name, lines }: { name: string; lines: strin
   return (
     <section aria-labelledby="template-title" className={cardClass}>
       <h2 id="template-title" className="text-center font-display text-2xl text-leaf-dark sm:text-3xl">
-        Einladungstext-Vorlage: {name}
+        {t("templateTitle", { name })}
       </h2>
-      <p className="mt-3 text-center text-muted">
-        Kopieren, Platzhalter in [eckigen Klammern] ersetzen und zusammen mit deinem Einladungslink
-        verschicken.
-      </p>
-      <p className="mt-2 text-center text-sm text-muted">
-        Noch einfacher: Legst du dein Event bei GASTZILLA an, wird der Einladungstext auf deiner
-        Event-Seite automatisch mit deinen Daten und dem Link zusammengesetzt.
-      </p>
+      <p className="mt-3 text-center text-muted">{t("templateHint")}</p>
+      <p className="mt-2 text-center text-sm text-muted">{t("templateEasier")}</p>
       <pre
         ref={textRef}
         className="mt-6 whitespace-pre-wrap rounded-2xl border border-leaf/15 bg-[var(--surface-solid)] p-4 text-left font-sans text-muted">
@@ -48,15 +44,11 @@ export function InvitationTemplate({ name, lines }: { name: string; lines: strin
       </pre>
       <div className="mt-4 flex justify-center">
         <Button variant="outline" onClick={copy}>
-          {copyState === "copied"
-            ? "Kopiert!"
-            : copyState === "failed"
-              ? "Text ist markiert – jetzt kopieren"
-              : "Text kopieren"}
+          {copyState === "copied" ? t("copied") : copyState === "failed" ? t("copyFailed") : t("copy")}
         </Button>
       </div>
       <p aria-live="polite" className="sr-only">
-        {copyState === "copied" ? "Einladungstext kopiert" : ""}
+        {copyState === "copied" ? t("copiedAnnouncement") : ""}
       </p>
     </section>
   );

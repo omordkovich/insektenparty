@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useId } from "react";
 import { EVENT_PASSWORD_MAX_LENGTH } from "@/lib/validation";
 import { InfoTooltip } from "./InfoTooltip";
@@ -25,6 +26,7 @@ export function EventPasswordFields({
   onPasswordRepeatChange,
   disabled = false,
 }: EventPasswordFieldsProps) {
+  const t = useTranslations("eventDialog");
   const passwordId = useId();
   const repeatId = useId();
 
@@ -39,13 +41,10 @@ export function EventPasswordFields({
             onChange={(event) => onProtectedChange(event.target.checked)}
             className="h-5 w-5 rounded border-leaf/40"
           />
-          Passwortgeschützt
+          {t("passwortgeschutzt")}
         </label>
-        <InfoTooltip label="Was bedeutet passwortgeschützt?">
-          Nur wer das Passwort kennt, sieht deine Event-Seite und die Gästeliste.{" "}
-          <strong>Teile das Passwort deinen Gästen mit</strong> – am einfachsten zusammen mit dem
-          Einladungslink. Im Einladungstext fügen wir es automatisch ein. Wer es nicht hat, kann
-          es auf der Event-Seite bei dir anfragen; du bekommst dann eine E-Mail.
+        <InfoTooltip label={t("wasBedeutetPasswortgeschutzt")}>
+          {t.rich("passwordInfo", { b: (chunks) => <strong>{chunks}</strong> })}
         </InfoTooltip>
       </div>
 
@@ -53,7 +52,7 @@ export function EventPasswordFields({
         <div className="mt-3 space-y-3">
           <div>
             <label htmlFor={passwordId} className="mb-1 block text-sm font-semibold text-leaf-dark">
-              Passwort
+              {t("passwort")}
             </label>
             <PasswordInput
               id={passwordId}
@@ -63,11 +62,11 @@ export function EventPasswordFields({
               maxLength={EVENT_PASSWORD_MAX_LENGTH}
               disabled={disabled}
             />
-            <p className="mt-1 text-xs text-muted">Mindestens 4 Zeichen.</p>
+            <p className="mt-1 text-xs text-muted">{t("mindestens4Zeichen")}</p>
           </div>
           <div>
             <label htmlFor={repeatId} className="mb-1 block text-sm font-semibold text-leaf-dark">
-              Passwort wiederholen
+              {t("passwortWiederholen")}
             </label>
             <PasswordInput
               id={repeatId}

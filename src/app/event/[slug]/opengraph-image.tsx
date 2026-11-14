@@ -1,3 +1,6 @@
+import { getTranslations } from "next-intl/server";
+import { eventLocale } from "@/i18n/request-locale";
+import { formatDateRangeLabel } from "@/lib/calendar";
 import { cloudinaryPng, OG_SIZE, renderOgCard, renderSiteOgImage } from "@/lib/og-image";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { getEventByAddress } from "@/repositories/event-repository";
@@ -6,7 +9,6 @@ import { getEventLifecycle } from "@/services/event-lifecycle-service";
 // Link preview for a shared invitation: the event's theme logo, title and
 // date - nothing a link holder couldn't see on the page anyway. Password-
 // protected events show only their title.
-export const alt = "Einladung";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
@@ -18,17 +20,19 @@ export default async function EventOpengraphImage({
   const { slug } = await params;
   const event = await getEventByAddress(slug);
   if (!event) return renderSiteOgImage();
+  const locale = eventLocale(event);
+  const t = await getTranslations({ locale, namespace: "meta" });
 
   // Expired: the preview is fetched anonymously - no title, no date.
   if ((await getEventLifecycle(event.id))?.stage === "expired") {
-    return renderSiteOgImage({ title: "Abgelaufene Einladung", subtitle: "GASTZILLA" });
+    return renderSiteOgImage({ title: t("expiredTitle"), subtitle: "GASTZILLA" });
   }
 
   // Password-protected: neither the theme (hints at the occasion) nor the date.
   if (event.accessPassword) {
     return renderSiteOgImage({
-      title: `Einladung: ${event.title || "Event"}`,
-      subtitle: "Passwortgeschützte Einladung",
+      title: t("eventOgTitle", { title: event.title || "Event" }),
+      subtitle: t("ogProtected"),
     });
   }
 
@@ -37,13 +41,15 @@ export default async function EventOpengraphImage({
     imageSrc: cloudinaryPng(assets.logo),
     imageWidth: 300,
     imageHeight: 300,
-    kicker: "Du bist eingeladen!",
-    title: event.title || "Einladung",
+    kicker: t("ogKicker"),
+    title: event.title || t("ogInvitation"),
     subtitle:
       event.dateMode === "unknown"
-        ? "Termin folgt"
+        ? t("ogDateFollows")
         : event.dateMode === "poll"
-          ? "Termin wird abgestimmt"
-          : event.dateLabel || undefined,
+          ? t("ogDateVoting")
+          : (event.eventDate
+              ? formatDateRangeLabel(event.eventDate, event.eventEndDate, locale)
+              : event.dateLabel) || undefined,
   });
 }

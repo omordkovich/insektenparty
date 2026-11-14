@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 
-vi.mock("@/repositories/event-repository", () => ({ getEventAccessInfo: vi.fn() }));
+vi.mock("@/repositories/event-repository", () => ({ getEventAccessInfo: vi.fn(), getEventLanguage: vi.fn(async () => "en") }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("next/headers", () => ({ cookies: vi.fn() }));
 vi.mock("@/services/event-lifecycle-service", () => ({ getEventLifecycle: vi.fn() }));
@@ -37,7 +38,7 @@ describe("unlockEvent", () => {
     expect(await unlockEvent("event-1", { password: "Winter" })).toEqual({
       ok: false,
       status: 401,
-      error: "Das Passwort ist leider falsch.",
+      error: err("wrongPassword"),
     });
     expect(await unlockEvent("event-1", {})).toMatchObject({ ok: false, status: 401 });
   });
@@ -80,8 +81,9 @@ describe("denyExpiredEvent", () => {
     signInAs(undefined);
     const response = await denyExpiredEvent("event-1");
     expect(response?.status).toBe(410);
-    expect(await response?.json()).toEqual({ error: "Diese Einladung ist abgelaufen." });
-    expect(EVENT_EXPIRED_ERROR).toBe("Diese Einladung ist abgelaufen.");
+    // In the event's language (mocked as English).
+    expect(await response?.json()).toEqual({ error: "This invitation has expired." });
+    expect(EVENT_EXPIRED_ERROR).toEqual(err("eventExpired"));
 
     signInAs("someone-else");
     expect((await denyExpiredEvent("event-1"))?.status).toBe(410);

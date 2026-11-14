@@ -13,7 +13,7 @@ describe("buildEventShareUrl", () => {
 
 describe("buildShareText", () => {
   it("names the event", () => {
-    expect(buildShareText("Milans 7. Geburtstag")).toBe(
+    expect(buildShareText("Milans 7. Geburtstag", "de")).toBe(
       "Du bist eingeladen: Milans 7. Geburtstag",
     );
   });
@@ -21,7 +21,7 @@ describe("buildShareText", () => {
 
 describe("buildShareLinks", () => {
   const url = "https://gastzilla.de/event/milans7BD";
-  const links = buildShareLinks({ url, title: "Milans Party & mehr" });
+  const links = buildShareLinks({ url, title: "Milans Party & mehr" , locale: "de" });
   const byId = Object.fromEntries(links.map((link) => [link.id, link]));
   const enc = encodeURIComponent;
   const text = "Du bist eingeladen: Milans Party & mehr";
@@ -78,7 +78,7 @@ describe("buildShareLinks", () => {
 describe("buildMessageShareLinks", () => {
   const url = "https://gastzilla.de/event/abc123";
   const text = ["Hallo zusammen,", "Sommerfest", url, "Bis bald!"].join("\n");
-  const links = buildMessageShareLinks({ text, url, subject: "Einladung: Sommerfest" });
+  const links = buildMessageShareLinks({ text, url, subject: "Einladung: Sommerfest", locale: "de" });
   const href = (id: string) => links.find((link) => link.id === id)?.href ?? "";
 
   it("offers the platforms that take a whole message", () => {
@@ -97,5 +97,11 @@ describe("buildMessageShareLinks", () => {
     const params = new URL(href("telegram")).searchParams;
     expect(params.get("url")).toBe(url);
     expect(params.get("text")).toBe("Hallo zusammen,\nSommerfest\nBis bald!");
+  });
+});
+
+describe("share text in English", () => {
+  it("invites in English and keeps the title as written", () => {
+    expect(buildShareText("Sommerfest", "en")).toBe("You're invited: Sommerfest");
   });
 });

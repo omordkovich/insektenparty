@@ -1,4 +1,5 @@
 import type { GuestDto } from "@/lib/types";
+import { useLocale, useTranslations } from "next-intl";
 import { formatTimeWindow } from "@/lib/validation";
 import { Button } from "./Button";
 
@@ -28,6 +29,8 @@ export function GuestItem({
   disabled = false,
   readOnly = false,
 }: GuestItemProps) {
+  const locale = useLocale();
+  const t = useTranslations("guest");
   return (
     <tr className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-leaf/15 bg-surface/80 px-4 py-3 shadow-(--shadow) backdrop-blur-sm sm:table-row sm:rounded-none sm:border-0 sm:border-b sm:border-leaf/10 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none sm:last:border-0">
       <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
@@ -42,8 +45,8 @@ export function GuestItem({
             type="button"
             onClick={() => onShowAdditionalGuests(guest)}
             disabled={disabled}
-            aria-label={`Zusätzliche Personen von ${guest.name} anzeigen`}
-            title="Zusätzliche Personen"
+            aria-label={t("zusatzlichePersonenVonName", { name: guest.name })}
+            title={t("zusatzlichePersonen")}
             className="flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-current px-0.5 text-xs leading-none font-bold text-leaf transition hover:text-leaf-dark disabled:opacity-50"
           >
             +{guest.additionalGuests}
@@ -53,15 +56,15 @@ export function GuestItem({
       {guest.declined ? (
         <>
           {/* Instead of the clock, gift and message icons (mobile) and the
-              time, "Ich bringe was mit" and message columns (desktop): a
+              time, t("ichBringeWasMit") and message columns (desktop): a
               greyed-out "Abgesagt" that opens the guest's message, if any. */}
           <td className="block sm:hidden">
             <button
               type="button"
               onClick={() => onShowDeclined(guest)}
               disabled={disabled}
-              aria-label={`${guest.name} hat abgesagt - anzeigen`}
-              title="Abgesagt"
+              aria-label={t("declinedShow", { name: guest.name })}
+              title={t("declined")}
               className="block text-muted transition hover:text-ink disabled:opacity-50"
             >
               <DeclinedIcon />
@@ -72,11 +75,11 @@ export function GuestItem({
               type="button"
               onClick={() => onShowDeclined(guest)}
               disabled={disabled}
-              aria-label={`${guest.name} hat abgesagt - anzeigen`}
+              aria-label={t("declinedShow", { name: guest.name })}
               className="mx-auto flex items-center gap-2 font-bold text-muted transition hover:text-ink disabled:opacity-50"
             >
               <DeclinedIcon />
-              Abgesagt
+              {t("declined")}
             </button>
           </td>
         </>
@@ -89,8 +92,8 @@ export function GuestItem({
               type="button"
               onClick={() => onShowTime(guest)}
               disabled={disabled}
-              aria-label={`Ankunfts- und Abreisezeit von ${guest.name} anzeigen`}
-              title="Ankunfts- und Abreisezeit"
+              aria-label={t("ankunftsUndAbreisezeitVon", { name: guest.name })}
+              title={t("ankunftsUndAbreisezeit")}
               className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
             >
               <ClockIcon />
@@ -98,13 +101,13 @@ export function GuestItem({
           </td>
           <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
             {guest.arrivalTime ? (
-              formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime)
+              formatTimeWindow(guest.arrivalTime, guest.arrivalEndTime, locale)
             ) : (
-              <span className="font-sans text-sm font-normal tracking-normal text-muted">noch offen</span>
+              <span className="font-sans text-sm font-normal tracking-normal text-muted">{t("nochOffen")}</span>
             )}
           </td>
           <td className="hidden [overflow-wrap:normal] sm:table-cell sm:px-2 sm:py-3 sm:align-middle font-mono text-base font-semibold tracking-wide text-ink">
-            {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime) : null}
+            {guest.departureTime ? formatTimeWindow(guest.departureTime, guest.departureEndTime, locale) : null}
           </td>
           <td className="block sm:table-cell sm:px-2 sm:py-3 sm:align-middle">
             {guest.bringingSomething ? (
@@ -112,14 +115,14 @@ export function GuestItem({
                 type="button"
                 onClick={() => onShowBringing(guest)}
                 disabled={disabled}
-                aria-label={`${guest.name} bringt etwas mit - anzeigen`}
-                title="Bringt etwas mit"
+                aria-label={t("nameBringtEtwasMit", { name: guest.name })}
+                title={t("bringtEtwasMit")}
                 className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
               >
                 <GiftIcon />
               </button>
             ) : (
-              <span className="text-muted/40" aria-label="Bringt nichts mit" title="Bringt nichts mit">
+              <span className="text-muted/40" aria-label={t("bringtNichtsMit")} title={t("bringtNichtsMit")}>
                 <GiftIcon />
               </span>
             )}
@@ -130,14 +133,14 @@ export function GuestItem({
                 type="button"
                 onClick={() => onShowMessage(guest)}
                 disabled={disabled}
-                aria-label={`Nachricht von ${guest.name} anzeigen`}
-                title="Hat eine Nachricht hinterlassen"
+                aria-label={t("nachrichtVonNameAnzeigen", { name: guest.name })}
+                title={t("hatEineNachrichtHinterlassen")}
                 className="block text-leaf transition hover:text-leaf-dark disabled:opacity-50"
               >
                 <MessageIcon />
               </button>
             ) : (
-              <span className="text-muted/40" aria-label="Keine Nachricht" title="Keine Nachricht">
+              <span className="text-muted/40" aria-label={t("keineNachricht")} title={t("keineNachricht")}>
                 <MessageIcon />
               </span>
             )}
@@ -151,7 +154,7 @@ export function GuestItem({
             variant="outline"
             size="icon"
             className="bg-surface"
-            aria-label={`${guest.name} bearbeiten`}
+            aria-label={t("editGuest", { name: guest.name })}
             onClick={() => onEdit(guest)}
             disabled={disabled}
           >
@@ -160,7 +163,7 @@ export function GuestItem({
           <Button
             variant="outline-danger"
             size="icon"
-            aria-label={`${guest.name} löschen`}
+            aria-label={t("nameLoschen", { name: guest.name })}
             onClick={() => onDelete(guest)}
             disabled={disabled}
           >

@@ -1,16 +1,19 @@
+import { apiErrors } from "@/i18n/api-errors";
+import { err } from "@/i18n/errors";
 import { NextResponse } from "next/server";
 import { createEventForOwner } from "@/services/event-service";
 import { createClient } from "@/lib/supabase/server";
 import { consentRequiredError } from "@/lib/terms-consent";
 
 export async function POST(request: Request) {
+  const fail = apiErrors();
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
     const userId = data?.claims?.sub;
 
     if (!userId) {
-      return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
+      return fail(err("signInRequired"), 401);
     }
 
     // Accounts created via Google's login tab have no consent yet, older
@@ -18,14 +21,14 @@ export async function POST(request: Request) {
     // for both); they must not be able to skip that dialog.
     const consentError = consentRequiredError(data.claims.user_metadata);
     if (consentError) {
-      return NextResponse.json({ error: consentError }, { status: 403 });
+      return fail(consentError, 403);
     }
 
     let body: unknown;
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
+      return fail(err("invalidRequest"), 400);
     }
 
     const result = await createEventForOwner(userId, {
@@ -34,18 +37,16 @@ export async function POST(request: Request) {
       accessPassword: (body as { accessPassword?: unknown })?.accessPassword,
       date: (body as { date?: unknown })?.date,
       paid: (body as { paid?: unknown })?.paid,
+      language: (body as { language?: unknown })?.language,
     });
 
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
 
     return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
     console.error("POST /api/events failed:", error);
-    return NextResponse.json(
-      { error: "Das Event konnte nicht erstellt werden. Bitte versuche es erneut." },
-      { status: 500 },
-    );
+    return fail(err("eventCreateFailed"), 500);
   }
 }

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { err } from "@/i18n/errors";
 
 vi.mock("@/repositories/event-repository", () => ({ getEventOwnerId: vi.fn(async () => "owner-1") }));
 vi.mock("@/repositories/date-poll-repository", () => ({ getEventDateMode: vi.fn(async () => "poll") }));
@@ -14,7 +15,7 @@ vi.mock("@/repositories/guest-repository", () => ({
 }));
 vi.mock("@/services/notification-service", () => ({ notifyOwnerOfGuestChange: vi.fn() }));
 vi.mock("@/services/event-lifecycle-service", () => ({
-  EVENT_OVER_ERROR: "Dieses Event ist vorbei.",
+  EVENT_OVER_ERROR: { key: "eventOver" },
   denyIfOver: vi.fn(async () => null),
 }));
 
@@ -28,7 +29,7 @@ describe("guest list while the date is open", () => {
     expect(await createGuestForEvent("event-1", {}, "owner-1")).toEqual({
       ok: false,
       status: 409,
-      error: "Der Termin steht noch nicht fest.",
+      error: err("dateNotFixed"),
     });
     expect(await updateGuestForEvent("event-1", "guest-1", {}, "owner-1")).toMatchObject({ ok: false, status: 409 });
     expect(createGuest).not.toHaveBeenCalled();
@@ -38,7 +39,7 @@ describe("guest list while the date is open", () => {
 describe("guest list once the event is over", () => {
   beforeEach(() => {
     vi.mocked(getEventDateMode).mockResolvedValue("fixed");
-    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: "Dieses Event ist vorbei." });
+    vi.mocked(denyIfOver).mockResolvedValue({ ok: false, status: 409, error: err("eventOver") });
     vi.mocked(createGuest).mockClear();
     vi.mocked(updateGuest).mockClear();
     vi.mocked(deleteGuest).mockClear();
@@ -49,7 +50,7 @@ describe("guest list once the event is over", () => {
   });
 
   it("refuses new, changed and deleted entries without writing", async () => {
-    const over = { ok: false, status: 409, error: "Dieses Event ist vorbei." };
+    const over = { ok: false, status: 409, error: err("eventOver") };
     expect(await createGuestForEvent("event-1", {}, "owner-1")).toEqual(over);
     expect(await updateGuestForEvent("event-1", "guest-1", {}, "owner-1")).toEqual(over);
     expect(await deleteGuestForEvent("event-1", "guest-1", {}, "owner-1")).toEqual(over);
@@ -89,7 +90,7 @@ describe("seat limit", () => {
     expect(await createGuestForEvent("event-1", guest)).toEqual({
       ok: false,
       status: 409,
-      error: "Es ist nur noch 1 Platz frei.",
+      error: err("seatsLeft", { free: 1 }),
     });
   });
 
@@ -97,7 +98,7 @@ describe("seat limit", () => {
     expect(await createGuestForEvent("event-1", guest, "owner-1")).toEqual({
       ok: false,
       status: 409,
-      error: "Es ist nur noch 1 Platz frei.",
+      error: err("seatsLeft", { free: 1 }),
     });
   });
 });

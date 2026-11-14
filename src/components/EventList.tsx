@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -32,6 +33,8 @@ type EventListProps = {
 };
 
 export function EventList({ initialEvents, entitlements, dummyPayments }: EventListProps) {
+  const t = useTranslations("home");
+  const locale = useLocale();
   const [eventList, setEventList] = useState(initialEvents);
   // From the server's entitlements only: deleting an event gives nothing
   // back, so the list shrinking must not unlock the button.
@@ -46,13 +49,13 @@ export function EventList({ initialEvents, entitlements, dummyPayments }: EventL
       <section className="w-full">
         <div className="rounded-[2rem] border border-leaf/20 bg-[var(--surface)] p-5 shadow-(--shadow) sm:p-8">
           <h2 className="text-center font-display text-3xl text-leaf-dark sm:text-4xl">
-            Meine Events
+            {t("myEvents")}
           </h2>
 
           {eventList.length === 0 ? (
             <div className="mt-8 text-center">
-              <p className="text-lg text-muted">Du hast noch keine Events erstellt.</p>
-              <p className="mt-1 text-xl font-bold text-leaf-dark">Leg direkt los!</p>
+              <p className="text-lg text-muted">{t("noEvents")}</p>
+              <p className="mt-1 text-xl font-bold text-leaf-dark">{t("getStarted")}</p>
               <div className="mt-6 flex justify-center">
                 {createButton}
               </div>
@@ -79,17 +82,17 @@ export function EventList({ initialEvents, entitlements, dummyPayments }: EventL
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2">
                           <span className="min-w-0 truncate text-base font-bold text-leaf-dark">
-                            {event.title || "Unbenanntes Event"}
+                            {event.title || t("untitledEvent")}
                           </span>
                           {event.plan === "free" ? (
                             <span className="shrink-0 rounded-full bg-leaf/10 px-2 py-0.5 text-xs font-bold text-leaf-dark">
-                              Free
+                              {t("freeBadge")}
                             </span>
                           ) : null}
                         </span>
                         {event.stage !== "active" ? (
                           <span className="block text-sm text-muted">
-                            Vorbei · wird am {formatDottedDate(event.deletionDate)} gelöscht
+                            {t("overDeletedOn", { date: formatDottedDate(event.deletionDate, locale) })}
                           </span>
                         ) : null}
                       </span>
@@ -97,13 +100,13 @@ export function EventList({ initialEvents, entitlements, dummyPayments }: EventL
                     <div className="flex shrink-0 gap-2">
                       <ShareButton
                         url={buildEventShareUrl(event.slug)}
-                        title={event.title || "Unbenanntes Event"}
+                        title={event.title || t("untitledEvent")}
                         className="bg-white"
                       />
                       <Button
                         variant="outline-danger"
                         size="icon"
-                        aria-label={`${event.title || "Unbenanntes Event"} löschen`}
+                        aria-label={t("deleteEvent", { title: event.title || t("untitledEvent") })}
                         onClick={() => setDeleteTarget(event)}
                       >
                         <TrashIcon />

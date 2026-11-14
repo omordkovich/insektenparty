@@ -1,32 +1,49 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { LEGAL_DOCUMENTS, type LegalDocument } from "@/lib/legal-documents";
+import { localizedPath } from "@/lib/page-metadata";
 import { LegalDialog } from "./LegalDialog";
 
 export type { LegalDocument };
 
 function LoadingText() {
-  return <p className="text-sm text-muted">Wird geladen …</p>;
+  const t = useTranslations("common");
+  return <p className="text-sm text-muted">{t("loading")}</p>;
 }
 
 // Loaded only when a dialog is opened: the link sits in the cookie banner
-// (root layout), so static imports would put all four texts on every page.
-const CONTENT: Record<LegalDocument, ComponentType> = {
-  imprint: dynamic(() => import("./ImprintContent").then((m) => m.ImprintContent), {
-    loading: LoadingText,
-  }),
-  privacy: dynamic(() => import("./PrivacyPolicyContent").then((m) => m.PrivacyPolicyContent), {
-    loading: LoadingText,
-  }),
-  terms: dynamic(() => import("./TermsContent").then((m) => m.TermsContent), {
-    loading: LoadingText,
-  }),
-  withdrawal: dynamic(() => import("./WithdrawalContent").then((m) => m.WithdrawalContent), {
-    loading: LoadingText,
-  }),
+// (root layout), so static imports would put all texts on every page. One
+// entry per text and language (the same files as src/components/legal).
+function load(loader: () => Promise<ComponentType>): ComponentType {
+  return dynamic(loader, { loading: LoadingText });
+}
+
+const CONTENT: Record<LegalDocument, Record<Locale, ComponentType>> = {
+  imprint: {
+    de: load(() => import("./legal/ImprintDe").then((m) => m.ImprintDe)),
+    en: load(() => import("./legal/ImprintEn").then((m) => m.ImprintEn)),
+    ru: load(() => import("./legal/ImprintRu").then((m) => m.ImprintRu)),
+  },
+  privacy: {
+    de: load(() => import("./legal/PrivacyDe").then((m) => m.PrivacyDe)),
+    en: load(() => import("./legal/PrivacyEn").then((m) => m.PrivacyEn)),
+    ru: load(() => import("./legal/PrivacyRu").then((m) => m.PrivacyRu)),
+  },
+  terms: {
+    de: load(() => import("./legal/TermsDe").then((m) => m.TermsDe)),
+    en: load(() => import("./legal/TermsEn").then((m) => m.TermsEn)),
+    ru: load(() => import("./legal/TermsRu").then((m) => m.TermsRu)),
+  },
+  withdrawal: {
+    de: load(() => import("./legal/WithdrawalDe").then((m) => m.WithdrawalDe)),
+    en: load(() => import("./legal/WithdrawalEn").then((m) => m.WithdrawalEn)),
+    ru: load(() => import("./legal/WithdrawalRu").then((m) => m.WithdrawalRu)),
+  },
 };
 
 type LegalLinkProps = {
@@ -45,14 +62,17 @@ export function LegalLink({
   className = "text-sm text-muted underline underline-offset-2 hover:text-leaf-dark",
   children,
 }: LegalLinkProps) {
+  const t = useTranslations("legal");
+  const locale = useLocale() as Locale;
   const [open, setOpen] = useState(false);
-  const { label, title, href } = LEGAL_DOCUMENTS[document];
-  const Content = CONTENT[document];
+  const { title, href } = LEGAL_DOCUMENTS[document];
+  const label = t(`labels.${document}`);
+  const Content = CONTENT[document][locale];
 
   return (
     <>
       <a
-        href={href}
+        href={localizedPath(href, locale)}
         onClick={(event) => {
           // Let ctrl/cmd/middle-click open the page in a new tab as usual.
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
@@ -64,7 +84,12 @@ export function LegalLink({
         {children ?? label}
       </a>
       {open ? (
-        <LegalDialog title={title} onCloseAction={() => setOpen(false)}>
+        <LegalDialog title={title[locale]} onCloseAction={() => setOpen(false)}>
+          {locale === DEFAULT_LOCALE ? null : (
+            <p className="mb-4 rounded-2xl border border-leaf/20 bg-leaf/5 px-4 py-3 text-sm text-muted">
+              {t("translationNotice")}
+            </p>
+          )}
           <Content />
         </LegalDialog>
       ) : null}

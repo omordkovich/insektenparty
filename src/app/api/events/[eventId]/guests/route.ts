@@ -1,3 +1,5 @@
+import { apiErrors } from "@/i18n/api-errors";
+import { err } from "@/i18n/errors";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation";
@@ -9,10 +11,11 @@ type RouteContext = {
 };
 
 export async function GET(_request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId } = await context.params;
     if (!isUuid(eventId)) {
-      return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
+      return fail(err("invalidEventId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -25,18 +28,16 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json(guests);
   } catch (error) {
     console.error("GET /api/events/[eventId]/guests failed:", error);
-    return NextResponse.json(
-      { error: "Die Gästeliste konnte nicht geladen werden." },
-      { status: 500 },
-    );
+    return fail(err("guestListLoadFailed"), 500);
   }
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const fail = apiErrors(context);
   try {
     const { eventId } = await context.params;
     if (!isUuid(eventId)) {
-      return NextResponse.json({ error: "Ungültige Event-ID." }, { status: 400 });
+      return fail(err("invalidEventId"), 400);
     }
 
     const denied = await denyLockedEvent(eventId);
@@ -46,7 +47,7 @@ export async function POST(request: Request, context: RouteContext) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Ungültige Anfragedaten." }, { status: 400 });
+      return fail(err("invalidRequest"), 400);
     }
 
     const supabase = await createClient();
@@ -56,17 +57,12 @@ export async function POST(request: Request, context: RouteContext) {
     const result = await createGuestForEvent(eventId, body, requesterId);
 
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return fail(result.error, result.status);
     }
 
     return NextResponse.json(result.data, { status: 201 });
   } catch (error) {
     console.error("POST /api/events/[eventId]/guests failed:", error);
-    return NextResponse.json(
-      {
-        error: "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      },
-      { status: 500 },
-    );
+    return fail(err("guestSaveFailed"), 500);
   }
 }

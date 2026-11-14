@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import {
   describeChoice,
   voteAnswer,
@@ -21,10 +22,10 @@ import { getEventOwnerId } from "@/repositories/event-repository";
 import { denyIfOver } from "@/services/event-lifecycle-service";
 import { notifyOwnerOfPollVote } from "@/services/notification-service";
 
-export type PollServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: string };
+export type PollServiceResult<T> = { ok: true; data: T } | { ok: false; status: number; error: ErrorMessage };
 
-const POLL_CLOSED = "Die Abstimmung ist beendet.";
-const NOT_FOUND = "Event wurde nicht gefunden.";
+const POLL_CLOSED = err("pollClosed");
+const NOT_FOUND = err("eventNotFound");
 
 export async function getPollForEvent(eventId: string): Promise<PollServiceResult<PollDto>> {
   const mode = await getEventDateMode(eventId);
@@ -50,7 +51,7 @@ async function checkWrite(
   eventId: string,
   body: unknown,
   requesterId: string | undefined,
-): Promise<{ ok: true; isOwner: boolean; options: PollOption[] } | { ok: false; status: number; error: string }> {
+): Promise<{ ok: true; isOwner: boolean; options: PollOption[] } | { ok: false; status: number; error: ErrorMessage }> {
   const ownerId = await getEventOwnerId(eventId);
   if (ownerId === undefined) return { ok: false, status: 404, error: NOT_FOUND };
   const over = await denyIfOver(eventId);
@@ -76,12 +77,12 @@ export async function createPollVoteForEvent(
   const validation = validatePollVote(body, check.options.map((option) => option.id));
   if (!validation.ok) return { ok: false, status: 400, error: validation.error };
   if ((await countPollVotes(eventId)) >= MAX_POLL_VOTES) {
-    return { ok: false, status: 409, error: "Die Abstimmung ist voll." };
+    return { ok: false, status: 409, error: err("pollFull") };
   }
 
   const vote = await insertPollVote(eventId, validation.value);
   if (!check.isOwner) {
-    await notifyOwnerOfPollVote(eventId, "created", vote.name, describeChoice(vote, check.options));
+    await notifyOwnerOfPollVote(eventId, "created", vote.name, (locale) => describeChoice(vote, check.options, locale));
   }
   return { ok: true, data: vote };
 }
@@ -99,9 +100,9 @@ export async function updatePollVoteForEvent(
   if (!validation.ok) return { ok: false, status: 400, error: validation.error };
 
   const vote = await updatePollVote(eventId, voteId, validation.value);
-  if (!vote) return { ok: false, status: 404, error: "Stimme wurde nicht gefunden." };
+  if (!vote) return { ok: false, status: 404, error: err("voteNotFound") };
   if (!check.isOwner) {
-    await notifyOwnerOfPollVote(eventId, "updated", vote.name, describeChoice(vote, check.options));
+    await notifyOwnerOfPollVote(eventId, "updated", vote.name, (locale) => describeChoice(vote, check.options, locale));
   }
   return { ok: true, data: vote };
 }
@@ -116,9 +117,9 @@ export async function deletePollVoteForEvent(
   if (!check.ok) return check;
 
   const deleted = await deletePollVote(eventId, voteId);
-  if (!deleted) return { ok: false, status: 404, error: "Stimme wurde nicht gefunden." };
+  if (!deleted) return { ok: false, status: 404, error: err("voteNotFound") };
   if (!check.isOwner) {
-    await notifyOwnerOfPollVote(eventId, "deleted", deleted.name, "");
+    await notifyOwnerOfPollVote(eventId, "deleted", deleted.name, () => "");
   }
   return { ok: true, data: { ok: true } };
 }

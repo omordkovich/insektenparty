@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { MIN_REGISTRATION_AGE } from "@/lib/legal-info";
 import { LegalLink } from "./LegalLink";
 
@@ -11,9 +12,10 @@ type ConsentCheckboxesProps = {
   onConfirmedAgeChange: (checked: boolean) => void;
 };
 
-export const CONSENT_TERMS_ERROR =
-  "Bitte akzeptiere die AGB und bestätige, dass du die Datenschutzerklärung zur Kenntnis genommen hast.";
-export const CONSENT_AGE_ERROR = `Bitte bestätige, dass du mindestens ${MIN_REGISTRATION_AGE} Jahre alt bist.`;
+// Message keys (namespace "consent") for a missing tick; values for ageError.
+export const CONSENT_TERMS_ERROR = "termsError";
+export const CONSENT_AGE_ERROR = "ageError";
+export const CONSENT_AGE_VALUES = { age: MIN_REGISTRATION_AGE };
 
 // The two checkboxes every registration (email or Google) has to tick.
 export function ConsentCheckboxes({
@@ -23,6 +25,7 @@ export function ConsentCheckboxes({
   onAcceptedTermsChange,
   onConfirmedAgeChange,
 }: ConsentCheckboxesProps) {
+  const t = useTranslations("consent");
   return (
     <>
       <label className="flex items-start gap-2 text-left text-sm">
@@ -36,15 +39,18 @@ export function ConsentCheckboxes({
           className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
         />
         <span>
-          Ich akzeptiere die{" "}
-          <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
-            AGB
-          </LegalLink>{" "}
-          und habe die{" "}
-          <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
-            Datenschutzerklärung
-          </LegalLink>{" "}
-          zur Kenntnis genommen.
+          {t.rich("termsCheckbox", {
+            terms: (chunks) => (
+              <LegalLink document="terms" className="underline underline-offset-2 hover:text-leaf-dark">
+                {chunks}
+              </LegalLink>
+            ),
+            privacy: (chunks) => (
+              <LegalLink document="privacy" className="underline underline-offset-2 hover:text-leaf-dark">
+                {chunks}
+              </LegalLink>
+            ),
+          })}
         </span>
       </label>
 
@@ -58,7 +64,7 @@ export function ConsentCheckboxes({
           onChange={(event) => onConfirmedAgeChange(event.target.checked)}
           className="mt-0.5 h-5 w-5 shrink-0 rounded border-leaf/40"
         />
-        <span>Ich bin mindestens {MIN_REGISTRATION_AGE} Jahre alt.</span>
+        <span>{t("ageCheckbox", { age: MIN_REGISTRATION_AGE })}</span>
       </label>
     </>
   );

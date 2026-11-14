@@ -1,3 +1,4 @@
+import { err, type ErrorMessage } from "@/i18n/errors";
 import { z } from "zod";
 
 type RecaptchaVerifyResponse = {
@@ -14,12 +15,12 @@ export function getRecaptchaToken(body: unknown): string | null {
 
 export async function verifyRecaptchaToken(
   token: string | null,
-): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
+): Promise<{ ok: true } | { ok: false; error: ErrorMessage; status: number }> {
   if (!token) {
     return {
       ok: false,
       status: 400,
-      error: "Bitte bestätige, dass du kein Roboter bist.",
+      error: err("recaptchaRequired"),
     };
   }
 
@@ -30,7 +31,7 @@ export async function verifyRecaptchaToken(
       ok: false,
       status: 500,
       error:
-        "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        err("guestSaveFailed"),
     };
   }
 
@@ -53,7 +54,7 @@ export async function verifyRecaptchaToken(
       return {
         ok: false,
         status: 400,
-        error: "Die Roboterprüfung ist fehlgeschlagen. Bitte versuche es erneut.",
+        error: err("recaptchaFailed"),
       };
     }
 
@@ -64,7 +65,7 @@ export async function verifyRecaptchaToken(
       ok: false,
       status: 500,
       error:
-        "Der Gast konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        err("guestSaveFailed"),
     };
   }
 }

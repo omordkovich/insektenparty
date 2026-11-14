@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { InvitationFacts } from "@/lib/invitation-text";
 import { Button } from "./Button";
@@ -15,6 +16,7 @@ type InvitationTextButtonProps = {
 // Owner-only icon button next to "Link kopieren" that opens the
 // invitation text overlay.
 export function InvitationTextButton({ eventId, facts, className = "" }: InvitationTextButtonProps) {
+  const t = useTranslations("event");
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
@@ -24,8 +26,8 @@ export function InvitationTextButton({ eventId, facts, className = "" }: Invitat
         size="icon"
         className={className}
         onClick={() => setDialogOpen(true)}
-        aria-label="Einladungstext erstellen"
-        title="Einladungstext"
+        aria-label={t("createInvitationText")}
+        title={t("invitationText")}
       >
         <TextIcon />
       </Button>
