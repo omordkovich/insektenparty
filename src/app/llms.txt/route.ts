@@ -8,6 +8,8 @@ import { FEATURES, LIMITATIONS } from "@/lib/structured-data";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/i18n/config";
 import { localizedPath } from "@/lib/page-metadata";
 import { occasionPath, occasionsFor, occasionsHub, occasionsPath } from "@/lib/occasions";
+import { designPath, designsFor, designsHub, designsPath } from "@/lib/designs";
+import { formatPrice, PRODUCTS } from "@/lib/products";
 
 // "- [title](url): teaser" for the overview and every occasion page of a language.
 function occasionLinks(locale: Locale, hubNote: string): string {
@@ -18,20 +20,35 @@ function occasionLinks(locale: Locale, hubNote: string): string {
   ].join("\n");
 }
 
+// "- [title](url): teaser" for the designs overview and every design page of
+// a language.
+function designLinks(locale: Locale, hubNote: string): string {
+  const url = (path: string) => `${SITE_URL}${localizedPath(path, locale)}`;
+  return [
+    `- [${designsHub(locale).title}](${url(designsPath(locale))}): ${hubNote}`,
+    ...designsFor(locale).map((design) => `- [${design.title}](${url(designPath(design))}): ${design.teaser}`),
+  ].join("\n");
+}
+
 // The file is German; every other language gets a short section of its
 // own, written in that language.
-const LANGUAGE_SECTION: Record<Exclude<Locale, "de">, { heading: string; startPage: string; legalNote: string; hubNote: string }> = {
+const LANGUAGE_SECTION: Record<
+  Exclude<Locale, "de">,
+  { heading: string; startPage: string; legalNote: string; hubNote: string; designsNote: string }
+> = {
   en: {
     heading: "In English",
     startPage: "Start page",
     legalNote: "Legal texts (translations – the German versions are binding):",
     hubNote: "Overview of all occasion pages",
+    designsNote: "Overview of all premium designs, one page per design",
   },
   ru: {
     heading: "На русском",
     startPage: "Главная страница",
     legalNote: "Юридические тексты (переводы – обязательной является немецкая версия):",
     hubNote: "Обзор всех страниц с поводами",
+    designsNote: "Обзор всех премиум-дизайнов, по странице на каждый дизайн",
   },
 };
 
@@ -48,6 +65,8 @@ function languageSections(): string {
 ${SITE_DESCRIPTIONS[locale]} ${section.startPage}: [${home}](${home}).
 
 ${occasionLinks(locale, section.hubNote)}
+
+- [${designsHub(locale).title}](${SITE_URL}${localizedPath(designsPath(locale), locale)}): ${section.designsNote}
 
 ${section.legalNote}
 
@@ -84,11 +103,17 @@ Privatpersonen, Familien, Vereine und kleine Teams, die ein Event organisieren �
 
 Jedes Konto bekommt einmalig ein kostenloses Event: mit festem Termin, der höchstens drei Monate nach dem Erstellen liegt, mit Gästeliste, Einladungstext, Passwortschutz und den Farbdesigns. Wird es gelöscht, gibt es kein neues.
 
-Kostenpflichtige Extras sind ein freigeschaltetes Event (alle Designs inklusive, Terminabstimmung, Termin vorerst offen lassen, Termin bis zwölf Monate nach dem Erstellen des Events), einzelne Premium-Designs und eine Event-Seite ohne den Hinweis „made with GASTZILLA“. Weitere Events sollen bald dazugekauft werden können. Wie lange Events gespeichert bleiben, steht unten bei den häufigen Fragen.
+Kostenpflichtige Extras sind ein freigeschaltetes Event (alle Designs inklusive, Terminabstimmung, Termin vorerst offen lassen, Termin bis zwölf Monate nach dem Erstellen des Events), einzelne Premium-Designs und eine Event-Seite ohne den Hinweis „made with GASTZILLA“. Preise: ein freigeschaltetes Event ${formatPrice(PRODUCTS.paid_event.priceCents, "de")}, ein einzelnes Premium-Design ${formatPrice(PRODUCTS.theme.priceCents, "de")} (gilt für alle Events des Kontos), die Event-Seite ohne Hinweis ${formatPrice(PRODUCTS.no_badge.priceCents, "de")}. Die Zahlung ist noch im Aufbau; weitere Events sollen bald dazugekauft werden können. Wie lange Events gespeichert bleiben, steht unten bei den häufigen Fragen.
 
 ## Anlässe
 
 ${occasionLinks("de", "Übersicht aller Anlass-Seiten")}
+
+## Designs
+
+Farbdesigns sind kostenlos. Jedes Premium-Design mit Grafiken hat eine eigene Seite mit Beschreibung, passenden Anlässen und Preisen.
+
+${designLinks("de", "Übersicht aller Premium-Designs")}
 
 ${languageSections()}
 

@@ -10,6 +10,10 @@ export const PRODUCTS = {
 
 export type ProductKey = keyof typeof PRODUCTS;
 
+// What a paid event adds - message keys of the "eventDialog" namespace.
+// Shown in the unlock dialog and on the design pages.
+export const PAID_EVENT_FEATURE_KEYS = ["allDesigns", "terminAbstimmenLassen", "terminOffenLassen", "datumBis12Monate"] as const;
+
 const PRICE_FORMAT: Record<Locale, (euros: number, cents: string) => string> = {
   de: (euros, cents) => `${euros},${cents} €`,
   en: (euros, cents) => `€${euros}.${cents}`,

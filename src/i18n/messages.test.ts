@@ -50,3 +50,10 @@ describe("messages", () => {
     }
   });
 });
+
+describe("unlock texts", () => {
+  // Owner's decision 2026-11-20: prices are shown, never "coming soon".
+  it.each(LOCALES)("%s has no 'coming soon' text for purchases", (locale) => {
+    expect(Object.keys(leaves(MESSAGES[locale]))).not.toContain("eventDialog.baldVerfugbar");
+  });
+});

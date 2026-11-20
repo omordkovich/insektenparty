@@ -1,5 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
+import { designSectionPath } from "@/lib/design-slugs";
 import { LEGAL_DOCUMENTS, type LegalDocument } from "@/lib/legal-documents";
 import { INSTAGRAM_URL } from "@/lib/site";
 import { CookieSettingsLink } from "./CookieSettingsLink";
@@ -8,12 +10,13 @@ const PAGE_LINKS: LegalDocument[] = ["privacy", "imprint", "terms", "withdrawal"
 
 const linkClass = "text-sm text-muted underline underline-offset-2 hover:text-leaf-dark";
 
-// Über uns / Instagram / Cookies / Datenschutz / Impressum / AGB / Widerruf - must be
+// Über uns / Designs / Instagram / Cookies / Datenschutz / Impressum / AGB / Widerruf - must be
 // reachable from every page, with or without the "made with" badge above it.
 // Legal texts link to their own pages; "Cookies" is a settings dialog, not a
 // document, so it stays an overlay.
 export async function LegalLinks({ className = "" }: { className?: string }) {
   const t = await getTranslations("legal");
+  const locale = await getLocale();
   return (
     <nav
       aria-label={t("navLabel")}
@@ -21,6 +24,9 @@ export async function LegalLinks({ className = "" }: { className?: string }) {
     >
       <Link href="/about" className={linkClass}>
         {t("about")}
+      </Link>
+      <Link href={designSectionPath(isLocale(locale) ? locale : DEFAULT_LOCALE)} className={linkClass}>
+        {t("designs")}
       </Link>
       <a href={INSTAGRAM_URL} target="_blank" rel="me noopener noreferrer" className={linkClass}>
         Instagram

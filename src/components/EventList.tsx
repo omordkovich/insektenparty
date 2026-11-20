@@ -9,6 +9,7 @@ import type { EventPlan } from "@/lib/event-plan";
 import type { LifecycleStage } from "@/lib/event-lifecycle";
 import { canCreateEvent, type UserEntitlements } from "@/lib/features";
 import { buildEventShareUrl } from "@/lib/share";
+import type { StartIntent } from "@/lib/start-intent";
 import { THEME_ASSETS, type ThemeKey } from "@/lib/theme-presets";
 import { Button } from "./Button";
 import { CreateEventButton } from "./CreateEventButton";
@@ -30,17 +31,29 @@ type EventListProps = {
   initialEvents: EventListItem[];
   entitlements: UserEntitlements;
   dummyPayments: boolean;
+  /** From the URL: open the create dialog with this design right away. */
+  startIntent?: StartIntent | null;
 };
 
-export function EventList({ initialEvents, entitlements, dummyPayments }: EventListProps) {
+export function EventList({ initialEvents, entitlements, dummyPayments, startIntent = null }: EventListProps) {
   const t = useTranslations("home");
   const locale = useLocale();
   const [eventList, setEventList] = useState(initialEvents);
   // From the server's entitlements only: deleting an event gives nothing
   // back, so the list shrinking must not unlock the button.
   const limitReached = !canCreateEvent(entitlements);
+  // The button is rendered in two places (empty list / list) and remounts
+  // when the last event is deleted: the wish from the URL may open the
+  // dialog only once.
+  const [pendingStart, setPendingStart] = useState(startIntent);
   const createButton = (
-    <CreateEventButton entitlements={entitlements} limitReached={limitReached} dummyPayments={dummyPayments} />
+    <CreateEventButton
+      entitlements={entitlements}
+      limitReached={limitReached}
+      dummyPayments={dummyPayments}
+      startIntent={pendingStart}
+      onStartConsumedAction={() => setPendingStart(null)}
+    />
   );
   const [deleteTarget, setDeleteTarget] = useState<EventListItem | null>(null);
 

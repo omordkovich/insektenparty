@@ -1,6 +1,6 @@
 ---
 name: building-event-themes
-description: Use when adding a new event theme (Thema/Theme) to GASTZILLA (this repo) from a folder of PNG graphics plus a theme name - e.g. "nimm die Bilder aus D:\projects\Insektenparty_gfx\<ordner> und bau ein Thema <name>", "neues Theme mit Farbschema", "Bilder in webp konvertieren und auf Cloudinary hochladen für ein Thema", or when a theme can't be saved ("Das Event konnte nicht gespeichert werden" after picking a new theme).
+description: Use when adding a new event theme (Thema/Theme / Design) to GASTZILLA (this repo) from a folder of PNG graphics plus a theme name and a short description - including its public design page (/designs/<slug>) in de/en/ru - e.g. "nimm die Bilder aus D:\projects\Insektenparty_gfx\<ordner> und bau ein Thema <name>", "neues Theme mit Farbschema", "Bilder in webp konvertieren und auf Cloudinary hochladen für ein Thema", or when a theme can't be saved ("Das Event konnte nicht gespeichert werden" after picking a new theme).
 ---
 
 # Building event themes for GASTZILLA
@@ -9,8 +9,9 @@ description: Use when adding a new event theme (Thema/Theme) to GASTZILLA (this 
 
 1. **PNG folder** - e.g. `D:\projects\Insektenparty_gfx\schaum`
 2. **Theme name** - becomes the theme key, Cloudinary folder and file prefix (e.g. `foam`). Lowercase, `[a-z0-9]` only - it is a CSS class suffix, a DB value and a public_id prefix.
+3. **Short description** (optional) - a line from the owner about mood and intended occasions (e.g. „düster, für Halloween-Partys von Erwachsenen“). It steers the German name, the design-page texts and the occasions in step 6. Without it, derive both from the graphics and say so.
 
-Ask only if one of these is missing. Default: the theme is **free** (not in `PREMIUM_THEMES`) so the user can test it right away; make it premium only when asked.
+Ask only if 1 or 2 is missing. A theme with side or floating graphics (`plantsLeft`/`plantsRight`/`accentOne`/`accentTwo`) is **automatically premium** (`isPremiumTheme` in `theme-presets.ts`); only plain colour designs are free. The owner's test account gets every new design in step 5.4, so it can be tested right away.
 
 ## File-name mapping
 
@@ -77,10 +78,11 @@ Files use CRLF line endings - use the Edit tool, not sed/node string replace wit
 
 **`src/lib/theme-presets.ts`** - four places:
 - `ThemeKey` union: add `| "<name>"`
-- `THEME_LABELS`: label shown in the picker; object order = picker order. Use the name the user gave unless they ask for a German one.
+- `THEME_LABELS`: the **German** name shown in the picker (German site language); object order = picker order. Add the English name to `THEME_LABELS_EN` (unless identical) and the Russian one to `THEME_LABELS_RU`.
 - `THEME_CLASS_NAMES`: `<name>: "event-theme-<name>"`
 - `THEME_ASSETS`: the Cloudinary URLs from step 3
-- `PREMIUM_THEMES`: only if the theme should be paid
+
+**Design page**: every premium theme needs one - step 6. `src/lib/designs.test.ts` fails until it exists.
 
 **`src/app/globals.css`** - add `.event-theme-<name>` and `.event-theme-<name> .parallax-background` next to the similar themes (light ones near `ballons`, dark ones near `schwarz`). Copy the structure of an existing block and set every token:
 - `--bg-top/--bg-mid/--bg-bottom`, `--leaf/--leaf-dark` (accent text/borders), `--honey/--honey-dark` + `--on-honey` (text on honey, >= 4.5:1), `--petal`, `--ink`, `--muted`, `--surface/--surface-solid`, `--danger/--danger-dark`, `--ring`, `--shadow`
@@ -99,9 +101,38 @@ Files use CRLF line endings - use the Edit tool, not sed/node string replace wit
 2. Write `supabase/migrations/<YYYY-MM-DD>-add-<name>-theme.sql`: drop and re-add the constraint with the **current** list plus `'<name>'` (don't copy a list from an older migration - another theme may have been added since).
 3. This is the production DB: tell the user what the migration does and **ask before** `apply_migration`. Afterwards re-run the query from step 1 to confirm.
 
-`user_entitlements` needs nothing: its check allows any `theme:%` feature.
+`user_entitlements` needs no schema change: its check allows any `theme:%` feature.
 
-### 6. Verify
+4. **Owner's test account gets every new design as bought** (owner's standing wish, 2026-11-20). Right after the constraint is confirmed, insert the entitlement (no need to ask again - it only touches this one account):
+   ```sql
+   insert into public.user_entitlements (user_id, feature, quantity, source, note)
+   select '189a83d5-f3e5-42b4-9c22-3f4bb37c9137'::uuid, 'theme:<name>', 1, 'manual', 'Neues Design, Owner-Testkonto'
+   where not exists (select 1 from public.user_entitlements
+     where user_id = '189a83d5-f3e5-42b4-9c22-3f4bb37c9137'::uuid and feature = 'theme:<name>');
+   ```
+   No other account gets anything.
+
+### 6. Design page (premium themes only - every theme with graphics)
+
+Each premium design has a public page in its own theme, in three languages: `/designs/<slug>`, `/en/designs/<slug>`, `/ru/dizajny/<slug>` (route `src/app/[locale]/[section]/[slug]`, view `src/components/DesignPages.tsx`). It shows the logo with the floating accents, the side graphics, a description, „Passt zu“ links to occasion pages and both purchase options; the occasion pages link back automatically („Passende Designs“ in the „Darum passt GASTZILLA zu …“ card). Load the `optimizing-seo-aeo-geo` skill first.
+
+1. **Look at every graphic** (logo, both side graphics, both accents - the Read tool shows the PNGs from the input folder) and note motifs, colours and mood. Texts may only describe what is really there. Combine with the owner's short description (input 3).
+2. **Names** in `src/lib/theme-presets.ts`: German in `THEME_LABELS` (picker order), English in `THEME_LABELS_EN` (unless identical), Russian in `THEME_LABELS_RU`.
+3. **Slugs** in `DESIGN_SLUGS` (`src/lib/design-slugs.ts`): one per language from that language's name, `[a-z0-9-]`, Russian transliterated (e.g. `khellouin-kladbishche`). German and English share the `/designs` section - a German slug must never equal another theme's English slug. Never change a live slug without a redirect (`next.config.ts`).
+4. **Occasions** in `DESIGN_OCCASIONS` (`src/lib/designs.ts`): 2-5 ids from `OCCASION_SLUGS` (`src/lib/occasion-slugs.ts`) that the graphics really suit (a gold/black balloon design is for adults, not a baby shower).
+5. **Search terms**: `python -X utf8 .claude/skills/optimizing-seo-aeo-geo/scripts/suggest.py "<motiv> einladung"` (en: `suggest_en.py`, ru: `suggest_ru.py`). Little data → use the general pattern „<Anlass>-Einladung“ / "<occasion> invitation design".
+6. **Texts** - one entry each in `src/lib/designs-de.ts`, `designs-en.ts` (British English, written for English searches, not translated word for word), `designs-ru.ts` (written for Russian searches, almost only Cyrillic):
+   - `metaTitle`: ends with „– GASTZILLA“, ≤ 60 characters, e.g. „Halloween-Einladung im Friedhof-Design – GASTZILLA“
+   - `metaDescription`: 70-160 characters, motifs + occasions; may end with „Gäste sagen per Link zu.“
+   - `title` (H1): name + search term, e.g. „Halloween-Friedhof – düsteres Design für deine Halloween-Einladung“
+   - `teaser`: one sentence (overview card, llms.txt)
+   - `description`: 1-2 paragraphs - first sentence what the graphics show, then which occasions it suits. Only features from `project-map.md`.
+   - `updated`: today (YYYY-MM-DD); it feeds sitemap and schema, it is **not** shown on the page.
+   - Every title/description/teaser must be unique across all designs of the language.
+7. **Nothing else to wire**: overview `/designs`, sitemap with hreflang, llms.txt, JSON-LD, OG image, footer link, the unlock dialog's „Vorschau“ link and the occasion back-links all read these lists.
+8. **Check**: `npx vitest run src/lib/designs.test.ts src/lib/theme-presets.test.ts`, then on the dev server open `/designs/<de-slug>`, `/en/designs/<en-slug>`, `/ru/dizajny/<ru-slug>` (375 px too): theme, graphics, readable text, one H1, language switcher lands on the same design; and one occasion page from step 6.4 shows the design under „Passende Designs“.
+
+### 7. Verify
 - `npx tsc --noEmit` and `npx vitest run src/lib`
 - curl each URL through the loader transform (`.../image/upload/f_auto,q_auto,c_limit,w_256/<name>_logo.webp`) - expect 200
 - Contrast: compute ratios for ink/muted/leaf on `--bg-mid` and `--surface-solid`, button text on button, `--on-honey` on honey (>= 4.5:1), and the sampled graphic colors against `--bg-top`/`--bg-bottom` (step 1.3). A small node one-liner with the WCAG luminance formula is enough.
@@ -118,3 +149,4 @@ When the user re-saves some PNGs ("bg_l neu abgespeichert, aktualisiere es"):
 - No `git commit`/`push` - the user commits themselves.
 - Don't write theme changes into existing events' rows to test.
 - Don't skip step 5 - it is the reason the first theme of this kind failed.
+- Never remove a theme without redirecting its design pages (all three languages) to the designs overview (`next.config.ts`).

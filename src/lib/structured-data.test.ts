@@ -5,10 +5,14 @@ import { getOccasionBySlug, occasionsFor } from "@/lib/occasions";
 import {
   aboutStructuredData,
   comparisonStructuredData,
+  designsHubStructuredData,
+  designStructuredData,
   occasionStructuredData,
   occasionsHubStructuredData,
   siteStructuredData,
 } from "@/lib/structured-data";
+import { getDesign } from "@/lib/designs";
+import { PREMIUM_THEMES } from "@/lib/theme-presets";
 
 type Node = Record<string, unknown> & { "@type": string };
 
@@ -164,5 +168,44 @@ describe("aboutStructuredData", () => {
     const page = byType(data, "AboutPage");
     expect(page.mainEntity).toEqual({ "@id": "https://gastzilla.de/#organization" });
     expect(byType(data, "Organization")["@id"]).toBe("https://gastzilla.de/#organization");
+  });
+});
+
+describe("designStructuredData", () => {
+  const design = getDesign("foam", "de")!;
+  const data = designStructuredData(design);
+
+  it("describes the design page as part of the site", () => {
+    const page = byType(data, "WebPage");
+    expect(page.url).toBe("https://gastzilla.de/designs/schaumparty");
+    expect(page.name).toBe(design.metaTitle);
+    expect(page.description).toBe(design.metaDescription);
+    expect(page.inLanguage).toBe("de");
+    expect(page.dateModified).toBe(design.updated);
+    expect(page.isPartOf).toEqual({ "@id": "https://gastzilla.de/#website" });
+  });
+
+  it("has a breadcrumb home > designs > name", () => {
+    const list = byType(data, "BreadcrumbList");
+    const items = list.itemListElement as { name: string }[];
+    expect(items.map((item) => item.name)).toEqual(["Startseite", "Designs", design.name]);
+  });
+
+  it("offers nothing for sale yet", () => {
+    expect((data["@graph"] as Node[]).some((node) => node["@type"] === "Product" || node["@type"] === "Offer")).toBe(false);
+  });
+
+  it("uses the Russian URL for a Russian page", () => {
+    const ru = designStructuredData(getDesign("foam", "ru")!);
+    expect(byType(ru, "WebPage")).toMatchObject({ url: "https://gastzilla.de/ru/dizajny/pennaya-vecherinka", inLanguage: "ru" });
+  });
+});
+
+describe("designsHubStructuredData", () => {
+  it("lists every design page", () => {
+    const page = byType(designsHubStructuredData("en"), "CollectionPage");
+    const list = page.mainEntity as { itemListElement: { url: string }[] };
+    expect(list.itemListElement).toHaveLength(PREMIUM_THEMES.length);
+    expect(list.itemListElement[0].url).toMatch(/^https:\/\/gastzilla\.de\/en\/designs\//);
   });
 });

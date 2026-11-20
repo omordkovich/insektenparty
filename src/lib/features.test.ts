@@ -66,7 +66,7 @@ describe("resolveEntitlements", () => {
   });
 
   it("keeps theme order of THEME_LABELS", () => {
-    const result = resolveEntitlements([row("theme:natur"), row("theme:ballons")]);
+    const result = resolveEntitlements(PREMIUM_THEMES.map((theme) => row(`theme:${theme}`)));
     expect(result.unlockedThemes).toEqual(ALL_THEMES);
   });
 

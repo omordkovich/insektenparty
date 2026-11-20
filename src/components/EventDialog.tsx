@@ -37,6 +37,9 @@ type EventDialogProps = (
       createPlan: EventPlan;
       /** The user's own designs; a paid event gets all of them. */
       unlockedThemes: ThemeKey[];
+      /** Preselected design ("Mit diesem Design starten"). A locked one
+       *  opens its "Design freischalten" dialog right away. */
+      initialTheme?: ThemeKey;
     }
   | {
       // Owner's event page: design and password protection - the title is
@@ -76,10 +79,20 @@ export function EventDialog(props: EventDialogProps) {
   const originalLanguage = mode === "settings" ? props.event.language : undefined;
   const [language, setLanguage] = useState<Locale>(originalLanguage ?? siteLocale);
   const [name, setName] = useState("");
-  const [theme, setTheme] = useState<ThemeKey>(mode === "settings" ? props.event.theme : THEME_KEYS[0]);
+  // The preselected design counts only if this event may use it; otherwise
+  // its unlock dialog opens first and buying it selects it.
+  const startTheme = mode === "create" ? props.initialTheme : undefined;
+  const startThemeUsable =
+    startTheme !== undefined &&
+    isThemeSelectable(unlockedThemesFor({ unlockedThemes: props.unlockedThemes }, mode === "create" ? props.createPlan : "free"), startTheme);
+  const [theme, setTheme] = useState<ThemeKey>(
+    mode === "settings" ? props.event.theme : startTheme && startThemeUsable ? startTheme : THEME_KEYS[0],
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlockTarget, setUnlockTarget] = useState<UnlockTarget | null>(null);
+  const [unlockTarget, setUnlockTarget] = useState<UnlockTarget | null>(() =>
+    startTheme && !startThemeUsable ? { kind: "theme", theme: startTheme } : null,
+  );
   // Unlocked from this dialog: designs bought one by one, and the whole
   // event (create: it is created as a paid event; settings: it was upgraded).
   const [boughtThemes, setBoughtThemes] = useState<ThemeKey[]>([]);
@@ -318,7 +331,7 @@ export function EventDialog(props: EventDialogProps) {
               aria-disabled={!selectable || undefined}
               className={`relative flex flex-col items-center gap-1 rounded-2xl border p-2 text-center transition ${
                 theme === key ? "border-leaf bg-leaf/10" : "border-leaf/20 hover:bg-leaf/5"
-              } ${selectable ? "" : "opacity-50"}`}
+              }`}
             >
               {selectable ? null : (
                 <span className="absolute top-1 right-1 rounded-full bg-white p-1 text-leaf-dark shadow-sm">

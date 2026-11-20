@@ -20,3 +20,12 @@ describe("languageSwitchHref", () => {
     );
   });
 });
+
+describe("languageSwitchHref on design pages", () => {
+  it("goes to the same design under its translated URL", () => {
+    expect(languageSwitchHref("/designs/halloween-friedhof", "", "ru")).toBe("/ru/dizajny/khellouin-kladbishche");
+    expect(languageSwitchHref("/designs/halloween-friedhof", "", "en")).toBe("/en/designs/halloween-graveyard");
+    expect(languageSwitchHref("/dizajny/khellouin-kladbishche", "", "de")).toBe("/designs/halloween-friedhof");
+    expect(languageSwitchHref("/designs", "", "ru")).toBe("/ru/dizajny");
+  });
+});

@@ -12,6 +12,7 @@ import { getAccountName, getSignInMethods } from "@/lib/account";
 import { todayInBerlin } from "@/lib/date-poll";
 import { lifecycleOf } from "@/lib/event-lifecycle";
 import { isDummyPaymentEnabled } from "@/lib/payments";
+import { parseStartIntent } from "@/lib/start-intent";
 import { termsConsentState } from "@/lib/terms-consent";
 import type { ThemeKey } from "@/lib/theme-presets";
 import { createClient } from "@/lib/supabase/server";
@@ -30,13 +31,20 @@ export async function generateMetadata({ params }: LocaleParams) {
 }
 
 type HomeProps = LocaleParams & {
-  searchParams: Promise<{ link_expired?: string | string[]; auth_error?: string | string[] }>;
+  searchParams: Promise<{
+    link_expired?: string | string[];
+    auth_error?: string | string[];
+    // "Mit diesem Design starten" on a design page (src/lib/start-intent.ts).
+    design?: string | string[];
+    event?: string | string[];
+  }>;
 };
 
 export default async function Home({ params, searchParams }: HomeProps) {
   await pageLocale(params);
   const t = await getTranslations("home");
-  const { link_expired, auth_error: authError } = await searchParams;
+  const { link_expired, auth_error: authError, design, event } = await searchParams;
+  const startIntent = parseStartIntent({ design, event });
   const linkExpired: LinkExpiredKind | null =
     link_expired === "recovery" ? "recovery" : link_expired === "signup" ? "signup" : null;
 
@@ -91,6 +99,7 @@ export default async function Home({ params, searchParams }: HomeProps) {
                     initialEvents={myEvents}
                     entitlements={entitlements}
                     dummyPayments={isDummyPaymentEnabled()}
+                    startIntent={startIntent}
                   />
                 </div>
               </section>

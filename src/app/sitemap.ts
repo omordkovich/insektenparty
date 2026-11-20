@@ -7,6 +7,8 @@ import { COMPARISON } from "@/lib/comparison";
 import { ABOUT_UPDATED, SITE_URL } from "@/lib/site";
 import { latestOccasionUpdate, occasionAlternates, occasionPath, occasionsFor, occasionsPath } from "@/lib/occasions";
 import { OCCASION_SECTION } from "@/lib/occasion-slugs";
+import { DESIGN_SECTION } from "@/lib/design-slugs";
+import { designAlternates, designPath, designsFor, designsPath, latestDesignUpdate } from "@/lib/designs";
 import { REVIEWS_PAGE_PATH, reviewsSitemapEntries } from "@/lib/reviews-page";
 import { getLatestApproval } from "@/repositories/review-repository";
 
@@ -82,6 +84,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "monthly" as const,
         priority: 0.8,
         alternates: { languages: absolute(languageAlternates(occasionAlternates(occasion.id))) },
+      })),
+    ]),
+    ...LOCALES.flatMap((locale) => [
+      {
+        url: `${SITE_URL}${localizedPath(designsPath(locale), locale)}`,
+        lastModified: latestDesignUpdate(locale),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: { languages: absolute(languageAlternates(DESIGN_SECTION)) },
+      },
+      ...designsFor(locale).map((design) => ({
+        url: `${SITE_URL}${localizedPath(designPath(design), locale)}`,
+        lastModified: design.updated,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+        alternates: { languages: absolute(languageAlternates(designAlternates(design.theme))) },
       })),
     ]),
   ];

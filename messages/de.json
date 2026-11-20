@@ -44,7 +44,8 @@
       "withdrawal": "Widerruf"
     },
     "privacyPolicy": "Datenschutzerklärung",
-    "termsShort": "AGB"
+    "termsShort": "AGB",
+    "designs": "Designs"
   },
   "home": {
     "metaTitle": "Online-Einladung & Gästeliste kostenlos erstellen – GASTZILLA",
@@ -206,7 +207,6 @@
     "mindestens4Zeichen": "Mindestens 4 Zeichen.",
     "passwortWiederholen": "Passwort wiederholen",
     "wasBedeutetPasswortgeschutzt": "Was bedeutet passwortgeschützt?",
-    "baldVerfugbar": "Bald verfügbar",
     "furAlleDeineEvents": "Für alle deine Events nutzbar.",
     "dasLogoMadeWith": "Das Logo „made with Gastzilla“ unten auf deiner Event-Seite verschwindet – für alle Besucher. Teilen-Buttons und die Links zu Impressum, Datenschutz und AGB bleiben.",
     "einFreigeschaltetesEventKann": "Ein freigeschaltetes Event kann mehr:",
@@ -233,7 +233,8 @@
     "noBadge": "Ohne GASTZILLA-Hinweis",
     "onlyThisDesign": "Nur dieses Design – {price}",
     "unlocking": "Wird freigeschaltet ...",
-    "namePlaceholder": "z. B. Geburtstagsfeier 2026"
+    "namePlaceholder": "z. B. Geburtstagsfeier 2026",
+    "preview": "Vorschau"
   },
   "eventSettings": {},
   "themes": {},
@@ -727,5 +728,27 @@
     "intro": "Nach einem Event mit festem Termin und mindestens einer Zusage bitten wir den Gastgeber per E-Mail um eine kurze Bewertung. Hier stehen alle, die wir freigegeben haben – die neuesten zuerst, jede in der Sprache, in der sie geschrieben wurde.",
     "examplesNote": "Es gibt noch keine freigegebenen Bewertungen. Die Karten unten sind Beispiele und stammen nicht von echten Gastgebern.",
     "count": "{count, plural, one {# Bewertung} other {# Bewertungen}}"
+  },
+  "designs": {
+    "logoAlt": "Logo des Designs {name}",
+    "fitsTitle": "Passt zu diesen Anlässen",
+    "buyTitle": "So bekommst du das Design",
+    "onlyThisDesign": "Nur dieses Design – {price}",
+    "forAllEvents": "Einmal freischalten, in allen deinen Events nutzen.",
+    "wholeEvent": "Ganzes Event freischalten – {price}",
+    "wholeEventText": "Ein freigeschaltetes Event hat dieses und alle anderen Designs, dazu:",
+    "startWithDesign": "Mit diesem Design starten",
+    "testUnlock": "Freischalten (Test, ohne Zahlung)",
+    "unlocking": "Wird freigeschaltet …",
+    "unlockedTheme": "Freigeschaltet – das Design steht dir in allen deinen Events zur Verfügung.",
+    "unlockedEvent": "Freigeschaltet – dein nächstes Event ist ein freigeschaltetes Event.",
+    "unlockFailed": "Das Freischalten hat nicht geklappt. Bitte versuch es noch einmal.",
+    "allDesigns": "Alle Designs ansehen",
+    "learnMore": "Design ansehen →",
+    "hubCardTitle": "Designs für deine Einladung",
+    "hubCardText": "Premium-Designs mit Grafiken – von Halloween über Kindergeburtstag bis Hochzeit.",
+    "hubCardCta": "Zu den Designs →",
+    "ogSubtitle": "Design für deine Online-Einladung – GASTZILLA",
+    "matchingTitle": "Passende Designs"
   }
 }

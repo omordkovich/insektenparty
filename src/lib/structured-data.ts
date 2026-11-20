@@ -1,4 +1,13 @@
 import { COMPARISON, comparisonBreadcrumbs } from "@/lib/comparison";
+import {
+  type Design,
+  designBreadcrumbs,
+  designPath,
+  designsFor,
+  designsHub,
+  designsHubBreadcrumbs,
+  designsPath,
+} from "@/lib/designs";
 import { LOCALES, type Locale } from "@/i18n/config";
 import { faqEntries, type FaqItem } from "@/lib/faq";
 import { localizedPath } from "@/lib/page-metadata";
@@ -216,6 +225,64 @@ export function occasionsHubStructuredData(locale: Locale) {
         },
       },
       breadcrumbList(hubBreadcrumbs(locale), `${url}#breadcrumb`, locale),
+    ],
+  };
+}
+
+// One design page (/designs/<slug>, /ru/dizajny/<slug>): the page and its
+// breadcrumb. No Product/Offer yet - nothing can be bought live until real
+// payments exist (docs/seo-todo.md).
+export function designStructuredData(design: Design) {
+  const { locale } = design;
+  const url = `${SITE_URL}${localizedPath(designPath(design), locale)}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: design.metaTitle,
+        description: design.metaDescription,
+        inLanguage: locale,
+        dateModified: design.updated,
+        isPartOf: { "@id": WEBSITE_ID },
+        about: { "@id": APP_ID },
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+      },
+      breadcrumbList(designBreadcrumbs(design), `${url}#breadcrumb`, locale),
+    ],
+  };
+}
+
+// The designs overview (/designs, /ru/dizajny): a collection of all design
+// pages of that language.
+export function designsHubStructuredData(locale: Locale) {
+  const url = `${SITE_URL}${localizedPath(designsPath(locale), locale)}`;
+  const hub = designsHub(locale);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: hub.metaTitle,
+        description: hub.description,
+        inLanguage: locale,
+        isPartOf: { "@id": WEBSITE_ID },
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: designsFor(locale).map((design, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: design.name,
+            url: `${SITE_URL}${localizedPath(designPath(design), locale)}`,
+          })),
+        },
+      },
+      breadcrumbList(designsHubBreadcrumbs(locale), `${url}#breadcrumb`, locale),
     ],
   };
 }

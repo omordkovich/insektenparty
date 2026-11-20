@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { cardClass } from "@/components/card";
@@ -14,6 +16,7 @@ import { UpdatedDate } from "@/components/UpdatedDate";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 import { COMPARISON } from "@/lib/comparison";
+import { designPath, designsForOccasion, designsPath } from "@/lib/designs";
 import { OCCASION_SECTION } from "@/lib/occasion-slugs";
 import {
   hubBreadcrumbs,
@@ -27,6 +30,7 @@ import {
 } from "@/lib/occasions";
 import { localizedPath, pageMetadata } from "@/lib/page-metadata";
 import { occasionStructuredData, occasionsHubStructuredData } from "@/lib/structured-data";
+import { THEME_ASSETS } from "@/lib/theme-presets";
 
 // The occasion pages in every language: German under /einladung, English
 // under /en/invitations (see occasion-slugs.ts). The route files
@@ -60,6 +64,8 @@ export function occasionsHubMetadata(locale: Locale): Metadata {
 // Info page for one occasion - for search engines and AI assistants;
 // signing up works as on the start page.
 export function OccasionPageView({ occasion }: { occasion: Occasion }) {
+  const tDesigns = useTranslations("designs");
+  const designs = designsForOccasion(occasion.id, occasion.locale);
   return (
     <>
       <SiteHeader />
@@ -97,6 +103,31 @@ export function OccasionPageView({ occasion }: { occasion: Occasion }) {
                 </li>
               ))}
             </ul>
+            {designs.length > 0 ? (
+              // Back-links to the design pages made for this occasion.
+              <div className="mt-8 border-t border-leaf/15 pt-6">
+                <h3 className="text-center font-display text-lg text-leaf-dark">{tDesigns("matchingTitle")}</h3>
+                <ul className="mt-4 flex flex-wrap justify-center gap-3">
+                  {designs.map((design) => (
+                    <li key={design.theme}>
+                      <Link
+                        href={designPath(design)}
+                        className="flex w-24 flex-col items-center gap-1 rounded-2xl border border-leaf/20 p-2 text-center transition hover:border-leaf/50 hover:bg-leaf/5"
+                      >
+                        <Image
+                          src={THEME_ASSETS[design.theme].logo}
+                          alt=""
+                          width={56}
+                          height={56}
+                          className="h-14 w-14 object-contain"
+                        />
+                        <span className="text-xs leading-tight text-muted hyphens-auto">{design.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </section>
 
           <InvitationTemplate name={occasion.name} lines={occasion.invitationText} />
@@ -117,6 +148,7 @@ export function OccasionPageView({ occasion }: { occasion: Occasion }) {
 // Overview of all occasion pages of a language - one card per occasion.
 export async function OccasionsHubView({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "occasions" });
+  const tDesigns = await getTranslations({ locale, namespace: "designs" });
   const hub = occasionsHub(locale);
   return (
     <>
@@ -153,6 +185,12 @@ export async function OccasionsHubView({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ul>
+
+          <Link href={designsPath(locale)} className={`${cardClass} block text-center transition hover:border-leaf/50`}>
+            <h2 className="font-display text-xl text-leaf-dark">{tDesigns("hubCardTitle")}</h2>
+            <p className="mt-2 text-muted">{tDesigns("hubCardText")}</p>
+            <span className="mt-3 inline-block font-bold text-leaf-dark">{tDesigns("hubCardCta")}</span>
+          </Link>
 
           {/* The comparison exists in German only - no detour for English readers. */}
           {locale === DEFAULT_LOCALE ? (

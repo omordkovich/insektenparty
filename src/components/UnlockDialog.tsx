@@ -5,9 +5,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { PRODUCTS, formatPrice } from "@/lib/products";
+import { designSlugPath } from "@/lib/design-slugs";
+import { localizedPath } from "@/lib/page-metadata";
+import { PAID_EVENT_FEATURE_KEYS, PRODUCTS, formatPrice } from "@/lib/products";
 import { THEME_ASSETS, themeLabel, type ThemeKey } from "@/lib/theme-presets";
-import { Button } from "./Button";
+import { Button, buttonClassName } from "./Button";
 import { Modal } from "./Modal";
 import { themePortalTarget } from "./themePortalTarget";
 
@@ -61,9 +63,6 @@ type UnlockWay = {
   body: PurchaseBody | null;
 };
 
-// Message keys (namespace "eventDialog").
-const PAID_EVENT_FEATURE_KEYS = ["allDesigns", "terminAbstimmenLassen", "terminOffenLassen", "datumBis12Monate"] as const;
-
 const TITLE_KEYS = {
   event: "diesesEventFreischalten",
   credit: "eventFreischalten",
@@ -72,8 +71,8 @@ const TITLE_KEYS = {
 } as const satisfies Record<UnlockDialogProps["kind"], string>;
 
 // The "Freischalten" dialog behind every locked spot. Until real payments
-// exist the button is a dummy purchase (PAYMENTS_DUMMY); an unused event
-// credit is always spent first. Portalled to the themed page root so it
+// exist the button is a dummy purchase (PAYMENTS_DUMMY); without it only the
+// price is shown. An unused event credit is always spent first. Portalled to the themed page root so it
 // stacks above the dialog it was opened from.
 export function UnlockDialog(props: UnlockDialogProps) {
   const t = useTranslations("eventDialog");
@@ -87,6 +86,9 @@ export function UnlockDialog(props: UnlockDialogProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasCredit = eventCredits > 0;
+  // The design's public page (colour designs have none).
+  const previewPath = props.kind === "theme" ? designSlugPath(props.theme, locale) : undefined;
+  const previewHref = previewPath ? localizedPath(previewPath, locale) : undefined;
 
   // The whole event: an existing event is upgraded (the server spends a
   // credit first); for the event being created a credit is bought - unless
@@ -173,7 +175,8 @@ export function UnlockDialog(props: UnlockDialogProps) {
         </Button>
       );
     }
-    return <p className="text-sm font-semibold text-muted">{t("baldVerfugbar")}</p>;
+    // No way to pay yet: the price above stays, without a button.
+    return null;
   }
 
   const creditNote =
@@ -197,7 +200,18 @@ export function UnlockDialog(props: UnlockDialogProps) {
               height={64}
               className="h-16 w-16 shrink-0 object-contain"
             />
-            <p className="font-semibold text-leaf-dark">{themeLabel(props.theme, locale)}</p>
+            <p className="min-w-0 flex-1 font-semibold text-leaf-dark">{themeLabel(props.theme, locale)}</p>
+            {previewHref ? (
+              // New tab: the dialog it was opened from keeps everything typed so far.
+              <a
+                href={previewHref}
+                target="_blank"
+                rel="noopener"
+                className={`${buttonClassName("outline")} shrink-0`}
+              >
+                {t("preview")}
+              </a>
+            ) : null}
           </div>
           <div className="mt-4 space-y-3">
             {ways.map((way, index) => (
@@ -240,7 +254,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
         </>
       )}
 
-      <p className="mt-4 text-xs text-muted">{t("testphaseEsWirdNichts")}</p>
+      {dummyPayments ? <p className="mt-4 text-xs text-muted">{t("testphaseEsWirdNichts")}</p> : null}
 
       {error ? (
         <p className="mt-4 text-sm text-danger" role="alert">

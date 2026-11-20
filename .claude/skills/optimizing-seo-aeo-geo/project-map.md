@@ -19,16 +19,18 @@
 | Event pages (noindex) | `src/app/event/[slug]/layout.tsx` |
 | Maintenance (what stays reachable) | `src/lib/maintenance.ts` |
 | Site constants (URL, name, description) | `src/lib/site.ts` |
+| Design pages (texts, slugs, occasions) | `src/lib/designs.ts`, `designs-de/-en/-ru.ts`, `design-slugs.ts` |
 | Open SEO tasks | `docs/seo-todo.md` |
 
 ## Verified features (may be claimed)
-Gäste sagen per Link zu oder ab – ohne Konto/App · Begleitpersonen mit Namen, mitgezählt · Ankunftszeit (Pflicht) + „bleibe bis“ (optional) · Mitbringsel-Eintrag, für alle sichtbar · Nachricht zur Zusage (für Link-Inhaber sichtbar) · Gäste ändern/löschen ihren Eintrag · E-Mail an den Gastgeber bei neuer Zusage, Änderung, Löschung · Teilen per WhatsApp, Signal, Telegram, E-Mail, Link kopieren · Termin in Kalender (nur mit Datum + Uhrzeit) · Zeitraum über mehrere Tage · Passwortschutz der Event-Seite · Terminabstimmung (kostenpflichtiges Extra) · Einladungstext-Editor für den Owner · Farbdesigns kostenlos; kostenpflichtige Premium-Designs · 1 Event pro Konto kostenlos, einmalig, nur mit festem Termin ≤ 3 Monate nach dem Erstellen; Terminabstimmung, offener Termin, Termin bis 12 Monate, Event-Seite ohne GASTZILLA-Hinweis = kostenpflichtige Extras; weitere Events „bald“ (keine Preise nennen, Zahlung in Testphase) · automatische Löschung 90 Tage nach dem Stichtag, Einladungslink ab Stichtag + 30 Tage „abgelaufen“, Löschhinweis-Mail 7 Tage vorher · werbefrei, keine Tracking-Cookies, Server in der EU · Event-Seiten nicht in Suchmaschinen.
+Gäste sagen per Link zu oder ab – ohne Konto/App · Begleitpersonen mit Namen, mitgezählt · Ankunftszeit (Pflicht) + „bleibe bis“ (optional) · Mitbringsel-Eintrag, für alle sichtbar · Nachricht zur Zusage (für Link-Inhaber sichtbar) · Gäste ändern/löschen ihren Eintrag · E-Mail an den Gastgeber bei neuer Zusage, Änderung, Löschung · Teilen per WhatsApp, Signal, Telegram, E-Mail, Link kopieren · Termin in Kalender (nur mit Datum + Uhrzeit) · Zeitraum über mehrere Tage · Passwortschutz der Event-Seite · Terminabstimmung (kostenpflichtiges Extra) · Einladungstext-Editor für den Owner · Farbdesigns kostenlos; kostenpflichtige Premium-Designs · 1 Event pro Konto kostenlos, einmalig, nur mit festem Termin ≤ 3 Monate nach dem Erstellen; Terminabstimmung, offener Termin, Termin bis 12 Monate, Event-Seite ohne GASTZILLA-Hinweis = kostenpflichtige Extras; Preise dürfen genannt werden (Owner-Entscheidung 2026-11-20: freigeschaltetes Event 2,99 €, einzelnes Premium-Design 0,99 €, ohne Hinweis 0,99 € – immer aus `PRODUCTS`/`formatPrice`); echte Zahlung noch im Aufbau, weitere Events „bald“ · automatische Löschung 90 Tage nach dem Stichtag, Einladungslink ab Stichtag + 30 Tage „abgelaufen“, Löschhinweis-Mail 7 Tage vorher · werbefrei, keine Tracking-Cookies, Server in der EU · Event-Seiten nicht in Suchmaschinen.
 
 **Not available (never imply):** Tickets/Bezahlung/Kostenteilung, Tisch- oder Escape-Room-Reservierung, Sitzplan, Teams, wiederkehrende Termine, Teilnehmerlimit, Erinnerungen/Benachrichtigungen an Gäste.
 
-**Designs** (owner's decision 2026-10-22):
-- Frame as „Designs für jeden Anlass“ / „im passenden Design“: Farbdesigns kostenlos, dazu „kostenpflichtige Premium-Designs“.
-- Never name individual designs or colours („Schwarz“, Ballons …) and never state how many there are – describe them generically („ein dunkles Farbdesign“), so copy survives when designs change.
+**Designs** (owner's decisions 2026-10-22, updated 2026-11-20):
+- Frame as „Designs für jeden Anlass“ / „im passenden Design“: Farbdesigns kostenlos, dazu „kostenpflichtige Premium-Designs“ (= every design with side/floating graphics).
+- Individual designs are named **only** on the design pages (`/designs/<slug>`, `/en/designs/…`, `/ru/dizajny/…`, texts in `src/lib/designs-de.ts`/`-en.ts`/`-ru.ts`) and on the designs overview. Everywhere else: never name individual designs or colours and never state how many there are, so copy survives when designs change.
+- Design-page texts describe what the graphics really show (look at them) – no invented motifs.
 - No „bald“ for Premium-Designs; never list designs as a limitation.
 
 Re-verify in code before relying on a feature that may have changed (`src/components/GuestModal.tsx`, `src/services/*`).

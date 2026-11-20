@@ -113,7 +113,7 @@ export function LanguageSwitcher({ signedIn }: LanguageSwitcherProps) {
               aria-checked={option === locale}
               lang={option}
               onClick={() => void choose(option)}
-              className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-base text-zinc-800 transition hover:bg-leaf/10 focus:bg-leaf/10 focus:outline-none"
+              className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-base text-ink transition hover:bg-leaf/10 focus:bg-leaf/10 focus:outline-none"
             >
               <span className={option === locale ? "font-bold text-leaf-dark" : undefined}>{LOCALE_NAMES[option]}</span>
               {option === locale ? (

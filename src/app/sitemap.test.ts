@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import sitemap from "@/app/sitemap";
 import { COMPARISON } from "@/lib/comparison";
 import { PRIVACY_VERSION, WITHDRAWAL_VERSION } from "@/lib/legal-info";
+import { designsFor, latestDesignUpdate } from "@/lib/designs";
 import { latestOccasionUpdate, occasionsFor } from "@/lib/occasions";
 
 const getLatestApproval = vi.fn<() => Promise<Date | null>>();
@@ -16,6 +17,19 @@ describe("sitemap", () => {
     getLatestApproval.mockResolvedValue(null);
     entries = await sitemap();
     byUrl = new Map(entries.map((entry) => [entry.url, entry]));
+  });
+
+  it("lists the design overview and every design page in every language", () => {
+    expect(byUrl.get("https://gastzilla.de/designs")?.lastModified).toBe(latestDesignUpdate("de"));
+    expect(byUrl.get("https://gastzilla.de/ru/dizajny")?.lastModified).toBe(latestDesignUpdate("ru"));
+    for (const design of designsFor("en")) {
+      expect(byUrl.get(`https://gastzilla.de/en/designs/${design.slug}`)?.lastModified).toBe(design.updated);
+    }
+    expect(byUrl.get("https://gastzilla.de/designs/halloween-friedhof")?.alternates?.languages).toMatchObject({
+      de: "https://gastzilla.de/designs/halloween-friedhof",
+      en: "https://gastzilla.de/en/designs/halloween-graveyard",
+      ru: "https://gastzilla.de/ru/dizajny/khellouin-kladbishche",
+    });
   });
 
   it("lists the occasion overview with the newest occasion date", () => {
@@ -74,7 +88,7 @@ describe("sitemap", () => {
 
   it("leaves out the German-only pages' English frame", () => {
     const english = entries.filter((entry) => entry.url.startsWith("https://gastzilla.de/en/"));
-    const translated = ["/en/invitations", "/en/impressum", "/en/datenschutz", "/en/agb", "/en/widerruf"];
+    const translated = ["/en/invitations", "/en/designs", "/en/impressum", "/en/datenschutz", "/en/agb", "/en/widerruf"];
     expect(english.every((entry) => translated.some((path) => entry.url.startsWith(`https://gastzilla.de${path}`)))).toBe(true);
     expect(byUrl.has("https://gastzilla.de/en/about")).toBe(false);
     expect(byUrl.has("https://gastzilla.de/ru/about")).toBe(false);

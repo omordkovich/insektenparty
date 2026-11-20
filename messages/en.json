@@ -44,7 +44,8 @@
       "withdrawal": "Withdrawal"
     },
     "privacyPolicy": "privacy policy",
-    "termsShort": "terms"
+    "termsShort": "terms",
+    "designs": "Designs"
   },
   "home": {
     "metaTitle": "Free Online Invitation & Guest List – GASTZILLA",
@@ -206,7 +207,6 @@
     "mindestens4Zeichen": "At least 4 characters.",
     "passwortWiederholen": "Repeat password",
     "wasBedeutetPasswortgeschutzt": "What does password-protected mean?",
-    "baldVerfugbar": "Coming soon",
     "furAlleDeineEvents": "Usable for all your events.",
     "dasLogoMadeWith": "The “made with Gastzilla” logo at the bottom of your event page disappears – for all visitors. The share buttons and the links to the imprint, privacy policy and terms stay.",
     "einFreigeschaltetesEventKann": "An unlocked event can do more:",
@@ -233,7 +233,8 @@
     "noBadge": "Without the GASTZILLA note",
     "onlyThisDesign": "Just this design – {price}",
     "unlocking": "Unlocking ...",
-    "namePlaceholder": "e.g. Birthday party 2026"
+    "namePlaceholder": "e.g. Birthday party 2026",
+    "preview": "Preview"
   },
   "eventSettings": {},
   "themes": {},
@@ -727,5 +728,27 @@
     "intro": "After an event with a fixed date and at least one acceptance, we email the host to ask for a short review. Here are all the reviews we have approved – newest first, each in the language it was written in.",
     "examplesNote": "There are no approved reviews yet. The cards below are examples and do not come from real hosts.",
     "count": "{count, plural, one {# review} other {# reviews}}"
+  },
+  "designs": {
+    "logoAlt": "Logo of the {name} design",
+    "fitsTitle": "Made for these occasions",
+    "buyTitle": "How to get this design",
+    "onlyThisDesign": "Just this design – {price}",
+    "forAllEvents": "Unlock it once and use it in all your events.",
+    "wholeEvent": "Unlock a whole event – {price}",
+    "wholeEventText": "An unlocked event gets this design and every other one, plus:",
+    "startWithDesign": "Start with this design",
+    "testUnlock": "Unlock (test, no payment)",
+    "unlocking": "Unlocking …",
+    "unlockedTheme": "Unlocked – the design is now available in all your events.",
+    "unlockedEvent": "Unlocked – your next event will be an unlocked event.",
+    "unlockFailed": "Unlocking didn't work. Please try again.",
+    "allDesigns": "See all designs",
+    "learnMore": "View design →",
+    "hubCardTitle": "Designs for your invitation",
+    "hubCardText": "Premium designs with artwork – from Halloween and kids' parties to weddings.",
+    "hubCardCta": "See the designs →",
+    "ogSubtitle": "A design for your online invitation – GASTZILLA",
+    "matchingTitle": "Matching designs"
   }
 }

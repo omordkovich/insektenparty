@@ -56,33 +56,33 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   orange: "Orange",
   gelb: "Gelb",
   ballons: "Ballons",
-  foam: "Foam",
-  halloweenclay: "Halloween Clay",
-  halloweengraveyard: "Halloween Graveyard",
-  halloweenkids: "Halloween Kids",
-  christmaskids: "Christmas Kids",
-  christmassnow: "Christmas Snow",
-  artdeco: "Art Deco",
+  foam: "Schaumparty",
+  halloweenclay: "Halloween-Knete",
+  halloweengraveyard: "Halloween-Friedhof",
+  halloweenkids: "Halloween für Kinder",
+  christmaskids: "Weihnachten für Kinder",
+  christmassnow: "Weihnachtsschnee",
+  artdeco: "Art déco",
   disco: "Disco",
   hippie: "Hippie",
-  newyear: "New Year",
-  birthdaypresents: "Birthday Presents",
-  birthdayprincess: "Birthday Princess",
-  penandpaper: "Pen & Paper",
-  magic: "Magic",
-  pirates: "Pirates",
-  pirateskids: "Pirates Kids",
-  teddy: "Teddy",
-  cinema: "Cinema",
+  newyear: "Silvester",
+  birthdaypresents: "Geburtstagsgeschenke",
+  birthdayprincess: "Prinzessin",
+  penandpaper: "Rollenspiel",
+  magic: "Zauberei",
+  pirates: "Piraten",
+  pirateskids: "Piraten für Kinder",
+  teddy: "Teddybär",
+  cinema: "Kino",
   tarot: "Tarot",
-  karnaval: "Karnaval",
+  karnaval: "Karneval",
   pride: "Pride",
   dinosaurier: "Dinosaurier",
   weltall: "Weltall",
   einschulung: "Einschulung",
   ninja: "Ninja",
   fussball: "Fußball",
-  toycars: "Toy Cars",
+  toycars: "Spielzeugautos",
   hochzeit: "Hochzeit",
   brettspiele: "Brettspiele",
   bowling: "Bowling",
@@ -90,9 +90,6 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   natur: "Natur",
 };
 
-// Themes that must be unlocked per user (see user_entitlements, feature key
-// "theme:<key>"). Adding a paid theme later only needs a new entry here -
-// the DB check constraint only enforces the "theme:%" pattern.
 // English names for the themes whose label is German; all others are the
 // same in every language.
 const THEME_LABELS_EN: Partial<Record<ThemeKey, string>> = {
@@ -111,6 +108,23 @@ const THEME_LABELS_EN: Partial<Record<ThemeKey, string>> = {
   hochzeit: "Wedding",
   brettspiele: "Board games",
   natur: "Nature",
+  foam: "Foam",
+  halloweenclay: "Halloween Clay",
+  halloweengraveyard: "Halloween Graveyard",
+  halloweenkids: "Halloween Kids",
+  christmaskids: "Christmas Kids",
+  christmassnow: "Christmas Snow",
+  artdeco: "Art Deco",
+  newyear: "New Year",
+  birthdaypresents: "Birthday Presents",
+  birthdayprincess: "Birthday Princess",
+  penandpaper: "Pen & Paper",
+  magic: "Magic",
+  pirates: "Pirates",
+  pirateskids: "Pirates Kids",
+  teddy: "Teddy",
+  cinema: "Cinema",
+  toycars: "Toy Cars",
 };
 
 const THEME_LABELS_RU: Record<ThemeKey, string> = {
@@ -168,7 +182,6 @@ export function themeLabel(theme: ThemeKey, locale: Locale): string {
   return THEME_LABELS_BY_LOCALE[locale][theme] ?? THEME_LABELS[theme];
 }
 
-export const PREMIUM_THEMES: readonly ThemeKey[] = ["natur", "ballons"];
 
 // Maps to the CSS theme classes defined in globals.css.
 export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
@@ -472,3 +485,18 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1789756201/ins_accent-2.webp",
   },
 };
+
+// A design with side or floating graphics is a paid one (premium); only the
+// plain colour designs are free. Premium designs must be unlocked per user
+// (user_entitlements, feature key "theme:<key>") or come with a paid event.
+// The DB check constraint only enforces the "theme:%" pattern.
+export function isPremiumTheme(theme: ThemeKey): boolean {
+  const assets = THEME_ASSETS[theme];
+  return Boolean(assets.plantsLeft || assets.plantsRight || assets.accentOne || assets.accentTwo);
+}
+
+const ALL_THEME_KEYS = Object.keys(THEME_LABELS) as ThemeKey[];
+
+// Both in picker order (THEME_LABELS).
+export const PREMIUM_THEMES: readonly ThemeKey[] = ALL_THEME_KEYS.filter(isPremiumTheme);
+export const FREE_THEMES: readonly ThemeKey[] = ALL_THEME_KEYS.filter((theme) => !isPremiumTheme(theme));
