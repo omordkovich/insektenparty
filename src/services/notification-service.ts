@@ -2,6 +2,11 @@ import type { Locale } from "@/i18n/config";
 import { serverTranslator } from "@/i18n/translator";
 import { buildLifecycleMessage, type LifecycleMail } from "@/lib/lifecycle-mails";
 import { sendEmail } from "@/lib/email";
+import { addDays } from "@/lib/date-poll";
+import { buildFeedbackRequestMail } from "@/lib/feedback-mails";
+import { FEEDBACK_LINK_VALID_DAYS, getFeedbackSecret, signFeedbackToken } from "@/lib/feedback-token";
+import { localizedPath } from "@/lib/page-metadata";
+import { SITE_URL } from "@/lib/site";
 import { buildEventShareUrl } from "@/lib/share";
 import { getEventForNotification } from "@/repositories/event-repository";
 import { getUserContact } from "@/repositories/user-repository";
@@ -112,5 +117,35 @@ export async function sendLifecycleMail(
 
   const { subject, text } = buildLifecycleMessage(kind, event, date, owner.locale);
   await sendEmail({ to: owner.email, subject, text });
+  return true;
+}
+
+// "Wie war dein Event?" - once, the day after the event (lifecycle job).
+// False when nothing was sent: no FEEDBACK_SECRET, no owner/e-mail, or the
+// owner unsubscribed from feedback mails.
+export async function sendFeedbackRequestMail(
+  event: { id: string; ownerId: string | null; title: string },
+  today: string,
+): Promise<boolean> {
+  const secret = getFeedbackSecret();
+  if (!secret || !event.ownerId) return false;
+  const owner = await getUserContact(event.ownerId);
+  if (!owner?.email || !owner.feedbackMails) return false;
+
+  const feedback = signFeedbackToken(
+    { kind: "feedback", id: event.id, exp: addDays(today, FEEDBACK_LINK_VALID_DAYS) },
+    secret,
+  );
+  const unsubscribe = signFeedbackToken({ kind: "unsubscribe", id: event.ownerId }, secret);
+  const base = `${SITE_URL}${localizedPath("/feedback", owner.locale)}`;
+  const mail = buildFeedbackRequestMail(
+    {
+      title: event.title,
+      feedbackLink: `${base}?t=${encodeURIComponent(feedback)}`,
+      unsubscribeLink: `${base}/abmelden?t=${encodeURIComponent(unsubscribe)}`,
+    },
+    owner.locale,
+  );
+  await sendEmail({ to: owner.email, ...mail });
   return true;
 }

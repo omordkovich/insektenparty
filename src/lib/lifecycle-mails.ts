@@ -20,6 +20,11 @@ export type LifecycleMailRow = LifecycleInput & {
   pollStartedOn: string | null;
   deletionNoticeSentAt: Date | null;
   dateReminderSentAt: Date | null;
+  // Feedback mail (see feedbackRequestDue): guests who did not decline, and
+  // whether the mail went out / feedback came in.
+  acceptedGuests: number;
+  feedbackRequestSentAt: Date | null;
+  feedbackSubmittedAt: Date | null;
 };
 
 // Days before the deletion / Stichtag / latest poll proposal a mail goes out.
@@ -55,6 +60,16 @@ export function dueMail(row: LifecycleMailRow, today: string): LifecycleMail | n
     return "poll_reminder";
   }
   return null;
+}
+
+// Feedback mail to the host: only for an event that really took place (fixed
+// date, at least one acceptance), once, from the day after its last day while
+// the event page is "over" (days 1-29) - so a skipped run is caught up, but no
+// long-past event is asked. Independent of dueMail (own sent mark).
+export function feedbackRequestDue(row: LifecycleMailRow, today: string): boolean {
+  if (row.dateMode !== "fixed" || !row.eventDate) return false;
+  if (row.acceptedGuests < 1 || row.feedbackRequestSentAt || row.feedbackSubmittedAt) return false;
+  return lifecycleStage(stichtag(row), today) === "over";
 }
 
 // `date` is the deletion date, the Stichtag or the latest poll proposal,

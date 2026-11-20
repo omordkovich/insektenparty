@@ -14,6 +14,8 @@ export const NAME_MIN_LENGTH = 2;
 export const NAME_MAX_LENGTH = 100;
 export const BRINGING_DESCRIPTION_MAX_LENGTH = 1000;
 export const MESSAGE_MAX_LENGTH = 1000;
+export const REVIEW_TEXT_MIN_LENGTH = 20;
+export const REVIEW_TEXT_MAX_LENGTH = 200;
 export const MAX_ADDITIONAL_GUESTS = 30;
 export const ARRIVAL_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 // Deliberately simple: something@something.tld, no spaces.
@@ -794,4 +796,42 @@ export function validateMaxGuests(value: unknown): FieldResult<number | null> {
     return { ok: false, error: MAX_GUESTS_ERROR };
   }
   return { ok: true, value: parsed };
+}
+
+// --- Feedback (host review) --------------------------------------------------
+
+export type FeedbackInput = { rating: number; text: string; displayName: string | null };
+
+const feedbackSchema = z
+  .object({
+    rating: z.int({ error: msg("ratingRequired") }).min(1, msg("ratingRequired")).max(5, msg("ratingRequired")),
+    text: z
+      .string({ error: msg("reviewTextTooShort", { min: REVIEW_TEXT_MIN_LENGTH }) })
+      .trim()
+      .min(REVIEW_TEXT_MIN_LENGTH, msg("reviewTextTooShort", { min: REVIEW_TEXT_MIN_LENGTH }))
+      .max(REVIEW_TEXT_MAX_LENGTH, msg("reviewTextTooLong", { max: REVIEW_TEXT_MAX_LENGTH })),
+    showName: z.boolean().optional(),
+    name: z.unknown().optional(),
+    consent: z.unknown(),
+  })
+  .transform((input, ctx): FeedbackInput => {
+    const fail = (message: string) => {
+      ctx.addIssue({ code: "custom", message });
+      return z.NEVER;
+    };
+    let displayName: string | null = null;
+    if (input.showName === true) {
+      // Same rules as the account name ("Mein Konto").
+      const name = personNameSchema.safeParse(input.name);
+      if (!name.success) return fail(JSON.stringify(firstError(name.error)));
+      displayName = name.data;
+    }
+    if (input.consent !== true) return fail(msg("publishConsentRequired"));
+    return { rating: input.rating, text: input.text, displayName };
+  });
+
+// Feedback form: 1-5 stars, 20-200 characters, the name only with the
+// "Mein Vorname darf erscheinen" tick, and the publication consent.
+export function validateFeedback(value: unknown): FieldResult<FeedbackInput> {
+  return toFieldResult(feedbackSchema.safeParse(value));
 }

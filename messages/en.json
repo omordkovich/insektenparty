@@ -429,7 +429,15 @@
     "viaEmail": "by email to {email}",
     "viaPhone": "via {channel} to {phone}",
     "messageLine": "Message: {message}",
-    "replyHint": "Just reply to this email to send {name} the password."
+    "replyHint": "Just reply to this email to send {name} the password.",
+    "feedbackSubject": "How was “{title}”?",
+    "feedbackGreeting": "Thanks for planning “{title}” with GASTZILLA!",
+    "feedbackAsk": "How did collecting replies go? Tell us in a sentence or two what you thought. After a quick check, your review may appear on gastzilla.de.",
+    "feedbackButton": "Give feedback",
+    "feedbackLinkLine": "Give feedback: {link}",
+    "feedbackWhy": "You get this email once after your event. The link is valid for 30 days.",
+    "feedbackUnsubscribe": "No more feedback emails",
+    "feedbackUnsubscribeLine": "No more feedback emails: {link}"
   },
   "errors": {
     "invalidRequest": "Invalid request data.",
@@ -557,7 +565,15 @@
     "passwordNeedsLower": "The password must contain at least one lowercase letter.",
     "passwordNeedsUpper": "The password must contain at least one uppercase letter.",
     "passwordNeedsDigit": "The password must contain at least one digit.",
-    "passwordNeedsSymbol": "The password must contain at least one special character, e.g. ! ? # $ %."
+    "passwordNeedsSymbol": "The password must contain at least one special character, e.g. ! ? # $ %.",
+    "ratingRequired": "Please give 1 to 5 stars.",
+    "reviewTextTooShort": "Please write at least {min} characters.",
+    "reviewTextTooLong": "Please write no more than {max} characters.",
+    "publishConsentRequired": "Please confirm that we may publish your review.",
+    "feedbackLinkInvalid": "This link is invalid or has expired.",
+    "feedbackAlreadySent": "We have already received feedback for this event. Thank you!",
+    "feedbackEventGone": "This event no longer exists.",
+    "feedbackSendFailed": "Your feedback could not be sent. Please try again later."
   },
   "meta": {
     "eventNotFound": "Event not found",
@@ -589,7 +605,8 @@
     "confirm": "Confirm",
     "updateText": "Our terms have a new version ({date}). To keep creating events and buying extras, we need your consent. Your existing events and the extras you bought stay as they are.",
     "updateCheckbox": "I agree to the updated <terms>terms</terms>.",
-    "googleText": "Your account was created with Google. Before you get started, we need your consent:"
+    "googleText": "Your account was created with Google. Before you get started, we need your consent:",
+    "feedbackNotice": "After your event, we’ll email you once to ask for a short review. You can unsubscribe with one click."
   },
   "guestForm": {
     "abbrechen": "Cancel",
@@ -659,5 +676,56 @@
     "copied": "Copied!",
     "copyFailed": "Text selected – copy it now",
     "copiedAnnouncement": "Invitation text copied"
+  },
+  "feedback": {
+    "metaTitle": "Feedback on your event",
+    "title": "How was your event?",
+    "intro": "Thanks for planning “{title}” with GASTZILLA. Tell us briefly how it went.",
+    "ratingLabel": "Your rating",
+    "starLabel": "{n, plural, one {# out of 5 stars} other {# out of 5 stars}}",
+    "textLabel": "Your feedback",
+    "textHint": "{min} to {max} characters",
+    "charsLeft": "{count} characters left",
+    "showName": "My first name may appear with the review",
+    "nameLabel": "First name",
+    "consent": "I agree that GASTZILLA may publish my review on gastzilla.de. More in the <privacy>privacy policy</privacy>.",
+    "review": "We read every review before it appears.",
+    "submit": "Send feedback",
+    "sending": "Sending …",
+    "thanksTitle": "Thank you for your feedback!",
+    "thanksText": "We’ll take a look. With a bit of luck, it will soon appear on our start page.",
+    "invalidTitle": "Invalid link",
+    "invalidText": "This link is invalid or has expired. Feedback links are valid for 30 days.",
+    "doneTitle": "Already done",
+    "doneText": "We have already received your feedback for this event. Thank you!",
+    "goneTitle": "Event no longer available",
+    "goneText": "This event no longer exists, so we can’t accept feedback for it any more.",
+    "homeLink": "Go to the start page",
+    "unsubscribeMetaTitle": "Unsubscribe from feedback emails",
+    "unsubscribeTitle": "No more feedback emails?",
+    "unsubscribeText": "After an event, we ask you once by email for a short review. If you’d rather not, unsubscribe here.",
+    "unsubscribeButton": "No more feedback emails",
+    "unsubscribedTitle": "Unsubscribed",
+    "unsubscribedText": "You won’t get any more feedback emails from us. All other emails about your events stay as they are."
+  },
+  "reviews": {
+    "title": "What hosts say",
+    "examplesLabel": "(examples)",
+    "verification": "Reviews come from hosts after their event and are checked by us before they appear.",
+    "examplesNote": "Example reviews – real reviews coming soon.",
+    "fallbackName": "Host",
+    "prev": "Previous review",
+    "next": "Next review",
+    "starsLabel": "{n} out of 5 stars",
+    "quote": "“{text}”",
+    "showAll": "See all reviews"
+  },
+  "reviewsPage": {
+    "metaTitle": "Reviews and experiences from hosts – GASTZILLA",
+    "description": "What hosts say about GASTZILLA after their event: reviews of online invitations, RSVPs and guest lists – each one checked before it appears.",
+    "title": "Reviews from hosts",
+    "intro": "After an event with a fixed date and at least one acceptance, we email the host to ask for a short review. Here are all the reviews we have approved – newest first, each in the language it was written in.",
+    "examplesNote": "There are no approved reviews yet. The cards below are examples and do not come from real hosts.",
+    "count": "{count, plural, one {# review} other {# reviews}}"
   }
 }

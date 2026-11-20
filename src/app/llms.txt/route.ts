@@ -1,4 +1,5 @@
 import { COMPARISON } from "@/lib/comparison";
+import { REVIEWS_PAGE_PATH } from "@/lib/reviews-page";
 import { FAQ } from "@/lib/faq";
 import { LEGAL_DOCUMENTS } from "@/lib/legal-documents";
 import { LEGAL_INFO } from "@/lib/legal-info";
@@ -100,6 +101,7 @@ ${FAQ.map((item) => `### ${item.question}\n\n${item.answer}`).join("\n\n")}
 - [Startseite](${SITE_URL}/): Überblick und kostenlose Registrierung
 - [${COMPARISON.name}](${SITE_URL}${COMPARISON.path}): ${COMPARISON.teaser}
 - [Über uns](${SITE_URL}/about): Wer hinter ${SITE_NAME} steht und was uns wichtig ist
+- [Bewertungen](${SITE_URL}${REVIEWS_PAGE_PATH}): Bewertungen von Gastgebern nach ihrem Event, jede vor der Veröffentlichung gesichtet und in ihrer Originalsprache
 ${Object.values(LEGAL_DOCUMENTS)
   .map((doc) => `- [${doc.title.de}](${SITE_URL}${doc.href}): ${doc.description.de}`)
   .join("\n")}

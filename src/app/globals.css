@@ -2206,6 +2206,68 @@ html[data-cookie-banner] .cookie-banner {
   animation: fade-up 0.7s ease-out both;
 }
 
+/* Start page review banner (ReviewsBanner): the card list twice in a row,
+   moved left by half its width - endless, right to left. Stops while hovered
+   or focused; without motion it becomes a swipeable row of the first copy. */
+/* Start page review strip (ReviewsCarousel). Scrolls natively (swipe,
+   trackpad); the vertical padding (set on the element) leaves room for the
+   card shadows. Both sides fade out; with the mouse over it the fade widens
+   so the neighbours of the centred card are half faded, and the arrow
+   buttons appear (also for keyboard focus) - only when the cards do not all
+   fit (data-overflow, set by the component). */
+@property --reviews-fade {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 8%;
+}
+
+.reviews-strip {
+  --reviews-fade: 8%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--reviews-fade),
+    #000 calc(100% - var(--reviews-fade)),
+    transparent
+  );
+  transition: --reviews-fade 0.4s ease;
+}
+
+.reviews-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.reviews-arrow {
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.25s ease,
+    background-color 0.15s ease;
+}
+
+.reviews-carousel[data-overflow="true"]:has(:focus-visible) .reviews-strip {
+  --reviews-fade: 26%;
+}
+
+.reviews-carousel[data-overflow="true"]:has(:focus-visible) .reviews-arrow {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .reviews-carousel[data-overflow="true"]:hover .reviews-strip {
+    --reviews-fade: 26%;
+  }
+
+  .reviews-carousel[data-overflow="true"]:hover .reviews-arrow {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+
 /* Scrollbars follow the theme - thin, in its muted text color - instead of
    the browser's light default. Dark themes also tell the browser they are
    dark, so native controls (scrollbars, date and time pickers) match. */

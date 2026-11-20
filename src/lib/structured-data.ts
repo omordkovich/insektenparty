@@ -264,3 +264,24 @@ export function aboutStructuredData({ updated }: { updated: string }) {
     ],
   };
 }
+
+// Reviews page (/bewertungen): a plain WebPage about the organization.
+// Deliberately no Review / AggregateRating markup - reviews of one's own
+// service are not eligible for review stars and only invite doubts.
+export function reviewsPageStructuredData({ locale, name, url }: { locale: Locale; name: string; url: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name,
+        inLanguage: locale,
+        isPartOf: { "@id": WEBSITE_ID },
+        about: { "@id": ORGANIZATION_ID },
+      },
+      organization(),
+    ],
+  };
+}

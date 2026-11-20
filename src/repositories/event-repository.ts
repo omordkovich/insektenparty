@@ -1,8 +1,8 @@
-import { and, desc, eq, max, min } from "drizzle-orm";
+import { and, count, desc, eq, max, min } from "drizzle-orm";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { eventLocale } from "@/i18n/request-locale";
 import { getDb } from "@/db";
-import { datePollOptions, events, userEntitlements } from "@/db/schema";
+import { datePollOptions, events, guests, userEntitlements } from "@/db/schema";
 import { isDateMode, todayInBerlin } from "@/lib/date-poll";
 import type { LifecycleInput } from "@/lib/event-lifecycle";
 import { isEventPlan, type EventPlan } from "@/lib/event-plan";
@@ -190,6 +190,9 @@ export async function getEventsByOwner(ownerId: string): Promise<EventListRow[]>
 
 export type LifecycleJobRow = LifecycleInput & {
   pollStartedOn: string | null;
+  acceptedGuests: number;
+  feedbackRequestSentAt: Date | null;
+  feedbackSubmittedAt: Date | null;
   id: string;
   ownerId: string | null;
   title: string;
@@ -211,6 +214,12 @@ export async function getAllLifecycleRows(): Promise<LifecycleJobRow[]> {
     .from(datePollOptions)
     .groupBy(datePollOptions.eventId)
     .as("latest_poll");
+  const accepted = getDb()
+    .select({ eventId: guests.eventId, total: count().as("accepted_guests") })
+    .from(guests)
+    .where(eq(guests.declined, false))
+    .groupBy(guests.eventId)
+    .as("accepted");
   const rows = await getDb()
     .select({
       id: events.id,
@@ -225,11 +234,16 @@ export async function getAllLifecycleRows(): Promise<LifecycleJobRow[]> {
       pollStartedAt: latestPoll.startedAt,
       deletionNoticeSentAt: events.deletionNoticeSentAt,
       dateReminderSentAt: events.dateReminderSentAt,
+      acceptedGuests: accepted.total,
+      feedbackRequestSentAt: events.feedbackRequestSentAt,
+      feedbackSubmittedAt: events.feedbackSubmittedAt,
     })
     .from(events)
-    .leftJoin(latestPoll, eq(latestPoll.eventId, events.id));
-  return rows.map(({ createdAt, pollStartedAt, ...row }) => ({
+    .leftJoin(latestPoll, eq(latestPoll.eventId, events.id))
+    .leftJoin(accepted, eq(accepted.eventId, events.id));
+  return rows.map(({ createdAt, pollStartedAt, acceptedGuests, ...row }) => ({
     ...row,
+    acceptedGuests: Number(acceptedGuests ?? 0),
     dateMode: isDateMode(row.dateMode) ? row.dateMode : "unknown",
     createdOn: todayInBerlin(createdAt),
     // The poll's clock starts with its earliest proposal; "Abstimmung neu
@@ -245,6 +259,10 @@ export async function markMailSent(id: string, kind: LifecycleMail): Promise<voi
     .update(events)
     .set(kind === "deletion_notice" ? { deletionNoticeSentAt: now } : { dateReminderSentAt: now })
     .where(eq(events.id, id));
+}
+
+export async function markFeedbackRequestSent(id: string): Promise<void> {
+  await getDb().update(events).set({ feedbackRequestSentAt: new Date() }).where(eq(events.id, id));
 }
 
 // For the lifecycle job (no owner check); guests, poll options and votes

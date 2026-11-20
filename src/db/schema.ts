@@ -3,6 +3,7 @@ import {
   date,
   integer,
   pgTable,
+  smallint,
   text,
   timestamp,
   uuid,
@@ -56,6 +57,10 @@ export const events = pgTable("events", {
   dateReminderSentAt: timestamp("date_reminder_sent_at", {
     withTimezone: true,
   }),
+  // Feedback mail to the owner sent / feedback for this event submitted
+  // (blocks a second submission), see services/feedback-service.ts.
+  feedbackRequestSentAt: timestamp("feedback_request_sent_at", { withTimezone: true }),
+  feedbackSubmittedAt: timestamp("feedback_submitted_at", { withTimezone: true }),
   // "Ohne GASTZILLA-Hinweis" (0,99 € per event): hides the GASTZILLA badge.
   badgeHidden: boolean("badge_hidden").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -152,3 +157,20 @@ export const userEntitlements = pgTable("user_entitlements", {
 });
 
 export type UserEntitlementRecord = typeof userEntitlements.$inferSelect;
+
+// Host reviews for the start page banner. Deliberately no event_id/user_id:
+// a review is never tied to an event or account (and outlives the event).
+// Checks (rating 1-5, language, status) live in the migration.
+export const reviews = pgTable("reviews", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  rating: smallint("rating").notNull(),
+  text: varchar("text", { length: 200 }).notNull(),
+  displayName: varchar("display_name", { length: 100 }),
+  language: text("language").notNull(),
+  // "pending" | "approved"
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+});
+
+export type ReviewRecord = typeof reviews.$inferSelect;

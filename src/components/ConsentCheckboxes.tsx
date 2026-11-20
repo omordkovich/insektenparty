@@ -66,6 +66,10 @@ export function ConsentCheckboxes({
         />
         <span>{t("ageCheckbox", { age: MIN_REGISTRATION_AGE })}</span>
       </label>
+
+      {/* § 7 Abs. 3 UWG: say when the address is collected that we ask for
+          feedback by e-mail, and that it can be turned off. */}
+      <p className="text-left text-xs text-muted">{t("feedbackNotice")}</p>
     </>
   );
 }

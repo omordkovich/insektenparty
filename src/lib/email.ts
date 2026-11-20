@@ -21,6 +21,8 @@ export async function sendEmail(options: {
   to: string;
   subject: string;
   text: string;
+  // Optional HTML version; `text` stays the fallback for plain-text clients.
+  html?: string;
   replyTo?: string;
 }): Promise<void> {
   const client = getTransporter();
@@ -36,6 +38,7 @@ export async function sendEmail(options: {
     to: options.to,
     subject: options.subject,
     text: options.text,
+    html: options.html,
     replyTo: options.replyTo,
   });
 }

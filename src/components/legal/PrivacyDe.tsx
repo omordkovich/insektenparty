@@ -128,7 +128,7 @@ export function PrivacyDe() {
         <SubHeading>Nur mit Einwilligung</SubHeading>
         <List>
           <li>
-            <strong>Google reCAPTCHA</strong> – siehe Abschnitt 10.
+            <strong>Google reCAPTCHA</strong> – siehe Abschnitt 11.
           </li>
         </List>
         <p>
@@ -149,7 +149,7 @@ export function PrivacyDe() {
           dir außerdem Hinweise zu deinen Events: eine Erinnerung, wenn ein
           Event noch keinen Termin hat oder deine Terminabstimmung bald endet,
           und etwa sieben Tage vor der automatischen Löschung eines Events eine
-          Erinnerung daran (siehe Abschnitt 15). Außerdem speichern wir in
+          Erinnerung daran (siehe Abschnitt 16). Außerdem speichern wir in
           deinem Konto die Sprache, die du für die Seite gewählt hast (nur das
           Sprachkürzel), damit sie auf all deinen Geräten gilt und wir dir
           E-Mails in dieser Sprache schicken.
@@ -219,7 +219,7 @@ export function PrivacyDe() {
         </p>
         <p>
           Events werden nach einer festen Frist automatisch gelöscht (siehe
-          Abschnitt 15).
+          Abschnitt 16).
         </p>
         <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.</p>
       </Section>
@@ -257,7 +257,7 @@ export function PrivacyDe() {
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Teilnahme an der
           Gästeliste). Du kannst deinen Eintrag selbst ändern oder löschen,
           bis das Event vorbei ist (ab dem Tag nach dem Stichtag, siehe
-          Abschnitt 15). Danach wende dich dafür an uns (Abschnitt 16); der
+          Abschnitt 16). Danach wende dich dafür an uns (Abschnitt 17); der
           Veranstalter kann dann nur noch das ganze Event löschen. Spätestens 90 Tage nach dem Stichtag wird dein
           Eintrag mit dem Event automatisch gelöscht.
         </p>
@@ -306,7 +306,43 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="10. Google reCAPTCHA">
+      <Section title="10. Feedback und Bewertungen">
+        <p>
+          Am Tag nach einem Event mit festem Termin und mindestens einer Zusage
+          bitten wir den Veranstalter einmal per E-Mail um eine kurze Bewertung
+          von GASTZILLA. Rechtsgrundlage ist unser berechtigtes Interesse,
+          unseren Dienst zu verbessern und mit echten Stimmen vorzustellen
+          (Art. 6 Abs. 1 lit. f DSGVO; § 7 Abs. 3 UWG). Du kannst dem jederzeit
+          widersprechen – über den Link „Keine Feedback-Mails mehr“ in jeder
+          dieser E-Mails oder per E-Mail an <EmailLink />. Dafür entstehen dir
+          keine anderen als die Übermittlungskosten nach den Basistarifen.
+        </p>
+        <p>Wenn du das Feedback-Formular abschickst, speichern wir:</p>
+        <List>
+          <li>deine Sterne-Bewertung (1 bis 5) und deinen Text,</li>
+          <li>deinen Vornamen – nur, wenn du ihn ausdrücklich angibst,</li>
+          <li>die Sprache des Formulars und die Zeitpunkte von Eingang und Freigabe.</li>
+        </List>
+        <p>
+          Die Bewertung wird weder mit deinem Konto noch mit deinem Event
+          verknüpft. Beim Event vermerken wir nur, dass schon ein Feedback
+          abgeschickt wurde; dieser Vermerk wird mit dem Event gelöscht.
+        </p>
+        <p>
+          Jede Bewertung lesen wir, bevor sie erscheint. Freigegebene
+          Bewertungen zeigen wir auf gastzilla.de – auf der Startseite und auf
+          der Seite „Bewertungen“, in allen Sprachversionen der Website und
+          immer in der Sprache, in der du sie geschrieben hast –, mit deinem
+          Vornamen oder ohne Namen. Rechtsgrundlage für die Veröffentlichung ist
+          deine Einwilligung im Formular (Art. 6 Abs. 1 lit. a DSGVO). Du kannst
+          sie jederzeit per E-Mail an <EmailLink /> widerrufen; nenn uns dazu den
+          Text deiner Bewertung, da wir sie keinem Konto zuordnen können. Dann
+          löschen wir sie. Bewertungen, die wir nicht veröffentlichen, löschen
+          wir nach der Prüfung, spätestens 30 Tage nach Eingang.
+        </p>
+      </Section>
+
+      <Section title="11. Google reCAPTCHA">
         <p>
           Zum Schutz unserer Formulare (Registrierung, Login, Gästeliste) vor
           Spam und Missbrauch nutzen wir – nur nach deiner Einwilligung – Google
@@ -334,7 +370,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="11. Bilder über Cloudinary">
+      <Section title="12. Bilder über Cloudinary">
         <p>
           Einige Grafiken (z. B. Logos) laden wir vom Bilddienst Cloudinary
           (Cloudinary Ltd., 3400 Central Expressway, Suite 110, Santa Clara, CA
@@ -351,7 +387,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="12. Schriftarten">
+      <Section title="13. Schriftarten">
         <p>
           Die verwendeten Schriftarten (Nunito, Fredoka) sind lokal auf unserem
           Server eingebunden. Beim Aufruf der Seite wird keine Verbindung zu
@@ -359,7 +395,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="13. Unser Auftritt auf Instagram">
+      <Section title="14. Unser Auftritt auf Instagram">
         <p>
           Wir betreiben ein Profil auf Instagram ({INSTAGRAM_HANDLE}). Anbieter
           ist die Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04
@@ -402,7 +438,7 @@ export function PrivacyDe() {
           Rechtsgrundlage ist unser berechtigtes Interesse, GASTZILLA bekannt
           zu machen und mit Interessierten zu kommunizieren (Art. 6 Abs. 1 lit.
           f DSGVO); geht es in deiner Nachricht um die Nutzung von GASTZILLA,
-          auch Art. 6 Abs. 1 lit. b DSGVO. Deine Rechte (Abschnitt 16) kannst
+          auch Art. 6 Abs. 1 lit. b DSGVO. Deine Rechte (Abschnitt 17) kannst
           du sowohl bei uns als auch bei Meta geltend machen; Anfragen, die nur
           Meta erfüllen kann, leiten wir an Meta weiter.
         </p>
@@ -415,7 +451,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="14. Zahlungen über Stripe">
+      <Section title="15. Zahlungen über Stripe">
         <p>
           Für kostenpflichtige Erweiterungen wickeln wir Zahlungen über Stripe
           ab. Anbieter ist die Stripe Payments Europe, Ltd., 1 Grand Canal
@@ -443,7 +479,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="15. Speicherdauer">
+      <Section title="16. Speicherdauer">
         <List>
           <li>
             <strong>Benutzerkonto:</strong> bis zur Löschung deines Kontos.
@@ -467,7 +503,7 @@ export function PrivacyDe() {
           <li>
             <strong>Eigener Gasteintrag:</strong> bis du ihn selbst löschst
             (möglich, bis das Event vorbei ist; danach auf Anfrage bei uns,
-            siehe Abschnitt 16) oder das Event gelöscht wird,
+            siehe Abschnitt 17) oder das Event gelöscht wird,
             spätestens automatisch 90 Tage nach dem Stichtag.
           </li>
           <li>
@@ -479,6 +515,11 @@ export function PrivacyDe() {
             <strong>Server-Logfiles:</strong> nur kurzfristig, anschließend
             automatische Löschung.
           </li>
+          <li>
+            <strong>Bewertungen:</strong> veröffentlichte bis zum Widerruf
+            deiner Einwilligung; nicht veröffentlichte nach der Prüfung,
+            spätestens 30 Tage nach Eingang.
+          </li>
         </List>
         <p>
           Dein Konto kannst du jederzeit selbst unter „Mein Konto“ → „Konto
@@ -488,7 +529,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="16. Deine Rechte">
+      <Section title="17. Deine Rechte">
         <p>Du hast gegenüber uns folgende Rechte hinsichtlich deiner Daten:</p>
         <List>
           <li>Auskunft (Art. 15 DSGVO)</li>
@@ -520,7 +561,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="17. Pflicht zur Bereitstellung, automatisierte Entscheidungen">
+      <Section title="18. Pflicht zur Bereitstellung, automatisierte Entscheidungen">
         <p>
           Die Bereitstellung deiner Daten ist weder gesetzlich noch vertraglich
           vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben
@@ -530,7 +571,7 @@ export function PrivacyDe() {
         </p>
       </Section>
 
-      <Section title="18. Änderungen">
+      <Section title="19. Änderungen">
         <p>
           Wir passen diese Datenschutzerklärung an, wenn sich unsere Leistungen
           oder die Rechtslage ändern. Es gilt die jeweils hier veröffentlichte

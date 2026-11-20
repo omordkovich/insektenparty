@@ -1,12 +1,22 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import type { MetadataRoute } from "next";
 import sitemap from "@/app/sitemap";
 import { COMPARISON } from "@/lib/comparison";
 import { PRIVACY_VERSION, WITHDRAWAL_VERSION } from "@/lib/legal-info";
 import { latestOccasionUpdate, occasionsFor } from "@/lib/occasions";
 
+const getLatestApproval = vi.fn<() => Promise<Date | null>>();
+vi.mock("@/repositories/review-repository", () => ({ getLatestApproval: () => getLatestApproval() }));
+
 describe("sitemap", () => {
-  const entries = sitemap();
-  const byUrl = new Map(entries.map((entry) => [entry.url, entry]));
+  let entries: MetadataRoute.Sitemap = [];
+  let byUrl = new Map<string, MetadataRoute.Sitemap[number]>();
+
+  beforeAll(async () => {
+    getLatestApproval.mockResolvedValue(null);
+    entries = await sitemap();
+    byUrl = new Map(entries.map((entry) => [entry.url, entry]));
+  });
 
   it("lists the occasion overview with the newest occasion date", () => {
     expect(byUrl.get("https://gastzilla.de/einladung")?.lastModified).toBe(latestOccasionUpdate("de"));
@@ -73,5 +83,34 @@ describe("sitemap", () => {
 
   it("never lists event pages", () => {
     expect(entries.some((entry) => entry.url.includes("/event/"))).toBe(false);
+  });
+});
+
+describe("sitemap: reviews page", () => {
+  beforeEach(() => {
+    getLatestApproval.mockReset();
+    vi.restoreAllMocks();
+  });
+
+  it("leaves the reviews page out while there is no approved review", async () => {
+    getLatestApproval.mockResolvedValue(null);
+    expect((await sitemap()).some((entry) => entry.url.includes("/bewertungen"))).toBe(false);
+  });
+
+  it("lists it in every language once a review is approved, dated by the newest", async () => {
+    getLatestApproval.mockResolvedValue(new Date("2026-11-21T08:00:00Z"));
+    const byUrl = new Map((await sitemap()).map((entry) => [entry.url, entry]));
+    for (const url of ["https://gastzilla.de/bewertungen", "https://gastzilla.de/en/bewertungen", "https://gastzilla.de/ru/bewertungen"]) {
+      expect(byUrl.get(url)?.lastModified).toBe("2026-11-21");
+      expect(byUrl.get(url)?.alternates?.languages).toMatchObject({ "x-default": "https://gastzilla.de/bewertungen" });
+    }
+  });
+
+  it("still builds when the database is unreachable", async () => {
+    getLatestApproval.mockImplementation(async () => {
+      throw new Error("down");
+    });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect((await sitemap()).length).toBeGreaterThan(0);
   });
 });

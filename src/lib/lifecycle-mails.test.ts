@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLifecycleMessage, dueMail, type LifecycleMailRow } from "@/lib/lifecycle-mails";
+import { buildLifecycleMessage, dueMail, feedbackRequestDue, type LifecycleMailRow } from "@/lib/lifecycle-mails";
 
 const base: LifecycleMailRow = {
   dateMode: "fixed",
@@ -10,6 +10,9 @@ const base: LifecycleMailRow = {
   pollStartedOn: null,
   deletionNoticeSentAt: null,
   dateReminderSentAt: null,
+  acceptedGuests: 1,
+  feedbackRequestSentAt: null,
+  feedbackSubmittedAt: null,
 };
 const sent = new Date("2026-01-02T05:00:00Z");
 
@@ -151,5 +154,40 @@ describe("buildLifecycleMessage in English", () => {
     expect(buildLifecycleMessage("poll_reminder", event, "2026-03-10", "en").text).toContain(
       "Your poll ends on 10/03/2026.",
     );
+  });
+});
+
+describe("feedbackRequestDue", () => {
+  const ended: LifecycleMailRow = { ...base, eventDate: "2026-11-10" };
+
+  it("is due the day after the event", () => {
+    expect(feedbackRequestDue(ended, "2026-11-11")).toBe(true);
+  });
+  it("is not due on the event day", () => {
+    expect(feedbackRequestDue(ended, "2026-11-10")).toBe(false);
+  });
+  it("is still due on day 29 (a missed run is caught up)", () => {
+    expect(feedbackRequestDue(ended, "2026-12-09")).toBe(true);
+  });
+  it("is no longer due once the link has expired (day 30)", () => {
+    expect(feedbackRequestDue(ended, "2026-12-10")).toBe(false);
+  });
+  it("needs a fixed date", () => {
+    expect(feedbackRequestDue({ ...ended, dateMode: "poll", latestPollDate: "2026-11-10" }, "2026-11-11")).toBe(false);
+    expect(feedbackRequestDue({ ...ended, eventDate: null, createdOn: "2026-05-10" }, "2026-11-11")).toBe(false);
+  });
+  it("needs at least one accepted guest", () => {
+    expect(feedbackRequestDue({ ...ended, acceptedGuests: 0 }, "2026-11-11")).toBe(false);
+  });
+  it("is sent only once", () => {
+    expect(feedbackRequestDue({ ...ended, feedbackRequestSentAt: sent }, "2026-11-11")).toBe(false);
+  });
+  it("is not sent when feedback is already in", () => {
+    expect(feedbackRequestDue({ ...ended, feedbackSubmittedAt: sent }, "2026-11-11")).toBe(false);
+  });
+  it("waits for the last day of a multi-day event", () => {
+    const multi = { ...ended, eventEndDate: "2026-11-12" };
+    expect(feedbackRequestDue(multi, "2026-11-12")).toBe(false);
+    expect(feedbackRequestDue(multi, "2026-11-13")).toBe(true);
   });
 });

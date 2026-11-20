@@ -429,7 +429,15 @@
     "viaEmail": "per E-Mail an {email}",
     "viaPhone": "per {channel} an {phone}",
     "messageLine": "Nachricht: {message}",
-    "replyHint": "Antworte einfach auf diese E-Mail, um {name} das Passwort zu schicken."
+    "replyHint": "Antworte einfach auf diese E-Mail, um {name} das Passwort zu schicken.",
+    "feedbackSubject": "Wie war „{title}“?",
+    "feedbackGreeting": "Danke, dass du „{title}“ mit GASTZILLA geplant hast!",
+    "feedbackAsk": "Wie lief es mit den Zusagen? Sag uns in ein, zwei Sätzen, wie es dir gefallen hat. Nach einer kurzen Prüfung erscheint deine Bewertung vielleicht auf gastzilla.de.",
+    "feedbackButton": "Feedback geben",
+    "feedbackLinkLine": "Feedback geben: {link}",
+    "feedbackWhy": "Du bekommst diese E-Mail einmal nach deinem Event. Der Link gilt 30 Tage.",
+    "feedbackUnsubscribe": "Keine Feedback-Mails mehr",
+    "feedbackUnsubscribeLine": "Keine Feedback-Mails mehr: {link}"
   },
   "errors": {
     "invalidRequest": "Ungültige Anfragedaten.",
@@ -557,7 +565,15 @@
     "passwordNeedsLower": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
     "passwordNeedsUpper": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
     "passwordNeedsDigit": "Das Passwort muss mindestens eine Ziffer enthalten.",
-    "passwordNeedsSymbol": "Das Passwort muss mindestens ein Sonderzeichen enthalten, z. B. ! ? # $ %."
+    "passwordNeedsSymbol": "Das Passwort muss mindestens ein Sonderzeichen enthalten, z. B. ! ? # $ %.",
+    "ratingRequired": "Bitte vergib 1 bis 5 Sterne.",
+    "reviewTextTooShort": "Bitte schreib mindestens {min} Zeichen.",
+    "reviewTextTooLong": "Bitte schreib höchstens {max} Zeichen.",
+    "publishConsentRequired": "Bitte bestätige, dass wir deine Bewertung veröffentlichen dürfen.",
+    "feedbackLinkInvalid": "Dieser Link ist ungültig oder abgelaufen.",
+    "feedbackAlreadySent": "Für dieses Event ist schon ein Feedback angekommen. Danke!",
+    "feedbackEventGone": "Dieses Event gibt es nicht mehr.",
+    "feedbackSendFailed": "Dein Feedback konnte nicht gesendet werden. Bitte versuch es später noch einmal."
   },
   "meta": {
     "eventNotFound": "Event nicht gefunden",
@@ -589,7 +605,8 @@
     "confirm": "Bestätigen",
     "updateText": "Unsere AGB haben einen neuen Stand ({date}). Damit du weiter Events anlegen und Erweiterungen kaufen kannst, brauchen wir deine Zustimmung. Deine bestehenden Events und bereits gekaufte Erweiterungen bleiben, wie sie sind.",
     "updateCheckbox": "Ich stimme den geänderten <terms>AGB</terms> zu.",
-    "googleText": "Dein Konto wurde über Google angelegt. Bevor du loslegen kannst, brauchen wir noch deine Zustimmung:"
+    "googleText": "Dein Konto wurde über Google angelegt. Bevor du loslegen kannst, brauchen wir noch deine Zustimmung:",
+    "feedbackNotice": "Nach deinem Event bitten wir dich einmal per E-Mail um eine kurze Bewertung. Das kannst du mit einem Klick abbestellen."
   },
   "guestForm": {
     "abbrechen": "Abbrechen",
@@ -659,5 +676,56 @@
     "copied": "Kopiert!",
     "copyFailed": "Text ist markiert – jetzt kopieren",
     "copiedAnnouncement": "Einladungstext kopiert"
+  },
+  "feedback": {
+    "metaTitle": "Feedback zu deinem Event",
+    "title": "Wie war dein Event?",
+    "intro": "Danke, dass du „{title}“ mit GASTZILLA geplant hast. Erzähl uns kurz, wie es lief.",
+    "ratingLabel": "Deine Bewertung",
+    "starLabel": "{n, plural, one {# von 5 Sternen} other {# von 5 Sternen}}",
+    "textLabel": "Dein Feedback",
+    "textHint": "{min} bis {max} Zeichen",
+    "charsLeft": "noch {count} Zeichen",
+    "showName": "Mein Vorname darf mit der Bewertung erscheinen",
+    "nameLabel": "Vorname",
+    "consent": "Ich bin einverstanden, dass GASTZILLA meine Bewertung auf gastzilla.de veröffentlicht. Mehr dazu in der <privacy>Datenschutzerklärung</privacy>.",
+    "review": "Wir lesen jede Bewertung, bevor sie erscheint.",
+    "submit": "Feedback senden",
+    "sending": "Wird gesendet …",
+    "thanksTitle": "Danke für dein Feedback!",
+    "thanksText": "Wir schauen es uns an. Mit etwas Glück steht es bald auf unserer Startseite.",
+    "invalidTitle": "Link ungültig",
+    "invalidText": "Dieser Link ist ungültig oder abgelaufen. Feedback-Links gelten 30 Tage.",
+    "doneTitle": "Schon erledigt",
+    "doneText": "Für dieses Event ist dein Feedback schon angekommen. Danke!",
+    "goneTitle": "Event nicht mehr da",
+    "goneText": "Dieses Event gibt es nicht mehr, daher können wir kein Feedback mehr annehmen.",
+    "homeLink": "Zur Startseite",
+    "unsubscribeMetaTitle": "Feedback-Mails abbestellen",
+    "unsubscribeTitle": "Keine Feedback-Mails mehr?",
+    "unsubscribeText": "Nach einem Event bitten wir dich einmal per E-Mail um eine kurze Bewertung. Wenn du das nicht möchtest, bestell es hier ab.",
+    "unsubscribeButton": "Keine Feedback-Mails mehr",
+    "unsubscribedTitle": "Abbestellt",
+    "unsubscribedText": "Du bekommst von uns keine Feedback-Mails mehr. Alle anderen E-Mails zu deinen Events bleiben unverändert."
+  },
+  "reviews": {
+    "title": "Was Gastgeber sagen",
+    "examplesLabel": "(Beispiele)",
+    "verification": "Bewertungen stammen von Gastgebern nach ihrem Event und werden vor der Veröffentlichung von uns gesichtet.",
+    "examplesNote": "Beispiel-Bewertungen – echte Bewertungen folgen bald.",
+    "fallbackName": "Gastgeber:in",
+    "prev": "Vorherige Bewertung",
+    "next": "Nächste Bewertung",
+    "starsLabel": "{n} von 5 Sternen",
+    "quote": "„{text}“",
+    "showAll": "Alle Bewertungen ansehen"
+  },
+  "reviewsPage": {
+    "metaTitle": "Bewertungen & Erfahrungen von Gastgebern – GASTZILLA",
+    "description": "Was Gastgeber nach ihrem Event über GASTZILLA sagen: Bewertungen zu Online-Einladung, Zusagen und Gästeliste – jede vor der Veröffentlichung gesichtet.",
+    "title": "Bewertungen von Gastgebern",
+    "intro": "Nach einem Event mit festem Termin und mindestens einer Zusage bitten wir den Gastgeber per E-Mail um eine kurze Bewertung. Hier stehen alle, die wir freigegeben haben – die neuesten zuerst, jede in der Sprache, in der sie geschrieben wurde.",
+    "examplesNote": "Es gibt noch keine freigegebenen Bewertungen. Die Karten unten sind Beispiele und stammen nicht von echten Gastgebern.",
+    "count": "{count, plural, one {# Bewertung} other {# Bewertungen}}"
   }
 }

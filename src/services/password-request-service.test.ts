@@ -106,7 +106,7 @@ describe("requestEventPassword", () => {
       title: "Sommerfest",
       slug: "fest-abc123",
     });
-    vi.mocked(getUserContact).mockResolvedValue({ name: "Anna", email: "anna@example.de", locale: "de" });
+    vi.mocked(getUserContact).mockResolvedValue({ name: "Anna", email: "anna@example.de", locale: "de", feedbackMails: true });
   });
 
   it("mails the owner", async () => {

@@ -9,6 +9,7 @@ import { cardClass } from "./card";
 import { FaqSection } from "./FaqSection";
 import { HowItWorks } from "./HowItWorks";
 import { JsonLd } from "./JsonLd";
+import { ReviewsBanner } from "./ReviewsBanner";
 import { ClockIcon, GuestIcon, ShareIcon } from "./LandingIcons";
 
 const BENEFITS: { key: "Ready" | "NoAccount" | "Share"; icon: ReactNode }[] = [
@@ -74,6 +75,8 @@ export async function LandingContent({ hero }: { hero?: ReactNode }) {
           </Link>
         </p>
       </FaqSection>
+
+      <ReviewsBanner />
     </div>
   );
 }

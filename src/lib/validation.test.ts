@@ -9,6 +9,7 @@ import {
   validateEventTime,
   validateGuestInput,
   validateNewEventTitle,
+  validateFeedback,
   validatePersonName,
   validateRequestBody,
   validateTheme,
@@ -698,5 +699,51 @@ describe("validateMaxGuests", () => {
     for (const value of [0, 301, 2.5, "", "zwölf", -3]) {
       expect(validateMaxGuests(value)).toEqual({ ok: false, error });
     }
+  });
+});
+
+describe("validateFeedback", () => {
+  const text = "Super einfach, alle haben zugesagt!";
+  const valid = { rating: 5, text: `  ${text}  `, showName: true, name: "Anna", consent: true };
+
+  it("accepts a valid review and trims the text", () => {
+    expect(validateFeedback(valid)).toEqual({ ok: true, value: { rating: 5, text, displayName: "Anna" } });
+  });
+
+  it.each([0, 6, 2.5, "5", undefined])("rejects rating %s", (rating) => {
+    expect(validateFeedback({ ...valid, rating })).toEqual({ ok: false, error: err("ratingRequired") });
+  });
+
+  it("needs at least 20 characters after trimming", () => {
+    expect(validateFeedback({ ...valid, text: `  ${"a".repeat(19)}  ` })).toEqual({
+      ok: false,
+      error: err("reviewTextTooShort", { min: 20 }),
+    });
+  });
+
+  it("allows 200 but not 201 characters", () => {
+    expect(validateFeedback({ ...valid, text: "a".repeat(200) }).ok).toBe(true);
+    expect(validateFeedback({ ...valid, text: "a".repeat(201) })).toEqual({
+      ok: false,
+      error: err("reviewTextTooLong", { max: 200 }),
+    });
+  });
+
+  it("stores no name without the name tick", () => {
+    expect(validateFeedback({ ...valid, showName: false, name: "X" })).toEqual({
+      ok: true,
+      value: { rating: 5, text, displayName: null },
+    });
+  });
+
+  it("checks the name like an account name", () => {
+    const account = validatePersonName("A");
+    expect(account.ok).toBe(false);
+    expect(validateFeedback({ ...valid, name: "A" })).toEqual(account);
+    expect(validateFeedback({ ...valid, name: "a".repeat(101) })).toEqual(validatePersonName("a".repeat(101)));
+  });
+
+  it("needs the publication consent", () => {
+    expect(validateFeedback({ ...valid, consent: false })).toEqual({ ok: false, error: err("publishConsentRequired") });
   });
 });

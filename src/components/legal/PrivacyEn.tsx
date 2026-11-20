@@ -125,7 +125,7 @@ export function PrivacyEn() {
         <SubHeading>Only with consent</SubHeading>
         <List>
           <li>
-            <strong>Google reCAPTCHA</strong> – see section 10.
+            <strong>Google reCAPTCHA</strong> – see section 11.
           </li>
         </List>
         <p>
@@ -145,7 +145,7 @@ export function PrivacyEn() {
           notices about your events to this address: a reminder if an event
           has no date yet or your date poll is ending soon, and a reminder
           about seven days before an event is deleted automatically (see
-          section 15). We also store the language you chose for the site in
+          section 16). We also store the language you chose for the site in
           your account (only the language code), so that it applies on all
           your devices and we send you emails in that language.
         </p>
@@ -207,7 +207,7 @@ export function PrivacyEn() {
           password. We store the password so that we can show it to you in
           your invitation text; we do not show it to guests.
         </p>
-        <p>Events are deleted automatically after a fixed period (see section 15).</p>
+        <p>Events are deleted automatically after a fixed period (see section 16).</p>
         <p>The legal basis is Art. 6(1)(b) GDPR.</p>
       </Section>
 
@@ -241,8 +241,8 @@ export function PrivacyEn() {
         <p>
           The legal basis is Art. 6(1)(b) GDPR (taking part in the guest list).
           You can change or delete your entry yourself until the event is over
-          (from the day after the key date, see section 15). After that, please
-          contact us (section 16); the host can then only delete the whole
+          (from the day after the key date, see section 16). After that, please
+          contact us (section 17); the host can then only delete the whole
           event. Your entry is deleted automatically together with the event
           no later than 90 days after the key date.
         </p>
@@ -289,7 +289,41 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="10. Google reCAPTCHA">
+      <Section title="10. Feedback and reviews">
+        <p>
+          The day after an event with a fixed date and at least one acceptance,
+          we email the host once to ask for a short review of GASTZILLA. The
+          legal basis is our legitimate interest in improving our service and
+          presenting it with real voices (Art. 6(1)(f) GDPR; § 7(3) UWG, German
+          Unfair Competition Act). You can object at any time – via the “No more
+          feedback emails” link in each of these emails or by email to{" "}
+          <EmailLink />. This costs you nothing beyond the transmission costs at
+          the basic rates.
+        </p>
+        <p>When you send the feedback form, we store:</p>
+        <List>
+          <li>your star rating (1 to 5) and your text,</li>
+          <li>your first name – only if you explicitly enter it,</li>
+          <li>the language of the form and the times it was received and approved.</li>
+        </List>
+        <p>
+          The review is linked neither to your account nor to your event. With
+          the event we only note that feedback has already been sent; this note
+          is deleted together with the event.
+        </p>
+        <p>
+          We read every review before it appears. Approved reviews are shown on
+          gastzilla.de – on the start page and on the “Reviews” page, in every
+          language version of the website and always in the language you wrote
+          them in – with your first name or without a name. The legal basis for publishing is your consent in the form (Art.
+          6(1)(a) GDPR). You can withdraw it at any time by email to{" "}
+          <EmailLink />; please quote the text of your review, as we cannot link
+          it to an account. We will then delete it. Reviews we do not publish
+          are deleted after our check, no later than 30 days after they arrive.
+        </p>
+      </Section>
+
+      <Section title="11. Google reCAPTCHA">
         <p>
           To protect our forms (registration, login, guest list) from spam and
           abuse, we use Google reCAPTCHA – only with your consent. The provider
@@ -315,7 +349,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="11. Images via Cloudinary">
+      <Section title="12. Images via Cloudinary">
         <p>
           We load some graphics (e.g. logos) from the image service Cloudinary
           (Cloudinary Ltd., 3400 Central Expressway, Suite 110, Santa Clara, CA
@@ -330,7 +364,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="12. Fonts">
+      <Section title="13. Fonts">
         <p>
           The fonts used (Nunito, Fredoka) are hosted locally on our server.
           Loading the page does not connect to servers of Google or other font
@@ -338,7 +372,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="13. Our presence on Instagram">
+      <Section title="14. Our presence on Instagram">
         <p>
           We run a profile on Instagram ({INSTAGRAM_HANDLE}). The provider is
           Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04 X2K5,
@@ -377,7 +411,7 @@ export function PrivacyEn() {
           The legal basis is our legitimate interest in making GASTZILLA known
           and communicating with interested people (Art. 6(1)(f) GDPR); if your
           message concerns the use of GASTZILLA, also Art. 6(1)(b) GDPR. You
-          can exercise your rights (section 16) both with us and with Meta; we
+          can exercise your rights (section 17) both with us and with Meta; we
           forward requests that only Meta can fulfil to Meta.
         </p>
         <p>
@@ -388,7 +422,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="14. Payments via Stripe">
+      <Section title="15. Payments via Stripe">
         <p>
           We process payments for paid extensions via Stripe. The provider is
           Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal
@@ -414,7 +448,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="15. Storage period">
+      <Section title="16. Storage period">
         <List>
           <li>
             <strong>User account:</strong> until your account is deleted.
@@ -438,7 +472,7 @@ export function PrivacyEn() {
           <li>
             <strong>Your own guest entry:</strong> until you delete it yourself
             (possible until the event is over; after that on request to us, see
-            section 16) or the event is deleted, no later than automatically 90
+            section 17) or the event is deleted, no later than automatically 90
             days after the key date.
           </li>
           <li>
@@ -449,6 +483,11 @@ export function PrivacyEn() {
             <strong>Server log files:</strong> only briefly, then deleted
             automatically.
           </li>
+          <li>
+            <strong>Reviews:</strong> published ones until you withdraw your
+            consent; unpublished ones after our check, no later than 30 days
+            after they arrive.
+          </li>
         </List>
         <p>
           You can permanently delete your account yourself at any time under
@@ -458,7 +497,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="16. Your rights">
+      <Section title="17. Your rights">
         <p>You have the following rights regarding your data:</p>
         <List>
           <li>access (Art. 15 GDPR)</li>
@@ -486,7 +525,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="17. Obligation to provide data, automated decisions">
+      <Section title="18. Obligation to provide data, automated decisions">
         <p>
           Providing your data is neither required by law nor by contract.
           Without the details marked as required, however, we cannot provide
@@ -495,7 +534,7 @@ export function PrivacyEn() {
         </p>
       </Section>
 
-      <Section title="18. Changes">
+      <Section title="19. Changes">
         <p>
           We adapt this privacy policy when our services or the legal situation
           change. The version published here applies.

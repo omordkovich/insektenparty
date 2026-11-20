@@ -2,7 +2,12 @@ import { sql } from "drizzle-orm";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
 import { getDb } from "@/db";
 
-type AuthUserRow = { name: string | null; email: string | null; locale?: string | null };
+type AuthUserRow = {
+  name: string | null;
+  email: string | null;
+  locale?: string | null;
+  feedback_mails?: string | null;
+};
 
 // The display name is the metadata's `name` (same as getAccountName in
 // lib/account.ts); blank counts as missing.
@@ -29,14 +34,33 @@ export async function deleteUser(userId: string): Promise<void> {
 
 // `locale`: the account language (user metadata, see lib/account.ts) - the
 // language of the mails we send the owner. German when not set.
-export type UserContact = { name: string | null; email: string | null; locale: Locale };
+// `feedbackMails`: false once the owner unsubscribed from feedback mails
+// (metadata feedback_mails = false); missing counts as true.
+export type UserContact = { name: string | null; email: string | null; locale: Locale; feedbackMails: boolean };
 
 export async function getUserContact(userId: string): Promise<UserContact | null> {
   const rows = (await getDb().execute(
-    sql`select ${nameColumn}, email, raw_user_meta_data ->> 'locale' as locale from auth.users where id = ${userId}`,
+    sql`select ${nameColumn}, email, raw_user_meta_data ->> 'locale' as locale,
+        raw_user_meta_data ->> 'feedback_mails' as feedback_mails
+        from auth.users where id = ${userId}`,
   )) as unknown as AuthUserRow[];
 
   const row = rows[0];
   if (!row) return null;
-  return { name: row.name, email: row.email, locale: isLocale(row.locale) ? row.locale : DEFAULT_LOCALE };
+  return {
+    name: row.name,
+    email: row.email,
+    locale: isLocale(row.locale) ? row.locale : DEFAULT_LOCALE,
+    feedbackMails: row.feedback_mails !== "false",
+  };
+}
+
+// "Keine Feedback-Mails mehr" (unsubscribe link). A missing account is fine -
+// there is nothing left to mail.
+export async function disableFeedbackMails(userId: string): Promise<void> {
+  await getDb().execute(
+    sql`update auth.users
+        set raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) || '{"feedback_mails": false}'::jsonb
+        where id = ${userId}`,
+  );
 }

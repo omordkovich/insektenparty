@@ -30,5 +30,5 @@ export const MIN_REGISTRATION_AGE = 16;
 // Änderung selbst immer in allen Sprachen gleichzeitig (src/components/legal,
 // geprüft von legal-parity.test.ts).
 export const TERMS_VERSION = "2026-11-02";
-export const PRIVACY_VERSION = "2026-11-14";
+export const PRIVACY_VERSION = "2026-11-19";
 export const WITHDRAWAL_VERSION = "2026-09-29";

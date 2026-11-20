@@ -28,7 +28,8 @@ const ALWAYS_REACHABLE = new Set([
 ]);
 // Whole sections, matched as "/event" or "/event/..." (not "/events").
 // "/p" is the old event prefix - kept so its redirect still works.
-const ALWAYS_REACHABLE_SECTIONS = ["/event", "/p", "/api", "/auth"];
+// "/feedback": feedback, unsubscribe and moderation pages (links in mails).
+const ALWAYS_REACHABLE_SECTIONS = ["/event", "/p", "/api", "/auth", "/feedback"];
 
 function isAlwaysReachable(rawPathname: string): boolean {
   // The other languages' versions (/en/impressum …) follow their German

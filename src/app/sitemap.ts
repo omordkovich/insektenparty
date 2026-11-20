@@ -7,6 +7,21 @@ import { COMPARISON } from "@/lib/comparison";
 import { ABOUT_UPDATED, SITE_URL } from "@/lib/site";
 import { latestOccasionUpdate, occasionAlternates, occasionPath, occasionsFor, occasionsPath } from "@/lib/occasions";
 import { OCCASION_SECTION } from "@/lib/occasion-slugs";
+import { REVIEWS_PAGE_PATH, reviewsSitemapEntries } from "@/lib/reviews-page";
+import { getLatestApproval } from "@/repositories/review-repository";
+
+// The reviews page joins the sitemap once a review is approved - checked
+// at most once an hour.
+export const revalidate = 3600;
+
+async function latestApproval(): Promise<Date | null> {
+  try {
+    return await getLatestApproval();
+  } catch (error) {
+    console.error("sitemap: loading reviews failed:", error);
+    return null;
+  }
+}
 
 // Date of the last real content change per page - search engines only
 // trust lastModified while it stays accurate, so bump these by hand when a
@@ -24,7 +39,8 @@ function absolute(paths: Record<string, string>): Record<string, string> {
 }
 
 // Only public, indexable pages - never event pages (/event/...).
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const reviews = reviewsSitemapEntries(await latestApproval());
   return [
     ...LOCALES.map((locale) => ({
       url: `${SITE_URL}${localizedPath("/", locale)}`,
@@ -35,6 +51,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { url: `${SITE_URL}/about`, lastModified: ABOUT_UPDATED, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}${COMPARISON.path}`, lastModified: COMPARISON.updated, changeFrequency: "monthly", priority: 0.8 },
+    ...reviews.map(({ locale, lastModified }) => ({
+      url: `${SITE_URL}${localizedPath(REVIEWS_PAGE_PATH, locale)}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+      alternates: { languages: absolute(languageAlternates(REVIEWS_PAGE_PATH)) },
+    })),
     // Legal texts exist in every language (the German one is binding).
     ...(Object.keys(LEGAL_DOCUMENTS) as LegalDocument[]).flatMap((doc) =>
       LOCALES.map((locale) => ({

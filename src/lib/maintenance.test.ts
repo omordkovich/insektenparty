@@ -25,6 +25,13 @@ describe("shouldShowMaintenance", () => {
     }
   });
 
+  it("keeps the feedback pages reachable (links from feedback and admin mails)", () => {
+    for (const pathname of ["/feedback", "/feedback/abmelden", "/feedback/moderieren", "/en/feedback", "/ru/feedback/abmelden"]) {
+      expect(shouldShowMaintenance({ ...on, pathname })).toBe(false);
+    }
+    expect(shouldShowMaintenance({ ...on, pathname: "/feedbacks" })).toBe(true);
+  });
+
   it("does not treat look-alike paths as event pages", () => {
     expect(shouldShowMaintenance({ ...on, pathname: "/party" })).toBe(true);
     expect(shouldShowMaintenance({ ...on, pathname: "/apix" })).toBe(true);

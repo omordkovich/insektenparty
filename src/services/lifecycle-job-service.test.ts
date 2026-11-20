@@ -10,6 +10,10 @@ vi.mock("@/repositories/event-repository", () => ({
   deleteEventById: vi.fn(async (id: string) => {
     rows = rows.filter((r) => r.id !== id);
   }),
+  markFeedbackRequestSent: vi.fn(async (id: string) => {
+    const row = rows.find((r) => r.id === id);
+    if (row) row.feedbackRequestSentAt = new Date();
+  }),
   markMailSent: vi.fn(async (id: string, kind: string) => {
     const row = rows.find((r) => r.id === id);
     if (!row) return;
@@ -17,13 +21,17 @@ vi.mock("@/repositories/event-repository", () => ({
     else row.dateReminderSentAt = new Date();
   }),
 }));
+vi.mock("@/repositories/review-repository", () => ({
+  deletePendingReviewsCreatedBefore: vi.fn(async () => 0),
+}));
 vi.mock("@/services/notification-service", () => ({
   sendLifecycleMail: vi.fn(async () => true),
+  sendFeedbackRequestMail: vi.fn(async () => true),
 }));
 
 const { runLifecycleJob } = await import("@/services/lifecycle-job-service");
 const repo = await import("@/repositories/event-repository");
-const { sendLifecycleMail } = await import("@/services/notification-service");
+const { sendFeedbackRequestMail, sendLifecycleMail } = await import("@/services/notification-service");
 
 function row(id: string, overrides: Partial<Row> = {}): Row {
   return {
@@ -39,6 +47,9 @@ function row(id: string, overrides: Partial<Row> = {}): Row {
     pollStartedOn: null,
     deletionNoticeSentAt: null,
     dateReminderSentAt: null,
+    acceptedGuests: 0,
+    feedbackRequestSentAt: null,
+    feedbackSubmittedAt: null,
     ...overrides,
   };
 }
@@ -50,6 +61,9 @@ describe("runLifecycleJob", () => {
     vi.mocked(repo.markMailSent).mockClear();
     vi.mocked(sendLifecycleMail).mockReset();
     vi.mocked(sendLifecycleMail).mockResolvedValue(true);
+    vi.mocked(sendFeedbackRequestMail).mockReset();
+    vi.mocked(sendFeedbackRequestMail).mockResolvedValue(true);
+    vi.mocked(repo.markFeedbackRequestSent).mockClear();
     vi.spyOn(console, "error").mockImplementation(() => {}).mockClear();
   });
 
@@ -142,5 +156,65 @@ describe("runLifecycleJob", () => {
     vi.mocked(repo.deleteEventById).mockRejectedValueOnce(new Error("db down"));
     expect(await runLifecycleJob("2026-04-11")).toEqual({ mailed: 0, deleted: 1 });
     expect(console.error).toHaveBeenCalled();
+  });
+});
+
+describe("runLifecycleJob - feedback mail", () => {
+  beforeEach(() => {
+    rows = [];
+    vi.mocked(sendLifecycleMail).mockReset();
+    vi.mocked(sendLifecycleMail).mockResolvedValue(true);
+    vi.mocked(sendFeedbackRequestMail).mockReset();
+    vi.mocked(sendFeedbackRequestMail).mockResolvedValue(true);
+    vi.mocked(repo.markFeedbackRequestSent).mockClear();
+    vi.spyOn(console, "error").mockImplementation(() => {}).mockClear();
+  });
+
+  it("sends it the day after the event and marks it, once", async () => {
+    rows = [row("a", { acceptedGuests: 2 })];
+    expect(await runLifecycleJob("2026-12-02")).toEqual({ mailed: 1, deleted: 0 });
+    expect(sendFeedbackRequestMail).toHaveBeenCalledWith(expect.objectContaining({ id: "a" }), "2026-12-02");
+    expect(repo.markFeedbackRequestSent).toHaveBeenCalledWith("a");
+    expect(await runLifecycleJob("2026-12-02")).toEqual({ mailed: 0, deleted: 0 });
+    expect(sendFeedbackRequestMail).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not mark it when nothing was sent", async () => {
+    vi.mocked(sendFeedbackRequestMail).mockResolvedValue(false);
+    rows = [row("a", { acceptedGuests: 2 })];
+    expect(await runLifecycleJob("2026-12-02")).toEqual({ mailed: 0, deleted: 0 });
+    expect(repo.markFeedbackRequestSent).not.toHaveBeenCalled();
+  });
+
+  it("keeps going after an error on one event", async () => {
+    vi.mocked(sendFeedbackRequestMail).mockRejectedValueOnce(new Error("smtp"));
+    rows = [row("a", { acceptedGuests: 1 }), row("b", { acceptedGuests: 1 })];
+    expect(await runLifecycleJob("2026-12-02")).toEqual({ mailed: 1, deleted: 0 });
+    expect(repo.markFeedbackRequestSent).toHaveBeenCalledWith("b");
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  it("skips events without accepted guests", async () => {
+    rows = [row("a", { acceptedGuests: 0 })];
+    await runLifecycleJob("2026-12-02");
+    expect(sendFeedbackRequestMail).not.toHaveBeenCalled();
+  });
+});
+
+describe("runLifecycleJob - unreviewed feedback", () => {
+  it("deletes reviews still pending 30 days after they came in", async () => {
+    rows = [];
+    const reviews = await import("@/repositories/review-repository");
+    vi.mocked(reviews.deletePendingReviewsCreatedBefore).mockClear();
+    await runLifecycleJob("2026-12-31");
+    expect(reviews.deletePendingReviewsCreatedBefore).toHaveBeenCalledWith("2026-12-01");
+  });
+
+  it("keeps running when the cleanup fails", async () => {
+    rows = [];
+    const reviews = await import("@/repositories/review-repository");
+    vi.mocked(reviews.deletePendingReviewsCreatedBefore).mockRejectedValueOnce(new Error("db"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(runLifecycleJob("2026-12-31")).resolves.toEqual({ mailed: 0, deleted: 0 });
   });
 });
