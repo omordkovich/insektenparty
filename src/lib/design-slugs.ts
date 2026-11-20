@@ -43,6 +43,7 @@ export const DESIGN_SLUGS: Partial<Record<ThemeKey, Record<Locale, string>>> = {
   brettspiele: { de: "brettspiele", en: "board-games", ru: "nastolnye-igry" },
   bowling: { de: "bowling", en: "bowling", ru: "bouling" },
   hawaii: { de: "hawaii", en: "hawaii", ru: "gavayi" },
+  gaming: { de: "gaming", en: "gaming", ru: "videoigry" },
   natur: { de: "natur", en: "nature", ru: "priroda" },
 };
 

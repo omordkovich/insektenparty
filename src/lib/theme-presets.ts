@@ -35,6 +35,7 @@ export type ThemeKey =
   | "brettspiele"
   | "bowling"
   | "hawaii"
+  | "gaming"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -87,6 +88,7 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   brettspiele: "Brettspiele",
   bowling: "Bowling",
   hawaii: "Hawaii",
+  gaming: "Gaming",
   natur: "Natur",
 };
 
@@ -168,6 +170,7 @@ const THEME_LABELS_RU: Record<ThemeKey, string> = {
   brettspiele: "Настольные игры",
   bowling: "Боулинг",
   hawaii: "Гавайи",
+  gaming: "Видеоигры",
   natur: "Природа",
 };
 
@@ -225,6 +228,7 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   brettspiele: "event-theme-brettspiele",
   bowling: "event-theme-bowling",
   hawaii: "event-theme-hawaii",
+  gaming: "event-theme-gaming",
   natur: "event-theme",
 };
 
@@ -476,6 +480,13 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425401/hawaii_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425402/hawaii_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1794425403/hawaii_accent_r.webp",
+  },
+  gaming: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181833/gaming_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181834/gaming_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181835/gaming_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181836/gaming_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181837/gaming_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

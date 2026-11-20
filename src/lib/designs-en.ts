@@ -402,6 +402,18 @@ export const DESIGNS_EN: DesignContent[] = [
     updated: UPDATED,
   },
   {
+    theme: "gaming",
+    metaTitle: "Gaming night invitation design – GASTZILLA",
+    metaDescription:
+      "A joystick, an arcade cabinet and controllers in neon light: the design for gaming nights, gamers’ birthdays and retro theme parties.",
+    title: "Gaming – a design for your gaming night invitation",
+    teaser: "A joystick, an arcade cabinet, controllers and a beanbag in neon light.",
+    description: [
+      "A joystick with a red ball, an arcade cabinet with neon stripes, two controllers and a gamer on a beanbag with crisps and cola put your invitation in the glow of a games room at night. The design suits a gaming night with friends, a gamer’s birthday, a kids’ party around the console and a retro theme party.",
+    ],
+    updated: UPDATED,
+  },
+  {
     theme: "natur",
     metaTitle: "Nature invitation design with mushrooms – GASTZILLA",
     metaDescription:

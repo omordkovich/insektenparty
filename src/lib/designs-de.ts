@@ -393,6 +393,18 @@ export const DESIGNS_DE: DesignContent[] = [
     updated: UPDATED,
   },
   {
+    theme: "gaming",
+    metaTitle: "Einladung zum Gaming-Abend im Gaming-Design – GASTZILLA",
+    metaDescription:
+      "Joystick, Arcade-Automat und Controller in Neonlicht: das Gaming-Design für Gaming-Abend, Zocker-Geburtstag und Mottoparty. Gäste sagen per Link zu.",
+    title: "Gaming – Design für deine Einladung zum Gaming-Abend",
+    teaser: "Joystick, Arcade-Automat, Controller und Sitzsack im Neonlicht.",
+    description: [
+      "Ein Joystick mit roter Kugel, ein Arcade-Automat mit Neonstreifen, zwei Controller und ein Zocker im Sitzsack mit Chips und Cola tauchen deine Einladung in das Licht eines Spielzimmers am Abend. Das Design passt zum Gaming-Abend mit Freunden, zum Geburtstag von Zockern, zum Kindergeburtstag mit Konsole und zur Mottoparty im Retro-Stil.",
+    ],
+    updated: UPDATED,
+  },
+  {
     theme: "natur",
     metaTitle: "Einladung im Natur-Design mit Pilzen und Farn – GASTZILLA",
     metaDescription:

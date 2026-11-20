@@ -73,6 +73,7 @@ export const DESIGN_OCCASIONS: Partial<Record<ThemeKey, string[]>> = {
   brettspiele: ["tabletop-night", "family-celebration"],
   bowling: ["sports-together", "going-out", "company-party", "kids-birthday"],
   hawaii: ["barbecue", "theme-party", "birthday"],
+  gaming: ["gaming-night", "birthday", "kids-birthday", "theme-party"],
   natur: ["barbecue", "family-celebration", "wedding", "birthday"],
 };
 
