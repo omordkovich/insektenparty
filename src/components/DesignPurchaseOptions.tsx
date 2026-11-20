@@ -15,6 +15,8 @@ const AuthDialog = dynamic(() => import("./AuthDialog").then((m) => m.AuthDialog
 
 type DesignPurchaseOptionsProps = {
   theme: ThemeKey;
+  /** A colour design: free in every event - nothing to buy for it. */
+  free: boolean;
   /** PAYMENTS_DUMMY, read on the server when the page was built. */
   dummyPayments: boolean;
 };
@@ -25,7 +27,7 @@ type TestState = { busy: boolean; done: "theme" | "event" | null; failed: boolea
 // always leads on - to the create dialog with the design preselected (the
 // purchase itself happens there), after a login if needed. With dummy
 // purchases on, signed-in visitors can also unlock right here.
-export function DesignPurchaseOptions({ theme, dummyPayments }: DesignPurchaseOptionsProps) {
+export function DesignPurchaseOptions({ theme, free, dummyPayments }: DesignPurchaseOptionsProps) {
   const t = useTranslations("designs");
   const tDialog = useTranslations("eventDialog");
   const locale = useLocale();
@@ -68,8 +70,8 @@ export function DesignPurchaseOptions({ theme, dummyPayments }: DesignPurchaseOp
   const options = [
     {
       kind: "theme" as const,
-      heading: t("onlyThisDesign", { price: formatPrice(PRODUCTS.theme.priceCents, locale) }),
-      body: <p className="mt-2 text-muted">{t("forAllEvents")}</p>,
+      heading: free ? t("freeDesign") : t("onlyThisDesign", { price: formatPrice(PRODUCTS.theme.priceCents, locale) }),
+      body: <p className="mt-2 text-muted">{free ? t("freeText") : t("forAllEvents")}</p>,
       intent: { theme, paid: false },
     },
     {
@@ -104,7 +106,8 @@ export function DesignPurchaseOptions({ theme, dummyPayments }: DesignPurchaseOp
               <Button variant="primary" onClick={() => void start(option.intent)}>
                 {t("startWithDesign")}
               </Button>
-              {dummyPayments && loggedIn ? (
+              {/* Nothing to unlock for a free design. */}
+              {dummyPayments && loggedIn && !(free && option.kind === "theme") ? (
                 <Button variant="outline" onClick={() => testUnlock(option.kind)} disabled={test.busy}>
                   {test.busy ? t("unlocking") : t("testUnlock")}
                 </Button>

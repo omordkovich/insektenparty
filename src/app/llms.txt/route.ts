@@ -41,14 +41,14 @@ const LANGUAGE_SECTION: Record<
     startPage: "Start page",
     legalNote: "Legal texts (translations – the German versions are binding):",
     hubNote: "Overview of all occasion pages",
-    designsNote: "Overview of all premium designs, one page per design",
+    designsNote: "Overview of all designs – free colour designs and premium designs, one page each",
   },
   ru: {
     heading: "На русском",
     startPage: "Главная страница",
     legalNote: "Юридические тексты (переводы – обязательной является немецкая версия):",
     hubNote: "Обзор всех страниц с поводами",
-    designsNote: "Обзор всех премиум-дизайнов, по странице на каждый дизайн",
+    designsNote: "Обзор всех дизайнов – бесплатных цветовых и премиум, по странице на каждый",
   },
 };
 
@@ -111,9 +111,9 @@ ${occasionLinks("de", "Übersicht aller Anlass-Seiten")}
 
 ## Designs
 
-Farbdesigns sind kostenlos. Jedes Premium-Design mit Grafiken hat eine eigene Seite mit Beschreibung, passenden Anlässen und Preisen.
+Jedes Design hat eine eigene Seite mit Beschreibung und passenden Anlässen: die schlichten Farbdesigns sind in jedem Event kostenlos, die Premium-Designs mit Grafiken haben Preise.
 
-${designLinks("de", "Übersicht aller Premium-Designs")}
+${designLinks("de", "Übersicht aller Designs – kostenlose Farbdesigns und Premium-Designs")}
 
 ${languageSections()}
 

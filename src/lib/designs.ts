@@ -5,12 +5,12 @@ import { DESIGNS_EN, DESIGNS_HUB_EN } from "@/lib/designs-en";
 import { DESIGNS_HUB_RU, DESIGNS_RU } from "@/lib/designs-ru";
 import type { Breadcrumb } from "@/lib/occasions";
 import { formatPrice, PRODUCTS } from "@/lib/products";
-import { PREMIUM_THEMES, themeLabel, type ThemeKey } from "@/lib/theme-presets";
+import { isPremiumTheme, THEME_LABELS, themeLabel, type ThemeKey } from "@/lib/theme-presets";
 
-// Public page per premium design (/designs/<slug>, /en/designs/<slug>,
+// Public page per design (/designs/<slug>, /en/designs/<slug>,
 // /ru/dizajny/<slug>): shown in the design's own theme, with a short
-// description, fitting occasions and both ways to buy it. Colour designs
-// are free and have no page. Texts per language in designs-de/-en/-ru.ts.
+// description, fitting occasions and how to get it: premium designs are
+// bought, the colour designs are free in every event. Texts per language in designs-de/-en/-ru.ts.
 
 export type DesignContent = {
   theme: ThemeKey;
@@ -34,6 +34,8 @@ export type Design = DesignContent & {
   /** The design's name as the theme picker shows it. */
   name: string;
   occasionIds: string[];
+  /** A colour design: in every event, nothing to unlock. */
+  free: boolean;
 };
 
 export type DesignsHub = { title: string; metaTitle: string; description: string; intro: string };
@@ -41,6 +43,14 @@ export type DesignsHub = { title: string; metaTitle: string; description: string
 // Occasions (ids from OCCASION_SLUGS) a design suits, the same in every
 // language. Shown as links on the design page.
 export const DESIGN_OCCASIONS: Partial<Record<ThemeKey, string[]>> = {
+  weiss: ["wedding", "christening", "funeral", "family-celebration"],
+  schwarz: ["funeral", "new-years-eve", "halloween-party", "company-party"],
+  gruen: ["barbecue", "sports-together", "group-travel", "family-celebration"],
+  blau: ["oktoberfest", "group-travel", "culture-outing", "rehearsal"],
+  rot: ["advent-party", "carnival-party", "going-out", "birthday"],
+  pink: ["baby-shower", "bachelor-party", "kids-birthday", "birthday"],
+  orange: ["halloween-party", "barbecue", "school-events", "kids-playdate"],
+  gelb: ["kids-birthday", "kids-playdate", "school-start", "barbecue"],
   ballons: ["birthday", "new-years-eve", "company-party", "family-celebration"],
   foam: ["kids-birthday", "theme-party", "birthday"],
   halloweenclay: ["halloween-party", "kids-birthday", "theme-party"],
@@ -74,6 +84,8 @@ export const DESIGN_OCCASIONS: Partial<Record<ThemeKey, string[]>> = {
   bowling: ["sports-together", "going-out", "company-party", "kids-birthday"],
   hawaii: ["barbecue", "theme-party", "birthday"],
   gaming: ["gaming-night", "birthday", "kids-birthday", "theme-party"],
+  kerzenweiss: ["funeral", "family-celebration"],
+  kerzenschwarz: ["funeral", "family-celebration"],
   natur: ["barbecue", "family-celebration", "wedding", "birthday"],
 };
 
@@ -83,7 +95,7 @@ const eventPrice = formatPrice(PRODUCTS.paid_event.priceCents, "de");
 const DESIGNS_HUB_DE: DesignsHub = {
   title: "Designs für deine Online-Einladung",
   metaTitle: "Einladungs-Designs für jeden Anlass – GASTZILLA",
-  description: `Premium-Designs für deine Online-Einladung: Halloween, Kindergeburtstag, Hochzeit, Silvester und mehr – einzeln ${themePrice} oder im Event ${eventPrice}.`,
+  description: `Kostenlose Farbdesigns und Premium-Designs für deine Online-Einladung: Halloween, Kindergeburtstag, Hochzeit und mehr – einzeln ${themePrice}.`,
   intro: `Farbdesigns sind in jedem Event kostenlos. Ein Premium-Design schaltest du einzeln für ${themePrice} frei – oder du schaltest für ${eventPrice} ein ganzes Event frei, dann sind alle Designs dabei.`,
 };
 
@@ -95,11 +107,20 @@ const BREADCRUMB_NAMES: Record<Locale, { home: string; hub: string }> = {
 
 function withLanguage(list: DesignContent[], locale: Locale): Design[] {
   const byTheme = new Map(list.map((content) => [content.theme, content]));
-  return PREMIUM_THEMES.flatMap((theme) => {
+  return (Object.keys(THEME_LABELS) as ThemeKey[]).flatMap((theme) => {
     const content = byTheme.get(theme);
     const slug = DESIGN_SLUGS[theme]?.[locale];
     if (!content || !slug) return [];
-    return [{ ...content, locale, slug, name: themeLabel(theme, locale), occasionIds: DESIGN_OCCASIONS[theme] ?? [] }];
+    return [
+      {
+        ...content,
+        locale,
+        slug,
+        name: themeLabel(theme, locale),
+        occasionIds: DESIGN_OCCASIONS[theme] ?? [],
+        free: !isPremiumTheme(theme),
+      },
+    ];
   });
 }
 
@@ -111,7 +132,7 @@ const DESIGNS_BY_LOCALE: Record<Locale, Design[]> = {
 
 const HUB_BY_LOCALE: Record<Locale, DesignsHub> = { de: DESIGNS_HUB_DE, en: DESIGNS_HUB_EN, ru: DESIGNS_HUB_RU };
 
-// In picker order (PREMIUM_THEMES).
+// In picker order (THEME_LABELS): the colour designs first.
 export function designsFor(locale: Locale): Design[] {
   return DESIGNS_BY_LOCALE[locale];
 }

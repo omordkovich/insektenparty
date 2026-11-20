@@ -10,13 +10,109 @@ const eventPrice = formatPrice(PRODUCTS.paid_event.priceCents, "en");
 export const DESIGNS_HUB_EN: DesignsHub = {
   title: "Designs for your online invitation",
   metaTitle: "Invitation designs for every occasion – GASTZILLA",
-  description: `Premium designs for your online invitation: Halloween, kids' parties, weddings, New Year and more – ${themePrice} each or all of them for ${eventPrice} per event.`,
+  description: `Free colour designs and premium designs for your online invitation: Halloween, kids' parties, weddings and more – premium ones ${themePrice} each.`,
   intro: `Colour designs are free in every event. Unlock a premium design on its own for ${themePrice} – or unlock a whole event for ${eventPrice} and get every design with it.`,
 };
 
 const UPDATED = "2026-11-20";
 
 export const DESIGNS_EN: DesignContent[] = [
+  {
+    theme: "weiss",
+    metaTitle: "White invitation design – free – GASTZILLA",
+    metaDescription:
+      "Plain white with a soft grey gradient and dark text: the free colour design for weddings, christenings, funerals and family gatherings.",
+    title: "White – a simple, free design for your invitation",
+    teaser: "Light, calm and timeless – free in every event.",
+    description: [
+      "A white background with a soft grey gradient, dark text and the GASTZILLA logo as a pale disc let your words take centre stage. It suits a wedding or christening, a funeral and a family gathering – and it is free in every event, including the first one.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "schwarz",
+    metaTitle: "Black invitation design – free – GASTZILLA",
+    metaDescription:
+      "Deep black with light text: the free colour design for funerals, New Year’s Eve, Halloween and an elegant office party.",
+    title: "Black – an elegant, free design for your invitation",
+    teaser: "Dark and refined with light text – free in every event.",
+    description: [
+      "A background from charcoal to black, light text and the GASTZILLA logo as a dark disc look calm and elegant. It suits a funeral, New Year’s Eve, Halloween and an evening office party – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "gruen",
+    metaTitle: "Green invitation design – free – GASTZILLA",
+    metaDescription:
+      "Deep forest green with mint accents: the free colour design for barbecues, group sports, group trips and family gatherings outdoors.",
+    title: "Green – a fresh, free design for your invitation",
+    teaser: "Deep forest green with mint accents – free in every event.",
+    description: [
+      "A dark forest green, mint accents and the GASTZILLA logo as a green disc bring the outdoors to your invitation without any pictures. It suits a barbecue, a sports meet-up, a group trip and a family gathering in the open air – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "blau",
+    metaTitle: "Blue invitation design – free – GASTZILLA",
+    metaDescription:
+      "Midnight blue with light blue accents: the free colour design for Oktoberfest, group trips, cultural outings and rehearsals.",
+    title: "Blue – a calm, free design for your invitation",
+    teaser: "Midnight blue with light blue accents – free in every event.",
+    description: [
+      "A deep midnight blue, light blue accents and the GASTZILLA logo as a blue disc look clear and calm. It suits an Oktoberfest get-together, a group trip, a night at the theatre or a concert and a band or choir rehearsal – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "rot",
+    metaTitle: "Red invitation design – free – GASTZILLA",
+    metaDescription:
+      "Dark wine red with coral accents: the free colour design for Advent and Christmas parties, carnival, nights out and birthdays.",
+    title: "Red – a bold, free design for your invitation",
+    teaser: "Dark wine red with coral accents – free in every event.",
+    description: [
+      "A dark wine red, coral accents and the GASTZILLA logo as a red disc give your invitation warmth and punch. It suits a Christmas party in Advent, a carnival party, a night out and a birthday – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "pink",
+    metaTitle: "Pink invitation design – free – GASTZILLA",
+    metaDescription:
+      "Blush to hot pink with dark text: the free colour design for baby showers, hen dos, kids’ parties and birthdays.",
+    title: "Pink – a cheerful, free design for your invitation",
+    teaser: "From blush to hot pink – free in every event.",
+    description: [
+      "A gradient from blush to hot pink, dark berry text and the GASTZILLA logo as a pink disc make your invitation cheerful and playful. It suits a baby shower, a hen do, a kids’ party and a birthday – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "orange",
+    metaTitle: "Orange invitation design – free – GASTZILLA",
+    metaDescription:
+      "Bright orange to rust with light text: the free colour design for Halloween, barbecues, school fairs and playdates.",
+    title: "Orange – a bright, free design for your invitation",
+    teaser: "Bright orange to rust – free in every event.",
+    description: [
+      "A gradient from bright orange to rust, light text and the GASTZILLA logo as an orange disc feel as warm as an autumn evening. It suits a Halloween party, a barbecue, a nursery or school fair and a playdate – free in every event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "gelb",
+    metaTitle: "Yellow invitation design – free – GASTZILLA",
+    metaDescription:
+      "Sunny yellow to gold with dark brown text: the free colour design for kids’ parties, the first day of school, playdates and barbecues.",
+    title: "Yellow – a sunny, free design for your invitation",
+    teaser: "Sunny yellow to gold – free in every event.",
+    description: [
+      "A gradient from sunny yellow to gold, dark brown text and the GASTZILLA logo as a yellow disc put everyone in a good mood. It suits a kids’ party, the first day of school, a playdate and a summer barbecue – free in every event.",
+    ],
+    updated: UPDATED,
+  },
   {
     theme: "ballons",
     metaTitle: "Balloon invitation design – GASTZILLA",
@@ -410,6 +506,30 @@ export const DESIGNS_EN: DesignContent[] = [
     teaser: "A joystick, an arcade cabinet, controllers and a beanbag in neon light.",
     description: [
       "A joystick with a red ball, an arcade cabinet with neon stripes, two controllers and a gamer on a beanbag with crisps and cola put your invitation in the glow of a games room at night. The design suits a gaming night with friends, a gamer’s birthday, a kids’ party around the console and a retro theme party.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "kerzenweiss",
+    metaTitle: "Funeral invitation: flowers and candles, white – GASTZILLA",
+    metaDescription:
+      "A wreath of white roses, lanterns with candles, lilies and calla lilies: the light design for a funeral or memorial service invitation.",
+    title: "Flowers and candles (white) – a light design for a funeral invitation",
+    teaser: "White roses, lilies, calla lilies and lanterns with candles in soft watercolour.",
+    description: [
+      "A wreath of white roses with a ribbon, lanterns with lit candles, lilies, calla lilies and eucalyptus in soft watercolours give the invitation a calm, dignified setting. The light design suits an invitation to a funeral or memorial service, a burial and the gathering afterwards.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "kerzenschwarz",
+    metaTitle: "Funeral invitation: flowers and candles, black – GASTZILLA",
+    metaDescription:
+      "A black rose, dark petals and burning candles: the dark design for a funeral or memorial service invitation.",
+    title: "Flowers and candles (black) – a dark design for a funeral invitation",
+    teaser: "A black rose, dark petals and tall burning candles.",
+    description: [
+      "A black rose with falling petals and tall burning candles against deep darkness give the invitation a quiet, solemn setting. The dark design suits an invitation to a funeral, a burial and a memorial service.",
     ],
     updated: UPDATED,
   },

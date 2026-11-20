@@ -29,7 +29,7 @@ Gäste sagen per Link zu oder ab – ohne Konto/App · Begleitpersonen mit Namen
 
 **Designs** (owner's decisions 2026-10-22, updated 2026-11-20):
 - Frame as „Designs für jeden Anlass“ / „im passenden Design“: Farbdesigns kostenlos, dazu „kostenpflichtige Premium-Designs“ (= every design with side/floating graphics).
-- Individual designs are named **only** on the design pages (`/designs/<slug>`, `/en/designs/…`, `/ru/dizajny/…`, texts in `src/lib/designs-de.ts`/`-en.ts`/`-ru.ts`) and on the designs overview. Everywhere else: never name individual designs or colours and never state how many there are, so copy survives when designs change.
+- Individual designs - premium and the free colour designs - are named **only** on the design pages (`/designs/<slug>`, `/en/designs/…`, `/ru/dizajny/…`, texts in `src/lib/designs-de.ts`/`-en.ts`/`-ru.ts`), on the designs overview and in the „Passende Designs“ links of the occasion pages. Everywhere else: never name individual designs or colours and never state how many there are, so copy survives when designs change.
 - Design-page texts describe what the graphics really show (look at them) – no invented motifs.
 - No „bald“ for Premium-Designs; never list designs as a limitation.
 

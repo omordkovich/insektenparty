@@ -12,7 +12,7 @@ import {
   siteStructuredData,
 } from "@/lib/structured-data";
 import { getDesign } from "@/lib/designs";
-import { PREMIUM_THEMES } from "@/lib/theme-presets";
+import { THEME_LABELS } from "@/lib/theme-presets";
 
 type Node = Record<string, unknown> & { "@type": string };
 
@@ -205,7 +205,7 @@ describe("designsHubStructuredData", () => {
   it("lists every design page", () => {
     const page = byType(designsHubStructuredData("en"), "CollectionPage");
     const list = page.mainEntity as { itemListElement: { url: string }[] };
-    expect(list.itemListElement).toHaveLength(PREMIUM_THEMES.length);
+    expect(list.itemListElement).toHaveLength(Object.keys(THEME_LABELS).length);
     expect(list.itemListElement[0].url).toMatch(/^https:\/\/gastzilla\.de\/en\/designs\//);
   });
 });

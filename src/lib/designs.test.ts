@@ -17,18 +17,21 @@ import {
   latestDesignUpdate,
 } from "@/lib/designs";
 import { OCCASION_SLUGS } from "@/lib/occasion-slugs";
-import { FREE_THEMES, PREMIUM_THEMES } from "@/lib/theme-presets";
+import { FREE_THEMES, PREMIUM_THEMES, THEME_LABELS, type ThemeKey } from "@/lib/theme-presets";
+
+// Every design has a page - premium ones and the free colour designs.
+const ALL_THEMES = Object.keys(THEME_LABELS) as ThemeKey[];
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 describe("design slugs", () => {
-  it("has slugs for exactly the premium designs", () => {
-    expect(Object.keys(DESIGN_SLUGS).sort()).toEqual([...PREMIUM_THEMES].sort());
+  it("has slugs for every design", () => {
+    expect(Object.keys(DESIGN_SLUGS).sort()).toEqual([...ALL_THEMES].sort());
   });
 
   it("uses unique, URL-safe slugs per language", () => {
     for (const locale of LOCALES) {
-      const slugs = PREMIUM_THEMES.map((theme) => DESIGN_SLUGS[theme]?.[locale] ?? "");
+      const slugs = ALL_THEMES.map((theme) => DESIGN_SLUGS[theme]?.[locale] ?? "");
       for (const slug of slugs) expect(slug, locale).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
       expect(new Set(slugs).size, locale).toBe(slugs.length);
     }
@@ -53,9 +56,9 @@ describe("design slugs", () => {
 });
 
 describe("design occasions", () => {
-  it("links every premium design to 2-5 existing occasions", () => {
-    expect(Object.keys(DESIGN_OCCASIONS).sort()).toEqual([...PREMIUM_THEMES].sort());
-    for (const theme of PREMIUM_THEMES) {
+  it("links every design to 2-5 existing occasions", () => {
+    expect(Object.keys(DESIGN_OCCASIONS).sort()).toEqual([...ALL_THEMES].sort());
+    for (const theme of ALL_THEMES) {
       const ids = DESIGN_OCCASIONS[theme] ?? [];
       expect(ids.length, theme).toBeGreaterThanOrEqual(2);
       expect(ids.length, theme).toBeLessThanOrEqual(5);
@@ -86,7 +89,7 @@ describe("design paths", () => {
       { locale: "en", section: "designs" },
       { locale: "ru", section: "dizajny" },
     ]);
-    expect(pages).toHaveLength(PREMIUM_THEMES.length * LOCALES.length);
+    expect(pages).toHaveLength(ALL_THEMES.length * LOCALES.length);
   });
 });
 
@@ -107,9 +110,10 @@ for (const locale of LOCALES) {
   describe(`design pages (${locale})`, () => {
     const designs = designsFor(locale);
 
-    it("has a page for every premium design, in picker order, and none for colour designs", () => {
-      expect(designs.map((design) => design.theme)).toEqual([...PREMIUM_THEMES]);
-      for (const theme of FREE_THEMES) expect(getDesign(theme, locale), theme).toBeUndefined();
+    it("has a page for every design, in picker order, the colour designs marked free", () => {
+      expect(designs.map((design) => design.theme)).toEqual(ALL_THEMES);
+      for (const theme of FREE_THEMES) expect(getDesign(theme, locale)?.free, theme).toBe(true);
+      for (const theme of PREMIUM_THEMES) expect(getDesign(theme, locale)?.free, theme).toBe(false);
     });
 
     it("knows its language, slug, name and occasions", () => {
@@ -197,14 +201,19 @@ describe("design page languages", () => {
 describe("designsForOccasion", () => {
   it("lists the designs that name the occasion, in picker order", () => {
     const themes = designsForOccasion("halloween-party", "de").map((design) => design.theme);
-    expect(themes).toEqual(["halloweenclay", "halloweengraveyard", "halloweenkids", "tarot"]);
+    expect(themes).toEqual(["schwarz", "orange", "halloweenclay", "halloweengraveyard", "halloweenkids", "tarot"]);
   });
 
   it("uses the page language", () => {
     expect(designsForOccasion("wedding", "en").every((design) => design.locale === "en")).toBe(true);
   });
 
-  it("is empty for an occasion no design is made for", () => {
-    expect(designsForOccasion("funeral", "de")).toEqual([]);
+  it("suggests only calm designs for a funeral", () => {
+    expect(designsForOccasion("funeral", "de").map((design) => design.theme)).toEqual([
+      "weiss",
+      "schwarz",
+      "kerzenweiss",
+      "kerzenschwarz",
+    ]);
   });
 });

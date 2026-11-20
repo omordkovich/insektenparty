@@ -114,7 +114,7 @@ export async function DesignPageView({ design }: { design: Design }) {
               </section>
             ) : null}
 
-            <DesignPurchaseOptions theme={design.theme} dummyPayments={isDummyPaymentEnabled()} />
+            <DesignPurchaseOptions theme={design.theme} free={design.free} dummyPayments={isDummyPaymentEnabled()} />
 
             <Link href={designsPath(design.locale)} className="inline-block font-bold text-leaf-dark underline underline-offset-2">
               {t("allDesigns")}
@@ -129,11 +129,41 @@ export async function DesignPageView({ design }: { design: Design }) {
   );
 }
 
-// Overview of all design pages of a language - neutral site look, one card
-// per design.
+// One card of the overview.
+function DesignCard({ design, cta, badge }: { design: Design; cta: string; badge: string | null }) {
+  return (
+    <li>
+      <Link href={designPath(design)} className={`${cardClass} group block h-full transition hover:border-leaf/50`}>
+        <Image
+          src={THEME_ASSETS[design.theme].logo}
+          alt=""
+          width={96}
+          height={96}
+          className="mx-auto h-24 w-24 object-contain transition group-hover:scale-105"
+        />
+        <h3 className="mt-3 text-center font-display text-xl text-leaf-dark hyphens-auto">{design.name}</h3>
+        {badge ? (
+          <p className="mt-1 text-center">
+            <span className="inline-block rounded-full bg-leaf/10 px-3 py-0.5 text-xs font-bold text-leaf-dark">{badge}</span>
+          </p>
+        ) : null}
+        <p className="mt-2 text-muted">{design.teaser}</p>
+        <span className="mt-3 inline-block font-bold text-leaf-dark">{cta}</span>
+      </Link>
+    </li>
+  );
+}
+
+// Overview of all design pages of a language - neutral site look: first the
+// free colour designs, then the premium designs, one card each.
 export async function DesignsHubView({ locale }: { locale: Locale }) {
   const t = await getTranslations({ locale, namespace: "designs" });
   const hub = designsHub(locale);
+  const designs = designsFor(locale);
+  const groups = [
+    { id: "free", heading: t("freeHeading"), designs: designs.filter((design) => design.free) },
+    { id: "premium", heading: t("premiumHeading"), designs: designs.filter((design) => !design.free) },
+  ];
   return (
     <>
       <SiteHeader />
@@ -146,27 +176,23 @@ export async function DesignsHubView({ locale }: { locale: Locale }) {
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{hub.intro}</p>
           </section>
 
-          <ul className="grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-3">
-            {designsFor(locale).map((design) => (
-              <li key={design.theme}>
-                <Link
-                  href={designPath(design)}
-                  className={`${cardClass} group block h-full transition hover:border-leaf/50`}
-                >
-                  <Image
-                    src={THEME_ASSETS[design.theme].logo}
-                    alt=""
-                    width={96}
-                    height={96}
-                    className="mx-auto h-24 w-24 object-contain transition group-hover:scale-105"
+          {groups.map((group) => (
+            <section key={group.id} aria-labelledby={`designs-${group.id}`}>
+              <h2 id={`designs-${group.id}`} className="font-display text-2xl text-leaf-dark sm:text-3xl">
+                {group.heading}
+              </h2>
+              <ul className="mt-4 grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-3">
+                {group.designs.map((design) => (
+                  <DesignCard
+                    key={design.theme}
+                    design={design}
+                    cta={t("learnMore")}
+                    badge={design.free ? t("freeBadge") : null}
                   />
-                  <h2 className="mt-3 text-center font-display text-xl text-leaf-dark hyphens-auto">{design.name}</h2>
-                  <p className="mt-2 text-muted">{design.teaser}</p>
-                  <span className="mt-3 inline-block font-bold text-leaf-dark">{t("learnMore")}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
 
         <LegalLinks className="mt-auto pt-12" />

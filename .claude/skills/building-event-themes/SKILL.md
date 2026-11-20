@@ -82,7 +82,7 @@ Files use CRLF line endings - use the Edit tool, not sed/node string replace wit
 - `THEME_CLASS_NAMES`: `<name>: "event-theme-<name>"`
 - `THEME_ASSETS`: the Cloudinary URLs from step 3
 
-**Design page**: every premium theme needs one - step 6. `src/lib/designs.test.ts` fails until it exists.
+**Design page**: every theme needs one, a plain colour design too - step 6. `src/lib/designs.test.ts` fails until it exists.
 
 **`src/app/globals.css`** - add `.event-theme-<name>` and `.event-theme-<name> .parallax-background` next to the similar themes (light ones near `ballons`, dark ones near `schwarz`). Copy the structure of an existing block and set every token:
 - `--bg-top/--bg-mid/--bg-bottom`, `--leaf/--leaf-dark` (accent text/borders), `--honey/--honey-dark` + `--on-honey` (text on honey, >= 4.5:1), `--petal`, `--ink`, `--muted`, `--surface/--surface-solid`, `--danger/--danger-dark`, `--ring`, `--shadow`
@@ -112,9 +112,9 @@ Files use CRLF line endings - use the Edit tool, not sed/node string replace wit
    ```
    No other account gets anything.
 
-### 6. Design page (premium themes only - every theme with graphics)
+### 6. Design page (every theme - premium and plain colour designs)
 
-Each premium design has a public page in its own theme, in three languages: `/designs/<slug>`, `/en/designs/<slug>`, `/ru/dizajny/<slug>` (route `src/app/[locale]/[section]/[slug]`, view `src/components/DesignPages.tsx`). It shows the logo with the floating accents, the side graphics, a description, „Passt zu“ links to occasion pages and both purchase options; the occasion pages link back automatically („Passende Designs“ in the „Darum passt GASTZILLA zu …“ card). Load the `optimizing-seo-aeo-geo` skill first.
+Each design has a public page in its own theme (plain colour designs are marked free and offer „Kostenlos – in jedem Event“ instead of the 0,99 € option; the overview lists them first), in three languages: `/designs/<slug>`, `/en/designs/<slug>`, `/ru/dizajny/<slug>` (route `src/app/[locale]/[section]/[slug]`, view `src/components/DesignPages.tsx`). It shows the logo with the floating accents, the side graphics, a description, „Passt zu“ links to occasion pages and both purchase options; the occasion pages link back automatically („Passende Designs“ in the „Darum passt GASTZILLA zu …“ card). Load the `optimizing-seo-aeo-geo` skill first.
 
 1. **Look at every graphic** (logo, both side graphics, both accents - the Read tool shows the PNGs from the input folder) and note motifs, colours and mood. Texts may only describe what is really there. Combine with the owner's short description (input 3).
 2. **Names** in `src/lib/theme-presets.ts`: German in `THEME_LABELS` (picker order), English in `THEME_LABELS_EN` (unless identical), Russian in `THEME_LABELS_RU`.

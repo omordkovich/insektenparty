@@ -122,6 +122,11 @@ export function OccasionPageView({ occasion }: { occasion: Occasion }) {
                           className="h-14 w-14 object-contain"
                         />
                         <span className="text-xs leading-tight text-muted hyphens-auto">{design.name}</span>
+                        {design.free ? (
+                          <span className="rounded-full bg-leaf/10 px-2 text-[10px] font-bold text-leaf-dark">
+                            {tDesigns("freeBadge")}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   ))}

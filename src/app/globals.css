@@ -1818,6 +1818,99 @@ body {
     linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
 }
 
+/* Flowers and candles, white (light, a quiet memorial). Colors come from the
+   watercolours: pale sage mist as the air (so the white wreath and the white
+   flowers still read against it), warm cream paper in the middle, a soft
+   candle-lit sand at the bottom. Eucalyptus green carries accent text and the
+   buttons, candle flame gold is honey and the lavender of the small roses is
+   petal. */
+.event-theme-kerzenweiss {
+  --bg-top: #d3e0d6;
+  --bg-mid: #f7f4ed;
+  --bg-bottom: #e8dfcc;
+  --leaf: #3f5f4d;
+  --leaf-dark: #2d4637;
+  --honey: #e6bd72;
+  --honey-dark: #cfa457;
+  --petal: #8f78b0;
+  --ink: #2b3330;
+  --muted: #5c645f;
+  --surface: rgba(252, 250, 244, 0.92);
+  --surface-solid: #fcfaf4;
+  --danger: #a8302a;
+  --danger-dark: #84221e;
+  --ring: #3f5f4d;
+  --shadow: 0 18px 40px rgba(50, 60, 50, 0.14);
+  --on-honey: #2e2108;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #3f5f4d;
+  --button-primary-text: #ffffff;
+  --button-secondary: #3f5f4d;
+  --button-secondary-text: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: a soft pale haze behind the wreath (top center), candle
+   glow behind the lanterns on both sides and a warm floor. */
+.event-theme-kerzenweiss .parallax-background {
+  background:
+    radial-gradient(ellipse 280px 230px at 50% 140px, rgba(255, 255, 250, 0.55), transparent 72%),
+    radial-gradient(ellipse 26% 36% at 8% 40%, rgba(245, 214, 150, 0.3), transparent 75%),
+    radial-gradient(ellipse 26% 36% at 92% 36%, rgba(245, 214, 150, 0.3), transparent 75%),
+    radial-gradient(ellipse 90% 22% at 50% 100%, rgba(225, 205, 165, 0.35), transparent 72%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
+/* Flowers and candles, black (dark, a quiet vigil). Colors come from the
+   graphics: warm charcoal-brown as the room (lighter at the top so the black
+   rose reads against it, darker below so the cream candles glow), candle
+   flame gold for accents, the deep wine of the rose's highlights for the
+   buttons and a muted dusty rose as petal. */
+.event-theme-kerzenschwarz {
+  --bg-top: #3b2f2c;
+  --bg-mid: #231b19;
+  --bg-bottom: #120d0c;
+  --leaf: #e8b872;
+  --leaf-dark: #f6d9a8;
+  --honey: #d9a35a;
+  --honey-dark: #ebb870;
+  --petal: #b98a96;
+  --ink: #f4eadb;
+  --muted: #c3b3a0;
+  --surface: rgba(36, 28, 26, 0.8);
+  --surface-solid: #2a2220;
+  --danger: #ff8a7a;
+  --danger-dark: #e5675a;
+  --ring: #e8b872;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --on-honey: #251806;
+  /* Must be set explicitly - the :root defaults are already resolved to
+     natur's green/honey (see the note on --button-primary in :root). */
+  --button-primary: #7a1f2e;
+  --button-primary-text: #f6e8d4;
+  --button-secondary: #7a1f2e;
+  --button-secondary-text: #f6e8d4;
+
+  min-height: 100dvh;
+  background: var(--bg-mid);
+  color: var(--ink);
+}
+
+/* Light of the scene: a warm candle glow behind the black rose (top center)
+   so its dark petals stand out, and flame glow behind the candles on both
+   sides. */
+.event-theme-kerzenschwarz .parallax-background {
+  background:
+    radial-gradient(ellipse 300px 250px at 50% 140px, rgba(255, 196, 130, 0.34), transparent 72%),
+    radial-gradient(ellipse 28% 40% at 10% 38%, rgba(255, 170, 90, 0.22), transparent 75%),
+    radial-gradient(ellipse 28% 40% at 90% 40%, rgba(255, 170, 90, 0.22), transparent 75%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-mid) 50%, var(--bg-bottom));
+}
+
 /* Schwarz theme: minimal monochrome black/silver palette, no decorative
    side or floating graphics (see Header/ParallaxSideGraphics, which skip
    those images entirely when a theme's assets omit them). */
@@ -2340,6 +2433,7 @@ html[data-cookie-banner] .cookie-banner {
 .event-theme-tarot,
 .event-theme-weltall,
 .event-theme-gaming,
+.event-theme-kerzenschwarz,
 .event-theme-rot,
 .event-theme-orange {
   color-scheme: dark;

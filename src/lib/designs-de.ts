@@ -9,6 +9,102 @@ const UPDATED = "2026-11-20";
 
 export const DESIGNS_DE: DesignContent[] = [
   {
+    theme: "weiss",
+    metaTitle: "Einladung im weißen Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Schlichtes Weiß mit hellgrauem Verlauf und dunkler Schrift: das kostenlose Farbdesign für Hochzeit, Taufe, Trauerfeier und Familienfest.",
+    title: "Weiß – schlichtes, kostenloses Design für deine Einladung",
+    teaser: "Hell, ruhig und zeitlos – kostenlos in jedem Event.",
+    description: [
+      "Ein weißer Hintergrund mit sanftem Grauverlauf, dunkle Schrift und das GASTZILLA-Logo als helle Scheibe: Das Design tritt ganz hinter deine Worte zurück. Es passt zu Hochzeit und Taufe, zur Trauerfeier und zum Familienfest – und ist in jedem Event kostenlos, auch im ersten.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "schwarz",
+    metaTitle: "Einladung im schwarzen Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Tiefes Schwarz mit heller Schrift: das kostenlose Farbdesign für Trauerfeier, Silvester, Halloween und die elegante Firmenfeier.",
+    title: "Schwarz – elegantes, kostenloses Design für deine Einladung",
+    teaser: "Dunkel und edel mit heller Schrift – kostenlos in jedem Event.",
+    description: [
+      "Ein Hintergrund von Anthrazit bis Schwarz, helle Schrift und das GASTZILLA-Logo als dunkle Scheibe wirken ruhig und elegant. Das Design passt zur Trauerfeier, zu Silvester, zu Halloween und zur Firmenfeier am Abend – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "gruen",
+    metaTitle: "Einladung im grünen Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Tiefes Waldgrün mit mintfarbenen Akzenten: das kostenlose Farbdesign für Grillparty, Sport, Gruppenreise und Familienfest im Grünen.",
+    title: "Grün – frisches, kostenloses Design für deine Einladung",
+    teaser: "Tiefes Waldgrün mit Minzakzenten – kostenlos in jedem Event.",
+    description: [
+      "Ein dunkles Waldgrün, mintfarbene Akzente und das GASTZILLA-Logo als grüne Scheibe bringen Natur auf die Einladung, ganz ohne Bilder. Das Design passt zur Grillparty, zum Sporttreffen, zur Gruppenreise und zum Familienfest draußen – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "blau",
+    metaTitle: "Einladung im blauen Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Nachtblau mit hellblauen Akzenten: das kostenlose Farbdesign für Oktoberfest, Gruppenreise, Kulturabend und Proben.",
+    title: "Blau – ruhiges, kostenloses Design für deine Einladung",
+    teaser: "Nachtblau mit hellblauen Akzenten – kostenlos in jedem Event.",
+    description: [
+      "Ein tiefes Nachtblau, hellblaue Akzente und das GASTZILLA-Logo als blaue Scheibe wirken klar und ruhig. Das Design passt zum Oktoberfest-Treffen, zur Gruppenreise, zum Theater- oder Konzertbesuch und zur Probe von Band oder Chor – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "rot",
+    metaTitle: "Einladung im roten Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Dunkles Weinrot mit korallroten Akzenten: das kostenlose Farbdesign für Adventsfeier, Karneval, Ausgehabend und Geburtstag.",
+    title: "Rot – kräftiges, kostenloses Design für deine Einladung",
+    teaser: "Dunkles Weinrot mit Korallakzenten – kostenlos in jedem Event.",
+    description: [
+      "Ein dunkles Weinrot, korallrote Akzente und das GASTZILLA-Logo als rote Scheibe geben der Einladung Wärme und Kraft. Das Design passt zur Adventsfeier, zur Karnevalsparty, zum Ausgehabend und zum Geburtstag – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "pink",
+    metaTitle: "Einladung im pinken Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Zartrosa bis Knallpink mit dunkler Schrift: das kostenlose Farbdesign für Babyparty, Junggesellinnenabschied und Geburtstag.",
+    title: "Pink – fröhliches, kostenloses Design für deine Einladung",
+    teaser: "Von Zartrosa bis Knallpink – kostenlos in jedem Event.",
+    description: [
+      "Ein Verlauf von Zartrosa bis Knallpink, dunkle Beerenschrift und das GASTZILLA-Logo als pinke Scheibe machen die Einladung fröhlich und verspielt. Das Design passt zur Babyparty, zum Junggesellinnenabschied, zum Kindergeburtstag und zum Geburtstag – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "orange",
+    metaTitle: "Einladung im orangen Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Leuchtendes Orange bis Rostbraun mit heller Schrift: das kostenlose Farbdesign für Halloween, Grillparty, Schulfest und Spielverabredung.",
+    title: "Orange – leuchtendes, kostenloses Design für deine Einladung",
+    teaser: "Leuchtendes Orange bis Rostbraun – kostenlos in jedem Event.",
+    description: [
+      "Ein Verlauf von leuchtendem Orange bis Rostbraun, helle Schrift und das GASTZILLA-Logo als orange Scheibe wirken warm wie ein Herbstabend. Das Design passt zur Halloweenparty, zur Grillparty, zum Kita- oder Schulfest und zur Spielverabredung – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "gelb",
+    metaTitle: "Einladung im gelben Design – kostenlos – GASTZILLA",
+    metaDescription:
+      "Sonnengelb bis Goldgelb mit dunkelbrauner Schrift: das kostenlose Farbdesign für Kindergeburtstag, Einschulung, Spielverabredung und Grillfest.",
+    title: "Gelb – sonniges, kostenloses Design für deine Einladung",
+    teaser: "Sonnengelb bis Goldgelb – kostenlos in jedem Event.",
+    description: [
+      "Ein Verlauf von Sonnengelb bis Goldgelb, dunkelbraune Schrift und das GASTZILLA-Logo als gelbe Scheibe machen gute Laune. Das Design passt zum Kindergeburtstag, zur Einschulung, zur Spielverabredung und zum Grillfest im Sommer – kostenlos in jedem Event.",
+    ],
+    updated: UPDATED,
+  },
+  {
     theme: "ballons",
     metaTitle: "Einladung im Ballon-Design – GASTZILLA",
     metaDescription:
@@ -401,6 +497,30 @@ export const DESIGNS_DE: DesignContent[] = [
     teaser: "Joystick, Arcade-Automat, Controller und Sitzsack im Neonlicht.",
     description: [
       "Ein Joystick mit roter Kugel, ein Arcade-Automat mit Neonstreifen, zwei Controller und ein Zocker im Sitzsack mit Chips und Cola tauchen deine Einladung in das Licht eines Spielzimmers am Abend. Das Design passt zum Gaming-Abend mit Freunden, zum Geburtstag von Zockern, zum Kindergeburtstag mit Konsole und zur Mottoparty im Retro-Stil.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "kerzenweiss",
+    metaTitle: "Trauerfeier-Einladung: Blumen und Kerzen, Weiß – GASTZILLA",
+    metaDescription:
+      "Ein Kranz aus weißen Rosen, Laternen mit Kerzen, Lilien und Calla: das helle Design für die Einladung zur Trauerfeier und zur Beerdigung.",
+    title: "Blumen und Kerzen (Weiß) – helles Design für die Einladung zur Trauerfeier",
+    teaser: "Weiße Rosen, Lilien, Calla und Laternen mit Kerzen in zarten Aquarellfarben.",
+    description: [
+      "Ein Kranz aus weißen Rosen mit Schleife, Laternen mit brennenden Kerzen, Lilien, Calla und Eukalyptus in zarten Aquarellfarben geben der Einladung einen ruhigen, würdevollen Rahmen. Das helle Design passt zur Einladung zur Trauerfeier, zur Beerdigung und zum Trauerkaffee.",
+    ],
+    updated: UPDATED,
+  },
+  {
+    theme: "kerzenschwarz",
+    metaTitle: "Trauerfeier-Einladung: Rose und Kerzen, Schwarz – GASTZILLA",
+    metaDescription:
+      "Eine schwarze Rose, dunkle Blütenblätter und brennende Kerzen: das dunkle Design für die Einladung zur Trauerfeier und zur Beerdigung.",
+    title: "Blumen und Kerzen (Schwarz) – dunkles Design für die Einladung zur Trauerfeier",
+    teaser: "Eine schwarze Rose, dunkle Blütenblätter und hohe brennende Kerzen.",
+    description: [
+      "Eine schwarze Rose mit herabfallenden Blütenblättern und hohe, brennende Kerzen vor tiefem Dunkel geben der Einladung einen stillen, ernsten Rahmen. Das dunkle Design passt zur Einladung zur Trauerfeier, zur Beerdigung und zur Gedenkfeier.",
     ],
     updated: UPDATED,
   },

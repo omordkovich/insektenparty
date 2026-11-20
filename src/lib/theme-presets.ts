@@ -36,6 +36,8 @@ export type ThemeKey =
   | "bowling"
   | "hawaii"
   | "gaming"
+  | "kerzenweiss"
+  | "kerzenschwarz"
   | "schwarz"
   | "weiss"
   | "gruen"
@@ -89,6 +91,8 @@ export const THEME_LABELS: Record<ThemeKey, string> = {
   bowling: "Bowling",
   hawaii: "Hawaii",
   gaming: "Gaming",
+  kerzenweiss: "Blumen und Kerzen (Weiß)",
+  kerzenschwarz: "Blumen und Kerzen (Schwarz)",
   natur: "Natur",
 };
 
@@ -127,6 +131,8 @@ const THEME_LABELS_EN: Partial<Record<ThemeKey, string>> = {
   teddy: "Teddy",
   cinema: "Cinema",
   toycars: "Toy Cars",
+  kerzenweiss: "Flowers and candles (white)",
+  kerzenschwarz: "Flowers and candles (black)",
 };
 
 const THEME_LABELS_RU: Record<ThemeKey, string> = {
@@ -171,6 +177,8 @@ const THEME_LABELS_RU: Record<ThemeKey, string> = {
   bowling: "Боулинг",
   hawaii: "Гавайи",
   gaming: "Видеоигры",
+  kerzenweiss: "Цветы и свечи (белый)",
+  kerzenschwarz: "Цветы и свечи (чёрный)",
   natur: "Природа",
 };
 
@@ -229,6 +237,8 @@ export const THEME_CLASS_NAMES: Record<ThemeKey, string> = {
   bowling: "event-theme-bowling",
   hawaii: "event-theme-hawaii",
   gaming: "event-theme-gaming",
+  kerzenweiss: "event-theme-kerzenweiss",
+  kerzenschwarz: "event-theme-kerzenschwarz",
   natur: "event-theme",
 };
 
@@ -487,6 +497,20 @@ export const THEME_ASSETS: Record<ThemeKey, EventConfig["assets"]> = {
     plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181835/gaming_bg_r.webp",
     accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181836/gaming_accent_l.webp",
     accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795181837/gaming_accent_r.webp",
+  },
+  kerzenweiss: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191182/kerzenweiss_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191183/kerzenweiss_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191184/kerzenweiss_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191185/kerzenweiss_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191186/kerzenweiss_accent_r.webp",
+  },
+  kerzenschwarz: {
+    logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191187/kerzenschwarz_logo.webp",
+    plantsLeft: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191188/kerzenschwarz_bg_l.webp",
+    plantsRight: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191189/kerzenschwarz_bg_r.webp",
+    accentOne: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191190/kerzenschwarz_accent_l.webp",
+    accentTwo: "https://res.cloudinary.com/d6sufegz/image/upload/v1795191191/kerzenschwarz_accent_r.webp",
   },
   natur: {
     logo: "https://res.cloudinary.com/d6sufegz/image/upload/v1790020058/ins_logo.webp",

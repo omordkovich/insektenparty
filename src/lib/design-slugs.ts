@@ -9,8 +9,17 @@ import type { ThemeKey } from "@/lib/theme-presets";
 // The overview page of each language; design pages live below it.
 export const DESIGN_SECTION: Record<Locale, string> = { de: "/designs", en: "/designs", ru: "/dizajny" };
 
-// Premium design -> slug per language (from the design's name there).
+// Design -> slug per language (from the design's name there). Every design
+// has a page: the free colour designs and the premium ones.
 export const DESIGN_SLUGS: Partial<Record<ThemeKey, Record<Locale, string>>> = {
+  weiss: { de: "weiss", en: "white", ru: "belyy" },
+  schwarz: { de: "schwarz", en: "black", ru: "chernyy" },
+  gruen: { de: "gruen", en: "green", ru: "zelenyy" },
+  blau: { de: "blau", en: "blue", ru: "siniy" },
+  rot: { de: "rot", en: "red", ru: "krasnyy" },
+  pink: { de: "pink", en: "pink", ru: "rozovyy" },
+  orange: { de: "orange", en: "orange", ru: "oranzhevyy" },
+  gelb: { de: "gelb", en: "yellow", ru: "zheltyy" },
   ballons: { de: "ballons", en: "balloons", ru: "vozdushnye-shary" },
   foam: { de: "schaumparty", en: "foam-party", ru: "pennaya-vecherinka" },
   halloweenclay: { de: "halloween-knete", en: "halloween-clay", ru: "khellouin-plastilin" },
@@ -44,6 +53,8 @@ export const DESIGN_SLUGS: Partial<Record<ThemeKey, Record<Locale, string>>> = {
   bowling: { de: "bowling", en: "bowling", ru: "bouling" },
   hawaii: { de: "hawaii", en: "hawaii", ru: "gavayi" },
   gaming: { de: "gaming", en: "gaming", ru: "videoigry" },
+  kerzenweiss: { de: "blumen-und-kerzen-weiss", en: "flowers-and-candles-white", ru: "tsvety-i-svechi-belyy" },
+  kerzenschwarz: { de: "blumen-und-kerzen-schwarz", en: "flowers-and-candles-black", ru: "tsvety-i-svechi-chernyy" },
   natur: { de: "natur", en: "nature", ru: "priroda" },
 };
 
@@ -52,7 +63,7 @@ export function designSectionPath(locale: Locale): string {
 }
 
 // The design page of a theme in a language, without locale prefix.
-// undefined: a free colour design (it has no page).
+// undefined: a theme without a page entry.
 export function designSlugPath(theme: ThemeKey, locale: Locale): string | undefined {
   const slug = DESIGN_SLUGS[theme]?.[locale];
   return slug ? `${DESIGN_SECTION[locale]}/${slug}` : undefined;
